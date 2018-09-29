@@ -16,7 +16,5 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-for de_name in $DESKTOP_SESSION $XDG_SESSION_DESKTOP $XDG_CURRENT_DESKTOP; do
-    echo ${de_name##*/} | tr '[:upper:]' '[:lower:]'
-    exit 0
-done
+set -- $DESKTOP_SESSION $XDG_SESSION_DESKTOP $XDG_CURRENT_DESKTOP unknown
+echo ${1##*/} | tr '[:upper:]' '[:lower:]'
