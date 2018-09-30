@@ -27,4 +27,11 @@ case "$(get-platform-name)" in
 		;;
 	esac
 	;;
+    (SunOS)
+	case "$(get-distro-name)" in
+	    (illumos)
+		pkg contents "$@"
+		;;
+	esac
+	;;
 esac
