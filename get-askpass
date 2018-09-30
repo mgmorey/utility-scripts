@@ -30,7 +30,7 @@ case "$(get-platform-name)" in
 		    esac
 		;;
 	    (openSUSE)
-		case "$(get-de-name)" in
+		case "$(get-de-name | to-lower)" in
 		    (gnome*)
 			package_name=openssh-askpass-gnome
 			;;
@@ -78,6 +78,5 @@ case "$(get-platform-name)" in
 	;;
 esac
 
-if [ -n "$package_name" ]; then
-    get-package-filenames "$package_name" | grep 'askpass$'
-fi
+get-package-filenames "$package_name" | grep 'askpass$'
+
