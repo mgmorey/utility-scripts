@@ -22,7 +22,9 @@ case "$(get-platform-name)" in
 	    (Debian)
 		dpkg --listfiles "$@"
 		;;
+	    (openSUSE)
+		rpm --query --list "$@"
+		;;
 	esac
 	;;
 esac
-
