@@ -16,5 +16,5 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-distro_name=$(lsb_release -is 2>/dev/null || echo unknown)
-echo $distro_name | tr '[:upper:]' '[:lower:]'
+lsb_release -is 2>/dev/null || echo unknown
+

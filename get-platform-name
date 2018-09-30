@@ -20,9 +20,9 @@ system_name=$(uname -s)
 
 case $system_name in
     (CYGWIN_NT-*)
-	echo cygwin
+	echo ${system_name%-*}
 	;;
     (Linux|SunOS)
-	echo $system_name | tr '[:upper:]' '[:lower:]'
+	echo $system_name
 	;;
 esac
