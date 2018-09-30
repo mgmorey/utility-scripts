@@ -68,7 +68,7 @@ case "$(get-platform-name)" in
     (SunOS)
 	case "$(get-distro-name)" in
 	    (illumos)
-		case "$(get-de-name)" in
+		case "$(get-de-name | to-lower)" in
 		    (mate)
 			package_name=ssh-askpass
 			;;
@@ -79,4 +79,3 @@ case "$(get-platform-name)" in
 esac
 
 get-package-filenames "$package_name" | grep 'askpass$'
-
