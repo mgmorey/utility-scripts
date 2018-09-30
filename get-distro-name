@@ -16,5 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-lsb_release -is 2>/dev/null || echo unknown
+case "$(get-platform-name)" in
+    (Linux)
+	lsb_release -is 2>/dev/null || echo unknown
+	;;
+    (SunOS)
+	kernel=$(uname -o)
+	echo ${kernel%-*}
+	;;
+esac
 
