@@ -20,7 +20,7 @@ case "$(get-platform-name)" in
     (Linux)
 	case "$(get-distro-name)" in
 	    (Debian)
-		case "$(get-de-name)" in
+		case "$(get-de-name | to-lower)" in
 		    (gnome*)
 			package_name=ssh-askpass-gnome
 			;;
@@ -44,7 +44,7 @@ case "$(get-platform-name)" in
     (Linux)
 	case "$(get-distro-name)" in
 	    (Debian)
-		case "$(get-de-name)" in
+		case "$(get-de-name | to-lower)" in
 		    (gnome*)
 			package_name=ssh-askpass-gnome
 			;;
