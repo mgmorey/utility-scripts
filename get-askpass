@@ -22,13 +22,27 @@ case "$(get-platform-name)" in
 	    (Debian)
 		case "$(get-de-name)" in
 		    (gnome*)
-			get-package-filenames ssh-askpass-gnome | grep 'askpass$'
+			package_name=ssh-askpass-gnome
 			;;
 		    (kde*|plasma*)
-			get-package-filenames ksshaskpass | grep 'askpass$'
+			package_name=kaskpass
+			;;
+		    esac
+		;;
+	    (openSUSE)
+		case "$(get-de-name)" in
+		    (gnome*)
+			package_name=openssh-askpass-gnome
+			;;
+		    (kde*|plasma*)
+			package_name=ksshaskpass5
 			;;
 		    esac
 		;;
 	esac
 	;;
 esac
+
+if [ -n "$package_name" ]; then
+    get-package-filenames "$package_name" | grep 'askpass$'
+fi
