@@ -41,6 +41,41 @@ case "$(get-platform-name)" in
 		;;
 	esac
 	;;
+    (Linux)
+	case "$(get-distro-name)" in
+	    (Debian)
+		case "$(get-de-name)" in
+		    (gnome*)
+			package_name=ssh-askpass-gnome
+			;;
+		    (kde*|plasma*)
+			package_name=kaskpass
+			;;
+		    esac
+		;;
+	    (openSUSE)
+		case "$(get-de-name)" in
+		    (gnome*)
+			package_name=openssh-askpass-gnome
+			;;
+		    (kde*|plasma*)
+			package_name=ksshaskpass5
+			;;
+		    esac
+		;;
+	esac
+	;;
+    (SunOS)
+	case "$(get-distro-name)" in
+	    (illumos)
+		case "$(get-de-name)" in
+		    (mate)
+			package_name=ssh-askpass
+			;;
+		    esac
+		;;
+	esac
+	;;
 esac
 
 if [ -n "$package_name" ]; then
