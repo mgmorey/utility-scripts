@@ -20,17 +20,19 @@ case "$(get-platform-name)" in
     (Linux)
 	case "$(get-distro-name)" in
 	    (Debian)
-		dpkg --listfiles "$@"
+		dpkg --listfiles "$1"
 		;;
 	    (openSUSE)
-		rpm --query --list "$@"
+		rpm --query --list "$1"
 		;;
 	esac
 	;;
     (SunOS)
 	case "$(get-distro-name)" in
 	    (illumos)
-		pkg contents "$@"
+		for filename in $(pkg search -H -o search.match "basename:$1"); do
+		    echo "/$filename"
+		done
 		;;
 	esac
 	;;
