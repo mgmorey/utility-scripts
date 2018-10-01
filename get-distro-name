@@ -20,6 +20,8 @@ case "$(get-platform-name)" in
     (Linux)
 	if lsb_release -is 2>/dev/null; then
 	    :
+	elif [ -e /etc/centos-release ]; then
+	    (set -- $(cat /etc/centos-release); echo $1)
 	elif [ -e /etc/fedora-release ]; then
 	    (set -- $(cat /etc/fedora-release); echo $1)
 	else
