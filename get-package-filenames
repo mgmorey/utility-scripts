@@ -24,9 +24,9 @@ function abort() {
 distro_name=$(get-distro-name)
 platform_name=$(get-platform-name)
 
-case "$(get-platform-name)" in
+case "$platform_name" in
     (Linux)
-	case "$(get-distro-name)" in
+	case "$distro_name" in
 	    (Debian|Ubuntu)
 		dpkg --listfiles "$1"
 		;;
@@ -39,7 +39,7 @@ case "$(get-platform-name)" in
 	esac
 	;;
     (SunOS)
-	case "$(get-distro-name)" in
+	case "$distro_name" in
 	    (illumos)
 		for filename in $(pkg search -H -o search.match "basename:$1"); do
 		    echo "/$filename"
