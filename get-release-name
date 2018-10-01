@@ -17,6 +17,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 case "$(get-platform-name)" in
+    (CYGWIN_NT)
+	uname -r
+	;;
     (Linux)
 	if lsb_release -rs 2>/dev/null; then
 	    :
