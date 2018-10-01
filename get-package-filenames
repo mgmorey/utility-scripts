@@ -16,6 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+function abort() {
+    echo $1 >&2
+    exit 1
+}
+
+distro_name=$(get-distro-name)
+platform_name=$(get-platform-name)
+
 case "$(get-platform-name)" in
     (Linux)
 	case "$(get-distro-name)" in
@@ -24,6 +32,9 @@ case "$(get-platform-name)" in
 		;;
 	    (openSUSE)
 		rpm --query --list "$1"
+		;;
+	    (*)
+		abort "$distro_name: distro not supported"
 		;;
 	esac
 	;;
@@ -35,5 +46,8 @@ case "$(get-platform-name)" in
 		done
 		;;
 	esac
+	;;
+    (*)
+	abort "$platform_name: platform not supported"
 	;;
 esac

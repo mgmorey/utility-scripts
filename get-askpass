@@ -16,40 +16,61 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-case "$(get-platform-name)" in
+function abort() {
+    echo $1 >&2
+    exit 1
+}
+
+desktop_name=$(get-de-name | to-lower)
+distro_name=$(get-distro-name)
+platform_name=$(get-platform-name)
+
+case "$platform_name" in
     (Linux)
-	case "$(get-distro-name)" in
+	case "$distro_name" in
 	    (Debian)
-		case "$(get-de-name | to-lower)" in
+		case "$desktop_name" in
 		    (gnome*)
 			package_name=ssh-askpass-gnome
 			;;
 		    (kde*|plasma*)
 			package_name=kaskpass
 			;;
+		    (*)
+			abort "$desktop_name: desktop not supported"
+			;;
 		    esac
 		;;
 	    (openSUSE)
-		case "$(get-de-name | to-lower)" in
+		case "$desktop_name" in
 		    (gnome*)
 			package_name=openssh-askpass-gnome
 			;;
 		    (kde*|plasma*)
 			package_name=ksshaskpass5
 			;;
+		    (*)
+			abort "$desktop_name: desktop not supported"
+			;;
 		    esac
+		;;
+	    (*)
+		abort "$distro_name: distro not supported"
 		;;
 	esac
 	;;
     (Linux)
-	case "$(get-distro-name)" in
+	case "$distro_name" in
 	    (Debian)
-		case "$(get-de-name | to-lower)" in
+		case "$desktop_name" in
 		    (gnome*)
 			package_name=ssh-askpass-gnome
 			;;
 		    (kde*|plasma*)
 			package_name=kaskpass
+			;;
+		    (*)
+			abort "$desktop_name: desktop not supported"
 			;;
 		    esac
 		;;
@@ -61,20 +82,35 @@ case "$(get-platform-name)" in
 		    (kde*|plasma*)
 			package_name=ksshaskpass5
 			;;
+		    (*)
+			abort "$desktop_name: desktop not supported"
+			;;
 		    esac
+		;;
+	    (*)
+		abort "$distro_name: distro not supported"
 		;;
 	esac
 	;;
     (SunOS)
-	case "$(get-distro-name)" in
+	case "$distro_name" in
 	    (illumos)
-		case "$(get-de-name | to-lower)" in
+		case "$desktop_name" in
 		    (mate)
 			package_name=ssh-askpass
 			;;
+		    (*)
+			abort "$desktop_name: desktop not supported"
+			;;
 		    esac
 		;;
+	    (*)
+		abort "$distro_name: distro not supported"
+		;;
 	esac
+	;;
+    (*)
+	abort "$platform_name: platform not supported"
 	;;
 esac
 
