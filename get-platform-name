@@ -19,11 +19,8 @@
 system_name=$(uname -s)
 
 case "$system_name" in
-    (CYGWIN_NT-*)
+    (CYGWIN_NT-*|FreeBSD|Linux|SunOS)
 	echo ${system_name%-*}
-	;;
-    (Linux|SunOS)
-	echo $system_name
 	;;
     (*)
 	echo unknown

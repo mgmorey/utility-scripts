@@ -38,6 +38,9 @@ case "$platform_name" in
 		;;
 	esac
 	;;
+    (FreeBSD)
+	pkg query %Fp "$1"
+	;;
     (SunOS)
 	case "$distro_name" in
 	    (illumos)
