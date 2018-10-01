@@ -27,6 +27,16 @@ distro_name=$(get-distro-name)
 platform_name=$(get-platform-name)
 
 case "$platform_name" in
+    (CYGWIN_NT)
+	askpass_helper=/usr/libexec/gnome-ssh-askpass
+
+	if [ -e "$askpass_helper" ]; then
+	    echo "$askpass_helper"
+	    exit 0
+	else
+	    abort "askpass_helper: No such askpass helper"
+	fi
+	;;
     (Linux)
 	case "$distro_name" in
 	    (Debian|Ubuntu)
