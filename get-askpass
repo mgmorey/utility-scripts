@@ -30,7 +30,7 @@ case "$platform_name" in
     (Linux)
 	case "$distro_name" in
 	    (Debian|Ubuntu)
-		case "$desktop_name" in
+		case "${desktop_name#ubuntu:}" in
 		    (gnome*)
 			package_name=ssh-askpass-gnome
 			;;
