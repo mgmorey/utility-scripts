@@ -27,7 +27,7 @@ platform_name=$(get-platform-name)
 case "$(get-platform-name)" in
     (Linux)
 	case "$(get-distro-name)" in
-	    (Debian)
+	    (Debian|Ubuntu)
 		dpkg --listfiles "$1"
 		;;
 	    (openSUSE)
