@@ -39,7 +39,20 @@ case "$platform_name" in
 		    (*)
 			abort "$desktop_name: Desktop not supported"
 			;;
-		    esac
+		esac
+		;;
+	    (CentOS)
+		case "$desktop_name" in
+		    (gnome*)
+			package_name=openssh-askpass
+			;;
+		    (kde*|plasma*)
+			package_name=ksshaskpass
+			;;
+		    (*)
+			abort "$desktop_name: Desktop not supported"
+			;;
+		esac
 		;;
 	    (Fedora)
 		case "$desktop_name" in
@@ -52,7 +65,7 @@ case "$platform_name" in
 		    (*)
 			abort "$desktop_name: Desktop not supported"
 			;;
-		    esac
+		esac
 		;;
 	    (openSUSE)
 		case "$desktop_name" in
@@ -65,7 +78,7 @@ case "$platform_name" in
 		    (*)
 			abort "$desktop_name: Desktop not supported"
 			;;
-		    esac
+		esac
 		;;
 	    (*)
 		abort "$distro_name: Distro not supported"
@@ -94,4 +107,4 @@ case "$platform_name" in
 	;;
 esac
 
-get-package-filenames "$package_name" | egrep '/usr/(bin|lib)/.+askpass$'
+get-package-filenames "$package_name" | egrep '/usr/(bin|lib|libexec)/.+askpass$' | head -n 1
