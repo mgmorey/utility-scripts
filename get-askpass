@@ -28,7 +28,14 @@ platform_name=$(get-platform-name)
 
 case "$platform_name" in
     (CYGWIN_NT)
-	askpass_helper=/usr/libexec/gnome-ssh-askpass
+	case "$desktop_name" in
+	    (mate)
+		askpass_helper=/usr/libexec/gnome-ssh-askpass
+		;;
+	    (*)
+		abort "$desktop_name: Desktop not supported"
+		;;
+	esac
 
 	if [ -e "$askpass_helper" ]; then
 	    echo "$askpass_helper"
