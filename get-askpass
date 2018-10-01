@@ -28,13 +28,13 @@ platform_name=$(get-platform-name)
 case "$platform_name" in
     (Linux)
 	case "$distro_name" in
-	    (Debian)
+	    (Debian|Ubuntu)
 		case "$desktop_name" in
 		    (gnome*)
 			package_name=ssh-askpass-gnome
 			;;
 		    (kde*|plasma*)
-			package_name=kaskpass
+			package_name=ksshaskpass
 			;;
 		    (*)
 			abort "$desktop_name: desktop not supported"
@@ -43,39 +43,6 @@ case "$platform_name" in
 		;;
 	    (openSUSE)
 		case "$desktop_name" in
-		    (gnome*)
-			package_name=openssh-askpass-gnome
-			;;
-		    (kde*|plasma*)
-			package_name=ksshaskpass5
-			;;
-		    (*)
-			abort "$desktop_name: desktop not supported"
-			;;
-		    esac
-		;;
-	    (*)
-		abort "$distro_name: distro not supported"
-		;;
-	esac
-	;;
-    (Linux)
-	case "$distro_name" in
-	    (Debian)
-		case "$desktop_name" in
-		    (gnome*)
-			package_name=ssh-askpass-gnome
-			;;
-		    (kde*|plasma*)
-			package_name=kaskpass
-			;;
-		    (*)
-			abort "$desktop_name: desktop not supported"
-			;;
-		    esac
-		;;
-	    (openSUSE)
-		case "$(get-de-name)" in
 		    (gnome*)
 			package_name=openssh-askpass-gnome
 			;;
@@ -114,4 +81,4 @@ case "$platform_name" in
 	;;
 esac
 
-get-package-filenames "$package_name" | grep 'askpass$'
+get-package-filenames "$package_name" | egrep '/usr/(bin|lib)/.+askpass$'
