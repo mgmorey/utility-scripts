@@ -18,10 +18,15 @@
 
 case "$(get-platform-name)" in
     (Linux)
-	lsb_release -rs 2>/dev/null || echo unknown
+	if lsb_release -rs 2>/dev/null; then
+	    :
+	elif [ -e /etc/fedora-release ]; then
+	    (set -- $(cat /etc/fedora-release); echo $1)
+	else
+	    echo unknown
+	fi
 	;;
     (*)
 	echo unknown
 	;;
 esac
-

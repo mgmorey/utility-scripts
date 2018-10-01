@@ -41,6 +41,19 @@ case "$platform_name" in
 			;;
 		    esac
 		;;
+	    (Fedora)
+		case "$desktop_name" in
+		    (gnome*)
+			package_name=openssh-askpass-gnome
+			;;
+		    (kde*|plasma*)
+			package_name=ksshaskpass
+			;;
+		    (*)
+			abort "$desktop_name: Desktop not supported"
+			;;
+		    esac
+		;;
 	    (openSUSE)
 		case "$desktop_name" in
 		    (gnome*)

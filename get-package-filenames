@@ -30,7 +30,7 @@ case "$platform_name" in
 	    (Debian|Ubuntu)
 		dpkg --listfiles "$1"
 		;;
-	    (openSUSE)
+	    (Fedora|openSUSE)
 		rpm --query --list "$1"
 		;;
 	    (*)
@@ -44,6 +44,9 @@ case "$platform_name" in
 		for filename in $(pkg search -H -o search.match "basename:$1"); do
 		    echo "/$filename"
 		done
+		;;
+	    (*)
+		abort "$distro_name: Distro not supported"
 		;;
 	esac
 	;;
