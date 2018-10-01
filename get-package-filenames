@@ -34,7 +34,7 @@ case "$platform_name" in
 		rpm --query --list "$1"
 		;;
 	    (*)
-		abort "$distro_name: distro not supported"
+		abort "$distro_name: Distro not supported"
 		;;
 	esac
 	;;
@@ -48,6 +48,6 @@ case "$platform_name" in
 	esac
 	;;
     (*)
-	abort "$platform_name: platform not supported"
+	abort "$platform_name: Platform not supported"
 	;;
 esac

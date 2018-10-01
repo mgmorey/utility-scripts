@@ -37,7 +37,7 @@ case "$platform_name" in
 			package_name=ksshaskpass
 			;;
 		    (*)
-			abort "$desktop_name: desktop not supported"
+			abort "$desktop_name: Desktop not supported"
 			;;
 		    esac
 		;;
@@ -50,12 +50,12 @@ case "$platform_name" in
 			package_name=ksshaskpass5
 			;;
 		    (*)
-			abort "$desktop_name: desktop not supported"
+			abort "$desktop_name: Desktop not supported"
 			;;
 		    esac
 		;;
 	    (*)
-		abort "$distro_name: distro not supported"
+		abort "$distro_name: Distro not supported"
 		;;
 	esac
 	;;
@@ -67,17 +67,17 @@ case "$platform_name" in
 			package_name=ssh-askpass
 			;;
 		    (*)
-			abort "$desktop_name: desktop not supported"
+			abort "$desktop_name: Desktop not supported"
 			;;
 		    esac
 		;;
 	    (*)
-		abort "$distro_name: distro not supported"
+		abort "$distro_name: Distro not supported"
 		;;
 	esac
 	;;
     (*)
-	abort "$platform_name: platform not supported"
+	abort "$platform_name: Platform not supported"
 	;;
 esac
 
