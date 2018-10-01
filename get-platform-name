@@ -18,11 +18,14 @@
 
 system_name=$(uname -s)
 
-case $system_name in
+case "$system_name" in
     (CYGWIN_NT-*)
 	echo ${system_name%-*}
 	;;
     (Linux|SunOS)
 	echo $system_name
+	;;
+    (*)
+	echo unknown
 	;;
 esac

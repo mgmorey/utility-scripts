@@ -24,5 +24,8 @@ case "$(get-platform-name)" in
 	kernel=$(uname -o)
 	echo ${kernel%-*}
 	;;
+    (*)
+	echo unknown
+	;;
 esac
 
