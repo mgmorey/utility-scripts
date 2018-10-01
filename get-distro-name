@@ -28,7 +28,7 @@ case "$(get-platform-name)" in
 	    echo unknown
 	fi
 	;;
-    (FreeBSD|SunOS)
+    (SunOS)
 	kernel=$(uname -o)
 	echo ${kernel%-*}
 	;;
