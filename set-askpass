@@ -17,13 +17,20 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 askpass_helper=$(get-askpass)
-commands="git ssh sudo"
 
 if [ $# -gt 0 ]; then
     commands="$@"
+else
+    commands="git ssh sudo"
 fi
 
 for command in $commands; do
-    var="${command}_askpass"
-    echo export ${var^^[a-z]}="$askpass_helper"
+    case "$command" in
+	(git|ssh|sudo)
+	    var=${command}_askpass
+	    echo export ${var^^[a-z]}="$askpass_helper"
+	    ;;
+	(*)
+	    echo "$command: Not a valid command" >&2
+    esac
 done
