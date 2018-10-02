@@ -21,14 +21,18 @@ function abort() {
     exit 1
 }
 
+if [ -z "${DISPLAY:-}" ]; then
+    abort "No DISPLAY variable set"
+fi
+
 askpass_re='/.*/(bin|lib|libexec)/.+askpass$'
-desktop_name=$(get-de-name | to-lower)
+desktop_name=$(get-de-name)
 distro_name=$(get-distro-name)
 platform_name=$(get-platform-name)
 
 case "$platform_name" in
     (CYGWIN_NT)
-	case "$desktop_name" in
+	case "${desktop_name,,[A-Z]}" in
 	    (mate)
 		askpass_helper=/usr/libexec/gnome-ssh-askpass
 		;;
@@ -47,8 +51,8 @@ case "$platform_name" in
     (Linux)
 	case "$distro_name" in
 	    (Debian|Ubuntu)
-		case "${desktop_name#ubuntu:}" in
-		    (gnome*)
+		case "${desktop_name,,[A-Z]}" in
+		    (gnome*|ubuntu:gnome)
 			package_name=ssh-askpass-gnome
 			;;
 		    (kde*|plasma*)
@@ -60,7 +64,7 @@ case "$platform_name" in
 		esac
 		;;
 	    (CentOS)
-		case "$desktop_name" in
+		case "${desktop_name,,[A-Z]}" in
 		    (gnome*)
 			package_name=openssh-askpass
 			;;
@@ -73,7 +77,7 @@ case "$platform_name" in
 		esac
 		;;
 	    (Fedora)
-		case "$desktop_name" in
+		case "${desktop_name,,[A-Z]}" in
 		    (gnome*)
 			package_name=openssh-askpass-gnome
 			;;
@@ -86,7 +90,7 @@ case "$platform_name" in
 		esac
 		;;
 	    (openSUSE)
-		case "$desktop_name" in
+		case "${desktop_name,,[A-Z]}" in
 		    (gnome*)
 			package_name=openssh-askpass-gnome
 			;;
@@ -104,7 +108,7 @@ case "$platform_name" in
 	esac
 	;;
     (FreeBSD)
-	case "$desktop_name" in
+	case "${desktop_name,,[A-Z]}" in
 	    (kde*|plasma*)
 		package_name=ksshaskpass
 		;;
@@ -116,7 +120,7 @@ case "$platform_name" in
     (SunOS)
 	case "$distro_name" in
 	    (illumos)
-		case "$desktop_name" in
+		case "${desktop_name,,[A-Z]}" in
 		    (mate)
 			package_name=ssh-askpass
 			;;
