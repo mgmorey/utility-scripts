@@ -17,7 +17,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 askpass_helper=$(get-askpass)
+commands="git ssh sudo"
 
-for var in GIT_ASKPASS SSH_ASKPASS SSH_ASKPASS; do
-    echo export $var="$askpass_helper"
+if [ $# -gt 0 ]; then
+    commands="$@"
+fi
+
+for command in $commands; do
+    var="${command}_askpass"
+    echo export ${var^^[a-z]}="$askpass_helper"
 done
