@@ -18,10 +18,10 @@
 
 case "$(get-platform-name)" in
     (Linux)
-	if [ -e /usr/bin/lsb_release ]; then
+	if [ -x /usr/bin/lsb_release ]; then
 	    /usr/bin/lsb_release -is
-	elif [ -e /etc/os-release ]; then
-	    (source /etc/os-release; echo $NAME)
+	elif [ -r /etc/os-release ]; then
+	    (source /etc/os-release && echo $NAME)
 	else
 	    for os in centos fedora redhat; do
 		if [ -e /etc/$os-release ]; then
@@ -34,8 +34,5 @@ case "$(get-platform-name)" in
     (SunOS)
 	kernel=$(uname -o)
 	echo ${kernel%-*}
-	;;
-    (*)
-	echo unknown
 	;;
 esac
