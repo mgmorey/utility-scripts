@@ -18,14 +18,14 @@
 
 case "$(get-platform-name)" in
     (Linux)
-	if lsb_release -is 2>/dev/null; then
-	    exit 0
+	if [ -e /usr/bin/lsb_release ]; then
+	    /usr/bin/lsb_release -is
 	elif [ -e /etc/os-release ]; then
-	    (source $(cat /etc/os-release); echo $NAME)
+	    (source /etc/os-release; echo $NAME)
 	else
 	    for os in centos fedora redhat; do
-		if [ -e /etc/${os}-release ]; then
-		    (set -- $(cat /etc/${os}-release); echo $1)
+		if [ -e /etc/$os-release ]; then
+		    awk '{print $1}' /etc/$os-release
 		    exit 0
 		fi
 	    done
