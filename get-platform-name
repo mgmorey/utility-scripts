@@ -23,6 +23,7 @@ case "$system_name" in
 	echo ${system_name%-*}
 	;;
     (*)
-	echo unknown
+	echo "Platform not supported" >&2
+	exit 1
 	;;
 esac
