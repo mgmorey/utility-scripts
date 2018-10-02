@@ -34,15 +34,15 @@ case "$platform_name" in
     (CYGWIN_NT-*)
 	case "${desktop_name,,[A-Z]}" in
 	    (mate)
-		askpass_helper=/usr/libexec/gnome-ssh-askpass
+		askpass_helper=/usr/libexec/gnome-ssh-askpass.exe
 		;;
 	    (*)
 		abort "$desktop_name: Desktop not supported"
 		;;
 	esac
 
-	if [ -e "$askpass_helper" ]; then
-	    echo "$askpass_helper"
+	if [ -x "$askpass_helper" ]; then
+	    echo "${askpass_helper%.exe}"
 	    exit 0
 	else
 	    abort "askpass_helper: No such askpass helper"
