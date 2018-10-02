@@ -16,14 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-system_name=$(uname -s)
-
-case "$system_name" in
-    (CYGWIN_NT-*|FreeBSD|Linux|SunOS)
-	echo ${system_name%-*}
-	;;
-    (*)
-	echo "Platform not supported" >&2
-	exit 1
-	;;
-esac
+if ! uname -s; then
+    echo "Platform not supported" >&2
+    exit 1
+fi
