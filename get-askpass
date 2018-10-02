@@ -31,7 +31,7 @@ distro_name=$(get-distro-name)
 platform_name=$(get-platform-name)
 
 case "$platform_name" in
-    (CYGWIN_NT)
+    (CYGWIN_NT-*)
 	case "${desktop_name,,[A-Z]}" in
 	    (mate)
 		askpass_helper=/usr/libexec/gnome-ssh-askpass
