@@ -21,17 +21,17 @@ case "$(get-platform-name)" in
 	uname -r
 	;;
     (Linux)
-	if lsb_release -rs 2>/dev/null; then
-	    :
-	elif [ -e /etc/centos-release ]; then
-	    (set -- $(cat /etc/centos-release); echo $4)
-	elif [ -e /etc/fedora-release ]; then
-	    (set -- $(cat /etc/fedora-release); echo $4)
+	if [ -x /usr/bin/lsb_release ]; then
+	    /usr/bin/lsb_release -rs
+	elif [ -r /etc/os-release ]; then
+	    (source /etc/os-release && echo $VERSION_ID)
 	else
-	    echo unknown
+	    for os in centos fedora redhat; do
+		if [ -e /etc/$os-release ]; then
+		    awk '{print $4}' /etc/$os-release
+		    exit 0
+		fi
+	    done
 	fi
-	;;
-    (*)
-	echo unknown
 	;;
 esac
