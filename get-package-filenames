@@ -30,7 +30,7 @@ case "$platform_name" in
 	    (Debian|Ubuntu)
 		dpkg --listfiles "$1"
 		;;
-	    (CentOS|Fedora|openSUSE)
+	    (CentOS*|Fedora|openSUSE)
 		rpm --query --list "$1"
 		;;
 	    (*)

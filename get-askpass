@@ -63,7 +63,7 @@ case "$platform_name" in
 			;;
 		esac
 		;;
-	    (CentOS)
+	    (CentOS*)
 		case "${desktop_name,,[A-Z]}" in
 		    (gnome*)
 			package_name=openssh-askpass
