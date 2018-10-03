@@ -49,8 +49,8 @@ case "$platform_name" in
 	fi
 	;;
     (Linux)
-	case "$distro_name" in
-	    (Debian|Ubuntu)
+	case "${distro_name,,[A-Z]}" in
+	    (debian|ubuntu)
 		case "${desktop_name,,[A-Z]}" in
 		    (gnome*|ubuntu:gnome)
 			package_name=ssh-askpass-gnome
@@ -63,7 +63,7 @@ case "$platform_name" in
 			;;
 		esac
 		;;
-	    (CentOS*)
+	    (centos)
 		case "${desktop_name,,[A-Z]}" in
 		    (gnome*)
 			package_name=openssh-askpass
