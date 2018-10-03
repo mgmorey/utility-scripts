@@ -33,14 +33,15 @@ for command in $commands; do
     case "$command" in
 	(git|ssh|sudo)
 	    var=${command}_askpass
+	    var=${var^^[a-z]}
 
-	    case $SHELL in
-		(/bin/bash)
-		    echo export ${var^^[a-z]}="$askpass_helper"
+	    case ${SHELL##*/} in
+		(bash|ksh|zsh)
+		    echo export $var="$askpass_helper"
 		    ;;
-		(/bin/ksh|/bin/sh)
-		    echo ${var^^[a-z]}="$askpass_helper"
-		    echo export ${var^^[a-z]}
+		(sh)
+		    echo $var="$askpass_helper"
+		    echo export $var
 		    ;;
 		(*)
 		    abort "$SHELL: Shell not supported"
