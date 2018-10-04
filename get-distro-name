@@ -24,12 +24,12 @@ case "$(get-platform-name)" in
 	    file=/etc/$key-release
 
 	    if [ -r $file ]; then
-		case $file in
-		    (/etc/os-release|/usr/lib/os-release)
+		case ${file#/etc/} in
+		    (os-release)
 			(source $file && printf "%s\n" "$ID")
 			exit 0
 			;;
-		    (/etc/*-release)
+		    (*-release)
 			awk '{print $1}' $file
 			exit 0
 			;;
