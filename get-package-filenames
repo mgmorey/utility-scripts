@@ -21,6 +21,7 @@ function abort() {
     exit 1
 }
 
+awk_expr='{ printf("/%s\n", $1) }'
 distro_name=$(get-distro-name)
 platform_name=$(get-platform-name)
 
@@ -44,7 +45,7 @@ case "$platform_name" in
     (SunOS)
 	case "$distro_name" in
 	    (illumos)
-		pkg search -H -o search.match "basename:$1" | awk '{ printf("/%s\n", $1) }'
+		pkg search -H -o search.match "basename:$1" | awk "$awk_expr"
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
