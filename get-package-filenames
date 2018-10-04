@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 function abort() {
-    echo $1 >&2
+    printf "$@" >&2
     exit 1
 }
 
@@ -34,7 +34,7 @@ case "$platform_name" in
 		rpm --query --list "$1"
 		;;
 	    (*)
-		abort "$distro_name: Distro not supported"
+		abort "%s: Distro not supported\n" "$distro_name"
 		;;
 	esac
 	;;
@@ -49,11 +49,11 @@ case "$platform_name" in
 		done
 		;;
 	    (*)
-		abort "$distro_name: Distro not supported"
+		abort "%s: Distro not supported\n" "$distro_name"
 		;;
 	esac
 	;;
     (*)
-	abort "$platform_name: Platform not supported"
+	abort "%s: Platform not supported\n" "$platform_name"
 	;;
 esac

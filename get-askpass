@@ -17,12 +17,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 function abort() {
-    echo $1 >&2
+    printf "$@" >&2
     exit 1
 }
 
 if [ -z "${DISPLAY:-}" ]; then
-    abort "No DISPLAY variable set"
+    abort "No DISPLAY variable set\n"
 fi
 
 askpass_re='/.*/(bin|lib|libexec)/.+askpass$'
@@ -42,7 +42,7 @@ case "$platform_name" in
 			package_name=ksshaskpass
 			;;
 		    (*)
-			abort "$desktop_name: Desktop not supported"
+			abort "%s: Desktop not supported\n" "$desktop_name"
 			;;
 		esac
 		;;
@@ -55,7 +55,8 @@ case "$platform_name" in
 			package_name=ksshaskpass
 			;;
 		    (*)
-			abort "$desktop_name: Desktop not supported"
+			abort "%s: Desktop not supported\n" "$desktop_name"
+
 			;;
 		esac
 		;;
@@ -68,7 +69,7 @@ case "$platform_name" in
 			package_name=ksshaskpass
 			;;
 		    (*)
-			abort "$desktop_name: Desktop not supported"
+			abort "%s: Desktop not supported\n" "$desktop_name"
 			;;
 		esac
 		;;
@@ -81,12 +82,12 @@ case "$platform_name" in
 			package_name=ksshaskpass5
 			;;
 		    (*)
-			abort "$desktop_name: Desktop not supported"
+			abort "%s: Desktop not supported\n" "$desktop_name"
 			;;
 		esac
 		;;
 	    (*)
-		abort "$distro_name: Distro not supported"
+		abort "%s: Distro not supported\n" "$distro_name"
 		;;
 	esac
 	;;
@@ -96,7 +97,7 @@ case "$platform_name" in
 		package_name=ksshaskpass
 		;;
 	    (*)
-		abort "$desktop_name: Desktop not supported"
+		abort "%s: Desktop not supported\n" "$desktop_name"
 		;;
 	esac
 	;;
@@ -108,12 +109,12 @@ case "$platform_name" in
 			package_name=ssh-askpass
 			;;
 		    (*)
-			abort "$desktop_name: Desktop not supported"
+			abort "%s: Desktop not supported\n" "$desktop_name"
 			;;
 		    esac
 		;;
 	    (*)
-		abort "$distro_name: Distro not supported"
+		abort "%s: Distro not supported\n" "$distro_name"
 		;;
 	esac
 	;;
@@ -123,7 +124,7 @@ case "$platform_name" in
 		askpass_helper=/usr/libexec/gnome-ssh-askpass.exe
 		;;
 	    (*)
-		abort "$desktop_name: Desktop not supported"
+		abort "%s: Desktop not supported\n" "$desktop_name"
 		;;
 	esac
 
@@ -131,11 +132,11 @@ case "$platform_name" in
 	    echo "${askpass_helper%.exe}"
 	    exit 0
 	else
-	    abort "$askpass_helper: No such askpass helper"
+	    abort "%s: No such askpass helper\n" "$askpass_helper"
 	fi
 	;;
     (*)
-	abort "$platform_name: Platform not supported"
+	abort "%s: Platform not supported\n" "$platform_name"
 	;;
 esac
 

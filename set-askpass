@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 function abort() {
-    echo $1 >&2
+    printf "%s\n" $1 >&2
     exit 1
 }
 
@@ -44,11 +44,11 @@ for command in $commands; do
 		    echo export $var
 		    ;;
 		(*)
-		    abort "$SHELL: Shell not supported"
+		    abort "%s: Shell not supported\n" "$SHELL"
 		    ;;
 	    esac
 	    ;;
 	(*)
-	    abort "$command: Not a valid command"
+	    abort "%s: Not a valid command\n" "$command"
     esac
 done

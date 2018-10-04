@@ -16,7 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+function abort() {
+    printf "$@" >&2
+    exit 1
+}
+
 if ! uname -s; then
-    echo "Platform not supported" >&2
+    abort "Platform not supported\n"
     exit 1
 fi
