@@ -72,7 +72,7 @@ case "$platform_name" in
 			;;
 		esac
 		;;
-	    (opensuse|opensuse-tumbleweed)
+	    (opensuse|opensuse-*)
 		case "${desktop_name,,[A-Z]}" in
 		    (gnome*)
 			package_name=openssh-askpass-gnome
