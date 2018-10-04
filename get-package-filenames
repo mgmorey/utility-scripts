@@ -21,6 +21,10 @@ function abort() {
     exit 1
 }
 
+if [ $# -eq 0 ]; then
+    abort "Not enough arguments\n"
+fi
+
 awk_expr='{ printf("/%s\n", $0) }'
 distro_name=$(get-distro-name)
 platform_name=$(get-platform-name)
