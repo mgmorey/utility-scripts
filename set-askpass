@@ -16,6 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+function abort() {
+    echo $1 >&2
+    exit 1
+}
+
 askpass_helper=$(get-askpass)
 
 if [ $# -gt 0 ]; then
@@ -28,9 +33,21 @@ for command in $commands; do
     case "$command" in
 	(git|ssh|sudo)
 	    var=${command}_askpass
-	    echo export ${var^^[a-z]}="$askpass_helper"
+
+	    case $SHELL in
+		(/bin/bash)
+		    echo export ${var^^[a-z]}="$askpass_helper"
+		    ;;
+		(/bin/ksh|/bin/sh)
+		    echo ${var^^[a-z]}="$askpass_helper"
+		    echo export ${var^^[a-z]}
+		    ;;
+		(*)
+		    abort "$SHELL: Shell not supported"
+		    ;;
+	    esac
 	    ;;
 	(*)
-	    echo "$command: Not a valid command" >&2
+	    abort "$command: Not a valid command"
     esac
 done
