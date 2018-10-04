@@ -31,23 +31,6 @@ distro_name=$(get-distro-name)
 platform_name=$(get-platform-name)
 
 case "$platform_name" in
-    (CYGWIN_NT-*)
-	case "${desktop_name,,[A-Z]}" in
-	    (mate)
-		askpass_helper=/usr/libexec/gnome-ssh-askpass.exe
-		;;
-	    (*)
-		abort "$desktop_name: Desktop not supported"
-		;;
-	esac
-
-	if [ -x "$askpass_helper" ]; then
-	    echo "${askpass_helper%.exe}"
-	    exit 0
-	else
-	    abort "$askpass_helper: No such askpass helper"
-	fi
-	;;
     (Linux)
 	case "${distro_name,,[A-Z]}" in
 	    (debian|ubuntu)
@@ -133,6 +116,23 @@ case "$platform_name" in
 		abort "$distro_name: Distro not supported"
 		;;
 	esac
+	;;
+    (CYGWIN_NT-*)
+	case "${desktop_name,,[A-Z]}" in
+	    (mate)
+		askpass_helper=/usr/libexec/gnome-ssh-askpass.exe
+		;;
+	    (*)
+		abort "$desktop_name: Desktop not supported"
+		;;
+	esac
+
+	if [ -x "$askpass_helper" ]; then
+	    echo "${askpass_helper%.exe}"
+	    exit 0
+	else
+	    abort "$askpass_helper: No such askpass helper"
+	fi
 	;;
     (*)
 	abort "$platform_name: Platform not supported"
