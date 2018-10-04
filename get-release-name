@@ -16,11 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-files="/etc/os-release /usr/lib/os-release /etc/{centos,fedora,redhat}-release"
+keys="os centos fedora redhat system"
 
 case "$(get-platform-name)" in
     (Linux)
-	for file in $files; do
+	for key in $keys; do
+	    file=/etc/$key-release
+
 	    if [ -r $file ]; then
 		case $file in
 		    (/etc/os-release|/usr/lib/os-release)
