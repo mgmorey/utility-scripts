@@ -41,6 +41,9 @@ case "$(get-platform-name)" in
 	    /usr/bin/lsb_release -rs
 	fi
 	;;
+    (FreeBSD)
+	uname -r
+	;;
     (SunOS)
 	os_version=$(uname -v)
 	echo ${os_version#*-}
