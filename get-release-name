@@ -16,26 +16,34 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+files="/etc/os-release /usr/lib/os-release /etc/{centos,fedora,redhat}-release"
+
 case "$(get-platform-name)" in
-    (CYGWIN_NT-*)
-	uname -r
-	;;
     (Linux)
+	for file in $files; do
+	    if [ -r $file ]; then
+		case $file in
+		    (/etc/os-release)
+			(source $file && echo $VERSION_ID)
+			exit 0
+			;;
+		    (/etc/*-release)
+			awk '{print $4}' $file
+			exit 0
+			;;
+		esac
+	    fi
+	done
+
 	if [ -x /usr/bin/lsb_release ]; then
 	    /usr/bin/lsb_release -rs
-	elif [ -r /etc/os-release ]; then
-	    (source /etc/os-release && echo $VERSION_ID)
-	else
-	    for os in centos fedora redhat; do
-		if [ -e /etc/$os-release ]; then
-		    awk '{print $4}' /etc/$os-release
-		    exit 0
-		fi
-	    done
 	fi
 	;;
     (SunOS)
 	os_version=$(uname -v)
 	echo ${os_version#*-}
+	;;
+    (CYGWIN_NT-*)
+	uname -r
 	;;
 esac
