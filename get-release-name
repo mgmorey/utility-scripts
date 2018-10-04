@@ -34,4 +34,8 @@ case "$(get-platform-name)" in
 	    done
 	fi
 	;;
+    (SunOS)
+	os_version=$(uname -v)
+	echo ${os_version#*-}
+	;;
 esac
