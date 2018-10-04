@@ -44,9 +44,7 @@ case "$platform_name" in
     (SunOS)
 	case "$distro_name" in
 	    (illumos)
-		for filename in $(pkg search -H -o search.match "basename:$1"); do
-		    printf "/%s\n" "$filename"
-		done
+		pkg search -H -o search.match "basename:$1" | awk '{ printf("/%s\n", $1) }'
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
