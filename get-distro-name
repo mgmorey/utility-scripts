@@ -42,7 +42,7 @@ case "$(get-platform-name)" in
 	fi
 	;;
     (SunOS)
-	os_name=$(uname -o)
+	os_name="$(uname -o)"
 	printf "%s\n" "${os_name%-*}"
 	;;
 esac
