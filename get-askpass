@@ -46,7 +46,7 @@ case "$platform_name" in
 			;;
 		esac
 		;;
-	    (centos)
+	    (centos|redhat)
 		case "${desktop_name,,[A-Z]}" in
 		    (gnome*)
 			package_name=openssh-askpass
@@ -59,7 +59,7 @@ case "$platform_name" in
 			;;
 		esac
 		;;
-	    (Fedora)
+	    (fedora)
 		case "${desktop_name,,[A-Z]}" in
 		    (gnome*)
 			package_name=openssh-askpass-gnome
@@ -72,7 +72,7 @@ case "$platform_name" in
 			;;
 		esac
 		;;
-	    (opensuse)
+	    (opensuse|opensuse-tumbleweed)
 		case "${desktop_name,,[A-Z]}" in
 		    (gnome*)
 			package_name=openssh-askpass-gnome
