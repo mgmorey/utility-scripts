@@ -23,7 +23,7 @@ case "$(get-platform-name)" in
 	for file in $files; do
 	    if [ -r $file ]; then
 		case $file in
-		    (/etc/os-release)
+		    (/etc/os-release|/usr/lib/os-release)
 			(source $file && echo $ID)
 			exit 0
 			;;
