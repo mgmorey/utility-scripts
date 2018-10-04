@@ -21,7 +21,7 @@ function abort() {
     exit 1
 }
 
-awk_expr='{ printf("/%s\n", $1) }'
+awk_expr='{ printf("/%s\n", $0) }'
 distro_name=$(get-distro-name)
 platform_name=$(get-platform-name)
 
