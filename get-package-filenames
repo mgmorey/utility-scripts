@@ -45,7 +45,7 @@ case "$platform_name" in
 	case "$distro_name" in
 	    (illumos)
 		for filename in $(pkg search -H -o search.match "basename:$1"); do
-		    echo "/$filename"
+		    printf "/%s\n" "$filename"
 		done
 		;;
 	    (*)

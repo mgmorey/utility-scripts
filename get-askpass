@@ -129,7 +129,7 @@ case "$platform_name" in
 	esac
 
 	if [ -x "$askpass_helper" ]; then
-	    echo "${askpass_helper%.exe}"
+	    printf "%s\n" "${askpass_helper%.exe}"
 	    exit 0
 	else
 	    abort "%s: No such askpass helper\n" "$askpass_helper"

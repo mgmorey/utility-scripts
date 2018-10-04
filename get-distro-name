@@ -26,7 +26,7 @@ case "$(get-platform-name)" in
 	    if [ -r $file ]; then
 		case $file in
 		    (/etc/os-release|/usr/lib/os-release)
-			(source $file && echo $ID)
+			(source $file && printf "%s\n" "$ID")
 			exit 0
 			;;
 		    (/etc/*-release)
@@ -43,6 +43,6 @@ case "$(get-platform-name)" in
 	;;
     (SunOS)
 	os_name=$(uname -o)
-	echo ${os_name%-*}
+	printf "%s\n" "${os_name%-*}"
 	;;
 esac

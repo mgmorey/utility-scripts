@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 function abort() {
-    printf "%s\n" $1 >&2
+    printf "$@" >&2
     exit 1
 }
 
@@ -37,11 +37,11 @@ for command in $commands; do
 
 	    case ${SHELL##*/} in
 		(bash|ksh|zsh)
-		    echo export $var="$askpass_helper"
+		    printf "export %s=%s\n" "$var" "$askpass_helper"
 		    ;;
 		(sh)
-		    echo $var="$askpass_helper"
-		    echo export $var
+		    printf "%s=%s\n" "$var" "$askpass_helper"
+		    printf "%export %s\n" "$var"
 		    ;;
 		(*)
 		    abort "%s: Shell not supported\n" "$SHELL"
