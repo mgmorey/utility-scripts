@@ -32,7 +32,7 @@ case "$(get-platform-name)" in
 	fi
 	;;
     (SunOS)
-	kernel=$(uname -o)
-	echo ${kernel%-*}
+	os_name=$(uname -o)
+	echo ${os_name%-*}
 	;;
 esac
