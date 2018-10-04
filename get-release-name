@@ -46,7 +46,7 @@ case "$(get-platform-name)" in
 	;;
     (SunOS)
 	os_version=$(uname -v)
-	printf "%s\n" ${os_version#*-}
+	printf "%s\n" "${os_version#*-}"
 	;;
     (CYGWIN_NT-*)
 	uname -r
