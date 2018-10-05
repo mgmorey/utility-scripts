@@ -31,6 +31,10 @@ desktop_name=$(get-de-name | to-lower)
 distro_name=$(get-distro-name | to-lower)
 platform_name=$(get-platform-name)
 
+if [ -z "${desktop_name:-}" ]; then
+    abort "Desktop not supported\n"
+fi
+
 case "$platform_name" in
     (Linux)
 	case "$distro_name" in
