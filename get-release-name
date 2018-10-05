@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/sh -eu
 
 # get-release-name: print name of Linux distribution release
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>

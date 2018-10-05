@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/sh -eu
 
 # to-lower: translate upper-case letters to lower-case
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>

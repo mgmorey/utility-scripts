@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/sh -eu
 
 # get-platform-name: print short name of operating system/platform
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-function abort() {
+abort() {
     printf "$@" >&2
     exit 1
 }

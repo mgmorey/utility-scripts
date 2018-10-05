@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/sh -eu
 
 # get-distro-name: print short name of Linux/illumos distribution
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
