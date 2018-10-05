@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/sh -eu
 
 # set-askpass: print Bash statements to set askpass helper binary
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
@@ -33,7 +33,7 @@ for command in $commands; do
     case "$command" in
 	(git|ssh|sudo)
 	    var=${command}_askpass
-	    var=${var^^[a-z]}
+	    var=$(echo var | to-lower)
 
 	    case ${SHELL##*/} in
 		(bash|fish|ksh|ksh93|rbash|zsh)
