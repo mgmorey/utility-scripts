@@ -44,7 +44,7 @@ for command in $commands; do
 		    ;;
 		(sh)
 		    printf "%s=%s\n" "$var" "$askpass_helper"
-		    printf "%export %s\n" "$var"
+		    printf "export %s\n" "$var"
 		    ;;
 		(*)
 		    abort "%s: Shell not supported\n" "$SHELL"
