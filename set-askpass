@@ -36,7 +36,7 @@ for command in $commands; do
 	    var=${var^^[a-z]}
 
 	    case ${SHELL##*/} in
-		(bash|ksh|ksh93|rbash|zsh)
+		(bash|fish|ksh|ksh93|rbash|zsh)
 		    printf "export %s=%s\n" "$var" "$askpass_helper"
 		    ;;
 		(csh|tcsh)
