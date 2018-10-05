@@ -26,7 +26,7 @@ case "$(get-platform-name)" in
 	    if [ -r $file ]; then
 		case ${file#/etc/} in
 		    (os-release)
-			(source $file && printf "%s\n" "$VERSION_ID")
+			(. $file && printf "%s\n" "$VERSION_ID")
 			exit 0
 			;;
 		    (*-release)
