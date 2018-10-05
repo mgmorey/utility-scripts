@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+ASKPASS_RE='/.+/(bin|lib|libexec)/.+askpass$'
+
 function abort() {
     printf "$@" >&2
     exit 1
@@ -25,7 +27,6 @@ if [ -z "${DISPLAY:-}" ]; then
     abort "No DISPLAY variable set\n"
 fi
 
-askpass_re='/.*/(bin|lib|libexec)/.+askpass$'
 desktop_name=$(get-de-name)
 distro_name=$(get-distro-name)
 platform_name=$(get-platform-name)
@@ -140,4 +141,4 @@ case "$platform_name" in
 	;;
 esac
 
-get-package-filenames "$package_name" | egrep "$askpass_re" | head -n 1
+get-package-filenames "$package_name" | egrep "$ASKPASS_RE" | head -n 1
