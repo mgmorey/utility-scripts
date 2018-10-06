@@ -18,7 +18,7 @@
 
 keys="os centos fedora redhat system"
 
-case "$(get-platform-name)" in
+case "$(get-os-kernel-name)" in
     (Linux)
 	for key in $keys; do
 	    file=/etc/$key-release

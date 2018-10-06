@@ -29,13 +29,13 @@ fi
 
 desktop_name=$(get-desktop-name)
 distro_name=$(get-os-distro-name)
-platform_name=$(get-platform-name)
+kernel_name=$(get-os-kernel-name)
 
 if [ -z "${desktop_name:-}" ]; then
     abort "Desktop not supported\n"
 fi
 
-case "$platform_name" in
+case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
@@ -141,7 +141,7 @@ case "$platform_name" in
 	fi
 	;;
     (*)
-	abort "%s: Platform not supported\n" "$platform_name"
+	abort "%s: Operating system not supported\n" "$kernel_name"
 	;;
 esac
 

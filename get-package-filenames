@@ -27,9 +27,9 @@ fi
 
 awk_expr='{ printf("/%s\n", $0) }'
 distro_name=$(get-os-distro-name)
-platform_name=$(get-platform-name)
+kernel_name=$(get-os-kernel-name)
 
-case "$platform_name" in
+case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
@@ -57,6 +57,6 @@ case "$platform_name" in
 	esac
 	;;
     (*)
-	abort "%s: Platform not supported\n" "$platform_name"
+	abort "%s: Operating system not supported\n" "$kernel_name"
 	;;
 esac

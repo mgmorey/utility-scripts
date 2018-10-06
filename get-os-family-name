@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-os-distro-name: print short name of OS distribution
+# get-system-name: print short name of operating system family
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,33 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-keys="os centos fedora redhat system"
+abort() {
+    printf "$@" >&2
+    exit 1
+}
 
-case "$(get-os-kernel-name)" in
-    (Linux)
-	for key in $keys; do
-	    file=/etc/$key-release
-
-	    if [ -r $file ]; then
-		case ${file#/etc/} in
-		    (os-release)
-			(. $file && printf "%s\n" "$ID")
-			exit 0
-			;;
-		    (*-release)
-			awk '{print $1}' $file
-			exit 0
-			;;
-		esac
-	    fi
-	done
-
-	if [ -x /usr/bin/lsb_release ]; then
-	    /usr/bin/lsb_release -is
-	fi
-	;;
-    (SunOS)
-	os_name="$(uname -o)"
-	printf "%s\n" "${os_name%-*}"
-	;;
-esac
+if ! uname -sr; then
+    abort "Operating system not supported\n"
+    exit 1
+fi

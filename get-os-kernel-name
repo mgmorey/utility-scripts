@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-platform-name: print short name of operating system/platform
+# get-os-kernel-name: print short name of operating system kernel
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,6 @@ abort() {
 }
 
 if ! uname -s; then
-    abort "Platform not supported\n"
+    abort "Operating system not supported\n"
     exit 1
 fi
