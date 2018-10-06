@@ -26,7 +26,7 @@ if [ $# -eq 0 ]; then
 fi
 
 awk_expr='{ printf("/%s\n", $0) }'
-distro_name=$(get-distro-name | to-lower)
+distro_name=$(get-distro-name)
 platform_name=$(get-platform-name)
 
 case "$platform_name" in
@@ -35,7 +35,7 @@ case "$platform_name" in
 	    (debian|ubuntu)
 		dpkg --listfiles "$1"
 		;;
-	    (centos|fedora|opensuse|opensuse-*)
+	    (centos|fedora|opensuse-*)
 		rpm --query --list "$1"
 		;;
 	    (*)
