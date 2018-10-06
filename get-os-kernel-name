@@ -21,7 +21,16 @@ abort() {
     exit 1
 }
 
-if ! uname -s; then
-    abort "Operating system not supported\n"
-    exit 1
-fi
+kernel_name="$(uname -s)"
+
+case "$kernel_name" in
+    (Linux|FreeBSD|SunOS)
+	echo $kernel_name
+	;;
+    (CYGWIN_NT-*)
+	echo NT
+	;;
+    (*)
+	abort "%s: Operating system not supported\n" "$kernel_name"
+	;;
+esac
