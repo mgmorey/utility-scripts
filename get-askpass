@@ -81,7 +81,6 @@ case "$kernel_name" in
 	    (opensuse-*)
 		case "$desktop_name" in
 		    (GNOME*|*:GNOME)
-		    (GNOME*)
 			package_name=openssh-askpass-gnome
 			;;
 		    (KDE*|plasma*)
