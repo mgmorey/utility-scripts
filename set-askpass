@@ -33,7 +33,7 @@ for command in $commands; do
     case "$command" in
 	(git|ssh|sudo)
 	    var=${command}_askpass
-	    var=$(echo var | to-lower)
+	    var=$(echo $var | to-upper)
 
 	    case ${SHELL##*/} in
 		(bash|fish|ksh|ksh93|rbash|zsh)
