@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-de-name: print short name of Linux desktop environment
+# get-desktop-name: print name of desktop environment
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
