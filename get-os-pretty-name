@@ -40,7 +40,7 @@ case "$kernel_name" in
 	done
 
 	if [ -x /usr/bin/lsb_release ]; then
-	    /usr/bin/lsb_release -is
+	    /usr/bin/lsb_release -drs
 	fi
 	;;
     (SunOS)
