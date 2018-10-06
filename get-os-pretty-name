@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-os-distro-name: print short name of OS distribution
+# get-os-pretty-name: print short name of OS distribution
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@ case "$(get-platform-name)" in
 	    if [ -r $file ]; then
 		case ${file#/etc/} in
 		    (os-release)
-			(. $file && printf "%s\n" "$PRETTY_NAME")
+			 (. $file && printf "%s\n" "$PRETTY_NAME")
 			exit 0
 			;;
 		    (*-release)
