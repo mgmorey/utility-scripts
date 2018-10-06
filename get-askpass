@@ -78,7 +78,7 @@ case "$platform_name" in
 			;;
 		esac
 		;;
-	    (opensuse|opensuse-*)
+	    (opensuse-*)
 		case "$desktop_name" in
 		    (GNOME*)
 			package_name=openssh-askpass-gnome
