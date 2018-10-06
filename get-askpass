@@ -27,8 +27,8 @@ if [ -z "${DISPLAY:-}" ]; then
     abort "No DISPLAY variable set\n"
 fi
 
-desktop_name=$(get-de-name | to-lower)
-distro_name=$(get-distro-name | to-lower)
+desktop_name=$(get-de-name)
+distro_name=$(get-distro-name)
 platform_name=$(get-platform-name)
 
 if [ -z "${desktop_name:-}" ]; then
@@ -40,10 +40,10 @@ case "$platform_name" in
 	case "$distro_name" in
 	    (debian|ubuntu)
 		case "$desktop_name" in
-		    (gnome*|ubuntu:gnome)
+		    (GNOME*|ubuntu:GNOME)
 			package_name=ssh-askpass-gnome
 			;;
-		    (kde*|plasma*)
+		    (KDE*|plasma*)
 			package_name=ksshaskpass
 			;;
 		    (*)
@@ -53,10 +53,10 @@ case "$platform_name" in
 		;;
 	    (centos|redhat)
 		case "$desktop_name" in
-		    (gnome*)
+		    (GNOME*)
 			package_name=openssh-askpass
 			;;
-		    (kde*|plasma*)
+		    (KDE*|plasma*)
 			package_name=ksshaskpass
 			;;
 		    (*)
@@ -67,10 +67,10 @@ case "$platform_name" in
 		;;
 	    (fedora)
 		case "$desktop_name" in
-		    (gnome*)
+		    (GNOME*)
 			package_name=openssh-askpass-gnome
 			;;
-		    (kde*|plasma*)
+		    (KDE*|plasma*)
 			package_name=ksshaskpass
 			;;
 		    (*)
@@ -80,10 +80,10 @@ case "$platform_name" in
 		;;
 	    (opensuse|opensuse-*)
 		case "$desktop_name" in
-		    (gnome*)
+		    (GNOME*)
 			package_name=openssh-askpass-gnome
 			;;
-		    (kde*|plasma*)
+		    (KDE*|plasma*)
 			package_name=ksshaskpass5
 			;;
 		    (*)
@@ -98,7 +98,7 @@ case "$platform_name" in
 	;;
     (FreeBSD)
 	case "$desktop_name" in
-	    (kde*|plasma*)
+	    (KDE*|plasma*)
 		package_name=ksshaskpass
 		;;
 	    (*)
@@ -110,7 +110,7 @@ case "$platform_name" in
 	case "$distro_name" in
 	    (illumos)
 		case "$desktop_name" in
-		    (mate)
+		    (MATE)
 			package_name=ssh-askpass
 			;;
 		    (*)
@@ -125,7 +125,7 @@ case "$platform_name" in
 	;;
     (CYGWIN_NT-*)
 	case "$desktop_name" in
-	    (mate)
+	    (MATE)
 		askpass_helper=/usr/libexec/gnome-ssh-askpass.exe
 		;;
 	    (*)
