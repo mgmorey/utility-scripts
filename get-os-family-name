@@ -30,7 +30,7 @@ case "$kernel_name" in
     (FreeBSD|SunOS)
 	echo Unix
 	;;
-    (CYGWIN_NT-*)
+    (NT)
 	echo Windows
 	;;
     (*)

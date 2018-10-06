@@ -48,7 +48,7 @@ case "$(get-os-kernel-name)" in
 	os_version="$(uname -v)"
 	printf "%s\n" "${os_version#*-}"
 	;;
-    (CYGWIN_NT-*)
+    (NT)
 	uname -r
 	;;
 esac

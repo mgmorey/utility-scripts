@@ -21,9 +21,9 @@ abort() {
     exit 1
 }
 
-kernel_name="$(uname -s)"
+system_name="$(uname -s)"
 
-case "$kernel_name" in
+case "$system_name" in
     (Linux|FreeBSD|SunOS)
 	echo $kernel_name
 	;;

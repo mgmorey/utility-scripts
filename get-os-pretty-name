@@ -16,11 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-keys="os centos fedora redhat system"
+KEYS="os centos fedora redhat system"
 
-case "$(get-os-kernel-name)" in
+kernel_name="$(get-os-kernel-name)"
+
+case "$kernel_name" in
     (Linux)
-	for key in $keys; do
+	for key in $KEYS; do
 	    file=/etc/$key-release
 
 	    if [ -r $file ]; then
@@ -40,5 +42,11 @@ case "$(get-os-kernel-name)" in
 	if [ -x /usr/bin/lsb_release ]; then
 	    /usr/bin/lsb_release -is
 	fi
+	;;
+    (SunOS)
+	printf "%s\n" "$(uname -o)"
+	;;
+    (NT)
+	printf "%s %s\n" "Cygwin NT" "$(get-os-release-name)"
 	;;
 esac
