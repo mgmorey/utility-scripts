@@ -27,8 +27,8 @@ if [ -z "${DISPLAY:-}" ]; then
     abort "No DISPLAY variable set\n"
 fi
 
-desktop_name=$(get-de-name)
-distro_name=$(get-distro-name)
+desktop_name=$(get-desktop-name)
+distro_name=$(get-os-distro-name)
 platform_name=$(get-platform-name)
 
 if [ -z "${desktop_name:-}" ]; then

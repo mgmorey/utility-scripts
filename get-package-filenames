@@ -26,7 +26,7 @@ if [ $# -eq 0 ]; then
 fi
 
 awk_expr='{ printf("/%s\n", $0) }'
-distro_name=$(get-distro-name)
+distro_name=$(get-os-distro-name)
 platform_name=$(get-platform-name)
 
 case "$platform_name" in
