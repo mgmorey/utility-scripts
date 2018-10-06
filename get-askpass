@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-ASKPASS_RE='/.+/(bin|lib|libexec)/.+askpass$'
+RE='/.+/(bin|lib|libexec)/.+askpass$'
 
 abort() {
     printf "$@" >&2
@@ -30,6 +30,7 @@ fi
 desktop_name=$(get-desktop-name)
 distro_name=$(get-os-distro-name)
 kernel_name=$(get-os-kernel-name)
+pretty_name=$(get-os-pretty-name)
 
 if [ -z "${desktop_name:-}" ]; then
     abort "Desktop not supported\n"
@@ -41,10 +42,10 @@ case "$kernel_name" in
 	    (debian|ubuntu)
 		case "$desktop_name" in
 		    (GNOME*|*:GNOME)
-			package_name=ssh-askpass-gnome
+			package=ssh-askpass-gnome
 			;;
 		    (KDE*|plasma*)
-			package_name=ksshaskpass
+			package=ksshaskpass
 			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"
@@ -54,10 +55,10 @@ case "$kernel_name" in
 	    (centos|redhat)
 		case "$desktop_name" in
 		    (GNOME*|*:GNOME)
-			package_name=openssh-askpass
+			package=openssh-askpass
 			;;
 		    (KDE*|plasma*)
-			package_name=ksshaskpass
+			package=ksshaskpass
 			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"
@@ -68,10 +69,10 @@ case "$kernel_name" in
 	    (fedora)
 		case "$desktop_name" in
 		    (GNOME*|*:GNOME)
-			package_name=openssh-askpass-gnome
+			package=openssh-askpass-gnome
 			;;
 		    (KDE*|plasma*)
-			package_name=ksshaskpass
+			package=ksshaskpass
 			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"
@@ -81,10 +82,10 @@ case "$kernel_name" in
 	    (opensuse-*)
 		case "$desktop_name" in
 		    (GNOME*|*:GNOME)
-			package_name=openssh-askpass-gnome
+			package=openssh-askpass-gnome
 			;;
 		    (KDE*|plasma*)
-			package_name=ksshaskpass5
+			package=ksshaskpass5
 			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"
@@ -99,7 +100,7 @@ case "$kernel_name" in
     (FreeBSD)
 	case "$desktop_name" in
 	    (KDE*|plasma*)
-		package_name=ksshaskpass
+		package=ksshaskpass
 		;;
 	    (*)
 		abort "%s: Desktop not supported\n" "$desktop_name"
@@ -111,7 +112,7 @@ case "$kernel_name" in
 	    (illumos)
 		case "$desktop_name" in
 		    (MATE)
-			package_name=ssh-askpass
+			package=ssh-askpass
 			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"
@@ -145,4 +146,5 @@ case "$kernel_name" in
 	;;
 esac
 
-get-package-filenames "$package_name" | egrep "$ASKPASS_RE" | head -n 1
+printf "# %s package %s:\n" "$pretty_name" $package
+get-package-filenames "$package" | egrep "$RE"
