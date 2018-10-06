@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-release-name: print name of Linux distribution release
+# get-os-release-name: print name of OS distribution release
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
