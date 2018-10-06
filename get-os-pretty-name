@@ -41,8 +41,4 @@ case "$(get-platform-name)" in
 	    /usr/bin/lsb_release -is
 	fi
 	;;
-    (SunOS)
-	os_name="$(uname -o)"
-	printf "%s\n" "${os_name%-*}"
-	;;
 esac
