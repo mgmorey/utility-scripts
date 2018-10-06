@@ -44,7 +44,7 @@ case "$kernel_name" in
 	fi
 	;;
     (SunOS)
-	printf "%s\n" "$(uname -o)"
+	printf "%s\n" "$(uname -sv)"
 	;;
     (NT)
 	printf "%s %s\n" "Cygwin NT" "$(get-os-release-name)"
