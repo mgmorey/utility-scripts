@@ -27,7 +27,10 @@ case "$kernel_name" in
     (Linux)
 	echo $kernel_name
 	;;
-    (FreeBSD|SunOS)
+    (Darwin|FreeBSD)
+	echo BSD
+	;;
+    (SunOS)
 	echo Unix
 	;;
     (NT)

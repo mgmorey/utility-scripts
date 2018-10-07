@@ -43,7 +43,7 @@ case "$kernel_name" in
 	    /usr/bin/lsb_release -ds
 	fi
 	;;
-    (FreeBSD)
+    (Darwin|FreeBSD)
 	printf "%s\n" "$(uname -sr)"
 	;;
     (SunOS)

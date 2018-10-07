@@ -41,7 +41,7 @@ case "$(get-os-kernel-name)" in
 	    /usr/bin/lsb_release -rs
 	fi
 	;;
-    (FreeBSD)
+    (Darwin|FreeBSD)
 	uname -r
 	;;
     (SunOS)

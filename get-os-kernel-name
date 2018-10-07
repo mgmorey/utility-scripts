@@ -24,7 +24,7 @@ abort() {
 system_name="$(uname -s)"
 
 case "$system_name" in
-    (Linux|FreeBSD|SunOS)
+    (Darwin|Linux|FreeBSD|SunOS)
 	echo $system_name
 	;;
     (CYGWIN_NT-*)
