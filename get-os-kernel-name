@@ -24,11 +24,11 @@ abort() {
 system_name="$(uname -s)"
 
 case "$system_name" in
-    (Darwin|Linux|FreeBSD|SunOS)
-	echo $system_name
-	;;
     (CYGWIN_NT-*)
 	echo NT
+	;;
+    (Darwin|GNU|Linux|FreeBSD|SunOS)
+	echo $system_name
 	;;
     (*)
 	abort "%s: Operating system not supported\n" "$system_name"

@@ -24,17 +24,20 @@ abort() {
 kernel_name="$(get-os-kernel-name)"
 
 case "$kernel_name" in
-    (Linux)
-	echo $kernel_name
+    (NT)
+	echo Windows
 	;;
     (Darwin|FreeBSD)
 	echo BSD
 	;;
+    (GNU)
+	echo $kernel_name
+	;;
+    (Linux)
+	echo GNU/$kernel_name
+	;;
     (SunOS)
 	echo Unix
-	;;
-    (NT)
-	echo Windows
 	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
