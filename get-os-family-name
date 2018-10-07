@@ -36,6 +36,9 @@ case "$kernel_name" in
     (Linux)
 	echo GNU/$kernel_name
 	;;
+    (Minix)
+	echo $kernel_name
+	;;
     (SunOS)
 	echo Unix
 	;;
