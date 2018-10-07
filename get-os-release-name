@@ -19,6 +19,12 @@
 keys="os centos fedora redhat system"
 
 case "$(get-os-kernel-name)" in
+    (NT)
+	uname -r
+	;;
+    (Darwin|FreeBSD|GNU)
+	uname -r
+	;;
     (Linux)
 	for key in $keys; do
 	    file=/etc/$key-release
@@ -41,14 +47,8 @@ case "$(get-os-kernel-name)" in
 	    /usr/bin/lsb_release -rs
 	fi
 	;;
-    (Darwin|FreeBSD)
-	uname -r
-	;;
     (SunOS)
 	os_version="$(uname -v)"
 	printf "%s\n" "${os_version#*-}"
-	;;
-    (NT)
-	uname -r
 	;;
 esac

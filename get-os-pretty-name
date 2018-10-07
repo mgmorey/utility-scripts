@@ -21,6 +21,12 @@ KEYS="os centos fedora redhat system"
 kernel_name="$(get-os-kernel-name)"
 
 case "$kernel_name" in
+    (NT)
+	printf "%s %s\n" "Cygwin NT" "$(get-os-release-name)"
+	;;
+    (Darwin|FreeBSD|GNU)
+	printf "%s\n" "$(uname -sr)"
+	;;
     (Linux)
 	for key in $KEYS; do
 	    file=/etc/$key-release
@@ -43,13 +49,7 @@ case "$kernel_name" in
 	    /usr/bin/lsb_release -ds
 	fi
 	;;
-    (Darwin|FreeBSD)
-	printf "%s\n" "$(uname -sr)"
-	;;
     (SunOS)
 	printf "%s\n" "$(uname -sv)"
-	;;
-    (NT)
-	printf "%s %s\n" "Cygwin NT" "$(get-os-release-name)"
 	;;
 esac

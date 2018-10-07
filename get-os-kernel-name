@@ -27,7 +27,7 @@ case "$system_name" in
     (CYGWIN_NT-*)
 	echo NT
 	;;
-    (Darwin|GNU|Linux|FreeBSD|SunOS)
+    (Darwin|FreeBSD|GNU|Linux|SunOS)
 	echo $system_name
 	;;
     (*)
