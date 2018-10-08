@@ -23,6 +23,10 @@ abort() {
 
 askpass_helper=$(get-askpass | awk '! /^#/')
 
+if [ -z "$askpass_helper" ]; then
+    exit 0
+fi
+
 if [ $# -gt 0 ]; then
     commands="$@"
 else
