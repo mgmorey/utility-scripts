@@ -21,8 +21,6 @@ abort() {
     exit 1
 }
 
-kernel_name="$(get-os-kernel-name)"
-
 system_name="$(uname -s)"
 
 case "$system_name" in
