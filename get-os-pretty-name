@@ -18,13 +18,10 @@
 
 KEYS="os centos fedora redhat system"
 
-kernel_name="$(get-os-kernel-name)"
+system_name="$(uname -s)"
 
-case "$kernel_name" in
-    (NT)
-	printf "%s %s\n" "Cygwin NT" "$(get-os-release-name)"
-	;;
-    (Darwin|FreeBSD|GNU)
+case "$system_name" in
+    (CYGWIN_NT-*|Darwin|FreeBSD|GNU)
 	printf "%s\n" "$(uname -sr)"
 	;;
     (Linux)

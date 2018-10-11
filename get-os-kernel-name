@@ -25,7 +25,9 @@ system_name="$(uname -s)"
 
 case "$system_name" in
     (CYGWIN_NT-*)
-	echo NT
+	cygwin_name=${system_name%-*}
+	kernel_name=${cygwin_name#*_}
+	echo $kernel_name
 	;;
     (Darwin|FreeBSD|GNU|Linux|Minix|SunOS)
 	echo $system_name

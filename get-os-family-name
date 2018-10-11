@@ -27,20 +27,14 @@ case "$kernel_name" in
     (NT)
 	echo Windows
 	;;
-    (Darwin|FreeBSD)
-	echo BSD
+    (Darwin|FreeBSD|SunOS)
+	echo Unix
 	;;
-    (GNU)
+    (GNU|Minix)
 	echo $kernel_name
 	;;
     (Linux)
 	echo GNU/$kernel_name
-	;;
-    (Minix)
-	echo $kernel_name
-	;;
-    (SunOS)
-	echo Unix
 	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
