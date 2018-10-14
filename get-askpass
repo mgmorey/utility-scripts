@@ -47,6 +47,9 @@ case "$kernel_name" in
 		    (KDE*|plasma*)
 			package=ksshaskpass
 			;;
+		    (MATE)
+			package=ssh-askpass
+			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"
 			;;
