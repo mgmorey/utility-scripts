@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# set-askpass: print Bash statements to set askpass helper binary
+# set-askpass: print shell commands to set askpass helper
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -25,9 +25,9 @@ askpass_helper=$(get-askpass | awk '! /^#/')
 
 if [ -z "$askpass_helper" ]; then
     exit 0
-fi
-
-if [ $# -gt 0 ]; then
+elif [ ! -x "$askpass_helper" ]; then
+    abort "%s: No such executable" "$askpass_helper"
+elif [ $# -gt 0 ]; then
     commands="$@"
 else
     commands="git ssh sudo"
