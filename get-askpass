@@ -44,7 +44,7 @@ case "$kernel_name" in
 		    (GNOME*|*:GNOME)
 			package=ssh-askpass-gnome
 			;;
-		    (KDE*|plasma*)
+		    (KDE*)
 			package=ksshaskpass
 			;;
 		    (MATE)
@@ -60,7 +60,7 @@ case "$kernel_name" in
 		    (GNOME*|*:GNOME)
 			package=openssh-askpass
 			;;
-		    (KDE*|plasma*)
+		    (KDE*)
 			package=ksshaskpass
 			;;
 		    (*)
@@ -74,7 +74,7 @@ case "$kernel_name" in
 		    (GNOME*|*:GNOME)
 			package=openssh-askpass-gnome
 			;;
-		    (KDE*|plasma*)
+		    (KDE*)
 			package=ksshaskpass
 			;;
 		    (*)
@@ -87,7 +87,7 @@ case "$kernel_name" in
 		    (GNOME*|*:GNOME)
 			package=openssh-askpass-gnome
 			;;
-		    (KDE*|plasma*)
+		    (KDE*)
 			package=ksshaskpass5
 			;;
 		    (*)
@@ -102,7 +102,7 @@ case "$kernel_name" in
 	;;
     (FreeBSD)
 	case "$desktop_name" in
-	    (KDE*|plasma*)
+	    (KDE*)
 		package=ksshaskpass
 		;;
 	    (*)
