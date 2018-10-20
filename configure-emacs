@@ -35,34 +35,26 @@ abort() {
     exit 1
 }
 
-distro_name=$(get-os-distro-name)
 kernel_name=$(get-os-kernel-name)
 
 case "$kernel_name" in
-    (Linux)
-	case "$distro_name" in
-	    (debian|ubuntu)
-		mkdir -p "$BUILD_DIR" "$(dirname "$SRC_DIR")" "$ARCHIVE_DIR"
+    (Linux|FreeBSD|SunOS|NT)
+	mkdir -p "$BUILD_DIR" "$(dirname "$SRC_DIR")" "$ARCHIVE_DIR"
 
-		if [ ! -r "$EMACS_PATHNAME" ]; then
-		    cd "$ARCHIVE_DIR"
-		    wget $EMACS_URL
-		fi
+	if [ ! -r "$EMACS_PATHNAME" ]; then
+	    cd "$ARCHIVE_DIR"
+	    wget $EMACS_URL
+	fi
 
-		if [ ! -r "$SRC_DIR/configure" ]; then
-		    cd $(dirname "$SRC_DIR")
-		    tar -xvf "$EMACS_PATHNAME"
-		fi
+	if [ ! -r "$SRC_DIR/configure" ]; then
+	    cd $(dirname "$SRC_DIR")
+	    tar -xvf "$EMACS_PATHNAME"
+	fi
 
-		if [ ! -r "$BUILD_DIR/config.status" ]; then
-		    cd "$BUILD_DIR"
-		    "$SRC_DIR/configure" "$@"
-		fi
-		;;
-	    (*)
-		abort "%s: Distro not supported\n" "$distro_name"
-		;;
-	esac
+	if [ ! -r "$BUILD_DIR/config.status" ]; then
+	    cd "$BUILD_DIR"
+	    "$SRC_DIR/configure" "$@"
+	fi
 	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
