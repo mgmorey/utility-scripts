@@ -16,9 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+BASE_URL=https://mirrors.ocf.berkeley.edu/gnu
 EMACS_VERSION=26.1
 
-BASE_URL=https://mirrors.ocf.berkeley.edu/gnu
 EMACS_BASENAME=emacs-$EMACS_VERSION
 
 ARCHIVE_DIR="$HOME/Downloads/GNU"
