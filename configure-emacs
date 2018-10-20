@@ -1,0 +1,70 @@
+#!/bin/sh -eux
+
+# configure-emacs: download and configure emacs
+# Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+EMACS_VERSION=26.1
+
+BASE_URL=https://mirrors.ocf.berkeley.edu/gnu
+EMACS_BASENAME=emacs-$EMACS_VERSION
+
+ARCHIVE_DIR="$HOME/Downloads/GNU/$EMACS_BASENAME"
+BUILD_DIR="$HOME/Documents/build/$EMACS_BASENAME"
+SRC_DIR="$HOME/Documents/src/GNU/$EMACS_BASENAME"
+
+EMACS_FILENAME=$EMACS_BASENAME.tar.xz
+
+EMACS_PATHNAME=$ARCHIVE_DIR.tar.xz
+EMACS_URL=$BASE_URL/emacs/$EMACS_FILENAME
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+distro_name=$(get-os-distro-name)
+kernel_name=$(get-os-kernel-name)
+
+case "$kernel_name" in
+    (Linux)
+	case "$distro_name" in
+	    (debian|ubuntu)
+		mkdir -p "$BUILD_DIR" "$SRC_DIR" "$(dirname "$ARCHIVE_DIR")"
+
+		if [ ! -r "$EMACS_PATHNAME" ]; then
+		    cd $(dirname "$ARCHIVE_DIR")
+		    wget $EMACS_URL
+		fi
+
+		if [ ! -r "$SRC_DIR/configure" ]; then
+		    cd "$SRC_DIR"
+		    tar -xvf "$EMACS_PATHNAME"
+		fi
+
+		if [ ! -r "$BUILD_DIR/config.status" ]; then
+		    cd "$BUILD_DIR"
+		   "$SRC_DIR/configure" "$@"
+		fi
+		;;
+	    (*)
+		abort "%s: Distro not supported\n" "$distro_name"
+		;;
+	esac
+	;;
+    (*)
+	abort "%s: Operating system not supported\n" "$kernel_name"
+	;;
+esac
