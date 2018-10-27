@@ -33,7 +33,7 @@ kernel_name=$(get-os-kernel-name)
 pretty_name=$(get-os-pretty-name)
 
 if [ -z "${desktop_name:-}" ]; then
-    abort "Desktop not specified\n"
+    exit 0  # Nothing to do
 fi
 
 case "$kernel_name" in
