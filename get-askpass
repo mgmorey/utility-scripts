@@ -32,10 +32,6 @@ distro_name=$(get-os-distro-name)
 kernel_name=$(get-os-kernel-name)
 pretty_name=$(get-os-pretty-name)
 
-if [ -z "${desktop_name:-}" ]; then
-    exit 0  # Nothing to do
-fi
-
 case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
@@ -48,6 +44,9 @@ case "$kernel_name" in
 			package=ksshaskpass
 			;;
 		    (MATE)
+			package=ssh-askpass
+			;;
+		    ('')
 			package=ssh-askpass
 			;;
 		    (*)
@@ -63,6 +62,9 @@ case "$kernel_name" in
 		    (KDE*)
 			package=ksshaskpass
 			;;
+		    ('')
+			package=openssh-askpass
+			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"
 			;;
@@ -76,6 +78,9 @@ case "$kernel_name" in
 		    (KDE*)
 			package=ksshaskpass
 			;;
+		    ('')
+			package=openssh-askpass-gnome
+			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"
 			;;
@@ -88,6 +93,9 @@ case "$kernel_name" in
 			;;
 		    (KDE*)
 			package=ksshaskpass5
+			;;
+		    ('')
+			package=openssh-askpass-gnome
 			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"
@@ -116,6 +124,9 @@ case "$kernel_name" in
 		    (MATE)
 			package=ssh-askpass
 			;;
+		    ('')
+			package=ssh-askpass
+			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"
 			;;
@@ -129,6 +140,9 @@ case "$kernel_name" in
     (NT)
 	case "$desktop_name" in
 	    (MATE)
+		askpass_helper=/usr/libexec/gnome-ssh-askpass.exe
+		;;
+	    ('')
 		askpass_helper=/usr/libexec/gnome-ssh-askpass.exe
 		;;
 	    (*)
