@@ -187,5 +187,3 @@ if [ -n "$askpass_helper" ]; then
 	abort "%s: No such askpass helper\n" "$askpass_helper"
     fi
 fi
-
-
