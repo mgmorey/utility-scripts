@@ -25,7 +25,7 @@ askpass_helper=$(get-askpass | awk '! /^#/')
 
 if [ -z "$askpass_helper" ]; then
     exit 0
-elif [ ! -x "$askpass_helper" ]; then
+elif [ ! -x "$(which "$askpass_helper")" ]; then
     abort "%s: No such executable" "$askpass_helper"
 elif [ $# -gt 0 ]; then
     commands="$@"
