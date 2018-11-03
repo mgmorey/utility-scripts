@@ -73,13 +73,13 @@ case "$kernel_name" in
 	    (fedora)
 		case "$desktop_name" in
 		    (GNOME*|*:GNOME)
-			package=openssh-askpass-gnome
+			package=openssh-askpass
 			;;
 		    (KDE*)
 			package=ksshaskpass
 			;;
 		    ('')
-			package=openssh-askpass-gnome
+			package=openssh-askpass
 			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"
@@ -173,7 +173,7 @@ case "$kernel_name" in
 esac
 
 if [ -z "${askpass_helper:-}" ]; then
-    askpass_helper=$(get-package-filenames "$package" | egrep "$RE")
+    askpass_helper=$(get-package-filenames "$package" | egrep "$RE" | head -n 1)
 fi
 
 if [ -n "${package:-}" ]; then
