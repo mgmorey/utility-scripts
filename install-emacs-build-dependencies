@@ -19,6 +19,8 @@
 DEBIAN_EMACS_PKGS="emacs25"
 DEBIAN_PKGS="libwebkit2gtk-4.0-dev"
 
+SUNOS_PKGS="build-essential gcc-8 gcc-8-runtime gnutls"
+
 SUSE_PKGS="gcc gconf2-devel giflib-devel gpm-devel gtk3-devel \
 ImageMagick-devel libacl-devel libgnutls-devel libjpeg62-devel \
 libICE-devel liblcms2-devel libpng16-devel libSM-devel \
@@ -49,6 +51,9 @@ case "$kernel_name" in
 		abort "%s: Distro not supported\n" "$distro_name"
 		;;
 	esac
+	;;
+    (SunOS)
+	sudo pkg install "$@" $SUNOS_PKGS
 	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
