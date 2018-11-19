@@ -23,10 +23,12 @@ abort() {
     exit 1
 }
 
-(cd "$HOME/Documents" && mkdir -p $DIRS)
+cd "$HOME/Documents"
+mkdir -p $DIRS
+cd "$HOME"
 
 for dir in $DIRS; do
-    if [ -e "$HOME/Documents/$dir" -a ! -e "$HOME/$dir" ]; then
-	ln -s "$HOME/Documents/$dir" "$HOME/$dir"
+    if [ -e Documents/$dir -a ! -e $dir ]; then
+	ln -s Documents/$dir $HOME/$dir
     fi
 done
