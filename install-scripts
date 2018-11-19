@@ -26,7 +26,6 @@ if [ -h $0 ]; then
 fi
 
 dir=$PWD
-
 cd "$HOME"
 mkdir -p Documents/bin
 
