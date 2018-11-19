@@ -16,11 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
 cwd="$(pwd)"
 
 if [ "$(basename "$cwd")" = bin ]; then
-    printf "Change to source directory" >&2
-    exit 1
+    abort "Please change to source directory before running this script\n"
 fi
 
 scripts=$(find "$cwd" -name '.*' -prune -o ! -name '*~' ! -name $(basename "$0") -perm 755 -type f -print)
