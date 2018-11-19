@@ -21,13 +21,11 @@ abort() {
     exit 1
 }
 
-cwd="$(pwd)"
-
-if [ "$(basename "$cwd")" = bin ]; then
+if [ -h $0 ]; then
     abort "Please change to source directory before running this script\n"
 fi
 
-scripts=$(find "$cwd" -name '.*' -prune -o ! -name '*~' ! -name $(basename "$0") -perm 755 -type f -print)
+scripts=$(find "$PWD" -name '.*' -prune -o ! -name '*~' ! -name $(basename "$0") -perm 755 -type f -print)
 
 cd "$HOME"
 mkdir -p Documents/bin
