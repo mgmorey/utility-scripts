@@ -25,14 +25,14 @@ if [ -h $0 ]; then
     abort "Please change to source directory before running this script\n"
 fi
 
-scripts=$(find "$PWD" -name '.*' -prune -o ! -name '*~' ! -name $(basename "$0") -perm 755 -type f -print)
+dir=$PWD
 
 cd "$HOME"
 mkdir -p Documents/bin
 
-for script in $scripts; do
-    if [ ! -e Documents/bin/$(basename $script) ]; then
-	ln -s $script Documents/bin
+for file in $dir/*; do
+    if [ ! -e Documents/bin/$(basename $file) -a -x $file ]; then
+	ln -s $file Documents/bin
     fi
 done
 
