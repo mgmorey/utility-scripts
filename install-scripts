@@ -23,7 +23,7 @@ if [ "$(basename "$cwd")" = bin ]; then
     exit 1
 fi
 
-scripts=$(find "$cwd" -name '.*' -type d -prune -o ! -name '*~' ! -name $(basename "$0") -perm 755 -type f -print)
+scripts=$(find "$cwd" -name '.*' -prune -o ! -name '*~' ! -name $(basename "$0") -perm 755 -type f -print)
 
 cd "$HOME"
 mkdir -p Documents/bin
