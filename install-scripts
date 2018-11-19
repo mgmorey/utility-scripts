@@ -21,11 +21,13 @@ abort() {
     exit 1
 }
 
-if [ $(basename "$(pwd)") == bin ]; then
+cwd="$(pwd)"
+
+if [ $(basename "$cwd") == bin ]; then
     abort "Change to source directory"
 fi
 
-scripts=$(find "$(pwd)" -name .git -type d -prune -o ! -name '*~' ! -name $(basename "$0") -perm 755 -type f -print)
+scripts=$(find "$cwd" -name .git -type d -prune -o ! -name '*~' ! -name $(basename "$0") -perm 755 -type f -print)
 
 cd "$HOME"
 mkdir -p Documents/bin
