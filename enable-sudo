@@ -23,25 +23,29 @@ abort() {
     exit 1
 }
 
-distro_name=$(get-os-distro-name)
-kernel_name=$(get-os-kernel-name)
+system_name="$(uname -s)"
 
-case "$kernel_name" in
+case "$system_name" in
     (Linux)
-	case "$distro_name" in
-	    (debian|ubuntu)
-		install-packages "$@" $DEBIAN_PKGS
-		;;
-	    (*)
-		abort "%s: Distro not supported\n" "$distro_name"
-		;;
-	esac
+	if [ -r /etc/os-release ]; then
+	    . /etc/os-release
+	    case "$ID" in
+		(debian|ubuntu)
+		    apt-get install $DEBIAN_PKGS
+		    ;;
+		(*)
+		    abort "%s: Distro not supported\n" "$distro_name"
+		    ;;
+	    esac
+	else
+	    abort "Distro not supported\n"
+	fi
 	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
 	;;
 esac
 
-if sudo usermod -a -G sudo $USER; then
+if usermod -a -G sudo $USER; then
     printf "Please restart before using sudo\n"
 fi
