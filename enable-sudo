@@ -43,5 +43,5 @@ case "$kernel_name" in
 esac
 
 if sudo usermod -a -G sudo $USER; then
-    printf "Please log out and back in again before using sudo\n"
+    printf "Please restart before using sudo\n"
 fi
