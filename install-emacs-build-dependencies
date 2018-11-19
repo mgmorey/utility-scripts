@@ -19,15 +19,15 @@
 DEBIAN_EMACS_PKGS="emacs25"
 DEBIAN_PKGS="libwebkit2gtk-4.0-dev"
 
-SUNOS_PKGS="build-essential gcc-8 gcc-8-runtime gnutls"
-
-SUSE_PKGS="gcc gconf2-devel giflib-devel gpm-devel gtk3-devel \
+OPENSUSE_PKGS="gcc gconf2-devel giflib-devel gpm-devel gtk3-devel \
 ImageMagick-devel libacl-devel libgnutls-devel libjpeg62-devel \
 libICE-devel liblcms2-devel libpng16-devel libSM-devel \
 libtiff-devel libX11-devel libXaw3d-devel libXext-devel libXi-devel \
 libXmu-devel libXpm-devel libXrandr-devel libXt-devel libXTrap-devel \
 libXtst-devel libXv-devel libxml2-devel make m17n-lib-devel \
 ncurses5-devel webkit2gtk3-devel zlib-devel"
+
+SUNOS_PKGS="build-essential gcc-8 gcc-8-runtime gnutls"
 
 abort() {
     printf "$@" >&2
@@ -45,7 +45,7 @@ case "$kernel_name" in
 		sudo apt-get install "$@" $DEBIAN_PKGS
 		;;
 	    (opensuse-*)
-		sudo zypper install "$@" $SUSE_PKGS
+		sudo zypper install "$@" $OPENSUSE_PKGS
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
