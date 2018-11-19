@@ -27,7 +27,7 @@ fi
 
 mkdir -p "$HOME/Documents/bin"
 
-scripts=$(find "$PWD" -name .git -type d -prune -o ! -name '*~' ! -name $(basename $0) -perm 755 -type f -print)
+scripts=$(find "$PWD" -name .git -type d -prune -o ! -name '*~' ! -name $(basename "$0") -perm 755 -type f -print)
 
 for script in $scripts; do
     if [ ! -e "$HOME/Documents/bin/$(basename $script)" ]; then
