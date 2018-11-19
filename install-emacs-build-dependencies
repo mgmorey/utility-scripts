@@ -36,16 +36,17 @@ abort() {
 
 distro_name=$(get-os-distro-name)
 kernel_name=$(get-os-kernel-name)
+package_manager=$(get-package-manager)
 
 case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
-		sudo apt-get build-dep "$@" $DEBIAN_EMACS_PKGS
-		sudo apt-get install "$@" $DEBIAN_PKGS
+		sudo $package_manager build-dep "$@" $DEBIAN_EMACS_PKGS
+		sudo $package_manager install "$@" $DEBIAN_PKGS
 		;;
 	    (opensuse-*)
-		sudo zypper install "$@" $OPENSUSE_PKGS
+		sudo $package_manager install "$@" $OPENSUSE_PKGS
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
@@ -53,7 +54,7 @@ case "$kernel_name" in
 	esac
 	;;
     (SunOS)
-	sudo pkg install "$@" $SUNOS_PKGS
+	sudo $package_manager install "$@" $SUNOS_PKGS
 	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
