@@ -1,4 +1,4 @@
-#!/bin/sh -eux
+#!/bin/sh -eu
 
 # install-emacs-build-dependencies: install emacs build dependencies
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_EMACS_PKGS="emacs25"
+DEBIAN_EMACS="emacs25"
 DEBIAN_PKGS="libwebkit2gtk-4.0-dev"
 
 OPENSUSE_PKGS="gcc gconf2-devel giflib-devel gpm-devel gtk3-devel \
@@ -42,11 +42,11 @@ case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
-		sudo $package_manager build-dep "$@" $DEBIAN_EMACS_PKGS
-		sudo $package_manager install "$@" $DEBIAN_PKGS
+		sudo $package_manager build-dep "$@" $DEBIAN_EMACS
+		install-packages "$@" $DEBIAN_PKGS
 		;;
 	    (opensuse-*)
-		sudo $package_manager install "$@" $OPENSUSE_PKGS
+		install-packages "$@" $OPENSUSE_PKGS
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
@@ -54,7 +54,7 @@ case "$kernel_name" in
 	esac
 	;;
     (SunOS)
-	sudo $package_manager install "$@" $SUNOS_PKGS
+	install-packages "$@" $SUNOS_PKGS
 	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
