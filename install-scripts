@@ -1,4 +1,4 @@
-#!/bin/sh -eu
+#!/bin/bash -eu
 
 # install-scripts: install scripts
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
@@ -21,13 +21,13 @@ abort() {
     exit 1
 }
 
-if [ $(basename "$PWD") == bin ]; then
+if [ $(basename "$(pwd)") == bin ]; then
     abort "Change to source directory"
 fi
 
 mkdir -p "$HOME/Documents/bin"
 
-scripts=$(find "$PWD" -name .git -type d -prune -o ! -name '*~' ! -name $(basename "$0") -perm 755 -type f -print)
+scripts=$(find "$(pwd)" -name .git -type d -prune -o ! -name '*~' ! -name $(basename "$0") -perm 755 -type f -print)
 
 for script in $scripts; do
     if [ ! -e "$HOME/Documents/bin/$(basename $script)" ]; then
