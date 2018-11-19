@@ -17,7 +17,5 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package_manager=$(get-package-manager)
+sudo $package_manager install "$@"
 
-if [ -n "$package_manager" ]; then
-    sudo $package_manager install "$@"
-fi
