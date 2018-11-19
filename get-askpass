@@ -176,12 +176,12 @@ if [ -z "${askpass_helper:-}" ]; then
     askpass_helper=$(get-package-filenames "$package" | egrep "$RE" | head -n 1)
 fi
 
-if [ -n "${package:-}" ]; then
-    printf "# %s package %s:\n" "$pretty_name" $package
-fi
-
 if [ -n "$askpass_helper" ]; then
     if [ -x "$(which "$askpass_helper")" ]; then
+	if [ -n "${package:-}" ]; then
+	    printf "# %s package %s:\n" "$pretty_name" $package
+	fi
+
 	printf "%s\n" "${askpass_helper%.exe}"
     else
 	abort "%s: No such askpass helper\n" "$askpass_helper"
