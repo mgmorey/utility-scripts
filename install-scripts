@@ -25,16 +25,17 @@ if [ $(basename "$(pwd)") == bin ]; then
     abort "Change to source directory"
 fi
 
-mkdir -p "$HOME/Documents/bin"
-
 scripts=$(find "$(pwd)" -name .git -type d -prune -o ! -name '*~' ! -name $(basename "$0") -perm 755 -type f -print)
 
+cd "$HOME"
+mkdir -p Documents/bin
+
 for script in $scripts; do
-    if [ ! -e "$HOME/Documents/bin/$(basename $script)" ]; then
-	ln -s $script "$HOME/Documents/bin"
+    if [ ! -e Documents/bin/$(basename $script) ]; then
+	ln -s $script Documents/bin
     fi
 done
 
-if [ ! -e "$HOME/bin" ]; then
-    ln -s "$HOME/Documents/bin" "$HOME/bin"
+if [ ! -e bin ]; then
+    ln -s Documents/bin bin
 fi
