@@ -1,0 +1,27 @@
+#!/bin/sh -eux
+
+DIR=$HOME/Documents/Mainframe/dasd
+INIT="dasdinit -a -lfs -linux"
+
+INSTANCE=0
+MODEL=3390
+
+mkdir -p $DIR
+cd $DIR
+
+for CUU in 120 122; do
+    FILE=$MODEL.LINUX.$INSTANCE$CUU
+
+    case $CUU in
+	(*0) TYPE=9
+		 ;;
+	(*1) TYPE=3
+	       ;;
+	(*2) TYPE=2
+	       ;;
+    esac
+
+    if [ ! -f $FILE ]; then
+	$INIT $FILE $MODEL-$TYPE LIN$CUU
+    fi
+done

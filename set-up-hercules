@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Create hercules account and group
+sudo useradd --system hercules
+
+# Add hercules group to user's groups
+sudo usermod -a -G hercules $USER
+
+# Install hercules and related packages
+sudo apt install hercules herculesstudio
+
+# Override Debian package permissions for hercules
+for f in /usr/bin/hercules /usr/bin/hercifc; do
+    sudo dpkg-statoverride --update --add root hercules 4750 "$f"
+done
+
+# Set up udev rules for hercules
+sudo sh <<EOF1
+cat <<EOF2 >/etc/udev/rules.d/99-local.rules
+KERNEL=="tun", ACTION=="add", GROUP="hercules", MODE="0660", OPTIONS+="static_node=net/tun"
+EOF2
+EOF1

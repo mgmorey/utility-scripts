@@ -1,0 +1,5 @@
+#!/bin/sh
+
+arch=$(uname -m)
+mkdir -p hercules/hyperion hercules/SoftFloat-3a hercules/$arch/hyperion
+mkdir -p hercules/$arch/s3fh hercules/$arch/s3fh.release hercules/$arch/s3fh.debug

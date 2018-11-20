@@ -1,0 +1,9 @@
+#!/bin/sh
+
+NETWORK=10.10.0.0/23
+
+sudo iptables -t nat -A POSTROUTING -s $NETWORK -j MASQUERADE  
+sudo iptables -A FORWARD -s $NETWORK -j ACCEPT
+sudo iptables -A FORWARD -d $NETWORK -j ACCEPT
+echo 1 | sudo sh -c "cat >/proc/sys/net/ipv4/ip_forward"
+echo 1 | sudo sh -c "cat >/proc/sys/net/ipv4/conf/all/proxy_arp"
