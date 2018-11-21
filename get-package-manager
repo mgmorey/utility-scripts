@@ -34,7 +34,7 @@ case "$kernel_name" in
 		printf dnf
 		;;
 	    (centos|redhat)
-		printf rpm
+		printf yum
 		;;
 	    (opensuse-*)
 		printf zypper
