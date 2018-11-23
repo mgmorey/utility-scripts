@@ -26,8 +26,8 @@ kernel_name=$(get-os-kernel-name)
 case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
-	    (debian|ubuntu)
-		sudo apt-get remove "$@" docker docker.io
+	    (debian)
+		sudo apt-get remove "$@" docker docker.io || true
 		sudo apt-get install "$@" $DOCKER_DEPS
 		curl -fsSL $DOCKER_URL | sudo apt-key add -
 		sudo add-apt-repository "$DOCKER_REPO"
