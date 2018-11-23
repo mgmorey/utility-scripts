@@ -16,21 +16,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DOCKER_DEPS="apt-transport-https ca-certificates curl gnupg2 software-properties-common"
-DOCKER_REPO="deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-DOCKER_URL=https://download.docker.com/linux/debian/gpg
+BASE_URL=https://download.docker.com/linux
+DEBIAN_PKGS="apt-transport-https ca-certificates curl gnupg2 \
+software-properties-common"
 
-distro_name=$(get-os-distro-name)
 kernel_name=$(get-os-kernel-name)
 
 case "$kernel_name" in
     (Linux)
-	case "$distro_name" in
-	    (debian)
+	distro="$(get-os-distro-name)"
+	url="$BASE_URL/$distro"
+
+	case "$distro" in
+	    (debian|ubuntu)
+		codename="$(lsb_release -cs)"
+		debian_repo="deb [arch=amd64] $url $codename stable"
 		sudo apt-get remove "$@" docker docker.io || true
-		sudo apt-get install "$@" $DOCKER_DEPS
-		curl -fsSL $DOCKER_URL | sudo apt-key add -
-		sudo add-apt-repository "$DOCKER_REPO"
+		sudo apt-get install "$@" $DEBIAN_PKGS
+		curl -fsSL $url/gpg | sudo apt-key add -
+		sudo add-apt-repository "$debian_repo"
 		sudo apt-get update
 		sudo apt-get install "$@" docker-ce
 		;;
