@@ -24,10 +24,10 @@ kernel_name=$(get-os-kernel-name)
 
 case "$kernel_name" in
     (Linux)
-	distro="$(get-os-distro-name)"
+	distro_name="$(get-os-distro-name)"
 	url="$BASE_URL/$distro"
 
-	case "$distro" in
+	case "$distro_name" in
 	    (debian|ubuntu)
 		codename="$(lsb_release -cs)"
 		debian_repo="deb [arch=amd64] $url $codename stable"
