@@ -20,6 +20,11 @@ DEBIAN_PKGS="apt-transport-https ca-certificates curl gnupg2 \
 software-properties-common"
 DOCKER_BASE_URL=https://download.docker.com
 
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
 distro_name=$(get-os-distro-name)
 kernel_name=$(get-os-kernel-name)
 
