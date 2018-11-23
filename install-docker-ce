@@ -16,9 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DOCKER_PKGS="docker docker.io"
+DOCKER_DEPS="apt-transport-https ca-certificates curl gnupg2 software-properties-common"
 DOCKER_REPO="deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-DOCKER_REQS="apt-transport-https ca-certificates curl gnupg2 software-properties-common"
 DOCKER_URL=https://download.docker.com/linux/debian/gpg
 
 distro_name=$(get-os-distro-name)
@@ -28,8 +27,8 @@ case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
-		sudo apt-get remove "$@" $DOCKER_PKGS
-		sudo apt-get install "$@" $DOCKER_REQS
+		sudo apt-get remove "$@" docker docker.io
+		sudo apt-get install "$@" $DOCKER_DEPS
 		curl -fsSL $DOCKER_URL | sudo apt-key add -
 		sudo add-apt-repository "$DOCKER_REPO"
 		sudo apt-get update
