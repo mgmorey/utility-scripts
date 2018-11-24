@@ -36,7 +36,7 @@ fi
 case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
-	    (debian|ubuntu)
+	    (debian)
 		case "$desktop_name" in
 		    (GNOME*|*:GNOME)
 			sudo software-properties-gtk
@@ -46,6 +46,22 @@ case "$kernel_name" in
 			;;
 		    (MATE)
 			sudo software-properties-gtk
+			;;
+		    (*)
+			abort "%s: Desktop not supported\n" "$desktop_name"
+			;;
+		esac
+		;;
+	    (ubuntu)
+		case "$desktop_name" in
+		    (GNOME*|*:GNOME)
+			software-properties-gtk
+			;;
+		    (KDE*)
+			software-properties-kde
+			;;
+		    (MATE)
+			software-properties-gtk
 			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"
