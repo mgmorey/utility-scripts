@@ -1,0 +1,5 @@
+#!/bin/sh -eu
+
+BASE_URL=https://github.com/pyenv
+
+curl -L $BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer | bash
