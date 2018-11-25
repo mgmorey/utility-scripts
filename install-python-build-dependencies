@@ -17,8 +17,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 DEBIAN_PYTHON="python3"
-DEBIAN_PKGS="gcc libffi-dev libgdbm-dev libhashkit-dev libreadline-dev \
-libsqlite3-dev libssl-dev tk-dev uuid-dev"
+DEBIAN_PKGS="build-essential libffi-dev libgdbm-dev libhashkit-dev \
+libreadline-dev libsqlite3-dev libssl-dev tk-dev uuid-dev"
 
 abort() {
     printf "$@" >&2
