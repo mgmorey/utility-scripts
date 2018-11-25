@@ -18,43 +18,43 @@
 
 
 BASE_URL=https://www.python.org/ftp
-PYTHON_VERSION=3.7.1
-
-PYTHON_BASENAME=Python-$PYTHON_VERSION
-
-ARCHIVE_DIR="$HOME/Downloads/Python"
-BUILD_DIR="$HOME/Documents/build/$PYTHON_BASENAME"
-SRC_DIR="$HOME/Documents/src/Python/$PYTHON_BASENAME"
-
-PYTHON_FILENAME=$PYTHON_BASENAME.tar.xz
-
-PYTHON_PATHNAME=$ARCHIVE_DIR/$PYTHON_FILENAME
-PYTHON_URL=$BASE_URL/python/$PYTHON_VERSION/$PYTHON_FILENAME
+VERSION=3.7.1
 
 abort() {
     printf "$@" >&2
     exit 1
 }
 
+basename=Python-$VERSION
+
+archive_dir="$HOME/Downloads/Python"
+build_dir="$HOME/Documents/build/$basename"
+src_dir="$HOME/Documents/src/Python/$basename"
+
+filename=$basename.tar.xz
+
+pathname=$archive_dir/$filename
+url=$BASE_URL/python/$VERSION/$filename
+
 kernel_name=$(get-os-kernel-name)
 
 case "$kernel_name" in
     (Linux|FreeBSD|SunOS|NT)
-	mkdir -p "$BUILD_DIR" "$(dirname "$SRC_DIR")" "$ARCHIVE_DIR"
+	mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
 
-	if [ ! -r "$PYTHON_PATHNAME" ]; then
-	    cd "$ARCHIVE_DIR"
-	    wget $PYTHON_URL
+	if [ ! -r "$pathname" ]; then
+	    cd "$archive_dir"
+	    wget $url
 	fi
 
-	if [ ! -r "$SRC_DIR/configure" ]; then
-	    cd $(dirname "$SRC_DIR")
-	    tar -xvf "$PYTHON_PATHNAME"
+	if [ ! -r "$src_dir/configure" ]; then
+	    cd $(dirname "$src_dir")
+	    tar -xvf "$pathname"
 	fi
 
-	if [ ! -r "$BUILD_DIR/config.status" ]; then
-	    cd "$BUILD_DIR"
-	    "$SRC_DIR/configure" "$@"
+	if [ ! -r "$build_dir/config.status" ]; then
+	    cd "$build_dir"
+	    "$src_dir/configure" "$@"
 	fi
 	;;
     (*)
