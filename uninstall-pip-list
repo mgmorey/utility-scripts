@@ -1,0 +1,3 @@
+#!/bin/sh
+
+pip3 uninstall $(pip list | awk 'NR > 2 {print $1}')
