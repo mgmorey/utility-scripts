@@ -35,6 +35,13 @@ for file in $dir/*; do
     fi
 done
 
+for file in Documents/bin/*; do
+    if [ -h $file -a ! -e $file ]; then
+	printf "Removing broken link: %s\n" "$file"
+	/bin/rm -f $file
+    fi
+done
+
 if [ ! -e bin ]; then
     ln -s Documents/bin bin
 fi
