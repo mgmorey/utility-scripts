@@ -16,7 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PYTHON="python3"
 DEBIAN_PKGS="build-essential libffi-dev libgdbm-dev libhashkit-dev \
 libreadline-dev libsqlite3-dev libssl-dev python-dev tk-dev uuid-dev"
 
@@ -33,7 +32,6 @@ case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
-		sudo $package_manager build-dep "$@" $DEBIAN_PYTHON
 		install-packages "$@" $DEBIAN_PKGS
 		;;
 	    (*)
