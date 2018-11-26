@@ -26,7 +26,7 @@ REDHAT_PKGS="gcc make gdbm-devel libffi-devel ncurses-devel \
 openssl-devel python-dev readline-devel sqlite-devel \
 tcl-devel tix-devel tk-devel uuid-dev yum-utils"
 
-SUNOS_PKGS="build-essential gcc-8 gcc-8-runtime gnutls"
+SUNOS_PKGS="build-essential gcc gcc-runtime gnutls"
 
 abort() {
     printf "$@" >&2
