@@ -16,4 +16,5 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-sudo $(get-package-manager) install "$@"
+install_options=$(get-package-install-options)
+sudo $(get-package-manager) install $install_options "$@"
