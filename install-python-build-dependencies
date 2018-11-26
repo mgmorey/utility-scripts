@@ -16,8 +16,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+DEBIAN_PKG="python"
 DEBIAN_PKGS="build-essential libffi-dev libgdbm-dev libhashkit-dev \
-libreadline-dev libsqlite3-dev libssl-dev python-dev tk-dev uuid-dev"
+libreadline-dev libsqlite3-dev libssl-dev python-dev readline-dev \
+tk-dev uuid-dev"
+
+REDHAT_PKG="python "
+REDHAT_PKGS="gcc make gdbm-devel libffi-devel ncurses-devel \
+openssl-devel python-dev readline-devel sqlite-devel \
+tcl-devel tix-devel tk-devel uuid-dev yum-utils"
+
+SUNOS_PKGS="build-essential gcc-8 gcc-8-runtime gnutls"
 
 abort() {
     printf "$@" >&2
@@ -33,11 +42,19 @@ case "$kernel_name" in
 	case "$distro_name" in
 	    (debian|ubuntu)
 		install-packages "$@" $DEBIAN_PKGS
+		sudo ${package_manager} build-dep "$@" $REDHAT_PKG
+		;;
+	    (redhat|centos)
+		install-packages "$@" $REDHAT_PKGS
+		sudo ${package_manager}-builddep "$@" $REDHAT_PKG
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
 		;;
 	esac
+	;;
+    (SunOS)
+	install-packages "$@" $SUNOS_PKGS
 	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
