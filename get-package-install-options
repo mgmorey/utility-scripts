@@ -23,7 +23,7 @@ case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
-		printf "-qy --no-install-recommends"
+		printf "%s\n" "-qy --no-install-recommends"
 		;;
 	esac
 	;;
