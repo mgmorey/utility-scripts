@@ -20,5 +20,5 @@ package_manager=$(get-package-manager)
 
 if [ -n "$package_manager" ]; then
     install_options=$(get-package-install-options)
-    sudo package_manager install $install_options "$@"
+    sudo "$package_manager" install $install_options "$@"
 fi
