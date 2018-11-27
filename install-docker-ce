@@ -36,7 +36,7 @@ case "$kernel_name" in
 	    (debian|ubuntu)
 		codename="$(lsb_release -cs)"
 		repository="deb [arch=amd64] $docker_url $codename stable"
-		sudo apt-get remove "$@" docker docker.io || true
+		sudo apt-get remove -qqy docker docker.io || true
 		sudo apt-get install "$@" $DEBIAN_PKGS
 		curl -fsSL $docker_url/gpg | sudo apt-key add -
 		sudo add-apt-repository "$repository"
