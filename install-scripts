@@ -29,16 +29,16 @@ dir=$PWD
 cd "$HOME"
 mkdir -p Documents/bin
 
-for file in $dir/*; do
-    if [ ! -e Documents/bin/$(basename $file) -a -x $file ]; then
-	ln -s $file Documents/bin
-    fi
-done
-
 for file in Documents/bin/*; do
     if [ -h $file -a ! -e $file ]; then
 	printf "Removing broken link: %s\n" "$file"
 	/bin/rm -f $file
+    fi
+done
+
+for file in $dir/*; do
+    if [ ! -e Documents/bin/$(basename $file) -a -x $file ]; then
+	ln -s $file Documents/bin
     fi
 done
 
