@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKGS="libwebkit2gtk-4.0-dev"
+DEBIAN_PKGS="libgnutls28-dev libgpm-dev libwebkit2gtk-4.0-dev"
 
 OPENSUSE_PKGS="webkit2gtk3-devel"
 
