@@ -16,8 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKG="emacs25"
-DEBIAN_PKGS="build-essential"
+DEBIAN_PKG=emacs25
 
 OPENSUSE_PKGS="gcc gconf2-devel giflib-devel gpm-devel gtk3-devel \
 ImageMagick-devel libacl-devel libgnutls-devel libjpeg62-devel \
@@ -27,10 +26,7 @@ libXmu-devel libXpm-devel libXrandr-devel libXt-devel libXTrap-devel \
 libXtst-devel libXv-devel libxml2-devel make m17n-lib-devel \
 ncurses5-devel zlib-devel"
 
-REDHAT_PKG="emacs"
-REDHAT_PKGS="gcc make yum-utils"
-
-SUNOS_PKGS="build-essential gcc-8 gcc-8-runtime gnutls"
+REDHAT_PKG=emacs
 
 abort() {
     printf "$@" >&2
@@ -46,11 +42,9 @@ case "$kernel_name" in
 	case "$distro_name" in
 	    (debian|ubuntu)
 		package=$DEBIAN_PKG
-		packages="$DEBIAN_PKGS"
 		;;
 	    (redhat|centos)
 		package=$REDHAT_PKG
-		packages="$REDHAT_PKGS"
 		;;
 	    (opensuse-*)
 		packages="$OPENSUSE_PKGS"
@@ -60,14 +54,13 @@ case "$kernel_name" in
 		;;
 	esac
 	;;
-    (SunOS)
-	packages="$SUNOS_PKGS"
-	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
 	;;
 esac
 
 if [ -z "${package:-}" ] || ! install-build-dependencies "$@" $package; then
-    install-packages "$@" $packages
+    if [ -n "${packages:-}" ]; then
+	install-packages "$@" $packages
+    fi
 fi
