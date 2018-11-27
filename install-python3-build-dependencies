@@ -16,17 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKG="python3-defaults"
-DEBIAN_PKGS="build-essential libffi-dev libgdbm-dev libhashkit-dev \
-libreadline-dev libsqlite3-dev libssl-dev python-dev readline-dev \
-tk-dev uuid-dev"
+DEBIAN_PKG=python3-defaults
 
-REDHAT_PKG="python3"
-REDHAT_PKGS="gcc make gdbm-devel libffi-devel ncurses-devel \
-openssl-devel python-dev readline-devel sqlite-devel \
-tcl-devel tix-devel tk-devel uuid-dev yum-utils"
-
-SUNOS_PKGS="build-essential gcc gcc-runtime gnutls"
+REDHAT_PKG=python3
 
 abort() {
     printf "$@" >&2
@@ -42,19 +34,14 @@ case "$kernel_name" in
 	case "$distro_name" in
 	    (debian|ubuntu)
 		package=$DEBIAN_PKG
-		packages="$DEBIAN_PKGS"
 		;;
 	    (redhat|centos)
 		package=$REDHAT_PKG
-		packages="$REDHAT_PKGS"
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
 		;;
 	esac
-	;;
-    (SunOS)
-	packages="$SUNOS_PKGS"
 	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
@@ -62,5 +49,7 @@ case "$kernel_name" in
 esac
 
 if [ -z "${package:-}" ] || ! install-build-dependencies "$@" $package; then
-    install-packages "$@" $packages
+    if [ -n "${packages:-}" ]; then
+	install-packages "$@" $packages
+    fi
 fi
