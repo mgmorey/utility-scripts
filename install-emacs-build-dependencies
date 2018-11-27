@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 DEBIAN_PKG="emacs25"
-DEBIAN_PKGS="build-essential libwebkit2gtk-4.0-dev"
+DEBIAN_PKGS="build-essential"
 
 OPENSUSE_PKGS="gcc gconf2-devel giflib-devel gpm-devel gtk3-devel \
 ImageMagick-devel libacl-devel libgnutls-devel libjpeg62-devel \
