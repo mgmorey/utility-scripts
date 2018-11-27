@@ -45,15 +45,15 @@ case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
-		install-packages "$@" $DEBIAN_PKGS
-		sudo $package_manager build-dep "$@" $DEBIAN_PKG
+		package=$DEBIAN_PKG
+		packages="$DEBIAN_PKGS"
 		;;
 	    (redhat|centos)
-		install-packages "$@" $REDHAT_PKGS
-		sudo ${package_manager}-builddep "$@" $REDHAT_PKG
+		package=$REDHAT_PKG
+		packages="$REDHAT_PKGS"
 		;;
 	    (opensuse-*)
-		install-packages "$@" $OPENSUSE_PKGS
+		packages="$OPENSUSE_PKGS"
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
@@ -61,9 +61,13 @@ case "$kernel_name" in
 	esac
 	;;
     (SunOS)
-	install-packages "$@" $SUNOS_PKGS
+	packages="$SUNOS_PKGS"
 	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
 	;;
 esac
+
+if [ -z "${package:-}" ] || ! install-build-dependencies "$@" $package; then
+    install-packages "$@" $packages
+fi
