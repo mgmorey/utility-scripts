@@ -31,7 +31,7 @@ case "$system_name" in
 	    . /etc/os-release
 	    case "$ID" in
 		(debian|ubuntu)
-		    apt-get install $DEBIAN_PKGS
+		    su -c "apt-get install $DEBIAN_PKGS"
 		    ;;
 		(*)
 		    abort "%s: Distro not supported\n" "$distro_name"
@@ -46,6 +46,6 @@ case "$system_name" in
 	;;
 esac
 
-if usermod -a -G sudo $USER; then
+if su -c "usermod -a -G sudo $USER"; then
     printf "Please restart before using sudo\n"
 fi

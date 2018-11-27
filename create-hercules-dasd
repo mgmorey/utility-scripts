@@ -1,6 +1,6 @@
-#!/bin/sh -eu
+#!/bin/sh -eux
 
-# install-scripts: install scripts
+# create-hercules-dasd: create Hercules DASD container files
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,32 +16,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-abort() {
-    printf "$@" >&2
-    exit 1
-}
+DIR=$HOME/Documents/Mainframe/dasd
+INIT="dasdinit -a -lfs -linux"
 
-if [ -h $0 ]; then
-    abort "Please change to source directory before running this script\n"
-fi
+INSTANCE=0
+MODEL=3390
 
-dir=$PWD
-cd "$HOME"
-mkdir -p Documents/bin
+mkdir -p $DIR
+cd $DIR
 
-for file in Documents/bin/*; do
-    if [ -h $file -a ! -e $file ]; then
-	printf "Removing broken link: %s\n" "$file"
-	/bin/rm -f $file
+for CUU in 120 122; do
+    FILE=$MODEL.LINUX.$INSTANCE$CUU
+
+    case $CUU in
+	(*0) TYPE=9
+		 ;;
+	(*1) TYPE=3
+	       ;;
+	(*2) TYPE=2
+	       ;;
+    esac
+
+    if [ ! -f $FILE ]; then
+	$INIT $FILE $MODEL-$TYPE LIN$CUU
     fi
 done
-
-for file in $dir/*; do
-    if [ ! -e Documents/bin/$(basename $file) -a -x $file ]; then
-	ln -s $file Documents/bin
-    fi
-done
-
-if [ ! -e bin ]; then
-    ln -s Documents/bin bin
-fi

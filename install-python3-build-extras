@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-scripts: install scripts
+# install-python3-build-extras: install Python3 build extras
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,32 +16,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# DEBIAN_PKGS=""
+
 abort() {
     printf "$@" >&2
     exit 1
 }
 
-if [ -h $0 ]; then
-    abort "Please change to source directory before running this script\n"
-fi
+distro_name=$(get-os-distro-name)
+kernel_name=$(get-os-kernel-name)
 
-dir=$PWD
-cd "$HOME"
-mkdir -p Documents/bin
+case "$kernel_name" in
+    (Linux)
+	case "$distro_name" in
+	    # (debian|ubuntu)
+	    # 	packages=$DEBIAN_PKGS
+	    # 	;;
+	    (*)
+		abort "%s: Distro not supported\n" "$distro_name"
+		;;
+	esac
+	;;
+    (*)
+	abort "%s: Operating system not supported\n" "$kernel_name"
+	;;
+esac
 
-for file in Documents/bin/*; do
-    if [ -h $file -a ! -e $file ]; then
-	printf "Removing broken link: %s\n" "$file"
-	/bin/rm -f $file
-    fi
-done
-
-for file in $dir/*; do
-    if [ ! -e Documents/bin/$(basename $file) -a -x $file ]; then
-	ln -s $file Documents/bin
-    fi
-done
-
-if [ ! -e bin ]; then
-    ln -s Documents/bin bin
-fi
+install-packages "$@" $packages

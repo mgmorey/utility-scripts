@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-python-build-dependencies: install python build dependencies
+# install-build-dependencies: install build dependencies
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKGS="build-essential libffi-dev libgdbm-dev libhashkit-dev \
-libreadline-dev libsqlite3-dev libssl-dev python-dev tk-dev uuid-dev"
+DEBIAN_BUILD_TOOLS="build-essential"
+
+REDHAT_BUILD_TOOLS="gcc make yum-utils"
 
 abort() {
     printf "$@" >&2
@@ -28,11 +29,20 @@ distro_name=$(get-os-distro-name)
 kernel_name=$(get-os-kernel-name)
 package_manager=$(get-package-manager)
 
+if [ -z "$package_manager" ]; then
+    abort "%s\n" "No package manager"
+fi
+
 case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
-		install-packages "$@" $DEBIAN_PKGS
+		install-packages $DEBIAN_BUILD_TOOLS
+		sudo $package_manager build-dep "$@"
+		;;
+	    (redhat|centos)
+		install-packages $REDHAT_BUILD_TOOLS
+		sudo ${package_manager}-builddep "$@"
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"

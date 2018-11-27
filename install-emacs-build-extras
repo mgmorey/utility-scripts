@@ -1,6 +1,6 @@
-#!/bin/sh -eux
+#!/bin/sh -eu
 
-# create-dasd: create IBM DASD container files for Hercules
+# install-emacs-build-extras: install GNU Emacs build extras
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,28 +16,35 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DIR=$HOME/Documents/Mainframe/dasd
-INIT="dasdinit -a -lfs -linux"
+DEBIAN_PKGS="libgnutls28-dev libgpm-dev libwebkit2gtk-4.0-dev"
 
-INSTANCE=0
-MODEL=3390
+OPENSUSE_PKGS="webkit2gtk3-devel"
 
-mkdir -p $DIR
-cd $DIR
+abort() {
+    printf "$@" >&2
+    exit 1
+}
 
-for CUU in 120 122; do
-    FILE=$MODEL.LINUX.$INSTANCE$CUU
+distro_name=$(get-os-distro-name)
+kernel_name=$(get-os-kernel-name)
 
-    case $CUU in
-	(*0) TYPE=9
-		 ;;
-	(*1) TYPE=3
-	       ;;
-	(*2) TYPE=2
-	       ;;
-    esac
+case "$kernel_name" in
+    (Linux)
+	case "$distro_name" in
+	    (debian|ubuntu)
+		packages="$DEBIAN_PKGS"
+		;;
+	    (opensuse-*)
+		packages="$OPENSUSE_PKGS"
+		;;
+	    (*)
+		abort "%s: Distro not supported\n" "$distro_name"
+		;;
+	esac
+	;;
+    (*)
+	abort "%s: Operating system not supported\n" "$kernel_name"
+	;;
+esac
 
-    if [ ! -f $FILE ]; then
-	$INIT $FILE $MODEL-$TYPE LIN$CUU
-    fi
-done
+install-packages "$@" $packages
