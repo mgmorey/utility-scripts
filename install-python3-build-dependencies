@@ -27,7 +27,6 @@ abort() {
 
 distro_name=$(get-os-distro-name)
 kernel_name=$(get-os-kernel-name)
-package_manager=$(get-package-manager)
 
 case "$kernel_name" in
     (Linux)
