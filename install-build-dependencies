@@ -38,11 +38,11 @@ case "$kernel_name" in
 	case "$distro_name" in
 	    (debian|ubuntu)
 		install-packages $DEBIAN_BUILD_TOOLS
-		sudo $package_manager build-dep "$1"
+		sudo $package_manager build-dep "$@"
 		;;
 	    (redhat|centos)
 		install-packages $REDHAT_BUILD_TOOLS
-		sudo ${package_manager}-builddep "$1"
+		sudo ${package_manager}-builddep "$@"
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
