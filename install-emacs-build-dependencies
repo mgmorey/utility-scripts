@@ -68,6 +68,6 @@ case "$kernel_name" in
 	;;
 esac
 
-if [ -z "${package:-}" ] || ! install-build-dependencies "$@" $package; then
-    install-packages "$@" $packages
+if [ -z "${package:-}" ] || ! install-build-dependencies $package; then
+    install-packages $packages
 fi
