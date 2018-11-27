@@ -25,7 +25,7 @@ libICE-devel liblcms2-devel libpng16-devel libSM-devel \
 libtiff-devel libX11-devel libXaw3d-devel libXext-devel libXi-devel \
 libXmu-devel libXpm-devel libXrandr-devel libXt-devel libXTrap-devel \
 libXtst-devel libXv-devel libxml2-devel make m17n-lib-devel \
-ncurses5-devel webkit2gtk3-devel zlib-devel"
+ncurses5-devel zlib-devel"
 
 REDHAT_PKG="emacs"
 REDHAT_PKGS="gcc make yum-utils"
