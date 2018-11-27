@@ -42,6 +42,9 @@ case "$kernel_name" in
 		sudo add-apt-repository "$repository"
 		sudo apt-get update
 		sudo apt-get install "$@" docker-ce
+		if sudo usermod -a -G docker $USER; then
+		    printf "Please restart before using docker\n"
+		fi
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
