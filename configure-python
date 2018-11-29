@@ -43,16 +43,10 @@ case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian)
-	    	install-python3-build-dependencies
-	    	install-python3-build-extras
 	    	;;
 	    (fedora)
-	    	install-python3-build-dependencies
-	    	install-python3-build-extras
 	    	;;
 	    (opensuse-*)
-	    	install-python3-build-dependencies
-	    	install-python3-build-extras
 	    	;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
@@ -65,6 +59,9 @@ case "$kernel_name" in
 	abort "%s: Operating system not supported\n" "$kernel_name"
 	;;
 esac
+
+install-python3-build-dependencies
+install-python3-build-extras
 
 mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
 
