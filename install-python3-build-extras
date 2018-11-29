@@ -19,7 +19,7 @@
 # DEBIAN_PKGS=""
 
 FEDORA_PKGS="bzip2-devel gdbm-devel lzma-sdk-devel mcpanel-devel \
-ncurses-devel readline-devel sqlite-devel tk-devel"
+ncurses-devel pyliblzma readline-devel sqlite-devel tk-devel"
 
 abort() {
     printf "$@" >&2
