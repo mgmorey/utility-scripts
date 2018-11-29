@@ -31,7 +31,7 @@ case "$kernel_name" in
 		printf apt-get
 		;;
 	    (fedora)
-		printf yum
+		printf dnf
 		;;
 	    (redhat|centos)
 		printf yum
