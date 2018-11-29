@@ -54,7 +54,7 @@ case "$kernel_name" in
 			;;
 		esac
 		;;
-	    (centos|redhat)
+	    (fedora)
 		case "$desktop_name" in
 		    (GNOME*|*:GNOME)
 			package=openssh-askpass
@@ -70,7 +70,7 @@ case "$kernel_name" in
 			;;
 		esac
 		;;
-	    (fedora)
+	    (redhat|centos)
 		case "$desktop_name" in
 		    (GNOME*|*:GNOME)
 			package=openssh-askpass
