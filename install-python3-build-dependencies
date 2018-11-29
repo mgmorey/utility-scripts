@@ -18,6 +18,8 @@
 
 DEBIAN_PKG=python3-defaults
 
+FEDORA_PKG=python3-defaults
+
 REDHAT_PKG=python
 
 abort() {
@@ -33,6 +35,9 @@ case "$kernel_name" in
 	case "$distro_name" in
 	    (debian|ubuntu)
 		package=$DEBIAN_PKG
+		;;
+	    (fedora)
+		package=$FEDORA_PKG
 		;;
 	    (redhat|centos)
 		package=$REDHAT_PKG
