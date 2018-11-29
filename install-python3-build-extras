@@ -22,8 +22,8 @@ libsqlite3-dev libssl-dev tk8.6-dev"
 FEDORA_PKGS="bzip2-devel gdbm-devel mcpanel-devel ncurses-devel \
 readline-devel sqlite-devel tk-devel"
 
-OPENSUSE_PKGS="bzip2-devel gdbm-devel libbz2-devel ncurses-devel \
-readline-devel sqlite-devel tk-devel"
+OPENSUSE_PKGS="gdbm-devel libbz2-devel libressl-devel ncurses-devel \
+readline-devel sqlite3-devel tk-devel"
 
 abort() {
     printf "$@" >&2
