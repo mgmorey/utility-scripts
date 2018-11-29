@@ -18,7 +18,7 @@
 
 DEBIAN_PKG=python3-defaults
 
-FEDORA_PKG=python3-defaults
+FEDORA_PKGS=pyliblzma
 
 REDHAT_PKG=python
 
@@ -37,7 +37,7 @@ case "$kernel_name" in
 		package=$DEBIAN_PKG
 		;;
 	    (fedora)
-		package=$FEDORA_PKG
+		packages=$FEDORA_PKGS
 		;;
 	    (redhat|centos)
 		package=$REDHAT_PKG
