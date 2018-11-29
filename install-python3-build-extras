@@ -16,7 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-FEDORA_PKGS="bzip2-devel gdbm-devel mcpanel-devel ncurses-devel \
+FEDORA_PKGS="libbz2-dev libgdbm-dev libncurses5-dev libreadline-dev \
+libsqlite3-dev libssl-dev tk8.6-dev"
+
+DEBIAN_PKGS="bzip2-devel gdbm-devel mcpanel-devel ncurses-devel \
 readline-devel sqlite-devel tk-devel"
 
 abort() {
@@ -30,6 +33,9 @@ kernel_name=$(get-os-kernel-name)
 case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
+	    (debian)
+	    	packages=$FEDORA_PKGS
+	    	;;
 	    (fedora)
 	    	packages=$FEDORA_PKGS
 	    	;;
