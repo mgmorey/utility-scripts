@@ -18,6 +18,9 @@
 
 # DEBIAN_PKGS=""
 
+FEDORA_PKGS="bzip2-devel gdbm-devel lzma-sdk-devel mcpanel-devel \
+ncurses-devel readline-devel sqlite-devel tk-devel"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -32,6 +35,9 @@ case "$kernel_name" in
 	    # (debian|ubuntu)
 	    # 	packages=$DEBIAN_PKGS
 	    # 	;;
+	    (fedora)
+	    	packages=$FEDORA_PKGS
+	    	;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
 		;;
