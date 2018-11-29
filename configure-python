@@ -36,28 +36,49 @@ filename=$basename.tar.xz
 pathname=$archive_dir/$filename
 url=$BASE_URL/python/$VERSION/$filename
 
+distro_name=$(get-os-distro-name)
 kernel_name=$(get-os-kernel-name)
 
 case "$kernel_name" in
-    (Linux|FreeBSD|SunOS|NT)
-	mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
-
-	if [ ! -r "$pathname" ]; then
-	    cd "$archive_dir"
-	    wget $url
-	fi
-
-	if [ ! -r "$src_dir/configure" ]; then
-	    cd $(dirname "$src_dir")
-	    tar -xvf "$pathname"
-	fi
-
-	if [ ! -r "$build_dir/config.status" ]; then
-	    cd "$build_dir"
-	    "$src_dir/configure" "$@"
-	fi
+    (Linux)
+	case "$distro_name" in
+	    (debian)
+	    	install-python3-build-dependencies
+	    	install-python3-build-extras
+	    	;;
+	    (fedora)
+	    	install-python3-build-dependencies
+	    	install-python3-build-extras
+	    	;;
+	    (opensuse-*)
+	    	install-python3-build-dependencies
+	    	install-python3-build-extras
+	    	;;
+	    (*)
+		abort "%s: Distro not supported\n" "$distro_name"
+		;;
+	esac
+	;;
+    (FreeBSD|SunOS|NT)
 	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
 	;;
 esac
+
+mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
+
+if [ ! -r "$pathname" ]; then
+    cd "$archive_dir"
+    wget $url
+fi
+
+if [ ! -r "$src_dir/configure" ]; then
+    cd $(dirname "$src_dir")
+    tar -xvf "$pathname"
+fi
+
+if [ ! -r "$build_dir/config.status" ]; then
+    cd "$build_dir"
+    "$src_dir/configure" "$@"
+fi
