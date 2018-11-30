@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-RE='/.+/(bin|lib|libexec)/.+askpass$'
+RE='/.+/(bin|lib|libexec)/.+(askpass|askpass2)$'
 
 abort() {
     printf "$@" >&2
@@ -119,8 +119,14 @@ case "$kernel_name" in
 	;;
     (FreeBSD)
 	case "$desktop_name" in
+	    (GNOME*)
+		package=gnome-ssh-askpass
+		;;
 	    (KDE*)
 		package=ksshaskpass
+		;;
+	    ('')
+		package=gnome-ssh-askpass
 		;;
 	    (*)
 		abort "%s: Desktop not supported\n" "$desktop_name"
