@@ -40,11 +40,7 @@ case "$kernel_name" in
 		install-packages $DEBIAN_BUILD_TOOLS
 		sudo $package_manager build-dep "$@"
 		;;
-	    (fedora)
-		install-packages $REDHAT_BUILD_TOOLS
-		sudo ${package_manager}-builddep "$@"
-		;;
-	    (redhat|centos)
+	    (fedora|redhat|centos)
 		install-packages $REDHAT_BUILD_TOOLS
 		sudo ${package_manager}-builddep "$@"
 		;;
