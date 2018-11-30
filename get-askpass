@@ -37,17 +37,11 @@ case "$kernel_name" in
 	case "$distro_name" in
 	    (debian|ubuntu)
 		case "$desktop_name" in
-		    (GNOME*|*:GNOME)
+		    (GNOME*|*:GNOME|'')
 			package=ssh-askpass-gnome
 			;;
 		    (KDE*)
 			package=ksshaskpass
-			;;
-		    (MATE)
-			package=ssh-askpass
-			;;
-		    ('')
-			package=ssh-askpass
 			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"
@@ -56,14 +50,11 @@ case "$kernel_name" in
 		;;
 	    (fedora)
 		case "$desktop_name" in
-		    (GNOME*|*:GNOME)
+		    (GNOME*|*:GNOME|'')
 			package=openssh-askpass
 			;;
 		    (KDE*)
 			package=ksshaskpass
-			;;
-		    ('')
-			package=openssh-askpass
 			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"
@@ -72,14 +63,11 @@ case "$kernel_name" in
 		;;
 	    (redhat|centos)
 		case "$desktop_name" in
-		    (GNOME*|*:GNOME)
+		    (GNOME*|*:GNOME|'')
 			package=openssh-askpass
 			;;
 		    (KDE*)
 			package=ksshaskpass
-			;;
-		    ('')
-			package=openssh-askpass
 			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"
@@ -88,14 +76,11 @@ case "$kernel_name" in
 		;;
 	    (opensuse-*)
 		case "$desktop_name" in
-		    (GNOME*|*:GNOME)
+		    (GNOME*|*:GNOME|'')
 			package=openssh-askpass-gnome
 			;;
 		    (KDE*)
 			package=ksshaskpass5
-			;;
-		    ('')
-			package=openssh-askpass-gnome
 			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"
@@ -119,14 +104,11 @@ case "$kernel_name" in
 	;;
     (FreeBSD)
 	case "$desktop_name" in
-	    (GNOME*)
+	    (GNOME*|'')
 		package=gnome-ssh-askpass
 		;;
 	    (KDE*)
 		package=ksshaskpass
-		;;
-	    ('')
-		package=gnome-ssh-askpass
 		;;
 	    (*)
 		abort "%s: Desktop not supported\n" "$desktop_name"
@@ -137,10 +119,7 @@ case "$kernel_name" in
 	case "$distro_name" in
 	    (illumos)
 		case "$desktop_name" in
-		    (MATE)
-			package=ssh-askpass
-			;;
-		    ('')
+		    (MATE|'')
 			package=ssh-askpass
 			;;
 		    (*)
@@ -155,10 +134,7 @@ case "$kernel_name" in
 	;;
     (NT)
 	case "$desktop_name" in
-	    (MATE|X-Cygwin)
-		askpass_helper=/usr/libexec/gnome-ssh-askpass.exe
-		;;
-	    ('')
+	    (MATE|X-Cygwin|'')
 		askpass_helper=/usr/libexec/gnome-ssh-askpass.exe
 		;;
 	    (*)
