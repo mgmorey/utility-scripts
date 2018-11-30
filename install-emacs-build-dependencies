@@ -18,13 +18,7 @@
 
 DEBIAN_PKG=emacs25
 
-OPENSUSE_PKGS="gcc gconf2-devel giflib-devel gpm-devel gtk3-devel \
-ImageMagick-devel libacl-devel libgnutls-devel libjpeg62-devel \
-libICE-devel liblcms2-devel libpng16-devel libSM-devel \
-libtiff-devel libX11-devel libXaw3d-devel libXext-devel libXi-devel \
-libXmu-devel libXpm-devel libXrandr-devel libXt-devel libXTrap-devel \
-libXtst-devel libXv-devel libxml2-devel make m17n-lib-devel \
-ncurses5-devel zlib-devel"
+OPENSUSE_PKGS="gcc"
 
 REDHAT_PKG=emacs
 
