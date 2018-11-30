@@ -36,7 +36,7 @@ kernel_name=$(get-os-kernel-name)
 case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
-	    (debian)
+	    (debian|ubuntu)
 	    	packages=$DEBIAN_PKGS
 	    	;;
 	    (fedora)
