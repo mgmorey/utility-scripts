@@ -40,6 +40,9 @@ case "$kernel_name" in
 	    (debian|ubuntu)
 		packages="$DEBIAN_PKGS"
 		;;
+	    (redhat|centos)
+		exit 0
+	    	;;
 	    (opensuse-*)
 		packages="$OPENSUSE_PKGS"
 		;;
