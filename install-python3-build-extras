@@ -55,4 +55,6 @@ case "$kernel_name" in
 	;;
 esac
 
-install-packages "$@" $packages
+if [ -n "${packages:-}" ]; then
+    install-packages "$@" $packages
+fi

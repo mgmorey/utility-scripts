@@ -41,7 +41,6 @@ case "$kernel_name" in
 		packages="$DEBIAN_PKGS"
 		;;
 	    (redhat|centos)
-		exit 0
 	    	;;
 	    (opensuse-*)
 		packages="$OPENSUSE_PKGS"
@@ -56,4 +55,6 @@ case "$kernel_name" in
 	;;
 esac
 
-install-packages "$@" $packages
+if [ -n "${packages:-}" ]; then
+    install-packages "$@" $packages
+fi
