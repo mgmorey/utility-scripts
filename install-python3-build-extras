@@ -16,13 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKGS="libbz2-dev libgdbm-dev libncurses5-dev libreadline-dev \
-libsqlite3-dev libssl-dev tk8.6-dev"
+DEBIAN_PKGS="libbz2-dev libgdbm-dev libncurses5-dev \
+libreadline-dev libsqlite3-dev libssl-dev tk8.6-dev"
 
-FEDORA_PKGS="bzip2-devel gdbm-devel mcpanel-devel ncurses-devel \
+FEDORA_PKGS="bzip2-devel gdbm-devel ncurses-devel \
 readline-devel sqlite-devel tk-devel"
 
-OPENSUSE_PKGS="gdbm-devel libbz2-devel libressl-devel ncurses-devel \
+OPENSUSE_PKGS="gdbm-devel libbz2-devel ncurses-devel \
 readline-devel sqlite3-devel tk-devel"
 
 abort() {
