@@ -1,6 +1,6 @@
 #!/bin/sh -eux
 
-# configure-qemu: download and configure qemu
+# configure-qemu: download and configure QEMU
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -62,7 +62,7 @@ if [ ! -r "$pathname" ]; then
     wget $url || exit $?
 fi
 
-if [ ! -r "$src_dir/INSTALL" ]; then
+if [ ! -r "$src_dir/Makefile" ]; then
     cd $(dirname "$src_dir")
     tar -xvf "$pathname"
 fi
