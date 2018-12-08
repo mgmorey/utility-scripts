@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-packages: install packages
+# get-package-manager: get name of package manager utility
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
