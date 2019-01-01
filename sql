@@ -68,7 +68,9 @@ sql_dir=$source_dir/sql
 
 scripts=
 
-if [ -r "$source_dir/.env" ]; then
+if [ -r .env ]; then
+    . ./.env
+elif [ -r "$source_dir/.env" ]; then
     . "$source_dir/.env"
 elif [ -r "$HOME/.env" ]; then
     . "$HOME/.env"
