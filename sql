@@ -76,19 +76,6 @@ elif [ -r "$HOME/.env" ]; then
     . "$HOME/.env"
 fi
 
-while getopts 'x:' OPTION; do
-    case $OPTION in
-	('x')
-	    parse_script "$OPTARG"
-	    ;;
-	('?')
-	    printf "Usage: %s: [-x <SCRIPT>]\n" $(basename $0) >&2
-	    exit 2
-	    ;;
-    esac
-done
-shift $(($OPTIND - 1))
-
 if [ $# -gt 0 ]; then
     for script; do
 	parse_script $script
