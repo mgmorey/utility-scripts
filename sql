@@ -88,7 +88,7 @@ if [ -n "$scripts" ]; then
 	    exec <"$script"
 	    exec_sql
 	else
-	    abort "%s: No such readable file\n" "$script"
+	    abort "%s: No read permissions\n" "$script"
 	fi
     done
 else
