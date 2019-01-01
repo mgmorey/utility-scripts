@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 : ${DATABASE_DIALECT:=sqlite}
-: ${DATABASE_FILENAME:="/tmp/$DATABASE_SCHEMA.sqlite"}
+: ${DATABASE_FILENAME:="${DATABASE_SCHEMA:+/tmp/$DATABASE_SCHEMA.sqlite}"}
 
 abort() {
     printf "$@" >&2
@@ -70,6 +70,8 @@ scripts=
 
 if [ -r "$source_dir/.env" ]; then
     . "$source_dir/.env"
+elif [ -r "$HOME/.env" ]; then
+    . "$HOME/.env"
 fi
 
 while getopts 'x:' OPTION; do
