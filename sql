@@ -43,6 +43,13 @@ parse_arg() {
 	(*.sql)
 	    file="$1"
 	    ;;
+	(*.sqlite)
+	    if [ "$DATABASE_DIALECT" = sqlite ]; then
+		DATABASE_FILENAME="$1"
+	    else
+		abort "Invalid SQL script name: %s\n" "$1"
+	    fi
+	    ;;
 	(*.*)
 	    abort "Invalid SQL script name: %s\n" "$1"
 	    ;;
@@ -51,7 +58,9 @@ parse_arg() {
 	    ;;
     esac
 
-    if [ -e "$file" ]; then
+    if [ -z "${file:-}" ]; then
+	return
+    elif [ -e "$file" ]; then
 	script="$1"
     elif [ -e "$sql_dir/$file.sql" ]; then
 	script="$sql_dir/$file.sql"
