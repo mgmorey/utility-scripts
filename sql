@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# sql.sh: wrapper for invoking SQL database client
+# sql: wrapper for invoking SQL database client command line
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@ abort() {
     exit 1
 }
 
-exec_sql() {
+exec_sql_cli() {
     case "$DATABASE_DIALECT" in
 	(mysql)
 	    ${1-} "$DATABASE_DIALECT" \
@@ -86,11 +86,11 @@ if [ -n "$scripts" ]; then
     for script in $scripts; do
 	if [ -r $script ]; then
 	    exec <"$script"
-	    exec_sql
+	    exec_sql_cli
 	else
 	    abort "%s: No read permissions\n" "$script"
 	fi
     done
 else
-    exec_sql exec
+    exec_sql_cli exec
 fi
