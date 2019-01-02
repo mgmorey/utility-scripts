@@ -65,7 +65,7 @@ parse_arg() {
     elif [ -e "$sql_dir/$file.sql" ]; then
 	script="$sql_dir/$file.sql"
     else
-	abort "%s: No such script file\n" "$script"
+	abort "%s: No such script file\n" "$file"
     fi
 
     scripts="${scripts:+$scripts }$script"
