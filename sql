@@ -38,13 +38,25 @@ exec_sql_cli() {
     esac
 }
 
-parse_script() {
-    if [ -r "$1" ]; then
+parse_arg() {
+    case "$1" in
+	(*.sql)
+	    file="$1"
+	    ;;
+	(*.*)
+	    abort "Invalid SQL script name: %s\n" "$1"
+	    ;;
+	(*)
+	    file="$1.sql"
+	    ;;
+    esac
+
+    if [ -e "$file" ]; then
 	script="$1"
-    elif [ -r "$sql_dir/$1-$DATABASE_DIALECT.sql" ]; then
-	script="$sql_dir/$1-$DATABASE_DIALECT.sql"
+    elif [ -e "$sql_dir/$file.sql" ]; then
+	script="$sql_dir/$file.sql"
     else
-	abort "%s: No such script file\n" "$1"
+	abort "%s: No such script file\n" "$script"
     fi
 
     scripts="${scripts:+$scripts }$script"
@@ -77,8 +89,8 @@ elif [ -r "$HOME/.env" ]; then
 fi
 
 if [ $# -gt 0 ]; then
-    for script; do
-	parse_script $script
+    for arg; do
+	parse_arg $arg
     done
 fi
 
@@ -87,8 +99,10 @@ if [ -n "$scripts" ]; then
 	if [ -r $script ]; then
 	    exec <"$script"
 	    exec_sql_cli
-	else
+	elif [ -e $script ]; then
 	    abort "%s: No read permissions\n" "$script"
+	else
+	    abort "%s: No such script file\n" "$script"
 	fi
     done
 else
