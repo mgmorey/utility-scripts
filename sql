@@ -105,11 +105,11 @@ fi
 
 if [ -n "$scripts" ]; then
     for script in $scripts; do
-	if [ -r $script ]; then
+	if [ -f "$script" ]; then
 	    exec <"$script"
 	    exec_sql_cli
-	elif [ -e $script ]; then
-	    abort "%s: No read permissions\n" "$script"
+	elif [ -d $script ]; then
+	    abort "%s: Is a directory\n" "$script"
 	else
 	    abort "%s: No such script file\n" "$script"
 	fi
