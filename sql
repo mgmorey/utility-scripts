@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 : ${DATABASE_DIALECT:=sqlite}
-: ${DATABASE_FILENAME:="${DATABASE_SCHEMA:+/tmp/$DATABASE_SCHEMA.sqlite}"}
+: ${DATABASE_FILENAME:=${DATABASE_SCHEMA:+/tmp/$DATABASE_SCHEMA.sqlite}}
 
 abort() {
     printf "$@" >&2
@@ -33,7 +33,7 @@ exec_sql() {
 		-p"${DATABASE_PASSWORD:-}"
 	    ;;
 	(sqlite)
-	    sqlite3 "$DATABASE_FILENAME"
+	    sqlite3 $DATABASE_FILENAME
 	    ;;
     esac
 }
