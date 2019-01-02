@@ -27,13 +27,13 @@ abort() {
 exec_sql() {
     case "$DATABASE_DIALECT" in
 	(mysql)
-	    "$DATABASE_DIALECT" \
+	    ${1-} "$DATABASE_DIALECT" \
 		-h"${DATABASE_HOST:-$localhost}" \
 		-u"${DATABASE_USER:-$USER}" \
 		-p"${DATABASE_PASSWORD:-}"
 	    ;;
 	(sqlite)
-	    sqlite3 $DATABASE_FILENAME
+	    ${1-} sqlite3 $DATABASE_FILENAME
 	    ;;
     esac
 }
@@ -92,5 +92,5 @@ if [ -n "$scripts" ]; then
 	fi
     done
 else
-    exec_sql
+    exec_sql exec
 fi
