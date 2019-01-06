@@ -104,7 +104,7 @@ case "$kernel_name" in
 	;;
     (FreeBSD)
 	case "$desktop_name" in
-	    (GNOME*|'')
+	    (GNOME*|MATE|'')
 		package=gnome-ssh-askpass
 		;;
 	    (KDE*)
