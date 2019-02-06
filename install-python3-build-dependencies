@@ -36,6 +36,8 @@ case "$kernel_name" in
 	    (debian|ubuntu)
 		package=$DEBIAN_PKG
 		;;
+	    (fedora)
+	    	;;
 	    (opensuse-*)
 		packages=$OPENSUSE_PKGS
 		;;
