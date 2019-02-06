@@ -45,6 +45,8 @@ case "$kernel_name" in
 	    (opensuse-*)
 	    	packages=$OPENSUSE_PKGS
 	    	;;
+	    (redhat|centos)
+		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
 		;;
