@@ -19,7 +19,7 @@
 DEBIAN_PKGS="libbz2-dev libgdbm-dev libncurses5-dev \
 libreadline-dev libsqlite3-dev libssl-dev tk8.6-dev"
 
-FEDORA_PKGS="bzip2-devel gdbm-devel ncurses-devel \
+FEDORA_PKGS="bzip2-devel gdbm-devel lzma-devel ncurses-devel \
 readline-devel sqlite-devel tk-devel"
 
 OPENSUSE_PKGS="gdbm-devel libbz2-devel libopenssl-devel \
@@ -45,6 +45,8 @@ case "$kernel_name" in
 	    (opensuse-*)
 	    	packages=$OPENSUSE_PKGS
 	    	;;
+	    (redhat|centos)
+		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
 		;;
