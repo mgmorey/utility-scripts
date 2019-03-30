@@ -42,7 +42,7 @@ case "$kernel_name" in
 		package=$REDHAT_PKG
 		;;
 	    (opensuse-*)
-		packages="$OPENSUSE_PKGS"
+		packages=$OPENSUSE_PKGS
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"

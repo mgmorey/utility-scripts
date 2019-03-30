@@ -38,12 +38,12 @@ case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
-		packages="$DEBIAN_PKGS"
+		packages=$DEBIAN_PKGS
 		;;
 	    (redhat|centos)
 	    	;;
 	    (opensuse-*)
-		packages="$OPENSUSE_PKGS"
+		packages=$OPENSUSE_PKGS
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
