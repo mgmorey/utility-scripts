@@ -23,8 +23,16 @@ FEDORA_PKGS="bzip2-devel gcc libffi-devel libsodium-devel lzma-devel make \
 ncurses-devel openssl-devel pipenv %s-devel %s-pip %s-pycodestyle %s-pytest \
 %s-virtualenv readline-devel sqlite-devel tk-devel"
 
+FREEBSD_PKGS="gmake %s-pip %s-pytest"
+
 OPENSUSE_PKGS="gdbm-devel libbz2-devel libopenssl-devel \
 ncurses-devel readline-devel sqlite3-devel tk-devel"
+
+REDHAT_PKGS="bzip2-devel gcc libffi-devel libsodium-devel make \
+ncurses-devel openssl-devel %s-devel %s-pip %s-pytest \
+%s-virtualenv readline-devel sqlite-devel tk-devel"
+
+SUNOS_PKGS="build-essential pip-%s"
 
 realpath() {
     if [ -x /usr/bin/realpath ]; then
@@ -55,11 +63,16 @@ case "$kernel_name" in
 	    	packages=$OPENSUSE_PKGS
 	    	;;
 	    (redhat|centos)
+		packages=$REDHAT_PKGS
 		;;
 	esac
 	;;
-    (FreeBSD|SunOS|NT)
-    	;;
+    (FreeBSD)
+	packages=$FREEBSD_PKGS
+	;;
+    (SunOS)
+	packages=$SUNOS_PKGS
+	;;
 esac
 
 data=$(sh -eu "$script_dir/get-python-package")
