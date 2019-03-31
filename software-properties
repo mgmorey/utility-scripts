@@ -21,13 +21,26 @@ abort() {
     exit 1
 }
 
+realpath() {
+    if [ -x /usr/bin/realpath ]; then
+	/usr/bin/realpath "$@"
+    else
+	if expr "$1" : '/.*' >/dev/null; then
+	    printf "%s\n" "$1"
+	else
+	    printf "%s\n" "$PWD/${1#./}"
+	fi
+    fi
+}
+
+script_dir=$(realpath $(dirname $0))
+desktop_name=$(sh -eu "$script_dir/get-desktop-name")
+distro_name=$(sh -eu "$script_dir/get-os-distro-name")
+kernel_name=$(sh -eu "$script_dir/get-os-kernel-name")
+
 if [ -z "${DISPLAY:-}" ]; then
     abort "No DISPLAY variable set\n"
 fi
-
-desktop_name=$(get-desktop-name)
-distro_name=$(get-os-distro-name)
-kernel_name=$(get-os-kernel-name)
 
 if [ -z "${desktop_name:-}" ]; then
     abort "Desktop not specified\n"
@@ -39,13 +52,13 @@ case "$kernel_name" in
 	    (debian)
 		case "$desktop_name" in
 		    (GNOME*|*:GNOME)
-			sudo software-properties-gtk
+			software-properties-gtk
 			;;
 		    (KDE*)
-			sudo software-properties-kde
+			software-properties-kde
 			;;
 		    (MATE)
-			sudo software-properties-gtk
+			software-properties-gtk
 			;;
 		    (*)
 			abort "%s: Desktop not supported\n" "$desktop_name"

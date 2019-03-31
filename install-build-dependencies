@@ -25,24 +25,34 @@ abort() {
     exit 1
 }
 
-distro_name=$(get-os-distro-name)
-kernel_name=$(get-os-kernel-name)
-package_manager=$(get-package-manager)
+realpath() {
+    if [ -x /usr/bin/realpath ]; then
+	/usr/bin/realpath "$@"
+    else
+	if expr "$1" : '/.*' >/dev/null; then
+	    printf "%s\n" "$1"
+	else
+	    printf "%s\n" "$PWD/${1#./}"
+	fi
+    fi
+}
 
-if [ -z "$package_manager" ]; then
-    abort "%s\n" "No package manager"
-fi
+script_dir=$(realpath $(dirname $0))
+distro_name=$(sh -eu "$script_dir/get-os-distro-name")
+kernel_name=$(sh -eu "$script_dir/get-os-kernel-name")
+package_manager=$(sh -eu "$script_dir/get-package-manager")
+packages=$(sh -eu "$script_dir/get-python3-build-extras")
 
 case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
-		install-packages $DEBIAN_BUILD_TOOLS
-		sudo $package_manager build-dep "$@"
+		install-packages $packages
+		$package_manager build-dep "$@"
 		;;
 	    (fedora|redhat|centos)
-		install-packages $REDHAT_BUILD_TOOLS
-		sudo ${package_manager}-builddep "$@"
+		install-packages $packages
+		${package_manager}-builddep "$@"
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"

@@ -16,9 +16,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-keys="os centos fedora redhat system"
+KEYS="os centos fedora redhat system"
 
-case "$(get-os-kernel-name)" in
+realpath() {
+    if [ -x /usr/bin/realpath ]; then
+	/usr/bin/realpath "$@"
+    else
+	if expr "$1" : '/.*' >/dev/null; then
+	    printf "%s\n" "$1"
+	else
+	    printf "%s\n" "$PWD/${1#./}"
+	fi
+    fi
+}
+
+script_dir=$(realpath $(dirname $0))
+kernel_name=$(sh -eu "$script_dir/get-os-kernel-name")
+
+case "$kernel_name" in
     (NT)
 	uname -r
 	;;
@@ -26,7 +41,7 @@ case "$(get-os-kernel-name)" in
 	uname -r
 	;;
     (Linux)
-	for key in $keys; do
+	for key in $KEYS; do
 	    file=/etc/$key-release
 
 	    if [ -r $file ]; then

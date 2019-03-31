@@ -16,18 +16,32 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+AWK_EXPR='{ printf("/%s\n", $0) }'
+
 abort() {
     printf "$@" >&2
     exit 1
 }
 
+realpath() {
+    if [ -x /usr/bin/realpath ]; then
+	/usr/bin/realpath "$@"
+    else
+	if expr "$1" : '/.*' >/dev/null; then
+	    printf "%s\n" "$1"
+	else
+	    printf "%s\n" "$PWD/${1#./}"
+	fi
+    fi
+}
+
+script_dir=$(realpath $(dirname $0))
+distro_name=$(sh -eu "$script_dir/get-os-distro-name")
+kernel_name=$(sh -eu "$script_dir/get-os-kernel-name")
+
 if [ $# -eq 0 ]; then
     abort "Not enough arguments\n"
 fi
-
-awk_expr='{ printf("/%s\n", $0) }'
-distro_name=$(get-os-distro-name)
-kernel_name=$(get-os-kernel-name)
 
 case "$kernel_name" in
     (Linux)
@@ -49,7 +63,7 @@ case "$kernel_name" in
     (SunOS)
 	case "$distro_name" in
 	    (illumos)
-		pkg search -H -o search.match "basename:$1" | awk "$awk_expr"
+		pkg search -H -o search.match "basename:$1" | awk "$AWK_EXPR"
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"

@@ -19,8 +19,9 @@
 DEBIAN_PKGS="libbz2-dev libgdbm-dev libncurses5-dev \
 libreadline-dev libsqlite3-dev libssl-dev tk8.6-dev"
 
-FEDORA_PKGS="bzip2-devel gdbm-devel lzma-devel ncurses-devel \
-readline-devel sqlite-devel tk-devel"
+FEDORA_PKGS="bzip2-devel gcc libffi-devel libsodium-devel lzma-devel make \
+ncurses-devel openssl-devel pipenv %s-devel %s-pip %s-pycodestyle %s-pytest \
+%s-virtualenv readline-devel sqlite-devel tk-devel"
 
 OPENSUSE_PKGS="gdbm-devel libbz2-devel libopenssl-devel \
 ncurses-devel readline-devel sqlite3-devel tk-devel"
@@ -30,8 +31,23 @@ abort() {
     exit 1
 }
 
-distro_name=$(get-os-distro-name)
-kernel_name=$(get-os-kernel-name)
+realpath() {
+    if [ -x /usr/bin/realpath ]; then
+	/usr/bin/realpath "$@"
+    else
+	if expr "$1" : '/.*' >/dev/null; then
+	    printf "%s\n" "$1"
+	else
+	    printf "%s\n" "$PWD/${1#./}"
+	fi
+    fi
+}
+
+script_dir=$(realpath $(dirname $0))
+distro_name=$(sh -eu "$script_dir/get-os-distro-name")
+kernel_name=$(sh -eu "$script_dir/get-os-kernel-name")
+package_manager=$(sh -eu "$script_dir/get-package-manager")
+packages=$(sh -eu "$script_dir/get-python3-build-extras")
 
 case "$kernel_name" in
     (Linux)
@@ -59,6 +75,8 @@ case "$kernel_name" in
 	;;
 esac
 
-if [ -n "${packages:-}" ]; then
-    install-packages "$@" $packages
+if [ -n "$package_manager" ]; then
+    if [ -n "$packages" ]; then
+	$package_manager install $packages
+    fi
 fi

@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-python3-build-dependencies: install Python3 build dependencies
+# get-python3-build-extras: get list of Python3 build extras
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,16 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKG=python3-defaults
+DEBIAN_PKGS="libbz2-dev libgdbm-dev libncurses5-dev \
+libreadline-dev libsqlite3-dev libssl-dev tk8.6-dev"
 
-OPENSUSE_PKGS="gcc"
+FEDORA_PKGS="bzip2-devel gcc libffi-devel libsodium-devel lzma-devel make \
+ncurses-devel openssl-devel pipenv %s-devel %s-pip %s-pycodestyle %s-pytest \
+%s-virtualenv readline-devel sqlite-devel tk-devel"
 
-REDHAT_PKG=python
-
-abort() {
-    printf "$@" >&2
-    exit 1
-}
+OPENSUSE_PKGS="gdbm-devel libbz2-devel libopenssl-devel \
+ncurses-devel readline-devel sqlite3-devel tk-devel"
 
 realpath() {
     if [ -x /usr/bin/realpath ]; then
@@ -47,30 +46,33 @@ case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
-		package=$DEBIAN_PKG
-		;;
+	    	packages=$DEBIAN_PKGS
+	    	;;
 	    (fedora)
+	    	packages=$FEDORA_PKGS
 	    	;;
 	    (opensuse-*)
-		packages=$OPENSUSE_PKGS
-		;;
+	    	packages=$OPENSUSE_PKGS
+	    	;;
 	    (redhat|centos)
-		package=$REDHAT_PKG
-		;;
-	    (*)
-		abort "%s: Distro not supported\n" "$distro_name"
 		;;
 	esac
 	;;
     (FreeBSD|SunOS|NT)
     	;;
-    (*)
-	abort "%s: Operating system not supported\n" "$kernel_name"
-	;;
 esac
 
-if [ -z "${package:-}" ] || ! install-build-dependencies "$@" $package; then
-    if [ -n "${packages:-}" ]; then
-	install-packages "$@" $packages
-    fi
-fi
+data=$(sh -eu "$script_dir/get-python-package")
+package_name=$(printf "%s" "$data" | awk '{print $1}')
+package_modifier=$(printf "%s" "$data" | awk '{print $2}')
+
+for package in ${packages:-}; do
+    case $package in
+	(*%s*)
+	    printf "$package\n" $package_modifier
+	    ;;
+	(*)
+	    printf "%s\n" $package
+	    ;;
+    esac
+done

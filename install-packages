@@ -16,9 +16,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-package_manager="$(get-package-manager)"
+realpath() {
+    if [ -x /usr/bin/realpath ]; then
+	/usr/bin/realpath "$@"
+    else
+	if expr "$1" : '/.*' >/dev/null; then
+	    printf "%s\n" "$1"
+	else
+	    printf "%s\n" "$PWD/${1#./}"
+	fi
+    fi
+}
+
+script_dir=$(realpath $(dirname $0))
+package_manager=$(sh -eu "$scripts_dir/get-package-manager")
 
 if [ -n "$package_manager" ]; then
-    install_options=$(get-package-install-options)
-    sudo "$package_manager" install $install_options "$@"
+    install_options=$(sh -eu "$scripts_dir/get-package-install-options")
+    "$package_manager" install $install_options "$@"
 fi

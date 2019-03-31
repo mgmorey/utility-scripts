@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-python3-build-dependencies: install Python3 build dependencies
+# get-python-package: get Python3 package name
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,16 +16,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKG=python3-defaults
+DARWIN_INFO="python python"
 
-OPENSUSE_PKGS="gcc"
+DEBIAN_INFO="python3 python3"
 
-REDHAT_PKG=python
+FEDORA_INFO="python36 python3"
 
-abort() {
-    printf "$@" >&2
-    exit 1
-}
+FREEBSD_INFO="python3 py36"
+
+OPENSUSE_INFO="python3 python3"
+
+REDHAT_INFO="python36 python36"
+
+SUNOS_INFO="python-34 34"
+
+UBUNTU_INFO="python3 python3"
 
 realpath() {
     if [ -x /usr/bin/realpath ]; then
@@ -46,31 +51,36 @@ kernel_name=$(sh -eu "$script_dir/get-os-kernel-name")
 case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
-	    (debian|ubuntu)
-		package=$DEBIAN_PKG
+	    (debian)
+		printf "%s %s\n" $DEBIAN_INFO
 		;;
 	    (fedora)
-	    	;;
+		printf "%s %s\n" $FEDORA_INFO
+		;;
 	    (opensuse-*)
-		packages=$OPENSUSE_PKGS
+		printf "%s %s\n" $OPENSUSE_INFO
 		;;
 	    (redhat|centos)
-		package=$REDHAT_PKG
+		printf "%s %s\n" $REDHAT_INFO
+		;;
+	    (ubuntu)
+		printf "%s %s\n" $UBUNTU_INFO
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
 		;;
 	esac
 	;;
-    (FreeBSD|SunOS|NT)
-    	;;
+    (Darwin)
+	printf "%s %s\n" $DARWIN_INFO
+	;;
+    (FreeBSD)
+	printf "%s %s\n" $FREEBSD_INFO
+	;;
+    (SunOS)
+	printf "%s %s\n" $SUNOS_INFO
+	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
 	;;
 esac
-
-if [ -z "${package:-}" ] || ! install-build-dependencies "$@" $package; then
-    if [ -n "${packages:-}" ]; then
-	install-packages "$@" $packages
-    fi
-fi
