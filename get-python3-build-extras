@@ -16,15 +16,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKGS="libbz2-dev libgdbm-dev libncurses5-dev \
-libreadline-dev libsqlite3-dev libssl-dev tk8.6-dev"
+DEBIAN_PKGS="libbz2-dev libffi-dev libgdbm-dev liblzma-dev libncurses5-dev \
+libreadline-dev libsodium-dev libsqlite3-dev libssl-dev %s-dev %s-pip \
+%s-pycodestyle %s-pytest %s-virtualenv tk8.6-dev virtualenv"
 
 FEDORA_PKGS="bzip2-devel gcc libffi-devel libsodium-devel lzma-devel make \
 ncurses-devel openssl-devel pipenv %s-devel %s-pip %s-pycodestyle %s-pytest \
 %s-virtualenv readline-devel sqlite-devel tk-devel"
 
-FREEBSD_PKGS="gmake libffi libsodium %s-pip %s-bz2file ncurses %s-lzma \
-%s-pip %s-pipenv %s-pycodestyle %s-pytest %s-sqlite3 %s-virtualenv"
+FREEBSD_PKGS="gmake libffi libsodium ncurses %s-bz2file %s-lzma %s-pip \
+%s-pipenv %s-pycodestyle %s-pytest %s-sqlite3 %s-virtualenv"
 
 OPENSUSE_PKGS="gcc gdbm-devel libbz2-devel libffi-devel libopenssl-devel \
 libsodium-devel lzma-sdk-devel make ncurses-devel %s-devel %s-pip \
