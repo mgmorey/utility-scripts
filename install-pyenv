@@ -37,5 +37,5 @@ else
 fi
 
 script_dir=$(realpath $(dirname $0))
-$script_dir/install-python3-build-extras
+$script_dir/install-python3-build-extras || true
 $sh -c "curl -L $BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer | bash"
