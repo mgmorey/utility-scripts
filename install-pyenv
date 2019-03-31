@@ -30,6 +30,12 @@ realpath() {
     fi
 }
 
+if [ "$(id -u)" -eq 0 ]; then
+    sh="su $SUDO_USER"
+else
+    sh="sh"
+fi
+
 script_dir=$(realpath $(dirname $0))
 $script_dir/install-python3-build-extras
-curl -L $BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer | bash
+$sh -c "curl -L $BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer | bash"
