@@ -16,16 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKGS="libbz2-dev libgdbm-dev libncurses5-dev \
-libreadline-dev libsqlite3-dev libssl-dev tk8.6-dev"
-
-FEDORA_PKGS="bzip2-devel gcc libffi-devel libsodium-devel lzma-devel make \
-ncurses-devel openssl-devel pipenv %s-devel %s-pip %s-pycodestyle %s-pytest \
-%s-virtualenv readline-devel sqlite-devel tk-devel"
-
-OPENSUSE_PKGS="gdbm-devel libbz2-devel libopenssl-devel \
-ncurses-devel readline-devel sqlite3-devel tk-devel"
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -53,13 +43,10 @@ case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
-	    	packages=$DEBIAN_PKGS
 	    	;;
 	    (fedora)
-	    	packages=$FEDORA_PKGS
 	    	;;
 	    (opensuse-*)
-	    	packages=$OPENSUSE_PKGS
 	    	;;
 	    (redhat|centos)
 		;;
