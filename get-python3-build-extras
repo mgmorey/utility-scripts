@@ -18,7 +18,8 @@
 
 DEBIAN_PKGS="build-essential gcc libbz2-dev libffi-dev libgdbm-dev liblzma-dev \
 libncurses5-dev libreadline-dev libsodium-dev libsqlite3-dev libssl-dev make \
-%s-dev pycodestyle %s-pip %s-pycodestyle %s-pytest %s-virtualenv virtualenv"
+%s-dev pycodestyle %s-pip %s-pycodestyle %s-pytest %s-virtualenv virtualenv \
+zlib1g-dev"
 
 FEDORA_PKGS="bzip2-devel gcc libffi-devel libsodium-devel lzma-devel make \
 ncurses-devel openssl-devel pipenv %s-devel %s-pip %s-pycodestyle %s-pytest \
