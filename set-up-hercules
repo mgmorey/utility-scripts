@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -eu
 
 # set-up-hercules: install and configure Hercules emulator
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>

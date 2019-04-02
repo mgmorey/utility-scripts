@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -eu
 
 # set-up-tunnel: set up IP forwarding tunnel using iptables
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
