@@ -47,11 +47,11 @@ case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
-		install-packages $packages
+		$package_manager install $packages
 		$package_manager build-dep "$@"
 		;;
 	    (fedora|redhat|centos)
-		install-packages $packages
+		$package_manager install $packages
 		${package_manager}-builddep "$@"
 		;;
 	    (*)
