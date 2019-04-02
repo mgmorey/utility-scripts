@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-build-dependencies: install build dependencies
+# install-python3-build-deps: install Python3 build dependencies
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_BUILD_TOOLS="build-essential"
+DEBIAN_PKG=python3-defaults
 
-REDHAT_BUILD_TOOLS="gcc make yum-utils"
+OPENSUSE_PKGS="gcc"
+
+REDHAT_PKG=python
 
 abort() {
     printf "$@" >&2
@@ -40,26 +42,35 @@ realpath() {
 script_dir=$(realpath $(dirname $0))
 distro_name=$(sh -eu "$script_dir/get-os-distro-name")
 kernel_name=$(sh -eu "$script_dir/get-os-kernel-name")
-package_manager=$(sh -eu "$script_dir/get-package-manager")
-packages=$(sh -eu "$script_dir/get-python3-build-extras")
 
 case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
-		$package_manager install $packages
-		$package_manager build-dep "$@"
+		package=$DEBIAN_PKG
 		;;
-	    (fedora|redhat|centos)
-		$package_manager install $packages
-		${package_manager}-builddep "$@"
+	    (fedora)
+	    	;;
+	    (opensuse-*)
+		packages=$OPENSUSE_PKGS
+		;;
+	    (redhat|centos)
+		package=$REDHAT_PKG
 		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
 		;;
 	esac
 	;;
+    (FreeBSD|SunOS|NT)
+    	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
 	;;
 esac
+
+if [ -z "${package:-}" ] || ! sh -eu $script_dir/install-build-deps "$@" $package; then
+    if [ -n "${packages:-}" ]; then
+	install-packages "$@" $packages
+    fi
+fi

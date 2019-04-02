@@ -54,7 +54,7 @@ case "$kernel_name" in
 	;;
 esac
 
-install-python3-build-dependencies
+install-python3-build-deps
 
 mkdir -p "$(dirname "$src_dir")" "$archive_dir"
 

@@ -55,7 +55,7 @@ case "$kernel_name" in
 	;;
 esac
 
-install-emacs-build-dependencies
+install-emacs-build-deps
 install-emacs-build-extras
 
 mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"

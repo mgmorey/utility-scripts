@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-emacs-build-dependencies: install GNU Emacs build dependencies
+# install-emacs-build-deps: install GNU Emacs build dependencies
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -69,7 +69,7 @@ case "$kernel_name" in
 	;;
 esac
 
-if [ -z "${package:-}" ] || ! install-build-dependencies "$@" $package; then
+if [ -z "${package:-}" ] || ! install-build-deps "$@" $package; then
     if [ -n "${packages:-}" ]; then
 	install-packages "$@" $packages
     fi
