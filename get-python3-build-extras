@@ -34,8 +34,8 @@ libsodium-devel lzma-sdk-devel make ncurses-devel %s-devel %s-pip \
 readline-devel sqlite3-devel"
 
 REDHAT_PKGS="bzip2-devel gcc libffi-devel libsodium-devel make ncurses-devel \
-openssl-devel pylint %s-devel %s-pip %s-pytest %s-virtualenv readline-devel \
-sqlite-devel"
+openssl-devel pylint %s-devel %s-pip %s-pytest %s-virtualenv pytest \
+readline-devel sqlite-devel"
 
 SUNOS_PKGS="build-essential pip-%s"
 
