@@ -37,6 +37,7 @@ script_dir=$(realpath $(dirname $0))
 distro_name=$(sh -eu "$script_dir/get-os-distro-name")
 kernel_name=$(sh -eu "$script_dir/get-os-kernel-name")
 package_manager=$(sh -eu "$script_dir/get-package-manager")
+package_manager_options=$(sh -eu "$script_dir/get-package-manager-options")
 packages=$(sh -eu "$script_dir/get-python3-build-extras")
 
 case "$kernel_name" in
@@ -64,6 +65,6 @@ esac
 
 if [ -n "$package_manager" ]; then
     if [ -n "$packages" ]; then
-	$package_manager install $packages
+	$package_manager install $package_manager_options $packages
     fi
 fi
