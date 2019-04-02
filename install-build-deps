@@ -41,17 +41,18 @@ script_dir=$(realpath $(dirname $0))
 distro_name=$(sh -eu "$script_dir/get-os-distro-name")
 kernel_name=$(sh -eu "$script_dir/get-os-kernel-name")
 package_manager=$(sh -eu "$script_dir/get-package-manager")
+package_install_options=$(sh -eu "$script_dir/get-package-install-options")
 packages=$(sh -eu "$script_dir/get-python3-build-extras")
 
 case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
-		$package_manager install $packages
+		$package_manager install $package_install_options $packages
 		$package_manager build-dep "$@"
 		;;
 	    (fedora|redhat|centos)
-		$package_manager install $packages
+		$package_manager install $package_install_options $packages
 		${package_manager}-builddep "$@"
 		;;
 	    (*)
