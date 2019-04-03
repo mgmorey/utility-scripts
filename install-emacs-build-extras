@@ -89,5 +89,5 @@ case "$kernel_name" in
 esac
 
 if [ -n "${packages:-}" ]; then
-    install-packages "$@" $packages
+    sh -eu $script_dir/install-packages "$@" $packages
 fi
