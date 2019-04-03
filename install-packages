@@ -52,9 +52,9 @@ realpath() {
 }
 
 script_dir=$(realpath "$(dirname "$0")")
-package_manager=$(sh -eu "$script_dir/get-package-manager")
+package_manager=$(sh -eu $script_dir/get-package-manager)
 
 if [ -n "$package_manager" ]; then
-    install_options=$(sh -eu "$script_dir/get-package-install-options")
+    install_options=$(sh -eu $script_dir/get-package-install-options)
     $package_manager install $install_options "$@"
 fi
