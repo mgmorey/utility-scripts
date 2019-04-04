@@ -89,18 +89,6 @@ realpath() {
     fi
 }
 
-realpath() {
-    if [ -x /usr/bin/realpath ]; then
-	/usr/bin/realpath "$@"
-    else
-	if expr "$1" : '/.*' >/dev/null; then
-	    printf "%s\n" "$1"
-	else
-	    printf "%s\n" "$PWD/${1#./}"
-	fi
-    fi
-}
-
 script_dir=$(realpath "$(dirname "$0")")
 source_dir=$script_dir/..
 sql_dir=$source_dir/sql
