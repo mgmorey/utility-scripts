@@ -62,7 +62,7 @@ case "$kernel_name" in
 		;;
 	esac
 	;;
-    (FreeBSD|SunOS|NT)
+    (Darwin|FreeBSD|SunOS|NT)
     	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
