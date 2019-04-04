@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -eu
 
 # to-upper: translate upper-case letters to upper-case
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
