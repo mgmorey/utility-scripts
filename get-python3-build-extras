@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+DARWIN_PKGS="gdbm libffi openssl readline zlib"
+
 DEBIAN_PKGS="build-essential gcc libbz2-dev libffi-dev libgdbm-dev liblzma-dev \
 libncurses5-dev libreadline-dev libsodium-dev libsqlite3-dev libssl-dev make \
 pycodestyle pylint3 %s-bcrypt %s-dev %s-nacl %s-pip %s-pycodestyle %s-pytest \
@@ -62,18 +64,6 @@ realpath() {
     fi
 }
 
-realpath() {
-    if [ -x /usr/bin/realpath ]; then
-	/usr/bin/realpath "$@"
-    else
-	if expr "$1" : '/.*' >/dev/null; then
-	    printf "%s\n" "$1"
-	else
-	    printf "%s\n" "$PWD/${1#./}"
-	fi
-    fi
-}
-
 script_dir=$(realpath "$(dirname "$0")")
 distro_name=$(sh -eu $script_dir/get-os-distro-name)
 kernel_name=$(sh -eu $script_dir/get-os-kernel-name)
@@ -94,6 +84,9 @@ case "$kernel_name" in
 		packages=$REDHAT_PKGS
 		;;
 	esac
+	;;
+    (Darwin)
+	packages=$DARWIN_PKGS
 	;;
     (FreeBSD)
 	packages=$FREEBSD_PKGS
