@@ -30,8 +30,8 @@ ncurses-devel openssl-devel %s-devel %s-pip %s-pycodestyle %s-pytest \
 FREEBSD_PKGS="bash gmake libffi libsodium ncurses pylint-%s %s-bz2file %s-lzma \
 %s-pip %s-pycodestyle %s-pytest %s-sqlite3 %s-virtualenv"
 
-OPENSUSE_PKGS="gcc gdbm-devel libbz2-devel libffi-devel libopenssl-devel \
-libsodium-devel lzma-sdk-devel make ncurses-devel %s-devel %s-pip \
+OPENSUSE_PKGS="gdbm-devel libbz2-devel libffi-devel libopenssl-devel \
+libsodium-devel lzma-sdk-devel ncurses-devel %s-devel %s-pip \
 %s-pycodestyle %s-pylint %s-pylzma %s-pytest %s-virtualenv \
 readline-devel sqlite3-devel"
 

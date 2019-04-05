@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-emacs-build-extras: install GNU Emacs build extras
+# get-emacs-build-extras: get list of GNU Emacs build extras
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,16 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+DEBIAN_PKGS="libgnutls28-dev libgpm-dev libwebkit2gtk-4.0-dev"
+
+OPENSUSE_PKGS="gconf2-devel giflib-devel gpm-devel gtk3-devel \
+ImageMagick-devel libacl-devel libgnutls-devel libjpeg62-devel \
+libICE-devel liblcms2-devel libpng16-devel libSM-devel \
+libtiff-devel libX11-devel libXaw3d-devel libXext-devel libXi-devel \
+libXmu-devel libXpm-devel libXrandr-devel libXt-devel libXTrap-devel \
+libXtst-devel libXv-devel libxml2-devel make m17n-lib-devel \
+ncurses5-devel zlib-devel webkit2gtk3-devel"
 
 abort() {
     printf "$@" >&2
@@ -48,34 +58,24 @@ installer=$(sh -eu $script_dir/get-package-manager)
 install_opts=$(sh -eu $script_dir/get-package-install-options)
 pattern_opts=$(sh -eu $script_dir/get-pattern-install-options)
 
-packages=$(sh -eu $script_dir/get-emacs-build-extras)
+packages=$(sh -eu $script_dir/get-python3-build-extras)
 pattern=$(sh -eu $script_dir/get-devel-pattern)
 
 case "$kernel_name" in
     (Linux)
 	case "$distro_name" in
 	    (debian|ubuntu)
+		packages=$DEBIAN_PKGS
 		;;
 	    (redhat|centos)
 	    	;;
 	    (opensuse-*)
-		;;
-	    (*)
-		abort "%s: Distro not supported\n" "$distro_name"
+		packages=$OPENSUSE_PKGS
 		;;
 	esac
 	;;
     (FreeBSD|SunOS|NT)
 	;;
-    (*)
-	abort "%s: Operating system not supported\n" "$kernel_name"
-	;;
 esac
 
-if [ -n "$pattern" ]; then
-    $installer install $install_opts $pattern_opts $pattern
-fi
-
-if [ -n "$packages" ]; then
-    $installer install $install_opts $packages
-fi
+printf "%s\n" $packages
