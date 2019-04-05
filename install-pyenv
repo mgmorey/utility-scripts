@@ -44,9 +44,9 @@ realpath() {
 if [ "$(id -u)" -eq 0 ]; then
     sh="su $SUDO_USER"
 else
-    sh="sh"
+    sh="sh -u"
 fi
 
 script_dir=$(realpath "$(dirname "$0")")
-$script_dir/install-pyenv-dependencies || true
+sh -eu $script_dir/install-pyenv-dependencies || true
 $sh -c "curl -L $BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer | bash"
