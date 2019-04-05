@@ -44,6 +44,7 @@ realpath() {
 }
 
 script_dir=$(realpath "$(dirname "$0")")
+
 distro_name=$(sh -eu $script_dir/get-os-distro-name)
 kernel_name=$(sh -eu $script_dir/get-os-kernel-name)
 

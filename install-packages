@@ -40,6 +40,7 @@ realpath() {
 }
 
 script_dir=$(realpath "$(dirname "$0")")
+
 package_manager=$(sh -eu $script_dir/get-package-manager)
 
 if [ -n "$package_manager" ]; then
