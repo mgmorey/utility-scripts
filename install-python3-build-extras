@@ -40,11 +40,16 @@ realpath() {
 }
 
 script_dir=$(realpath "$(dirname "$0")")
+
 distro_name=$(sh -eu $script_dir/get-os-distro-name)
 kernel_name=$(sh -eu $script_dir/get-os-kernel-name)
-package_install_options=$(sh -eu $script_dir/get-package-install-options)
-package_manager=$(sh -eu $script_dir/get-package-manager)
+
+installer=$(sh -eu $script_dir/get-package-manager)
+install_opts=$(sh -eu $script_dir/get-package-install-options)
+pattern_opts=$(sh -eu $script_dir/get-pattern-install-options)
+
 packages=$(sh -eu $script_dir/get-python3-build-extras)
+pattern=$(sh -eu $script_dir/get-devel-pattern)
 
 case "$kernel_name" in
     (Linux)
@@ -69,7 +74,10 @@ case "$kernel_name" in
 	;;
 esac
 
-if [ -n "$packages" ]; then
-    $package_manager install $package_install_options $packages
+if [ -n "$pattern" ]; then
+    $installer install $install_opts $pattern_opts $pattern
 fi
 
+if [ -n "$packages" ]; then
+    $installer install $install_opts $packages
+fi
