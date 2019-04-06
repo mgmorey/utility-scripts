@@ -18,35 +18,4 @@
 
 BASE_URL=https://github.com/pyenv
 
-abort() {
-    printf "$@" >&2
-    exit 1
-}
-
-assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
-}
-
-realpath() {
-    assert [ -d "$1" ]
-
-    if [ -x /usr/bin/realpath ]; then
-	/usr/bin/realpath "$1"
-    else
-	if expr "$1" : '/.*' >/dev/null; then
-	    printf "%s\n" "$1"
-	else
-	    printf "%s\n" "$PWD/${1#./}"
-	fi
-    fi
-}
-
-if [ "$(id -u)" -eq 0 ]; then
-    sh="su $SUDO_USER"
-else
-    sh="sh -eu"
-fi
-
-script_dir=$(realpath "$(dirname "$0")")
-$sh "$script_dir/install-pyenv-dependencies" || true
-$sh -c "curl -L $BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer | bash"
+curl -L $BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer | bash
