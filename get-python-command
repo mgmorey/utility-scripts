@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-pipenv: install Python Environment Manager
+# get-python-command: get Python 3 command binary or module
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+VERSION=3
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -25,32 +27,30 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-realpath() {
-    assert [ -d "$1" ]
-
-    if [ -x /usr/bin/realpath ]; then
-	/usr/bin/realpath "$1"
-    else
-	if expr "$1" : '/.*' >/dev/null; then
-	    printf "%s\n" "$1"
-	else
-	    printf "%s\n" "$PWD/${1#./}"
-	fi
-    fi
-}
-
-script_dir=$(realpath "$(dirname "$0")")
-
-pip=$(sh -eu $script_dir/get-python-command pip)
-
-if [ "$(id -u)" -eq 0 ]; then
-    sh="su $SUDO_USER"
-else
-    sh="sh -eu"
+if [ $# -eq 0 ]; then
+    abort "%s\n" "$0: Not enough arguments"
 fi
 
-if [ "$pip" != false ]; then
-    $sh -c "$pip install --upgrade --user pip pipenv"
-else
-    abort "$0: No pip in path"
-fi
+name="$1"
+version="${2:-$VERSION}"
+
+case "$name" in
+    (pip|pipenv|virtualenv)
+	for command in $name$version $name "python$version -m $name" false; do
+	    if $command --help >/dev/null 2>&1; then
+		break
+	    fi
+	done
+	;;
+    (pyvenv)
+	for command in "python$version -m venv" false; do
+	    if $command --help >/dev/null 2>&1; then
+		break
+	    fi
+	done
+	;;
+    (*)
+	abort "%s: Invalid command/module '%s'\n" "$0" "$name"
+esac
+
+printf "%s\n" "$command"
