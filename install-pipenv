@@ -39,18 +39,20 @@ realpath() {
     fi
 }
 
+if [ $(id -u) -eq 0 ]; then
+    abort "%s\n" "$0: Must be run as a non-privileged user"
+fi
+
 script_dir=$(realpath "$(dirname "$0")")
 
 pip=$(sh -eu $script_dir/get-python-command pip)
 
-if [ "$(id -u)" -eq 0 ]; then
-    sh="su $SUDO_USER"
-else
-    sh="sh -eu"
-fi
-
 if [ "$pip" != false ]; then
-    $sh -c "$pip install --upgrade --user pip pipenv"
+    if [ ! -d $HOME/.pyenv ]; then
+	sh -eu $script_dir/install-pyenv
+    fi
+
+    $pip install --upgrade --user pip pipenv
 else
     abort "$0: No pip in path"
 fi
