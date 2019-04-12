@@ -58,8 +58,15 @@ case "$kernel_name" in
 	    if [ -r $file ]; then
 		case ${file#/etc/} in
 		    (os-release)
-			(. $file && printf "%s\n" "$VERSION_ID")
-			exit 0
+			if . $file && [ -n "${VERSION_ID:-}" ]; then
+			    printf "%s\n" "$VERSION_ID"
+			    exit 0
+			elif [ -x /usr/bin/lsb_release ]; then
+			    /usr/bin/lsb_release -rs
+			    exit 0
+			else
+			    exit 1
+			fi
 			;;
 		    (*-release)
 			awk '{print $4}' $file
