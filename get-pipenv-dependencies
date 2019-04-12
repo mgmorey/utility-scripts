@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-pyenv-dependencies: get list of pyenv dependencies
+# get-pipenv-dependencies: get list of pipenv dependencies
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,23 +16,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DARWIN_PKGS="gdbm libffi openssl readline zlib"
+DARWIN_PKGS=""
 
-DEBIAN_PKGS="curl libbz2-dev libffi-dev libreadline-dev libsqlite3-dev \
-libssl-dev %s-dev zlib1g-dev"
+DEBIAN_PKGS="%s-pip"
 
-FEDORA_PKGS="bzip2-devel gcc libffi-devel make ncurses-devel openssl-devel \
-%s-devel %s-pip readline-devel sqlite-devel"
+FEDORA_PKGS=""
 
-FREEBSD_PKGS="bash gmake libffi ncurses"
+FREEBSD_PKGS=""
 
-OPENSUSE_PKGS="libbz2-devel libffi-devel libopenssl-devel %s-devel \
-readline-devel sqlite3-devel"
+OPENSUSE_PKGS=""
 
-REDHAT_PKGS="bzip2-devel gcc libffi-devel make ncurses-devel \
-openssl-devel %s-devel readline-devel sqlite-devel"
+REDHAT_PKGS=""
 
-SUNOS_PKGS="build-essential"
+SUNOS_PKGS=""
 
 abort() {
     printf "$@" >&2
