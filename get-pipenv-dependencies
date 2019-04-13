@@ -28,7 +28,7 @@ OPENSUSE_PKGS="%s-pip"
 
 REDHAT_PKGS=""
 
-SUNOS_PKGS=""
+SUNOS_PKGS="pip-%s"
 
 abort() {
     printf "$@" >&2
