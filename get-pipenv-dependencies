@@ -24,7 +24,7 @@ FEDORA_PKGS=""
 
 FREEBSD_PKGS="%s-pip %s-virtualenv"
 
-OPENSUSE_PKGS="%s-pip"
+OPENSUSE_PKGS="%s-pip %s-virtualenv"
 
 REDHAT_PKGS=""
 
