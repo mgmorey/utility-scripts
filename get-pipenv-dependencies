@@ -22,7 +22,7 @@ DEBIAN_PKGS="%s-pip"
 
 FEDORA_PKGS=""
 
-FREEBSD_PKGS=""
+FREEBSD_PKGS="%s-pip %s-virtualenv"
 
 OPENSUSE_PKGS="%s-pip"
 
