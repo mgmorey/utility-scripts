@@ -90,7 +90,9 @@ realpath() {
 }
 
 script_dir=$(realpath "$(dirname "$0")")
+
 source_dir=$script_dir/..
+
 sql_dir=$source_dir/sql
 
 scripts=
