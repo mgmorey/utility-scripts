@@ -24,10 +24,10 @@ abort() {
 system_name="$(uname -s)"
 
 case "$system_name" in
-    (GNU|Linux|Minux)
+    (Linux)
 	printf "%s\n" "$system_name"
 	;;
-    (Darwin|FreeBSD|SunOS)
+    (Darwin|FreeBSD|GNU|Minix|SunOS)
 	printf "%s\n" "$system_name"
 	;;
     (CYGWIN_NT-*)
