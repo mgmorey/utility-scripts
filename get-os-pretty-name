@@ -47,7 +47,7 @@ case "$system_name" in
 	printf "%s\n" "$(uname -sr)"
 	;;
     (SunOS)
-	printf "%s\n" "$(uname -sv)"
+	awk 'NR == 1 {printf("%s %s %s\n", $1, $2, $3)}' /etc/release
 	;;
     (CYGWIN_NT-*)
 	printf "%s\n" "$(uname -sr)"
