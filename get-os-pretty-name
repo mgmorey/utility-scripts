@@ -21,9 +21,6 @@ KEYS="os centos fedora redhat system"
 system_name="$(uname -s)"
 
 case "$system_name" in
-    (CYGWIN_NT-*|Darwin|FreeBSD|GNU)
-	printf "%s\n" "$(uname -sr)"
-	;;
     (Linux)
 	for key in $KEYS; do
 	    file=/etc/$key-release
@@ -46,7 +43,13 @@ case "$system_name" in
 	    /usr/bin/lsb_release -ds
 	fi
 	;;
+    (GNU|Darwin|FreeBSD)
+	printf "%s\n" "$(uname -sr)"
+	;;
     (SunOS)
 	printf "%s\n" "$(uname -sv)"
+	;;
+    (CYGWIN_NT-*)
+	printf "%s\n" "$(uname -sr)"
 	;;
 esac
