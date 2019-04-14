@@ -82,7 +82,6 @@ case "$kernel_name" in
 	fi
 	;;
     (SunOS)
-	os_version="$(uname -v)"
-	printf "%s\n" "${os_version#*-}"
+	awk 'NR == 1 {print $3}' /etc/release
 	;;
 esac
