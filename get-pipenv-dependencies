@@ -18,7 +18,7 @@
 
 DARWIN_PKGS=""
 
-DEBIAN_PKGS="%s-pip"
+DEBIAN_PKGS="%s-pip %s-virtualenv"
 
 FEDORA_PKGS="%s-pip %s-virtualenv"
 
