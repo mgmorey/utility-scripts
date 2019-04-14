@@ -44,17 +44,17 @@ script_dir=$(realpath "$(dirname "$0")")
 kernel_name=$(sh -eu $script_dir/get-os-kernel-name)
 
 case "$kernel_name" in
-    (NT)
-	printf "%s\n" "Windows"
-	;;
-    (Darwin|FreeBSD|SunOS)
-	printf "%s\n" "Unix"
+    (Linux)
+	uname -o
 	;;
     (GNU|Minix)
 	printf "%s\n" "$kernel_name"
 	;;
-    (Linux)
-	uname -o
+    (Darwin|FreeBSD|SunOS)
+	printf "%s\n" "Unix"
+	;;
+    (NT)
+	printf "%s\n" "Windows"
 	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
