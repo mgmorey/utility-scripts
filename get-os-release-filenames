@@ -18,4 +18,4 @@
 
 KEYS="lsb os fedora redhat centos system"
 
-ls $(printf "/etc/%s-release\n" $KEYS) 2>/dev/null
+ls $(printf "/etc/%s-release\n" $KEYS) 2>/dev/null || true
