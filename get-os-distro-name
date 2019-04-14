@@ -69,6 +69,6 @@ case "$kernel_name" in
 	fi
 	;;
     (SunOS)
-	uname -o
+	awk 'NR == 1 {printf("%s %s\n", $1, $2)}' /etc/release
 	;;
 esac
