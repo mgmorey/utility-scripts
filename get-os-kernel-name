@@ -24,13 +24,16 @@ abort() {
 system_name="$(uname -s)"
 
 case "$system_name" in
+    (GNU|Linux|Minux)
+	printf "%s\n" "$system_name"
+	;;
+    (Darwin|FreeBSD|SunOS)
+	printf "%s\n" "$system_name"
+	;;
     (CYGWIN_NT-*)
 	cygwin_name=${system_name%-*}
 	kernel_name=${cygwin_name#*_}
-	echo $kernel_name
-	;;
-    (Darwin|FreeBSD|GNU|Linux|Minix|SunOS)
-	echo $system_name
+	printf "%s\n" "$kernel_name"
 	;;
     (*)
 	abort "%s: Operating system not supported\n" "$system_name"
