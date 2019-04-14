@@ -60,8 +60,6 @@ case "$kernel_name" in
 	    	;;
 	    (opensuse-*)
 	    	;;
-	    (redhat|centos)
-		;;
 	    (*)
 		abort "%s: Distro not supported\n" "$distro_name"
 		;;
