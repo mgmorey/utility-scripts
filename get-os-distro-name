@@ -69,7 +69,6 @@ case "$kernel_name" in
 	fi
 	;;
     (SunOS)
-	os_name="$(uname -o)"
-	printf "%s\n" "${os_name%-*}"
+	uname -o
 	;;
 esac
