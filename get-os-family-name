@@ -45,16 +45,16 @@ kernel_name=$(sh -eu $script_dir/get-os-kernel-name)
 
 case "$kernel_name" in
     (NT)
-	echo Windows
+	printf "%s\n" "Windows"
 	;;
     (Darwin|FreeBSD|SunOS)
-	echo Unix
+	printf "%s\n" "Unix"
 	;;
     (GNU|Minix)
-	echo $kernel_name
+	printf "%s\n" "$kernel_name"
 	;;
     (Linux)
-	echo GNU/$kernel_name
+	uname -o
 	;;
     (*)
 	abort "%s: Operating system not supported\n" "$kernel_name"
