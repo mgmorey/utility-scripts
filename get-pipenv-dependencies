@@ -20,7 +20,7 @@ DARWIN_PKGS=""
 
 DEBIAN_PKGS="%s-pip"
 
-FEDORA_PKGS=""
+FEDORA_PKGS="%s-pip %s-virtualenv"
 
 FREEBSD_PKGS="%s-pip %s-virtualenv"
 
