@@ -50,7 +50,10 @@ case "$kernel_name" in
     (GNU|Minix)
 	printf "%s\n" "$kernel_name"
 	;;
-    (Darwin|FreeBSD|SunOS)
+    (Darwin|FreeBSD)
+	printf "%s\n" "BSD"
+	;;
+    (SunOS)
 	printf "%s\n" "Unix"
 	;;
     (NT)
