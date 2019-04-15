@@ -48,28 +48,18 @@ case "$system_name" in
 	eval set -- $files
 	file=$1
 
-	if [ -r $file ]; then
-	    case ${file#/etc/} in
-		(lsb-release)
-		    if . $file && [ -n "${DISTRIB_ID:-}" ]; then
-			printf "%s\n" "$DISTRIB_ID"
-			exit 0
-		    fi
-		    ;;
-		(os-release)
-		    if . $file && [ -n "${ID:-}" ]; then
-			printf "%s\n" "$ID"
-			exit 0
-		    fi
-		    ;;
-		(*-release)
-		    awk '{print $1}' $file
+	case ${file#/etc/} in
+	    (os-release)
+		if . $file && [ -n "${ID:-}" ]; then
+		    printf "%s\n" "$ID"
 		    exit 0
-		    ;;
-	    esac
-	fi
-
-	lsb_release -is
+		fi
+		;;
+	    (*-release)
+		awk '{print $1}' $file
+		exit 0
+		;;
+	esac
 	;;
     (SunOS)
 	awk 'NR == 1 {printf("%s %s\n", $1, $2)}' /etc/release

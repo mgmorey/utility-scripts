@@ -50,12 +50,6 @@ case "$system_name" in
 
 	if [ -r $file ]; then
 	    case ${file#/etc/} in
-		(lsb-release)
-		    if . $file && [ -n "${DISTRIB_RELEASE:-}" ]; then
-			printf "%s\n" "$DISTRIB_RELEASE"
-			exit 0
-		    fi
-		    ;;
 		(os-release)
 		    if . $file && [ -n "${VERSION_ID:-}" ]; then
 			printf "%s\n" "$VERSION_ID"
