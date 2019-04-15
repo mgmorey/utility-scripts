@@ -53,17 +53,13 @@ case "$system_name" in
 		(os-release)
 		    if . $file && [ -n "${VERSION_ID:-}" ]; then
 			printf "%s\n" "$VERSION_ID"
-			exit 0
 		    fi
 		    ;;
 		(*-release)
 		    awk '{print $4}' $file
-		    exit 0
 		    ;;
 	    esac
 	fi
-
-	lsb_release -rs
 	;;
     (Darwin|FreeBSD|GNU|Minix)
 	uname -r

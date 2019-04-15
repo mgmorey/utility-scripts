@@ -52,12 +52,10 @@ case "$system_name" in
 	    (os-release)
 		if . $file && [ -n "${ID:-}" ]; then
 		    printf "%s\n" "$ID"
-		    exit 0
 		fi
 		;;
 	    (*-release)
 		awk '{print $1}' $file
-		exit 0
 		;;
 	esac
 	;;
