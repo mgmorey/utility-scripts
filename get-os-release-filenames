@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-KEYS="os system redhat centos"
+KEYS="os"
 
-ls $(printf "/etc/%s-release\n" $KEYS) 2>/dev/null || true
+printf "/etc/%s-release\n" $KEYS
+
