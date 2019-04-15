@@ -48,18 +48,16 @@ case "$system_name" in
 	eval set -- $files
 	file=$1
 
-	if [ -r $file ]; then
-	    case ${file#/etc/} in
-		(os-release)
-		    if . $file && [ -n "${VERSION_ID:-}" ]; then
-			printf "%s\n" "$VERSION_ID"
-		    fi
-		    ;;
-		(*-release)
-		    awk '{print $4}' $file
-		    ;;
-	    esac
-	fi
+	case ${file#/etc/} in
+	    (os-release)
+		if . $file && [ -n "${VERSION_ID:-}" ]; then
+		    printf "%s\n" "$VERSION_ID"
+		fi
+		;;
+	    (*)
+		abort "%s: Unknown release file"
+		;;
+	esac
 	;;
     (Darwin|FreeBSD|GNU|Minix)
 	uname -r
