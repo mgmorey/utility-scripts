@@ -60,6 +60,6 @@ case "$system_name" in
 	esac
 	;;
     (SunOS)
-	awk 'NR == 1 {printf("%s %s\n", $1, $2)}' /etc/release
+	awk 'NR == 1 {print $1}' /etc/release | tr '[:upper:]' '[:lower:]'
 	;;
 esac
