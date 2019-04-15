@@ -54,8 +54,8 @@ case "$system_name" in
 		    printf "%s\n" "$PRETTY_NAME"
 		fi
 		;;
-	    (*-release)
-		awk '{print $1}' $file
+	    (*)
+		abort "%s: Unknown release file"
 		;;
 	esac
 	;;
