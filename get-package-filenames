@@ -69,7 +69,7 @@ case "$kernel_name" in
 	;;
     (SunOS)
 	case "$distro_name" in
-	    (illumos)
+	    (openindiana)
 		pkg search -H -o search.match "basename:$1" | awk "$AWK_EXPR"
 		;;
 	    (*)

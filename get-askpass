@@ -117,7 +117,7 @@ case "$kernel_name" in
 	;;
     (SunOS)
 	case "$distro_name" in
-	    (illumos)
+	    (openindiana)
 		case "$desktop_name" in
 		    (MATE|'')
 			package=ssh-askpass
