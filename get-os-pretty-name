@@ -66,6 +66,6 @@ case "$system_name" in
 	awk 'NR == 1 {printf("%s %s %s\n", $1, $2, $3)}' /etc/release
 	;;
     (CYGWIN_NT-*)
-	printf "%s\n" "$(uname -sr)"
+	printf "%s\n" "$system_name"
 	;;
 esac
