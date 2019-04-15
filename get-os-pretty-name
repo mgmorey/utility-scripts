@@ -55,7 +55,7 @@ case "$system_name" in
 		fi
 		;;
 	    (*)
-		abort "%s: Unknown release file"
+		abort "%s: Unknown release file\n" "$file"
 		;;
 	esac
 	;;
