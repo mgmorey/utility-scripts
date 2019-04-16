@@ -20,7 +20,7 @@ FILE=/etc/release
 OS_FILE=/etc/os-release
 
 usage() {
-    printf "Usage: %s: [-h|-i|-k|-p|-r]\n" $(basename "$0")
+    printf "Usage: %s: [-h|-i|-k|-n|-p|-r]\n" $(basename "$0")
 }
 
 system_name=$(uname -s)
