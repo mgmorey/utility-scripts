@@ -51,7 +51,7 @@ script_dir=$(realpath "$(dirname "$0")")
 
 desktop_name=$(sh -eu $script_dir/get-desktop-name)
 distro_name=$(sh -eu $script_dir/get-os-release -i)
-kernel_name=$(sh -eu $script_dir/get-os-kernel-name)
+kernel_name=$(sh -eu $script_dir/get-os-release -k)
 
 case "$kernel_name" in
     (Linux)
