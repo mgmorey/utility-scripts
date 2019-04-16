@@ -19,6 +19,10 @@
 FILE=/etc/release
 OS_FILE=/etc/os-release
 
+usage() {
+    printf "Usage: %s: [-h|-i|-p|-r]\n" $(basename "$0")
+}
+
 system_name="$(uname -s)"
 
 case "$system_name" in
@@ -42,11 +46,16 @@ case "$system_name" in
 	;;
 esac
 
+if [ $# -eq 0 -a -n "${ID:-}" ]; then
+    printf "%s\n" "$ID"
+    exit 0
+fi
+
 while getopts hipr opt
 do
      case $opt in
 	 (h)
-	     printf "Usage: %s: [-h|-i|-p|-r]\n" $(basename "$0")
+	     usage
 	     ;;
 	 (i)
 	     if [ -n "${ID:-}" ]; then
@@ -64,10 +73,8 @@ do
 	     fi
 	     ;;
 	 (?)
-	     printf "Usage: %s: [-d | -p | -r]\n" $(basename "$0")
+	     usage
 	     exit 2
 	     ;;
      esac
 done
-
-shift $(($OPTIND - 1))
