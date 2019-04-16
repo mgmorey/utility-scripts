@@ -43,7 +43,7 @@ case "$system_name" in
 	fi
 	;;
     (*)
-	abort "%s: Operating system not supported\n" "$kernel_name"
+	abort "%s: Operating system not supported\n" "$pretty_name"
 	;;
 esac
 
