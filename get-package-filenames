@@ -43,7 +43,7 @@ realpath() {
 
 script_dir=$(realpath "$(dirname "$0")")
 
-distro_name=$(sh -eu $script_dir/get-os-distro-name)
+distro_name=$(sh -eu $script_dir/get-os-release -i)
 kernel_name=$(sh -eu $script_dir/get-os-kernel-name)
 
 if [ $# -eq 0 ]; then
