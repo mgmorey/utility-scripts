@@ -49,6 +49,7 @@ script_dir=$(realpath "$(dirname "$0")")
 
 distro_name=$(sh -eu $script_dir/get-os-release -i)
 kernel_name=$(sh -eu $script_dir/get-os-release -k)
+pretty_name=$(sh -eu $script_dir/get-os-release -p)
 
 case "$kernel_name" in
     (Linux)
@@ -60,7 +61,7 @@ case "$kernel_name" in
 		rpm --query --list "$1"
 		;;
 	    (*)
-		abort "%s: Distro not supported\n" "$distro_name"
+		abort "%s: Distro not supported\n" "$pretty_name"
 		;;
 	esac
 	;;
@@ -73,7 +74,7 @@ case "$kernel_name" in
 		pkg search -H -o search.match "basename:$1" | awk "$AWK_EXPR"
 		;;
 	    (*)
-		abort "%s: Distro not supported\n" "$distro_name"
+		abort "%s: Distro not supported\n" "$pretty_name"
 		;;
 	esac
 	;;

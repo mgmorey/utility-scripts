@@ -47,6 +47,8 @@ script_dir=$(realpath "$(dirname "$0")")
 
 distro_name=$(sh -eu $script_dir/get-os-release -i)
 kernel_name=$(sh -eu $script_dir/get-os-release -k)
+pretty_name=$(sh -eu $script_dir/get-os-release -p)
+
 package_manager=$(sh -eu $script_dir/get-package-manager)
 package_install_options=$(sh -eu $script_dir/get-package-install-options)
 packages=$(sh -eu $script_dir/get-python3-build-extras)
@@ -63,7 +65,7 @@ case "$kernel_name" in
 		${package_manager}-builddep "$@"
 		;;
 	    (*)
-		abort "%s: Distro not supported\n" "$distro_name"
+		abort "%s: Distro not supported\n" "$pretty_name"
 		;;
 	esac
 	;;

@@ -24,6 +24,7 @@ abort() {
 }
 
 system_name="$(uname -s)"
+pretty_name=$(sh -eu $script_dir/get-os-release -p)
 
 case "$system_name" in
     (Linux)
@@ -34,7 +35,7 @@ case "$system_name" in
 		    su -c "apt-get install $DEBIAN_PKGS"
 		    ;;
 		(*)
-		    abort "%s: Distro not supported\n" "$distro_name"
+		    abort "%s: Distro not supported\n" "$pretty_name"
 		    ;;
 	    esac
 	else

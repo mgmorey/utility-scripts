@@ -52,6 +52,7 @@ script_dir=$(realpath "$(dirname "$0")")
 desktop_name=$(sh -eu $script_dir/get-desktop-name)
 distro_name=$(sh -eu $script_dir/get-os-release -i)
 kernel_name=$(sh -eu $script_dir/get-os-release -k)
+pretty_name=$(sh -eu $script_dir/get-os-release -p)
 
 case "$kernel_name" in
     (Linux)
@@ -89,7 +90,7 @@ case "$kernel_name" in
 		esac
 		;;
 	    (*)
-		abort "%s: Distro not supported\n" "$distro_name"
+		abort "%s: Distro not supported\n" "$pretty_name"
 		;;
 	esac
 	;;
