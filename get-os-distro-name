@@ -40,26 +40,5 @@ realpath() {
 }
 
 script_dir=$(realpath "$(dirname "$0")")
-system_name="$(uname -s)"
 
-case "$system_name" in
-    (Linux)
-	files=$(sh -eu $script_dir/get-os-release-filenames)
-	eval set -- $files
-	file=$1
-
-	case ${file#/etc/} in
-	    (os-release)
-		if . $file && [ -n "${ID:-}" ]; then
-		    printf "%s\n" "$ID"
-		fi
-		;;
-	    (*)
-		abort "%s: Unknown release file\n" "$file"
-		;;
-	esac
-	;;
-    (SunOS)
-	awk 'NR == 1 {print $1}' /etc/release | tr '[:upper:]' '[:lower:]'
-	;;
-esac
+sh -eu $script_dir/get-os-release -i
