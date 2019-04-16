@@ -46,11 +46,10 @@ case "$system_name" in
 	;;
     (CYGWIN_NT-*)
 	ID=
-	NAME=$system_name
+	NAME=${system_name%-*}
 	PRETTY_NAME=$system_name
 	VERSION_ID=${system_name#*-}
-	cygwin_name=${system_name%-*}
-	kernel_name=${cygwin_name#*_}
+	kernel_name=${NAME#*_}
 	;;
 esac
 
