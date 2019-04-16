@@ -41,14 +41,14 @@ realpath() {
     fi
 }
 
+if [ $# -eq 0 ]; then
+    abort "Not enough arguments\n"
+fi
+
 script_dir=$(realpath "$(dirname "$0")")
 
 distro_name=$(sh -eu $script_dir/get-os-release -i)
 kernel_name=$(sh -eu $script_dir/get-os-kernel-name)
-
-if [ $# -eq 0 ]; then
-    abort "Not enough arguments\n"
-fi
 
 case "$kernel_name" in
     (Linux)

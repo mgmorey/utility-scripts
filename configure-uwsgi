@@ -24,6 +24,29 @@ abort() {
     exit 1
 }
 
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+realpath() {
+    assert [ -d "$1" ]
+
+    if [ -x /usr/bin/realpath ]; then
+	/usr/bin/realpath "$1"
+    else
+	if expr "$1" : '/.*' >/dev/null; then
+	    printf "%s\n" "$1"
+	else
+	    printf "%s\n" "$PWD/${1#./}"
+	fi
+    fi
+}
+
 basename=uwsgi-$VERSION
 
 archive_dir="$HOME/Downloads/uWSGI"
@@ -34,8 +57,10 @@ filename=$basename.tar.gz
 pathname=$archive_dir/$filename
 url=$BASE_URL/$filename
 
-distro_name=$(get-os-release -i)
-kernel_name=$(get-os-kernel-name)
+script_dir=$(realpath "$(dirname "$0")")
+
+distro_name=$(sh -eu $script_dir/get-os-release -i)
+kernel_name=$(sh -eu $script_dir/get-os-kernel-name)
 
 case "$kernel_name" in
     (Linux)

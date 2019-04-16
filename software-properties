@@ -39,12 +39,6 @@ realpath() {
     fi
 }
 
-script_dir=$(realpath "$(dirname "$0")")
-
-desktop_name=$(sh -eu $script_dir/get-desktop-name)
-distro_name=$(sh -eu $script_dir/get-os-release -i)
-kernel_name=$(sh -eu $script_dir/get-os-kernel-name)
-
 if [ -z "${DISPLAY:-}" ]; then
     abort "No DISPLAY variable set\n"
 fi
@@ -52,6 +46,12 @@ fi
 if [ -z "${desktop_name:-}" ]; then
     abort "Desktop not specified\n"
 fi
+
+script_dir=$(realpath "$(dirname "$0")")
+
+desktop_name=$(sh -eu $script_dir/get-desktop-name)
+distro_name=$(sh -eu $script_dir/get-os-release -i)
+kernel_name=$(sh -eu $script_dir/get-os-kernel-name)
 
 case "$kernel_name" in
     (Linux)
