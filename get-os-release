@@ -30,21 +30,22 @@ release_name=${unix_name#* }
 case "$system_name" in
     (Linux)
 	. $OS_FILE
-	kernel_name=$system_name
 	;;
     (SunOS)
-	ID=$(awk 'NR == 1 {print $1}' $FILE | tr '[:upper:]' '[:lower:]')
-	NAME=$(awk 'NR == 1 {printf("%s %s\n", $1, $2)}' $FILE)
-	PRETTY_NAME=$(awk 'NR == 1 {printf("%s %s %s\n", $1, $2, $3)}' $FILE)
-	VERSION_ID=$(awk 'NR == 1 {print $3}' $FILE)
-	kernel_name=$system_name
+	sunos_name=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE)
+	pretty_name=${sunos_name%:*}
+	system_name=${pretty_name% *}
+	release_name=${sunos_name#*:}
+	ID=$(printf "%s\n" "$system_name" | tr '[:upper:]' '[:lower:]')
+	NAME=$system_name
+	PRETTY_NAME=$pretty_name
+	VERSION_ID=$release_name
 	;;
     (*)
 	ID=
 	NAME=$system_name
 	PRETTY_NAME=$unix_name
 	VERSION_ID=$release_name
-	kernel_name=$system_name
 	;;
 esac
 
@@ -62,11 +63,10 @@ do
 	 (i)
 	     if [ -n "${ID:-}" ]; then
 		 printf "%s\n" "$ID"
-	     fi
-	     ;;
+	     fi	     ;;
 	 (k)
-	     if [ -n "${kernel_name:-}" ]; then
-		 printf "%s\n" "$kernel_name"
+	     if [ -n "${system_name:-}" ]; then
+		 printf "%s\n" "$system_name"
 	     fi
 	     ;;
 	 (n)
