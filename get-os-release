@@ -23,18 +23,13 @@ usage() {
     printf "Usage: %s: [-h|-i|-k|-n|-p|-r]\n" $(basename "$0")
 }
 
-system_name=$(uname -s)
+unix_name=$(uname -sr)
+system_name=${unix_name% *}
+release_name=${unix_name#* }
 
 case "$system_name" in
     (Linux)
 	. $OS_FILE
-	kernel_name=$system_name
-	;;
-    (Darwin|FreeBSD|GNU|Minix)
-	ID=
-	NAME=$system_name
-	PRETTY_NAME=$(uname -sr)
-	VERSION_ID=$(uname -r)
 	kernel_name=$system_name
 	;;
     (SunOS)
@@ -44,12 +39,12 @@ case "$system_name" in
 	VERSION_ID=$(awk 'NR == 1 {print $3}' $FILE)
 	kernel_name=$system_name
 	;;
-    (CYGWIN_NT-*)
+    (*)
 	ID=
-	NAME=${system_name%-*}
-	PRETTY_NAME=$system_name
-	VERSION_ID=${system_name#*-}
-	kernel_name=${NAME#*_}
+	NAME=$system_name
+	PRETTY_NAME=$unix_name
+	VERSION_ID=$release_name
+	kernel_name=$system_name
 	;;
 esac
 
