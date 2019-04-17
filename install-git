@@ -49,6 +49,6 @@ case "$kernel_name" in
     	;;
 esac
 
-if ! git --version; then
+if ! git --version >/dev/null; then
     install-packages git
 fi
