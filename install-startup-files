@@ -50,12 +50,7 @@ fi
 dir=$PWD
 cd $HOME
 
-sh -eu $script_dir/install-homebrew
-
-if ! git --version; then
-    brew install git
-    brew link git
-fi
+sh -eu $script_dir/install-git
 
 if [ ! -d Documents/git ]; then
     mkdir -p Documents
