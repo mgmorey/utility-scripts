@@ -57,5 +57,5 @@ esac
 if brew update; then
     brew upgrade
 else
-    /usr/bin/ruby -e $expr "$(curl -fsSL $HOMEBREW_URL)"
+    /usr/bin/ruby -e "$(curl -fsSL $HOMEBREW_URL)"
 fi
