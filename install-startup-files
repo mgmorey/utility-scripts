@@ -23,11 +23,38 @@ abort() {
     exit 1
 }
 
-dir=$PWD
-cd $HOME
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+realpath() {
+    assert [ -d "$1" ]
+
+    if [ -x /usr/bin/realpath ]; then
+	/usr/bin/realpath "$1"
+    else
+	if expr "$1" : '/.*' >/dev/null; then
+	    printf "%s\n" "$1"
+	else
+	    printf "%s\n" "$PWD/${1#./}"
+	fi
+    fi
+}
+
+script_dir=$(realpath "$(dirname "$0")")
 
 if [ ! -h $0 ]; then
     abort "Please change from source directory before running this script\n"
+fi
+
+dir=$PWD
+cd $HOME
+
+sh -eu $script_dir/install-homebrew
+
+if ! git --version; then
+    brew install git
+    brew link git
 fi
 
 if [ ! -d Documents/git ]; then
@@ -65,3 +92,5 @@ if [ -d .emacs.d ]; then
 	/bin/cp $HOME/git/startup-files/.emacs.d/init.el .
     fi
 fi
+
+printf "Please log out and back in again to activate the new environment\n"
