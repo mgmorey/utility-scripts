@@ -19,8 +19,15 @@
 FILE=/etc/release
 OS_FILE=/etc/os-release
 
+print_all() {
+    printf "ID=%s\n" "$ID"
+    printf "NAME=\"%s\"\n" "$NAME"
+    printf "PRETTY_NAME=\"%s\"\n" "$PRETTY_NAME"
+    printf "VERSION_ID=%s\n" "$VERSION_ID"
+}
+
 print_id() {
-    if [ -n "${ID:-}" ]; then
+    if [ -n "${ID:-}" -a $ID != generic ]; then
 	case "$kernel_name" in
 	    (SunOS)
 		printf "%s\n" "$ID" | tr '[:upper:]' '[:lower:]'
@@ -63,7 +70,7 @@ print_version_id() {
 }
 
 usage() {
-    printf "Usage: %s: [-h|-i|-k|-n|-p|-r]\n" $(basename "$0")
+    printf "Usage: %s: [-a|-h|-i|-k|-n|-p|-r]\n" $(basename "$0")
 }
 
 sys_info=$(uname -sr)
@@ -102,9 +109,12 @@ if [ $# -eq 0 ]; then
     exit 0
 fi
 
-while getopts hiknprv opt
+while getopts ahiknprv opt
 do
      case $opt in
+	 (a)
+	     print_all
+	     ;;
 	 (h)
 	     usage
 	     ;;
