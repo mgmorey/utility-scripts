@@ -83,6 +83,14 @@ case "$kernel_name" in
 	PRETTY_NAME="$name $version_id"
 	VERSION_ID=$version_id
 	;;
+    (Darwin)
+	name=$(sw_vers -productName)
+	version_id=$(sw_vers -productVersion)
+	ID=macos
+	NAME=$name
+	PRETTY_NAME="$name $version_id"
+	VERSION_ID=$version_id
+	;;
     (*)
 	ID=
 	NAME=$kernel_name
