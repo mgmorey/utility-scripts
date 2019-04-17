@@ -152,7 +152,7 @@ case "$kernel_name" in
 		;;
 	esac
 	;;
-    (NT)
+    (CYGWIN_NT-*)
 	case "$desktop_name" in
 	    (MATE|X-Cygwin|'')
 		askpass_helper=/usr/libexec/gnome-ssh-askpass.exe
