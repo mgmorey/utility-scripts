@@ -98,7 +98,7 @@ esac
 : ${VERSION_ID:=$version_id}
 
 if [ $# -eq 0 ]; then
-    print_id
+    print_pretty_name
     exit 0
 fi
 
