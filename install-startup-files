@@ -53,6 +53,7 @@ fi
 cd ..
 
 if [ ! -e .profile ]; then
+    printf "Installing %s\n" .profile
     /bin/cp $HOME/git/startup-files/.profile .
 fi
 
@@ -60,6 +61,7 @@ if [ -d .emacs.d ]; then
     cd .emacs.d
 
     if [ ! -e init.el ]; then
+	printf "Installing %s\n" .emacs.d/init.el
 	/bin/cp $HOME/git/startup-files/.emacs.d/init.el .
     fi
 fi
