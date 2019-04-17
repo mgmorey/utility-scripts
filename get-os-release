@@ -79,17 +79,11 @@ case "$kernel_name" in
 	name=${data%:*}
 	version_id=${data#*:}
 	ID=${name% *}
-	NAME=$name
-	PRETTY_NAME="$name $version_id"
-	VERSION_ID=$version_id
 	;;
     (Darwin)
 	name=$(sw_vers -productName)
 	version_id=$(sw_vers -productVersion)
 	ID=macos
-	NAME=$name
-	PRETTY_NAME="$name $version_id"
-	VERSION_ID=$version_id
 	;;
     (*)
 	ID=
@@ -98,6 +92,10 @@ case "$kernel_name" in
 	VERSION_ID=$kernel_release
 	;;
 esac
+
+: ${NAME:=$name}
+: ${PRETTY_NAME:="$name $version_id"}
+: ${VERSION_ID:=$version_id}
 
 if [ $# -eq 0 ]; then
     print_id
