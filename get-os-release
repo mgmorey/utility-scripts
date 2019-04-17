@@ -84,8 +84,8 @@ case "$kernel_name" in
 	;;
 esac
 
-if [ $# -eq 0 -a -n "${ID:-}" ]; then
-    printf "%s\n" "$ID"
+if [ $# -eq 0 ]; then
+    print_id
     exit 0
 fi
 
