@@ -19,33 +19,68 @@
 FILE=/etc/release
 OS_FILE=/etc/os-release
 
+print_id() {
+    if [ -n "${ID:-}" ]; then
+	printf "%s\n" "$ID" | tr '[:upper:]' '[:lower:]'
+    fi
+}
+
+print_name() {
+    if [ -n "${NAME:-}" ]; then
+	printf "%s\n" "$NAME"
+    fi
+}
+
+print_kernel_name() {
+    if [ -n "${kernel_name:-}" ]; then
+	printf "%s\n" "$kernel_name"
+    fi
+}
+
+print_kernel_release() {
+    if [ -n "${kernel_release:-}" ]; then
+	printf "%s\n" "$kernel_release"
+    fi
+}
+
+print_pretty_name() {
+    if [ -n "${PRETTY_NAME:-}" ]; then
+	printf "%s\n" "$PRETTY_NAME"
+    fi
+}
+
+print_version_id() {
+    if [ -n "${VERSION_ID:-}" ]; then
+	printf "%s\n" "$VERSION_ID"
+    fi
+}
+
 usage() {
     printf "Usage: %s: [-h|-i|-k|-n|-p|-r]\n" $(basename "$0")
 }
 
-unix_name=$(uname -sr)
-system_name=${unix_name% *}
-release_name=${unix_name#* }
+sys_info=$(uname -sr)
+kernel_name=${sys_info% *}
+kernel_release=${sys_info#* }
 
-case "$system_name" in
+case "$kernel_name" in
     (Linux)
 	. $OS_FILE
 	;;
     (SunOS)
-	sunos_name=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE)
-	pretty_name=${sunos_name%:*}
-	system_name=${pretty_name% *}
-	release_name=${sunos_name#*:}
-	ID=$(printf "%s\n" "$system_name" | tr '[:upper:]' '[:lower:]')
-	NAME=$system_name
-	PRETTY_NAME=$pretty_name
-	VERSION_ID=$release_name
+	data=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE)
+	name=${data%:*}
+	version_id=${data#*:}
+	ID=${name% *}
+	NAME=$name
+	PRETTY_NAME="$name $version_id"
+	VERSION_ID=$version_id
 	;;
     (*)
 	ID=
-	NAME=$system_name
-	PRETTY_NAME=$unix_name
-	VERSION_ID=$release_name
+	NAME=$kernel_name
+	PRETTY_NAME=$sys_info
+	VERSION_ID=$kernel_release
 	;;
 esac
 
@@ -54,35 +89,29 @@ if [ $# -eq 0 -a -n "${ID:-}" ]; then
     exit 0
 fi
 
-while getopts hiknpv opt
+while getopts hiknprv opt
 do
      case $opt in
 	 (h)
 	     usage
 	     ;;
 	 (i)
-	     if [ -n "${ID:-}" ]; then
-		 printf "%s\n" "$ID"
-	     fi	     ;;
+	     print_id
+	     ;;
 	 (k)
-	     if [ -n "${system_name:-}" ]; then
-		 printf "%s\n" "$system_name"
-	     fi
+	     print_kernel_name
 	     ;;
 	 (n)
-	     if [ -n "${NAME:-}" ]; then
-		 printf "%s\n" "$NAME"
-	     fi
+	     print_name
 	     ;;
 	 (p)
-	     if [ -n "${PRETTY_NAME:-}" ]; then
-		 printf "%s\n" "$PRETTY_NAME"
-	     fi
+	     print_pretty_name
+	     ;;
+	 (r)
+	     print_kernel_release
 	     ;;
 	 (v)
-	     if [ -n "${VERSION_ID:-}" ]; then
-		 printf "%s\n" "$VERSION_ID"
-	     fi
+	     print_version_id
 	     ;;
 	 (?)
 	     usage
