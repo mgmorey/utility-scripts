@@ -1,0 +1,65 @@
+#!/bin/sh -eu
+
+# install-startup-files: install startup files in home directory
+# Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+STARTUP_FILES=https://mgmorey@github.com/mgmorey/startup-files.git
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+dir=$PWD
+cd $HOME
+
+if [ ! -h $0 ]; then
+    abort "Please change from source directory before running this script\n"
+fi
+
+if [ ! -d Documents/git ]; then
+    mkdir -p Documents
+
+    if [ -d git ]; then
+	/bin/mv git Documents/git
+    else
+	mkdir Documents/git
+    fi
+fi
+
+if [ ! -e git ]; then
+    /bin/ln -s Documents/git git
+fi
+
+cd git
+
+if [ ! -d startup-files ]; then
+    git clone $STARTUP_FILES
+fi
+
+cd ..
+
+if [ ! -e .profile ]; then
+    /bin/cp $HOME/git/startup-files/.profile .
+fi
+
+if [ -d .emacs.d ]; then
+    cd .emacs.d
+
+    if [ ! -e init.el ]; then
+	/bin/cp $HOME/git/startup-files/.emacs.d/init.el .
+    fi
+fi
