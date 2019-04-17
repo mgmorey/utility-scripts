@@ -48,11 +48,14 @@ pretty_name=$(sh -eu $script_dir/get-os-release -p)
 
 case "$kernel_name" in
     (Darwin)
-	if ! brew info >/dev/null 2>&1; then
-	    /usr/bin/ruby -e $expr "$(curl -fsSL $HOMEBREW_URL)"
-	fi
     	;;
     (*)
 	abort "%s: Operating system not supported\n" "$pretty_name"
 	;;
 esac
+
+if brew update; then
+    brew upgrade
+else
+    /usr/bin/ruby -e $expr "$(curl -fsSL $HOMEBREW_URL)"
+fi
