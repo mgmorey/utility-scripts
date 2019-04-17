@@ -86,7 +86,7 @@ case "$kernel_name" in
 	ID=macos
 	;;
     (*)
-	ID=
+	ID=generic
 	NAME=$kernel_name
 	PRETTY_NAME=$sys_info
 	VERSION_ID=$kernel_release
