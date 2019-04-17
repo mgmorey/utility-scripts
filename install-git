@@ -41,16 +41,14 @@ realpath() {
 
 script_dir=$(realpath "$(dirname "$0")")
 
-if [ ! -h $0 ]; then
-    abort "Please change from source directory before running this script\n"
-fi
+kernel_name=$(sh -eu $script_dir/get-os-release -k)
 
-dir=$PWD
-cd $HOME
-
-sh -eu $script_dir/install-homebrew
+case "$kernel_name" in
+    (Darwin)
+	sh -eu $script_dir/install-homebrew
+    	;;
+esac
 
 if ! git --version; then
-    brew install git
-    brew link git
+    install-package git
 fi
