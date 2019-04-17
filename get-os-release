@@ -21,7 +21,14 @@ OS_FILE=/etc/os-release
 
 print_id() {
     if [ -n "${ID:-}" ]; then
-	printf "%s\n" "$ID" | tr '[:upper:]' '[:lower:]'
+	case "$kernel_name" in
+	    (SunOS)
+		printf "%s\n" "$ID" | tr '[:upper:]' '[:lower:]'
+		;;
+	    (*)
+		printf "%s\n" "$ID"
+		;;
+	esac
     fi
 }
 
