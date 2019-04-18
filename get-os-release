@@ -75,18 +75,18 @@ usage() {
     printf "Usage: %s: [-a|-h|-i|-k|-n|-p|-r]\n" $(basename "$0")
 }
 
-sys_info=$(uname -sr)
-kernel_name=${sys_info% *}
-kernel_release=${sys_info#* }
+input=$(uname -sr)
+kernel_name=${input% *}
+kernel_release=${input#* }
 
 case "$kernel_name" in
     (Linux)
 	. $OS_FILE
 	;;
     (SunOS)
-	rel_info=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE)
-	name=${rel_info%:*}
-	version_id=${rel_info#*:}
+	input=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE)
+	name=${input%:*}
+	version_id=${input#*:}
 	ID=${name% *}
 	;;
     (Darwin)
@@ -103,7 +103,7 @@ case "$kernel_name" in
     (*)
 	ID=$kernel_name
 	NAME=$kernel_name
-	PRETTY_NAME=$sys_info
+	PRETTY_NAME=$input
 	VERSION_ID=$kernel_release
 	;;
 esac
