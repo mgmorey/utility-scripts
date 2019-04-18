@@ -17,13 +17,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 FILE=/etc/release
-OS_FILE=/etc/os-release
-SHELL_FORMAT=false
+FILE_OS=/etc/os-release
+IS_SHELL_FORMAT=false
 VARS_STANDARD="ID NAME PRETTY_NAME VERSION VERSION_ID"
 VARS_EXTENDED="distro_name kernel_name kernel_release pretty_name"
 
 add_variable() {
-    if [ $shell_format = false ]; then
+    if [ $is_shell_format = false ]; then
 	vars="${vars}${vars:+ }$1"
     else
 	wrong_usage "%s: conflicting arguments\n" "$0"
@@ -31,8 +31,8 @@ add_variable() {
 }
 
 set_variables() {
-    if [ $shell_format = false -a -z "$vars" ]; then
-	shell_format=true
+    if [ $is_shell_format = false -a -z "$vars" ]; then
+	is_shell_format=true
 	vars="${vars}${vars:+ }$1"
     else
 	wrong_usage "%s: conflicting arguments\n" "$0"
@@ -55,7 +55,7 @@ wrong_usage() {
     exit 2
 }
 
-shell_format=$SHELL_FORMAT
+is_shell_format=$IS_SHELL_FORMAT
 vars=
 
 while getopts Xhiknprvx opt
@@ -103,7 +103,7 @@ kernel_release=${input#* }
 
 case "$kernel_name" in
     (Linux)
-	. $OS_FILE
+	. $FILE_OS
 	;;
 
     (SunOS)
@@ -151,7 +151,7 @@ pretty_name=$PRETTY_NAME
 for var in ${vars:-PRETTY_NAME}; do
     eval val="\$$var"
 
-    if [ "$shell_format" = true ]; then
+    if [ "$is_shell_format" = true ]; then
 	printf "%s=\"%s\"\n" "$var" "$val"
     else
 	printf "%s\n" "$val"
