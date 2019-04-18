@@ -84,9 +84,9 @@ case "$kernel_name" in
 	. $OS_FILE
 	;;
     (SunOS)
-	data=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE)
-	name=${data%:*}
-	version_id=${data#*:}
+	rel_info=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE)
+	name=${rel_info%:*}
+	version_id=${rel_info#*:}
 	ID=${name% *}
 	;;
     (Darwin)
@@ -98,6 +98,7 @@ case "$kernel_name" in
 	name="Microsoft Windows"
 	version_id=${kernel_name#*-}
 	ID=ms-windows
+	kernel_release=${kernel_release%(*}
 	;;
     (*)
 	ID=$kernel_name
