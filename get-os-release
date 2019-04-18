@@ -33,7 +33,7 @@ add_variable() {
 set_variables() {
     if [ $is_shell_format = false -a -z "$vars" ]; then
 	is_shell_format=true
-	vars="${vars}${vars:+ }$1"
+	vars="$*"
     else
 	wrong_usage "%s: conflicting arguments\n" "$0"
     fi
@@ -80,10 +80,10 @@ do
 	    add_variable VERSION_ID
 	    ;;
 	(x)
-	    set_variables "$VARS_STANDARD"
+	    set_variables $VARS_STANDARD
 	    ;;
 	(X)
-	    set_variables "$VARS_STANDARD $VARS_EXTENDED"
+	    set_variables $VARS_STANDARD $VARS_EXTENDED
 	    ;;
 	(h)
 	    usage
