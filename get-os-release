@@ -125,8 +125,8 @@ for var in ${vars:-PRETTY_NAME}; do
     eval val="\$$var"
 
     if [ "$shell_format" = true ]; then
-	printf "%s=\"%s\"\\n" "$var" "$val"
+	printf "%s=\"%s\"\n" "$var" "$val"
     else
-	printf "%s\\n" "$val"
+	printf "%s\n" "$val"
     fi
 done
