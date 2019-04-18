@@ -95,10 +95,10 @@ case "$kernel_name" in
 	ID=macos
 	;;
     (CYGWIN_NT-*)
+	kernel_release=${kernel_release%(*}
 	name="Microsoft Windows"
 	version_id=${kernel_name#*-}
 	ID=ms-windows
-	kernel_release=${kernel_release%(*}
 	;;
     (*)
 	ID=$kernel_name
