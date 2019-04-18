@@ -22,6 +22,114 @@ IS_SHELL_FORMAT=false
 VARS_STANDARD="ID NAME PRETTY_NAME VERSION VERSION_ID"
 VARS_EXTENDED="distro_name kernel_name kernel_release pretty_name"
 
+parse_arguments() {
+    is_shell_format=$IS_SHELL_FORMAT
+    vars=
+
+    while getopts Xhiknprvx opt
+    do
+	case $opt in
+	    (i)
+		queue_variables ID
+		;;
+	    (k)
+		queue_variables kernel_name
+		;;
+	    (n)
+		queue_variables NAME
+		;;
+	    (p)
+		queue_variables PRETTY_NAME
+		;;
+	    (r)
+		queue_variables kernel_release
+		;;
+	    (v)
+		queue_variables VERSION_ID
+		;;
+	    (x)
+		queue_variables $VARS_STANDARD
+		;;
+	    (X)
+		queue_variables $VARS_STANDARD $VARS_EXTENDED
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		printf "%s\n" ""
+		usage
+		exit 2
+		;;
+	esac
+    done
+
+}
+
+process_data() {
+    input=$(uname -sr)
+    kernel_name=${input% *}
+    kernel_release=${input#* }
+
+    case "$kernel_name" in
+	(Linux)
+	    . $FILE_OS
+	    ;;
+
+	(SunOS)
+	    input=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE)
+	    NAME=${input%:*}
+	    VERSION=${input#*:}
+	    ID=$(printf "%s\n" "${NAME% *}" | tr '[:upper:]' '[:lower:]')
+	    ;;
+
+	(Darwin)
+	    NAME=$(sw_vers -productName)
+	    VERSION=$(sw_vers -productVersion)
+	    ID=macos
+	    ;;
+
+	(CYGWIN_NT-*)
+	    kernel_release=$(printf "%s\n" "$kernel_release" | sed -e 's/(.*)//')
+	    NAME="Microsoft Windows"
+	    VERSION=${kernel_name#*-}
+	    ID=ms-windows
+	    VERSION_ID=$VERSION
+	    ;;
+
+	(*)
+	    NAME=$kernel_name
+	    VERSION=$kernel_release
+	    ID=$kernel_name
+	    VERSION_ID=$kernel_release
+	    PRETTY_NAME=$input
+	    ;;
+
+    esac
+
+    if [ -z "${VERSION_ID-}" ]; then
+	VERSION_ID="$VERSION"
+    fi
+
+    if [ -z "${PRETTY_NAME-}" ]; then
+	PRETTY_NAME="$NAME $VERSION"
+    fi
+
+    distro_name=$ID
+    pretty_name=$PRETTY_NAME
+
+    for var in ${vars:-PRETTY_NAME}; do
+	eval val="\$$var"
+
+	if [ "$is_shell_format" = true ]; then
+	    printf "%s=\"%s\"\n" "$var" "$val"
+	else
+	    printf "%s\n" "$val"
+	fi
+    done
+}
+
 queue_variables() {
     if [ $# -gt 1 ]; then
 	if [ $is_shell_format = false -a -z "$vars" ]; then
@@ -55,105 +163,5 @@ usage() {
 	EOM
 }
 
-is_shell_format=$IS_SHELL_FORMAT
-vars=
-
-while getopts Xhiknprvx opt
-do
-    case $opt in
-	(i)
-	    queue_variables ID
-	    ;;
-	(k)
-	    queue_variables kernel_name
-	    ;;
-	(n)
-	    queue_variables NAME
-	    ;;
-	(p)
-	    queue_variables PRETTY_NAME
-	    ;;
-	(r)
-	    queue_variables kernel_release
-	    ;;
-	(v)
-	    queue_variables VERSION_ID
-	    ;;
-	(x)
-	    queue_variables $VARS_STANDARD
-	    ;;
-	(X)
-	    queue_variables $VARS_STANDARD $VARS_EXTENDED
-	    ;;
-	(h)
-	    usage
-	    exit 0
-	    ;;
-	(\?)
-	    printf "%s\n" ""
-	    usage
-	    exit 2
-	    ;;
-    esac
-done
-
-input=$(uname -sr)
-kernel_name=${input% *}
-kernel_release=${input#* }
-
-case "$kernel_name" in
-    (Linux)
-	. $FILE_OS
-	;;
-
-    (SunOS)
-	input=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE)
-	NAME=${input%:*}
-	VERSION=${input#*:}
-	ID=$(printf "%s\n" "${NAME% *}" | tr '[:upper:]' '[:lower:]')
-	;;
-
-    (Darwin)
-	NAME=$(sw_vers -productName)
-	VERSION=$(sw_vers -productVersion)
-	ID=macos
-	;;
-
-    (CYGWIN_NT-*)
-	kernel_release=$(printf "%s\n" "$kernel_release" | sed -e 's/(.*)//')
-	NAME="Microsoft Windows"
-	VERSION=${kernel_name#*-}
-	ID=ms-windows
-	VERSION_ID=$VERSION
-	;;
-
-    (*)
-	NAME=$kernel_name
-	VERSION=$kernel_release
-	ID=$kernel_name
-	VERSION_ID=$kernel_release
-	PRETTY_NAME=$input
-	;;
-
-esac
-
-if [ -z "${VERSION_ID-}" ]; then
-    VERSION_ID="$VERSION"
-fi
-
-if [ -z "${PRETTY_NAME-}" ]; then
-    PRETTY_NAME="$NAME $VERSION"
-fi
-
-distro_name=$ID
-pretty_name=$PRETTY_NAME
-
-for var in ${vars:-PRETTY_NAME}; do
-    eval val="\$$var"
-
-    if [ "$is_shell_format" = true ]; then
-	printf "%s=\"%s\"\n" "$var" "$val"
-    else
-	printf "%s\n" "$val"
-    fi
-done
+parse_arguments "$@"
+process_data
