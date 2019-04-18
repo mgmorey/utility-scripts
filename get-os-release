@@ -102,7 +102,7 @@ case "$kernel_name" in
 	;;
 
     (CYGWIN_NT-*)
-	kernel_release=$(printf "%s\n" "$kernel_release" | sed -e 's/\(.*\)//')
+	kernel_release=$(printf "%s\n" "$kernel_release" | sed -e 's/(.*)//')
 	os_name="Microsoft Windows"
 	os_version_id=${kernel_name#*-}
 
