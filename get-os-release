@@ -121,7 +121,7 @@ do
      esac
 done
 
-for var in ${vars-PRETTY_NAME}; do
+for var in ${vars:-PRETTY_NAME}; do
     eval val="\$$var"
 
     if [ "$shell_format" = true ]; then
