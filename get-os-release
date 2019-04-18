@@ -89,40 +89,42 @@ case "$kernel_name" in
 
     (SunOS)
 	input=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE)
-	os_name=${input%:*}
-	os_version_id=${input#*:}
-
-	ID=$(printf "%s\n" "${os_name% *}" | tr '[:upper:]' '[:lower:]')
+	NAME=${input%:*}
+	VERSION=${input#*:}
+	ID=$(printf "%s\n" "${NAME% *}" | tr '[:upper:]' '[:lower:]')
 	;;
 
     (Darwin)
-	os_name=$(sw_vers -productName)
-	os_version_id=$(sw_vers -productVersion)
-
+	NAME=$(sw_vers -productName)
+	VERSION=$(sw_vers -productVersion)
 	ID=macos
-	VERSION_ID=$os_version_id
 	;;
 
     (CYGWIN_NT-*)
 	kernel_release=$(printf "%s\n" "$kernel_release" | sed -e 's/(.*)//')
-	os_name="Microsoft Windows"
-	os_version_id=${kernel_name#*-}
-
+	NAME="Microsoft Windows"
+	VERSION=${kernel_name#*-}
 	ID=ms-windows
+	VERSION_ID=$VERSION
 	;;
 
     (*)
-	ID=$kernel_name
 	NAME=$kernel_name
-	PRETTY_NAME=$input
+	VERSION=$kernel_release
+	ID=$kernel_name
 	VERSION_ID=$kernel_release
+	PRETTY_NAME=$input
 	;;
 
 esac
 
-: ${NAME:=$os_name}
-: ${PRETTY_NAME:="$os_name $os_version_id"}
-: ${VERSION_ID:=$os_version_id}
+if [ -z "${VERSION_ID-}" ]; then
+    VERSION_ID="$VERSION"
+fi
+
+if [ -z "${PRETTY_NAME-}" ]; then
+    PRETTY_NAME="$NAME $VERSION"
+fi
 
 if [ $# -eq 0 ]; then
     print_pretty_name
