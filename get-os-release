@@ -22,6 +22,23 @@ SHELL_FORMAT=false
 VARS_STANDARD="ID NAME PRETTY_NAME VERSION VERSION_ID"
 VARS_EXTENDED="distro_name kernel_name kernel_release pretty_name"
 
+add_variable() {
+    if [ $shell_format = false ]; then
+	vars="${vars}${vars:+ }$1"
+    else
+	wrong_usage "%s: conflicting arguments\n" "$0"
+    fi
+}
+
+set_variables() {
+    if [ $shell_format = false -a -z "$vars" ]; then
+	shell_format=true
+	vars="${vars}${vars:+ }$1"
+    else
+	wrong_usage "%s: conflicting arguments\n" "$0"
+    fi
+}
+
 usage() {
     cat <<- EOM
 	Usage: $0: [-i|-k|-n|-p|-r|-v]
@@ -29,6 +46,13 @@ usage() {
 	       $0: -X
 	       $0: -h
 	EOM
+}
+
+wrong_usage() {
+    printf "$@" >&2
+    printf "%s\n" ""
+    usage
+    exit 2
 }
 
 input=$(uname -sr)
@@ -86,43 +110,41 @@ pretty_name=$PRETTY_NAME
 
 while getopts Xhiknprvx opt
 do
-     case $opt in
-	 (i)
-	     vars="${vars}${vars:+ }ID"
-	     ;;
-	 (k)
-	     vars="${vars}${vars:+ }kernel_name"
-	     ;;
-	 (n)
-	     vars="${vars}${vars:+ }NAME"
-	     ;;
-	 (p)
-	     vars="${vars}${vars:+ }PRETTY_NAME"
-	     ;;
-	 (r)
-	     vars="${vars}${vars:+ }kernel_release"
-	     ;;
-	 (v)
-	     vars="${vars}${vars:+ }VERSION_ID"
-	     ;;
-	 (x)
-	     shell_format=true
-	     vars="$VARS_STANDARD"
-	     ;;
-	 (X)
-	     shell_format=true
-	     vars="$VARS_STANDARD $VARS_EXTENDED"
-	     ;;
-	 (h)
-	     usage
-	     exit 0
-	     ;;
-	 (\?)
-	     printf "%s\n" ""
-	     usage
-	     exit 2
-	     ;;
-     esac
+    case $opt in
+	(i)
+	    add_variable ID
+	    ;;
+	(k)
+	    add_variable kernel_name
+	    ;;
+	(n)
+	    add_variable NAME
+	    ;;
+	(p)
+	    add_variable PRETTY_NAME
+	    ;;
+	(r)
+	    add_variable kernel_release
+	    ;;
+	(v)
+	    add_variable VERSION_ID
+	    ;;
+	(x)
+	    set_variables "$VARS_STANDARD"
+	    ;;
+	(X)
+	    set_variables "$VARS_STANDARD $VARS_EXTENDED"
+	    ;;
+	(h)
+	    usage
+	    exit 0
+	    ;;
+	(\?)
+	    printf "%s\n" ""
+	    usage
+	    exit 2
+	    ;;
+    esac
 done
 
 for var in ${vars:-PRETTY_NAME}; do
