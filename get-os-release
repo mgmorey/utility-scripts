@@ -90,7 +90,7 @@ case "$kernel_name" in
 	os_name=${input%:*}
 	os_version_id=${input#*:}
 
-	ID=${sunos_name% *}
+	ID=${os_name% *}
 	;;
 
     (Darwin)
