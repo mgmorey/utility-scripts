@@ -157,7 +157,7 @@ do
 	     print_version_id
 	     ;;
 	 (x)
-	     export_base
+	     export_basic
 	     ;;
 	 (?)
 	     usage
