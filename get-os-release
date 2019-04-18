@@ -91,7 +91,7 @@ process_data() {
 	    ;;
 
 	(CYGWIN_NT-*)
-	    kernel_release=$(printf "%s\n" "$kernel_release" | sed -e 's/(.*)//')
+	    kernel_release=$(printf "%s\n" "${input#* }" | sed -e 's/(.*)//')
 	    NAME="Microsoft Windows"
 	    VERSION=${kernel_name#*-}
 	    ID=ms-windows
@@ -101,8 +101,7 @@ process_data() {
 	(*)
 	    NAME=$kernel_name
 	    VERSION=$kernel_release
-	    ID=$kernel_name
-	    VERSION_ID=$kernel_release
+	    ID=$(printf "%s\n" "$NAME" | tr '[:upper:]' '[:lower:]')
 	    PRETTY_NAME=$input
 	    ;;
 
