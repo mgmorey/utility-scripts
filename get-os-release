@@ -20,18 +20,22 @@ FILE=/etc/release
 OS_FILE=/etc/os-release
 
 export_all() {
-    export_base
-    printf "distro_name=%s\n" "$ID"
-    printf "kernel_name=%s\n" "$kernel_name"
-    printf "kernel_release=%s\n" "$kernel_release"
-    printf "pretty_name=\"%s\"\n" "$PRETTY_NAME"
+    export_basic
+    export_extended
 }
 
-export_base() {
+export_basic() {
     printf "ID=%s\n" "$ID"
     printf "NAME=\"%s\"\n" "$NAME"
     printf "PRETTY_NAME=\"%s\"\n" "$PRETTY_NAME"
     printf "VERSION_ID=%s\n" "$VERSION_ID"
+}
+
+export_extended() {
+    printf "distro_name=%s\n" "$ID"
+    printf "kernel_name=%s\n" "$kernel_name"
+    printf "kernel_release=%s\n" "$kernel_release"
+    printf "pretty_name=\"%s\"\n" "$PRETTY_NAME"
 }
 
 print_id() {
