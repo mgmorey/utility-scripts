@@ -55,11 +55,51 @@ wrong_usage() {
     exit 2
 }
 
+shell_format=$SHELL_FORMAT
+vars=
+
+while getopts Xhiknprvx opt
+do
+    case $opt in
+	(i)
+	    add_variable ID
+	    ;;
+	(k)
+	    add_variable kernel_name
+	    ;;
+	(n)
+	    add_variable NAME
+	    ;;
+	(p)
+	    add_variable PRETTY_NAME
+	    ;;
+	(r)
+	    add_variable kernel_release
+	    ;;
+	(v)
+	    add_variable VERSION_ID
+	    ;;
+	(x)
+	    set_variables "$VARS_STANDARD"
+	    ;;
+	(X)
+	    set_variables "$VARS_STANDARD $VARS_EXTENDED"
+	    ;;
+	(h)
+	    usage
+	    exit 0
+	    ;;
+	(\?)
+	    printf "%s\n" ""
+	    usage
+	    exit 2
+	    ;;
+    esac
+done
+
 input=$(uname -sr)
 kernel_name=${input% *}
 kernel_release=${input#* }
-shell_format=$SHELL_FORMAT
-vars=
 
 case "$kernel_name" in
     (Linux)
@@ -107,45 +147,6 @@ fi
 
 distro_name=$ID
 pretty_name=$PRETTY_NAME
-
-while getopts Xhiknprvx opt
-do
-    case $opt in
-	(i)
-	    add_variable ID
-	    ;;
-	(k)
-	    add_variable kernel_name
-	    ;;
-	(n)
-	    add_variable NAME
-	    ;;
-	(p)
-	    add_variable PRETTY_NAME
-	    ;;
-	(r)
-	    add_variable kernel_release
-	    ;;
-	(v)
-	    add_variable VERSION_ID
-	    ;;
-	(x)
-	    set_variables "$VARS_STANDARD"
-	    ;;
-	(X)
-	    set_variables "$VARS_STANDARD $VARS_EXTENDED"
-	    ;;
-	(h)
-	    usage
-	    exit 0
-	    ;;
-	(\?)
-	    printf "%s\n" ""
-	    usage
-	    exit 2
-	    ;;
-    esac
-done
 
 for var in ${vars:-PRETTY_NAME}; do
     eval val="\$$var"
