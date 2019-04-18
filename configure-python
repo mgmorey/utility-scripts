@@ -55,9 +55,7 @@ url=$BASE_URL/python/$VERSION/$filename
 
 script_dir=$(realpath "$(dirname "$0")")
 
-distro_name=$(sh -eu $script_dir/get-os-release -i)
-kernel_name=$(sh -eu $script_dir/get-os-release -k)
-pretty_name=$(sh -eu $script_dir/get-os-release -p)
+eval $(sh -eu $script_dir/get-os-release -X)
 
 case "$kernel_name" in
     (Linux)
@@ -75,9 +73,6 @@ case "$kernel_name" in
 	abort "%s: Operating system not supported\n" "$pretty_name"
 	;;
 esac
-
-install-python3-build-deps
-install-python3-build-extras
 
 mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
 
