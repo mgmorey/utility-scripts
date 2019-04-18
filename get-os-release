@@ -18,15 +18,17 @@
 
 FILE=/etc/release
 OS_FILE=/etc/os-release
-
 SHELL_FORMAT=false
-USAGE="Usage: $(basename "$0"): [-a|-b|-h|-i|-k|-n|-p|-r]"
 VARS_STANDARD="ID NAME PRETTY_NAME VERSION VERSION_ID"
 VARS_EXTENDED="distro_name kernel_name kernel_release pretty_name"
 
 usage() {
-    printf "%s\n" "$USAGE"
-    exit 2
+    cat <<- EOM
+	Usage: $0: [-a|-b|-i|-k|-n|-p|-r]
+	       $0: -x
+	       $0: -X
+	       $0: -h
+	EOM
 }
 
 input=$(uname -sr)
@@ -90,8 +92,8 @@ do
 	     vars="$VARS_STANDARD $VARS_EXTENDED"
 	     ;;
 	 (h)
-	     shell_format=false
-	     vars="USAGE"
+	     usage
+	     exit 0
 	     ;;
 	 (i)
 	     vars="${vars}${vars:+ }ID"
@@ -115,8 +117,9 @@ do
 	     shell_format=true
 	     vars="$VARS_STANDARD"
 	     ;;
-	 (?)
+	 (\?)
 	     usage
+	     exit 2
 	     ;;
      esac
 done
