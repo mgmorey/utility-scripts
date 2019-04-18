@@ -24,7 +24,6 @@ VARS_EXTENDED="distro_name kernel_name kernel_release pretty_name"
 
 usage() {
     cat <<- EOM
-
 	Usage: $0: [-i|-k|-n|-p|-r|-v]
 	       $0: -x
 	       $0: -X
@@ -119,6 +118,7 @@ do
 	     exit 0
 	     ;;
 	 (\?)
+	     printf "%s\n" ""
 	     usage
 	     exit 2
 	     ;;
