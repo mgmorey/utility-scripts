@@ -31,14 +31,7 @@ print_all() {
 
 print_id() {
     if [ -n "${ID:-}" ]; then
-	case "$kernel_name" in
-	    (SunOS)
-		printf "%s\n" "$ID" | tr '[:upper:]' '[:lower:]'
-		;;
-	    (*)
-		printf "%s\n" "$ID"
-		;;
-	esac
+	printf "%s\n" "$ID"
     fi
 }
 
@@ -90,7 +83,7 @@ case "$kernel_name" in
 	os_name=${input%:*}
 	os_version_id=${input#*:}
 
-	ID=${os_name% *}
+	ID=$(printf "%s\n" "${os_name% *}" | tr '[:upper:]' '[:lower:]')
 	;;
 
     (Darwin)
