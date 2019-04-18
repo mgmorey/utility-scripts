@@ -19,14 +19,19 @@
 FILE=/etc/release
 OS_FILE=/etc/os-release
 
-print_all() {
+export_all() {
+    export_base
+    printf "distro_name=%s\n" "$ID"
+    printf "kernel_name=%s\n" "$kernel_name"
+    printf "kernel_release=%s\n" "$kernel_release"
+    printf "pretty_name=\"%s\"\n" "$PRETTY_NAME"
+}
+
+export_base() {
     printf "ID=%s\n" "$ID"
     printf "NAME=\"%s\"\n" "$NAME"
     printf "PRETTY_NAME=\"%s\"\n" "$PRETTY_NAME"
     printf "VERSION_ID=%s\n" "$VERSION_ID"
-    printf "distro_name=%s\n" "$distro_name"
-    printf "kernel_name=%s\n" "$kernel_name"
-    printf "kernel_release=%s\n" "$kernel_release"
 }
 
 print_id() {
@@ -66,7 +71,7 @@ print_version_id() {
 }
 
 usage() {
-    printf "Usage: %s: [-a|-h|-i|-k|-n|-p|-r]\n" $(basename "$0")
+    printf "Usage: %s: [-a|-b|-h|-i|-k|-n|-p|-r]\n" $(basename "$0")
 }
 
 input=$(uname -sr)
@@ -114,18 +119,17 @@ esac
 : ${NAME:=$os_name}
 : ${PRETTY_NAME:="$os_name $os_version_id"}
 : ${VERSION_ID:=$os_version_id}
-: ${distro_name:=$ID}
 
 if [ $# -eq 0 ]; then
     print_pretty_name
     exit 0
 fi
 
-while getopts ahiknprv opt
+while getopts Xhiknprvx opt
 do
      case $opt in
-	 (a)
-	     print_all
+	 (X)
+	     export_all
 	     ;;
 	 (h)
 	     usage
@@ -147,6 +151,9 @@ do
 	     ;;
 	 (v)
 	     print_version_id
+	     ;;
+	 (x)
+	     export_base
 	     ;;
 	 (?)
 	     usage
