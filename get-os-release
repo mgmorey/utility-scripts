@@ -88,14 +88,6 @@ pretty_name=$PRETTY_NAME
 while getopts Xhiknprvx opt
 do
      case $opt in
-	 (X)
-	     shell_format=true
-	     vars="$VARS_STANDARD $VARS_EXTENDED"
-	     ;;
-	 (h)
-	     usage
-	     exit 0
-	     ;;
 	 (i)
 	     vars="${vars}${vars:+ }ID"
 	     ;;
@@ -117,6 +109,14 @@ do
 	 (x)
 	     shell_format=true
 	     vars="$VARS_STANDARD"
+	     ;;
+	 (X)
+	     shell_format=true
+	     vars="$VARS_STANDARD $VARS_EXTENDED"
+	     ;;
+	 (h)
+	     usage
+	     exit 0
 	     ;;
 	 (\?)
 	     usage
