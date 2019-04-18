@@ -94,22 +94,22 @@ do
 	     vars="USAGE"
 	     ;;
 	 (i)
-	     vars="${vars}${vars+ } ID"
+	     vars="${vars}${vars:+ }ID"
 	     ;;
 	 (k)
-	     vars="${vars}${vars+ } kernel_name"
+	     vars="${vars}${vars:+ }kernel_name"
 	     ;;
 	 (n)
-	     vars="${vars}${vars+ } NAME"
+	     vars="${vars}${vars:+ }NAME"
 	     ;;
 	 (p)
-	     vars="${vars}${vars+ } PRETTY_NAME"
+	     vars="${vars}${vars:+ }PRETTY_NAME"
 	     ;;
 	 (r)
-	     vars="${vars}${vars+ } kernel_release"
+	     vars="${vars}${vars:+ }kernel_release"
 	     ;;
 	 (v)
-	     vars="${vars}${vars+ } VERSION_ID"
+	     vars="${vars}${vars:+ }VERSION_ID"
 	     ;;
 	 (x)
 	     shell_format=true
@@ -121,7 +121,7 @@ do
      esac
 done
 
-for var in ${vars:-PRETTY_NAME}; do
+for var in ${vars-PRETTY_NAME}; do
     eval val="\$$var"
 
     if [ "$shell_format" = true ]; then
