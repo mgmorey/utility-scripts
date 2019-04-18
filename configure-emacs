@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 BASE_URL=https://mirrors.ocf.berkeley.edu/gnu
-VERSION=26.1
+VERSION=26.2
 
 abort() {
     printf "$@" >&2
@@ -55,9 +55,7 @@ url=$BASE_URL/emacs/$filename
 
 script_dir=$(realpath "$(dirname "$0")")
 
-distro_name=$(sh -eu $script_dir/get-os-release -i)
-kernel_name=$(sh -eu $script_dir/get-os-release -k)
-pretty_name=$(sh -eu $script_dir/get-os-release -p)
+eval $(sh -eu $script_dir/get-os-release -X)
 
 case "$kernel_name" in
     (Linux)
@@ -75,9 +73,6 @@ case "$kernel_name" in
 	abort "%s: Operating system not supported\n" "$pretty_name"
 	;;
 esac
-
-install-emacs-build-deps
-install-emacs-build-extras
 
 mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
 
