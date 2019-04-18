@@ -100,7 +100,7 @@ case "$kernel_name" in
 	os_version_id=$(sw_vers -productVersion)
 
 	ID=macos
-	VERSION_ID=$darwin_version_id
+	VERSION_ID=$os_version_id
 	;;
 
     (CYGWIN_NT-*)
