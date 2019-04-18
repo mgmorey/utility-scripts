@@ -94,6 +94,11 @@ case "$kernel_name" in
 	version_id=$(sw_vers -productVersion)
 	ID=macos
 	;;
+    (CYGWIN_NT-*)
+	name="Microsoft Windows"
+	version_id=${kernel_name#*-}
+	ID=ms-windows
+	;;
     (*)
 	ID=$kernel_name
 	NAME=$kernel_name
