@@ -26,8 +26,7 @@ parse_arguments() {
     is_shell_format=$IS_SHELL_FORMAT
     vars=
 
-    while getopts Xhiknprvx opt
-    do
+    while getopts Xhiknprvx opt; do
 	case $opt in
 	    (i)
 		queue_variables ID
@@ -64,7 +63,6 @@ parse_arguments() {
 		;;
 	esac
     done
-
 }
 
 process_data() {
