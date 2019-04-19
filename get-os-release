@@ -156,10 +156,10 @@ queue_variables() {
 usage() {
     if [ $# -gt 0 ]; then
 	printf "$@" >&2
-	printf "%s\n" ""
+	printf "%s\n" "" >&2
     fi
 
-    cat <<- EOM
+    cat <<- EOM >&2
 	Usage: $0: [-i] [-k] [-n] [-p] [-r] [-v]
 	       $0: -x
 	       $0: -X
