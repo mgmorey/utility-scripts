@@ -19,6 +19,7 @@
 FILE=/etc/release
 FILE_OS=/etc/os-release
 IS_SHELL_FORMAT=false
+LOWERCASE="tr '[:upper:]' '[:lower:]'"
 VARS_STANDARD="ID NAME PRETTY_NAME VERSION VERSION_ID"
 VARS_EXTENDED="distro_name kernel_name kernel_release pretty_name"
 
@@ -81,7 +82,7 @@ process_data() {
 	    input=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE)
 	    NAME=${input%:*}
 	    VERSION=${input#*:}
-	    ID=$(printf "%s\n" "${NAME% *}" | tr '[:upper:]' '[:lower:]')
+	    ID=$(printf "%s\n" "${NAME% *}" | $LOWERCASE)
 	    ;;
 
 	(Darwin)
@@ -101,7 +102,7 @@ process_data() {
 	(*)
 	    NAME=$kernel_name
 	    VERSION=$kernel_release
-	    ID=$(printf "%s\n" "$NAME" | tr '[:upper:]' '[:lower:]')
+	    ID=$(printf "%s\n" "$NAME" | $LOWERCASE)
 	    PRETTY_NAME=$input
 	    ;;
 
