@@ -53,13 +53,6 @@ script_dir=$(realpath "$(dirname "$0")")
 
 eval $(sh -eu $script_dir/get-os-release -X)
 
-installer=$(sh -eu $script_dir/get-package-manager)
-install_opts=$(sh -eu $script_dir/get-package-install-options)
-pattern_opts=$(sh -eu $script_dir/get-pattern-install-options)
-
-packages=$(sh -eu $script_dir/get-python3-build-extras)
-pattern=$(sh -eu $script_dir/get-devel-pattern)
-
 case "$kernel_name" in
     (Linux)
 	case "$ID" in
@@ -77,4 +70,6 @@ case "$kernel_name" in
 	;;
 esac
 
-printf "%s\n" $packages
+if [ -n "${packages-}" ]; then
+    printf "%s\n" $packages
+fi
