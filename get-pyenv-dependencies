@@ -93,7 +93,7 @@ data=$(sh -eu $script_dir/get-python-package)
 package_name=$(printf "%s" "$data" | awk '{print $1}')
 package_modifier=$(printf "%s" "$data" | awk '{print $2}')
 
-for package in ${packages:-}; do
+for package in ${packages-}; do
     case $package in
 	(*%s*)
 	    printf "$package\n" $package_modifier

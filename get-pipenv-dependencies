@@ -86,7 +86,7 @@ package_modifier=$(printf "%s" "$data" | awk '{print $2}')
 
 printf "%s\n" $package_name
 
-for package in ${packages:-}; do
+for package in ${packages-}; do
     case $package in
 	(*%s*)
 	    printf "$package\n" $package_modifier
