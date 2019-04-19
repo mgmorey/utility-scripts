@@ -23,8 +23,13 @@ LOWERCASE="tr '[:upper:]' '[:lower:]'"
 VARS_STANDARD="ID NAME PRETTY_NAME VERSION VERSION_ID"
 VARS_EXTENDED="kernel_name kernel_release"
 
-abort_conflicting_options() {
-    usage "%s: conflicting options\n" "$0"
+abort_conflicting_option() {
+    usage "%s: conflicting option -- %s\n" "$0" "$1"
+    exit 2
+}
+
+abort_extra_arguments() {
+    usage "%s: extra arguments -- %s\n" "$0" "$*"
     exit 2
 }
 
@@ -139,6 +144,10 @@ parse_arguments() {
 		;;
 	esac
     done
+
+    if [ $# -gt 0 ]; then
+	abort_extra_arguments "$@"
+    fi
 }
 
 queue_vars() {
@@ -147,13 +156,13 @@ queue_vars() {
 	    is_shell_format=true
 	    vars="$*"
 	else
-	    abort_conflicting_options
+	    abort_conflicting_option $opt
 	fi
     elif [ $# -eq 1 ]; then
 	if [ $is_shell_format = false ]; then
 	    vars="${vars}${vars:+ }$1"
 	else
-	    abort_conflicting_options
+	    abort_conflicting_option $opt
 	fi
     fi
 }
