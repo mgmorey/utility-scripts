@@ -133,7 +133,7 @@ parse_arguments() {
 		exit 0
 		;;
 	    (\?)
-		printf "%s\n" ""
+		printf "%s\n" "" >&2
 		usage
 		exit 2
 		;;
