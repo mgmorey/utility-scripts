@@ -96,7 +96,6 @@ process_data() {
 	    NAME="Microsoft Windows"
 	    VERSION=${kernel_name#*-}
 	    ID=ms-windows
-	    VERSION_ID=$VERSION
 	    ;;
 
 	(*)
