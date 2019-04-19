@@ -119,15 +119,21 @@ process_data() {
 	PRETTY_NAME="$NAME $VERSION"
     fi
 
-    for var in ${vars:-PRETTY_NAME}; do
-	eval val="\$$var"
+    if [ -z "${vars-}" ]; then
+	vars=PRETTY_NAME
+    fi
 
-	if [ "$is_shell_format" = true ]; then
+    if [ "$is_shell_format" = true ]; then
+	for var in $vars; do
+	    eval val="\$$var"
 	    printf "%s=\"%s\"\n" "$var" "$val"
-	else
+	done
+    else
+	for var in $vars; do
+	    eval val="\$$var"
 	    printf "%s\n" "$val"
-	fi
-    done
+	done
+    fi
 }
 
 queue_variables() {
