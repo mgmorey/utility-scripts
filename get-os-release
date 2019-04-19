@@ -107,6 +107,10 @@ process_data() {
 
     esac
 
+    if [ -z "${VERSION-}" ]; then
+	VERSION=
+    fi
+
     if [ -z "${VERSION_ID-}" ]; then
 	VERSION_ID="$VERSION"
     fi
