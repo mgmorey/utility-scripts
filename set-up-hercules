@@ -45,16 +45,16 @@ eval $(sh -eu $script_dir/get-os-release -X)
 
 case "$kernel_name" in
     (Linux)
-	case "$distro_name" in
+	case "$ID" in
 	    (debian|ubuntu)
 	    	;;
 	    (*)
-		abort "%s: Distro not supported\n" "$pretty_name"
+		abort "%s: Distro not supported\n" "$PRETTY_NAME"
 		;;
 	esac
 	;;
     (*)
-	abort "%s: Operating system not supported\n" "$pretty_name"
+	abort "%s: Operating system not supported\n" "$PRETTY_NAME"
 	;;
 esac
 

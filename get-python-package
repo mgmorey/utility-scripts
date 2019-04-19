@@ -61,7 +61,7 @@ eval $(sh -eu $script_dir/get-os-release -X)
 
 case "$kernel_name" in
     (Linux)
-	case "$distro_name" in
+	case "$ID" in
 	    (debian)
 		printf "%s %s\n" $DEBIAN_INFO
 		;;
@@ -78,7 +78,7 @@ case "$kernel_name" in
 		printf "%s %s\n" $UBUNTU_INFO
 		;;
 	    (*)
-		abort "%s: Distro not supported\n" "$pretty_name"
+		abort "%s: Distro not supported\n" "$PRETTY_NAME"
 		;;
 	esac
 	;;
@@ -92,6 +92,6 @@ case "$kernel_name" in
 	printf "%s %s\n" $SUNOS_INFO
 	;;
     (*)
-	abort "%s: Operating system not supported\n" "$pretty_name"
+	abort "%s: Operating system not supported\n" "$PRETTY_NAME"
 	;;
 esac

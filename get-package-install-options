@@ -45,7 +45,7 @@ eval $(sh -eu $script_dir/get-os-release -X)
 
 case "$kernel_name" in
     (Linux)
-	case "$distro_name" in
+	case "$ID" in
 	    (debian|ubuntu)
 		printf "%s\n" "--no-install-recommends"
 		;;

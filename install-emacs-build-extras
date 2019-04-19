@@ -52,7 +52,7 @@ pattern=$(sh -eu $script_dir/get-devel-pattern)
 
 case "$kernel_name" in
     (Linux)
-	case "$distro_name" in
+	case "$ID" in
 	    (debian|ubuntu)
 		;;
 	    (redhat|centos)
@@ -60,14 +60,14 @@ case "$kernel_name" in
 	    (opensuse-*)
 		;;
 	    (*)
-		abort "%s: Distro not supported\n" "$pretty_name"
+		abort "%s: Distro not supported\n" "$PRETTY_NAME"
 		;;
 	esac
 	;;
     (FreeBSD|SunOS|NT)
 	;;
     (*)
-	abort "%s: Operating system not supported\n" "$pretty_name"
+	abort "%s: Operating system not supported\n" "$PRETTY_NAME"
 	;;
 esac
 
