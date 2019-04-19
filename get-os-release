@@ -19,8 +19,9 @@
 FILE=/etc/release
 FILE_OS=/etc/os-release
 IS_SHELL_FORMAT=false
+LOWERCASE="tr '[:upper:]' '[:lower:]'"
 VARS_STANDARD="ID NAME PRETTY_NAME VERSION VERSION_ID"
-VARS_EXTENDED="distro_name kernel_name kernel_release pretty_name"
+VARS_EXTENDED="kernel_name kernel_release"
 
 parse_arguments() {
     is_shell_format=$IS_SHELL_FORMAT
@@ -79,7 +80,7 @@ process_data() {
 	    input=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE)
 	    NAME=${input%:*}
 	    VERSION=${input#*:}
-	    ID=$(printf "%s\n" "${NAME% *}" | tr '[:upper:]' '[:lower:]')
+	    ID=$(printf "%s\n" "${NAME% *}" | $LOWERCASE)
 	    ;;
 
 	(Darwin)
@@ -89,22 +90,24 @@ process_data() {
 	    ;;
 
 	(CYGWIN_NT-*)
-	    kernel_release=$(printf "%s\n" "$kernel_release" | sed -e 's/(.*)//')
+	    kernel_release=$(printf "%s\n" "${input#* }" | sed -e 's/(.*)//')
 	    NAME="Microsoft Windows"
 	    VERSION=${kernel_name#*-}
 	    ID=ms-windows
-	    VERSION_ID=$VERSION
 	    ;;
 
 	(*)
 	    NAME=$kernel_name
 	    VERSION=$kernel_release
-	    ID=$kernel_name
-	    VERSION_ID=$kernel_release
+	    ID=$(printf "%s\n" "$NAME" | $LOWERCASE)
 	    PRETTY_NAME=$input
 	    ;;
 
     esac
+
+    if [ -z "${VERSION-}" ]; then
+	VERSION=
+    fi
 
     if [ -z "${VERSION_ID-}" ]; then
 	VERSION_ID="$VERSION"
@@ -114,18 +117,21 @@ process_data() {
 	PRETTY_NAME="$NAME $VERSION"
     fi
 
-    distro_name=$ID
-    pretty_name=$PRETTY_NAME
+    if [ -z "${vars-}" ]; then
+	vars=PRETTY_NAME
+    fi
 
-    for var in ${vars:-PRETTY_NAME}; do
-	eval val="\$$var"
-
-	if [ "$is_shell_format" = true ]; then
+    if [ "$is_shell_format" = true ]; then
+	for var in $vars; do
+	    eval val="\$$var"
 	    printf "%s=\"%s\"\n" "$var" "$val"
-	else
+	done
+    else
+	for var in $vars; do
+	    eval val="\$$var"
 	    printf "%s\n" "$val"
-	fi
-    done
+	done
+    fi
 }
 
 queue_variables() {

@@ -49,7 +49,7 @@ case "$kernel_name" in
     (Darwin)
     	;;
     (*)
-	abort "%s: Operating system not supported\n" "$pretty_name"
+	abort "%s: Operating system not supported\n" "$PRETTY_NAME"
 	;;
 esac
 

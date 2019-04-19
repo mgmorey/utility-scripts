@@ -51,7 +51,7 @@ pattern=$(sh -eu $script_dir/get-devel-pattern)
 
 case "$kernel_name" in
     (Linux)
-	case "$distro_name" in
+	case "$ID" in
 	    (debian|ubuntu)
 	    	;;
 	    # (fedora)
@@ -61,7 +61,7 @@ case "$kernel_name" in
 	    # (redhat|centos)
 	    # 	;;
 	    (*)
-		abort "%s: Distro not supported\n" "$pretty_name"
+		abort "%s: Distro not supported\n" "$PRETTY_NAME"
 		;;
 	esac
 	;;
@@ -70,7 +70,7 @@ case "$kernel_name" in
     (SunOS)
     	;;
     (*)
-	abort "%s: Operating system not supported\n" "$pretty_name"
+	abort "%s: Operating system not supported\n" "$PRETTY_NAME"
 	;;
 esac
 
