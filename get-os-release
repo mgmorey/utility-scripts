@@ -145,6 +145,8 @@ parse_arguments() {
 	esac
     done
 
+    shift $(($OPTIND - 1))
+
     if [ $# -gt 0 ]; then
 	abort_extra_arguments "$@"
     fi
