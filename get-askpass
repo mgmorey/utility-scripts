@@ -23,6 +23,10 @@ abort() {
     exit 1
 }
 
+abort_desktop_not_supported() {
+    abort "%s: %s: Desktop not supported\n" "$0" "$desktop_name"
+}
+
 abort_not_supported() {
     abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
 }
@@ -52,6 +56,7 @@ fi
 script_dir=$(realpath "$(dirname "$0")")
 
 desktop_name=$(sh -eu $script_dir/get-desktop-name)
+
 eval $(sh -eu $script_dir/get-os-release -X)
 
 case "$kernel_name" in
@@ -66,7 +71,7 @@ case "$kernel_name" in
 			package=ksshaskpass
 			;;
 		    (*)
-			abort "%s: Desktop not supported\n" "$desktop_name"
+			abort_desktop_not_supported
 			;;
 		esac
 		;;
@@ -79,7 +84,7 @@ case "$kernel_name" in
 			package=ksshaskpass
 			;;
 		    (*)
-			abort "%s: Desktop not supported\n" "$desktop_name"
+			abort_desktop_not_supported
 			;;
 		esac
 		;;
@@ -92,7 +97,7 @@ case "$kernel_name" in
 			package=ksshaskpass
 			;;
 		    (*)
-			abort "%s: Desktop not supported\n" "$desktop_name"
+			abort_desktop_not_supported
 			;;
 		esac
 		;;
@@ -105,7 +110,7 @@ case "$kernel_name" in
 			package=ksshaskpass5
 			;;
 		    (*)
-			abort "%s: Desktop not supported\n" "$desktop_name"
+			abort_desktop_not_supported
 			;;
 		esac
 		;;
@@ -115,7 +120,7 @@ case "$kernel_name" in
 			askpass_helper=ksshaskpass
 			;;
 		    (*)
-			abort "%s: Desktop not supported\n" "$desktop_name"
+			abort_desktop_not_supported
 			;;
 		esac
 		;;
@@ -133,7 +138,7 @@ case "$kernel_name" in
 		package=ksshaskpass
 		;;
 	    (*)
-		abort "%s: Desktop not supported\n" "$desktop_name"
+		abort_desktop_not_supported
 		;;
 	esac
 	;;
@@ -145,7 +150,7 @@ case "$kernel_name" in
 			package=ssh-askpass
 			;;
 		    (*)
-			abort "%s: Desktop not supported\n" "$desktop_name"
+			abort_desktop_not_supported
 			;;
 		    esac
 		;;
@@ -160,7 +165,7 @@ case "$kernel_name" in
 		askpass_helper=/usr/libexec/gnome-ssh-askpass.exe
 		;;
 	    (*)
-		abort "%s: Desktop not supported\n" "$desktop_name"
+		abort_desktop_not_supported
 		;;
 	esac
 
