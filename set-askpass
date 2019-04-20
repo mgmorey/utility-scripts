@@ -51,11 +51,11 @@ for command in $commands; do
 		    printf "export %s\n" "$var"
 		    ;;
 		(*)
-		    abort "%s: Shell not supported\n" "$SHELL"
+		    abort "%s: %s: Shell not supported\n" "$0" "$SHELL"
 		    ;;
 	    esac
 	    ;;
 	(*)
-	    abort "%s: Not a valid command\n" "$command"
+	    abort "%s: %s: Not a valid command\n" "$0" "$command"
     esac
 done
