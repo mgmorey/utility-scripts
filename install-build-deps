@@ -70,7 +70,9 @@ esac
 
 install_opts=$(sh -eu $script_dir/get-package-install-options)
 installer=$(sh -eu $script_dir/get-package-manager)
-packages=$(sh -eu $script_dir/get-python3-build-extras)
 
-$installer install $install_opts $packages
+if [ -n "${packages-}" ]; then
+    $installer install $install_opts $packages
+fi
+
 $installer build-dep "$@"
