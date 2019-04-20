@@ -21,6 +21,10 @@ abort() {
     exit 1
 }
 
+abort_desktop_not_supported() {
+    abort "%s: %s: Desktop not supported\n" "$0" "$desktop_name"
+}
+
 abort_not_supported() {
     abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
 }
@@ -44,17 +48,18 @@ realpath() {
 }
 
 if [ -z "${DISPLAY:-}" ]; then
-    abort "No DISPLAY variable set\n"
-fi
-
-if [ -z "${desktop_name:-}" ]; then
-    abort "Desktop not specified\n"
+    abort "%s: No DISPLAY variable set\n" "$0"
 fi
 
 script_dir=$(realpath "$(dirname "$0")")
 
-desktop_name=$(sh -eu $script_dir/get-desktop-name)
 eval $(sh -eu $script_dir/get-os-release -X)
+
+desktop_name=$(sh -eu $script_dir/get-desktop-name)
+
+if [ -z "${desktop_name:-}" ]; then
+    abort "%s: Desktop not specified\n" "$0"
+fi
 
 case "$kernel_name" in
     (Linux)
@@ -71,7 +76,7 @@ case "$kernel_name" in
 			software-properties-gtk
 			;;
 		    (*)
-			abort "%s: Desktop not supported\n" "$desktop_name"
+			abort_desktop_not_supported
 			;;
 		esac
 		;;
@@ -87,7 +92,7 @@ case "$kernel_name" in
 			software-properties-gtk
 			;;
 		    (*)
-			abort "%s: Desktop not supported\n" "$desktop_name"
+			abort_desktop_not_supported
 			;;
 		esac
 		;;
