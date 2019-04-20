@@ -81,9 +81,6 @@ case "$kernel_name" in
 	    (ubuntu)
 		printf "%s %s\n" $UBUNTU_INFO
 		;;
-	    (*)
-		abort_not_supported Distro
-		;;
 	esac
 	;;
     (Darwin)
@@ -94,8 +91,5 @@ case "$kernel_name" in
 	;;
     (SunOS)
 	printf "%s %s\n" $SUNOS_INFO
-	;;
-    (*)
-	abort_not_supported "Operating system"
 	;;
 esac
