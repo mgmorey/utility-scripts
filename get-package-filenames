@@ -46,7 +46,7 @@ realpath() {
 }
 
 if [ $# -eq 0 ]; then
-    abort "Not enough arguments\n"
+    abort "%s: Not enough arguments\n" "$0"
 fi
 
 script_dir=$(realpath "$(dirname "$0")")
