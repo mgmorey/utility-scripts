@@ -1,4 +1,4 @@
-#!/bin/sh -eu
+f#!/bin/sh -eu
 
 # install-docker-ce: install Docker Community Edition
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>

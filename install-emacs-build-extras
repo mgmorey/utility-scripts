@@ -47,12 +47,11 @@ script_dir=$(realpath "$(dirname "$0")")
 
 eval $(sh -eu $script_dir/get-os-release -X)
 
-installer=$(sh -eu $script_dir/get-package-manager)
 install_opts=$(sh -eu $script_dir/get-package-install-options)
-pattern_opts=$(sh -eu $script_dir/get-pattern-install-options)
-
+installer=$(sh -eu $script_dir/get-package-manager)
 packages=$(sh -eu $script_dir/get-emacs-build-extras)
 pattern=$(sh -eu $script_dir/get-devel-pattern)
+pattern_opts=$(sh -eu $script_dir/get-pattern-install-options)
 
 case "$kernel_name" in
     (Linux)

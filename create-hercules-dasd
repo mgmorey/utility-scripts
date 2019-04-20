@@ -22,6 +22,45 @@ INIT="dasdinit -a -lfs -linux"
 INSTANCE=0
 MODEL=3390
 
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+realpath() {
+    assert [ -d "$1" ]
+
+    if [ -x /usr/bin/realpath ]; then
+	/usr/bin/realpath "$1"
+    else
+	if expr "$1" : '/.*' >/dev/null; then
+	    printf "%s\n" "$1"
+	else
+	    printf "%s\n" "$PWD/${1#./}"
+	fi
+    fi
+}
+
+script_dir=$(realpath "$(dirname "$0")")
+
+eval $(sh -eu $script_dir/get-os-release -X)
+
+case "$kernel_name" in
+    (Linux)
+	;;
+    (*)
+	abort_not_supported "Operating system"
+	;;
+esac
+
 mkdir -p $DIR
 cd $DIR
 

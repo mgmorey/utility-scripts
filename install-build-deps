@@ -51,20 +51,12 @@ script_dir=$(realpath "$(dirname "$0")")
 
 eval $(sh -eu $script_dir/get-os-release -X)
 
-package_manager=$(sh -eu $script_dir/get-package-manager)
-package_install_options=$(sh -eu $script_dir/get-package-install-options)
-packages=$(sh -eu $script_dir/get-python3-build-extras)
-
 case "$kernel_name" in
     (Linux)
 	case "$ID" in
 	    (debian|ubuntu)
-		$package_manager install $package_install_options $packages
-		$package_manager build-dep "$@"
 		;;
 	    (fedora|redhat|centos)
-		$package_manager install $package_install_options $packages
-		${package_manager}-builddep "$@"
 		;;
 	    (*)
 		abort_not_supported Distro
@@ -75,3 +67,10 @@ case "$kernel_name" in
 	abort_not_supported "Operating system"
 	;;
 esac
+
+install_opts=$(sh -eu $script_dir/get-package-install-options)
+installer=$(sh -eu $script_dir/get-package-manager)
+packages=$(sh -eu $script_dir/get-python3-build-extras)
+
+$installer install $install_opts $packages
+$installer build-dep "$@"
