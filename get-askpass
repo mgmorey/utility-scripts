@@ -50,7 +50,7 @@ realpath() {
 }
 
 if [ -z "${DISPLAY:-}" ]; then
-    abort "No DISPLAY variable set\n"
+    abort "%s: No DISPLAY variable set\n" "$0"
 fi
 
 script_dir=$(realpath "$(dirname "$0")")
