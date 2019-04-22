@@ -1,4 +1,4 @@
-#!/bin/sh -u
+#!/bin/sh -eu
 
 # install-homebrew: install HomeBrew (for Darwin platform)
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
@@ -57,7 +57,10 @@ case "$kernel_name" in
 	;;
 esac
 
-if brew update; then
+xcode-select --install 2>/dev/null || true
+
+if brew --version >/dev/null 2>&1; then
+    brew update
     brew upgrade
 else
     /usr/bin/ruby -e "$(curl -fsSL $HOMEBREW_URL)"
