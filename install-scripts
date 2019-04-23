@@ -29,12 +29,12 @@ dir=$PWD
 cd "$HOME"
 
 if [ ! -d Documents/bin ]; then
-    mkdir -p Documents
+    mkdir -m go-w -p Documents
 
     if [ -d bin ]; then
 	/bin/mv bin Documents/bin
     else
-	mkdir Documents/bin
+	mkdir -m go-w Documents/bin
     fi
 fi
 
