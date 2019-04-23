@@ -24,7 +24,7 @@ abort() {
 }
 
 cd "$HOME/Documents"
-mkdir -p $DIRS
+mkdir -m go-w -p $DIRS
 cd "$HOME"
 
 for dir in $DIRS; do
