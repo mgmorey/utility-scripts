@@ -57,8 +57,6 @@ case "$kernel_name" in
 	;;
 esac
 
-xcode-select --install 2>/dev/null || true
-
 if brew --version >/dev/null 2>&1; then
     brew update
     brew upgrade
