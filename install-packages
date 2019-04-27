@@ -75,6 +75,6 @@ esac
 package_manager=$(sh -eu $script_dir/get-package-manager)
 
 if [ -n "$package_manager" ]; then
-    install_options=$(sh -eu $script_dir/get-package-install-options)
-    $package_manager install $install_options "$@"
+    install_opts=$(sh -eu $script_dir/get-package-install-options)
+    $package_manager install $install_opts "$@"
 fi
