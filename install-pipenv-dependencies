@@ -51,10 +51,13 @@ case "$kernel_name" in
     (Linux)
 	case "$ID" in
 	    (debian|ubuntu)
+		:
 	    	;;
 	    (opensuse-*)
+		:
 	    	;;
 	    (fedora)
+		:
 	    	;;
 	    (*)
 		abort_not_supported Distro
@@ -62,6 +65,7 @@ case "$kernel_name" in
 	esac
 	;;
     (Darwin|FreeBSD|SunOS|NT)
+	:
     	;;
     (*)
 	abort_not_supported "Operating system"

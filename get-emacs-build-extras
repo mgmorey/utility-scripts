@@ -76,6 +76,7 @@ case "$kernel_name" in
 	esac
 	;;
     (FreeBSD|SunOS|NT)
+	:
 	;;
 esac
 
