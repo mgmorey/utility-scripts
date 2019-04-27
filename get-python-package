@@ -69,11 +69,11 @@ case "$kernel_name" in
 	    (debian)
 		printf "%s %s\n" $DEBIAN_INFO
 		;;
-	    (fedora)
-		printf "%s %s\n" $FEDORA_INFO
-		;;
 	    (opensuse-*)
 		printf "%s %s\n" $OPENSUSE_INFO
+		;;
+	    (fedora)
+		printf "%s %s\n" $FEDORA_INFO
 		;;
 	    (redhat|centos)
 		printf "%s %s\n" $REDHAT_INFO

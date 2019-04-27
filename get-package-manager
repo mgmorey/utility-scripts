@@ -53,14 +53,14 @@ case "$kernel_name" in
 	    (debian|ubuntu)
 		printf "%s\n" apt-get
 		;;
+	    (opensuse-*)
+		printf "%s\n" zypper
+		;;
 	    (fedora)
 		printf "%s\n" dnf
 		;;
 	    (redhat|centos)
 		printf "%s\n" yum
-		;;
-	    (opensuse-*)
-		printf "%s\n" zypper
 		;;
 	    (*)
 		abort_not_supported Distro

@@ -51,12 +51,16 @@ case "$kernel_name" in
     (Linux)
 	case "$ID" in
 	    (debian|ubuntu)
+		:
+	    	;;
+	    (opensuse-*)
+		:
 	    	;;
 	    # (fedora)
+	    #   :
 	    # 	;;
-	    (opensuse-*)
-	    	;;
 	    # (redhat|centos)
+	    #   :
 	    # 	;;
 	    (*)
 		abort_not_supported Distro

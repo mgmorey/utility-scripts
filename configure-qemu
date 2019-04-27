@@ -64,7 +64,8 @@ eval $(sh -eu $script_dir/get-os-release -X)
 case "$kernel_name" in
     (Linux)
 	case "$ID" in
-	    (debian|ubuntu|fedora|opensuse-*)
+	    (debian|ubuntu|opensuse-*|fedora)
+		:
 	    	;;
 	    (*)
 		abort_not_supported Distro

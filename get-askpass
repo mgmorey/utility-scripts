@@ -75,6 +75,19 @@ case "$kernel_name" in
 			;;
 		esac
 		;;
+	    (opensuse-*)
+		case "$desktop_name" in
+		    (GNOME*|*:GNOME|'')
+			package=openssh-askpass-gnome
+			;;
+		    (KDE*)
+			package=ksshaskpass5
+			;;
+		    (*)
+			abort_desktop_not_supported
+			;;
+		esac
+		;;
 	    (fedora)
 		case "$desktop_name" in
 		    (GNOME*|*:GNOME|'')
@@ -95,19 +108,6 @@ case "$kernel_name" in
 			;;
 		    (KDE*)
 			package=ksshaskpass
-			;;
-		    (*)
-			abort_desktop_not_supported
-			;;
-		esac
-		;;
-	    (opensuse-*)
-		case "$desktop_name" in
-		    (GNOME*|*:GNOME|'')
-			package=openssh-askpass-gnome
-			;;
-		    (KDE*)
-			package=ksshaskpass5
 			;;
 		    (*)
 			abort_desktop_not_supported
