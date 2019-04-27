@@ -61,11 +61,11 @@ case "$kernel_name" in
 		package=$DEBIAN_PKG
 		packages=$DEBIAN_PKGS
 		;;
-	    (fedora|redhat|centos)
-		package=$REDHAT_PKG
-		;;
 	    (opensuse-*)
 		packages=$OPENSUSE_PKGS
+		;;
+	    (fedora|redhat|centos)
+		package=$REDHAT_PKG
 		;;
 	    (*)
 		abort_not_supported Distro
