@@ -70,7 +70,7 @@ case "$kernel_name" in
 		;;
 	esac
 	;;
-    (FreeBSD|SunOS|NT)
+    (FreeBSD|SunOS|CYGWIN_NT-*)
 	:
     	;;
     (*)
