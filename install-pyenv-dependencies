@@ -52,9 +52,9 @@ case "$kernel_name" in
 	case "$ID" in
 	    (debian|ubuntu)
 	    	;;
-	    (fedora)
-	    	;;
 	    (opensuse-*)
+	    	;;
+	    (fedora)
 	    	;;
 	    (redhat|centos)
 		;;
