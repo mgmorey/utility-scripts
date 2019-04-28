@@ -79,10 +79,9 @@ install_opts=$(sh -eu $script_dir/get-package-install-options)
 installer=$(sh -eu $script_dir/get-package-manager)
 packages=$(sh -eu $script_dir/get-pyenv-dependencies)
 pattern=$(sh -eu $script_dir/get-devel-pattern)
-pattern_opts=$(sh -eu $script_dir/get-pattern-install-options)
 
- if [ -n "$pattern" ]; then
-    $installer install $install_opts $pattern_opts $pattern
+if [ -n "$pattern" ]; then
+     $installer $install_cmd $install_opts "$pattern"
 fi
 
 if [ -n "$packages" ]; then
