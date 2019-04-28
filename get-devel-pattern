@@ -20,7 +20,7 @@ DARWIN_PATT=""
 
 DEBIAN_PATT="build-essential"
 
-FEDORA_PATT=""
+FEDORA_PATT="Development Tools"
 
 FREEBSD_PATT=""
 
