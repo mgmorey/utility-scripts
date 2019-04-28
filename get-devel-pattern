@@ -16,19 +16,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DARWIN_PKGS=""
+DARWIN_PATT=""
 
-DEBIAN_PKGS="build-essential"
+DEBIAN_PATT="build-essential"
 
-FEDORA_PKGS=""
+FEDORA_PATT=""
 
-FREEBSD_PKGS=""
+FREEBSD_PATT=""
 
-OPENSUSE_PKGS="devel_basis"
+OPENSUSE_PATT="devel_basis"
 
-REDHAT_PKGS=""
+REDHAT_PATT="Development Tools"
 
-SUNOS_PKGS="build-essential"
+SUNOS_PATT="build-essential"
 
 abort() {
     printf "$@" >&2
@@ -61,30 +61,30 @@ case "$kernel_name" in
     (Linux)
 	case "$ID" in
 	    (debian|ubuntu)
-	    	packages=$DEBIAN_PKGS
+	    	pattern=$DEBIAN_PATT
 	    	;;
 	    (opensuse-*)
-	    	packages=$OPENSUSE_PKGS
+	    	pattern=$OPENSUSE_PATT
 	    	;;
 	    (fedora)
-	    	packages=$FEDORA_PKGS
+	    	pattern=$FEDORA_PATT
 	    	;;
 	    (redhat|centos)
-		packages=$REDHAT_PKGS
+		pattern=$REDHAT_PATT
 		;;
 	esac
 	;;
     (Darwin)
-	packages=$DARWIN_PKGS
+	pattern=$DARWIN_PATT
 	;;
     (FreeBSD)
-	packages=$FREEBSD_PKGS
+	pattern=$FREEBSD_PATT
 	;;
     (SunOS)
-	packages=$SUNOS_PKGS
+	pattern=$SUNOS_PATT
 	;;
 esac
 
-if [ -n "${packages-}" ]; then
-    printf "%s\n" $packages
+if [ -n "${pattern-}" ]; then
+    printf "%s\n" "$pattern"
 fi
