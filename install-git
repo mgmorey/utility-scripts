@@ -40,11 +40,11 @@ get_path() {
 
 install_git() {
     if ! git --version >/dev/null; then
-	kernel_name=$(sh -eu $script_dir/get-os-release -k)
+	kernel_name=$($script_dir/get-os-release -k)
 
 	case "$kernel_name" in
 	    (Darwin)
-		sh -eu $script_dir/install-homebrew
+		$script_dir/install-homebrew
 		;;
 	esac
 
