@@ -22,5 +22,4 @@ import subprocess
 COMMAND = ['brew', 'info', '--installed', '--json']
 
 s = subprocess.run(COMMAND, stdout=subprocess.PIPE).stdout.decode('utf-8')
-packages = [p['name'] for p in json.loads(s) if p['keg_only']]
-print('\n'.join(packages))
+print('\n'.join([p['name'] for p in json.loads(s) if p['keg_only']]))
