@@ -65,7 +65,7 @@ parse_arguments() {
 
     shift $(($OPTIND - 1))
 
-    if [ is_query = true -a $# -gt 0 ]; then
+    if [ $is_query = true -a $# -gt 0 ]; then
 	abort_too_many_arguments "$@"
     elif [ $# -gt 0 ]; then
 	commands="$*"
