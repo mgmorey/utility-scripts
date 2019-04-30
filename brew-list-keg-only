@@ -17,9 +17,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import json
+import os
 import subprocess
+import sys
 
-COMMAND = ['brew', 'info', '--installed', '--json']
+BREW = '/usr/local/bin/brew'
+COMMAND = [BREW, 'info', '--installed', '--json']
 
-s = subprocess.run(COMMAND, stdout=subprocess.PIPE).stdout.decode('utf-8')
-print('\n'.join([p['name'] for p in json.loads(s) if p['keg_only']]))
+if os.path.isfile(BREW):
+    s = subprocess.run(COMMAND, stdout=subprocess.PIPE).stdout.decode('utf-8')
+    print('\n'.join([p['name'] for p in json.loads(s) if p['keg_only']]))
+else:
+    print('{}: No such file'.format(BREW), file=sys.stderr)
+    exit(1)
