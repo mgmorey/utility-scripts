@@ -21,10 +21,9 @@ import os
 import subprocess
 import sys
 
-BREW = '/usr/local/bin/brew'
-COMMAND = [BREW, 'info', '--installed', '--json']
+COMMAND = ['/usr/local/bin/brew', 'info', '--installed', '--json']
 
-if os.path.isfile(BREW):
+if os.path.isfile(COMMAND[0]):
     s = subprocess.run(COMMAND, stdout=subprocess.PIPE).stdout.decode('utf-8')
     print('\n'.join([p['name'] for p in json.loads(s) if p['keg_only']]))
 else:
