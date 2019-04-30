@@ -176,10 +176,10 @@ usage() {
     fi
 
     cat >&2 <<-EOM
-	Usage: $0: [-i] [-k] [-n] [-p] [-r] [-v]
-	       $0: -x
-	       $0: -X
-	       $0: -h
+	Usage: $0 [-i] [-k] [-n] [-p] [-r] [-v]
+	       $0 -h
+	       $0 -x
+	       $0 -X
 	EOM
 }
 
