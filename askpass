@@ -26,6 +26,10 @@ abort_too_many_arguments() {
     exit 2
 }
 
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
 parse_arguments() {
     is_query=false
 
@@ -50,8 +54,24 @@ parse_arguments() {
 
     if [ is_query = true -a $# -gt 0 ]; then
 	abort_too_many_arguments "$@"
-    else
+    elif [ $# -gt 0 ]; then
 	commands="$*"
+    else
+	commands="git ssh sudo"
+    fi
+}
+
+realpath() {
+    assert [ -d "$1" ]
+
+    if [ -x /usr/bin/realpath ]; then
+	/usr/bin/realpath "$1"
+    else
+	if expr "$1" : '/.*' >/dev/null; then
+	    printf "%s\n" "$1"
+	else
+	    printf "%s\n" "$PWD/${1#./}"
+	fi
     fi
 }
 
@@ -70,8 +90,10 @@ usage() {
 
 parse_arguments "$@"
 
+script_dir=$(realpath "$(dirname "$0")")
+
 if [ $is_query = true ]; then
-    get-askpass
+    $script_dir/get-askpass
 else
-    set-askpass ${commands-}
+    $script_dir/set-askpass ${commands-}
 fi
