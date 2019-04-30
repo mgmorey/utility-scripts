@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# askpass: configure askpass helper
+# askpass: configure or query askpass helper
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -21,23 +21,61 @@ abort() {
     exit 1
 }
 
-query_flag=0
+abort_wrong_arguments() {
+    usage "%s: wrong number of arguments\n" "$0"
+    exit 2
+}
 
-while getopts q opt
-do
-     case $opt in
-	 (q)
-	     query_flag=1
-	     ;;
-	 (?)
-	     printf "Usage: %s: [-q] [args]\n" $(basename "$0")
-	     exit 2
-	     ;;
-     esac
-done
+parse_arguments() {
+    arg_count=1
+    is_query=false
 
-if [ $query_flag -eq 1 ]; then
+    while getopts hq opt; do
+	case $opt in
+	    (h)
+		usage
+		exit 0
+		;;
+	    (q)
+		arg_count=0
+		is_query=true
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -ne $arg_count ]; then
+	abort_wrong_arguments
+    fi
+
+    if [ $# -gt 0 ]; then
+	program=$1
+    fi
+}
+
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
+    fi
+
+    cat >&2 <<-EOM
+	Usage: $0 PROGRAM
+	       $0 -h
+	       $0 -q
+	EOM
+}
+
+parse_arguments "$@"
+
+if [ $is_query = true ]; then
     get-askpass
 else
-    set-askpass "$@"
+    set-askpass $program
 fi
