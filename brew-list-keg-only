@@ -17,14 +17,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import json
-import pprint
 import subprocess
 
 COMMAND = ['brew', 'info', '--installed', '--json']
 
-text = subprocess.run(COMMAND, stdout=subprocess.PIPE).stdout.decode('utf-8')
-packages = json.loads(text)
-
-for package in packages:
-    if package['keg_only']:
-       print(package['name'])
+s = subprocess.run(COMMAND, stdout=subprocess.PIPE).stdout.decode('utf-8')
+packages = [p['name'] for p in json.loads(s) if p['keg_only']]
+print('\n'.join(packages))
