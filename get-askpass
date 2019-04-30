@@ -54,9 +54,9 @@ fi
 
 script_dir=$(get_path "$(dirname "$0")")
 
-desktop_name=$(sh -eu $script_dir/get-desktop-name)
+desktop_name=$($script_dir/get-desktop-name)
 
-eval $(sh -eu $script_dir/get-os-release -X)
+eval $($script_dir/get-os-release -X)
 
 case "$kernel_name" in
     (Linux)

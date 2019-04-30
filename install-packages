@@ -44,7 +44,7 @@ get_path() {
 
 script_dir=$(get_path "$(dirname "$0")")
 
-eval $(sh -eu $script_dir/get-os-release -X)
+eval $($script_dir/get-os-release -X)
 
 case "$kernel_name" in
     (Linux)
@@ -77,9 +77,9 @@ case "$kernel_name" in
 	;;
 esac
 
-package_manager=$(sh -eu $script_dir/get-package-manager)
+package_manager=$($script_dir/get-package-manager)
 
 if [ -n "$package_manager" ]; then
-    install_opts=$(sh -eu $script_dir/get-package-install-options)
+    install_opts=$($script_dir/get-package-install-options)
     $package_manager install $install_opts "$@"
 fi
