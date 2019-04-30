@@ -21,8 +21,8 @@ abort() {
     exit 1
 }
 
-abort_wrong_arguments() {
-    usage "%s: wrong number of arguments\n" "$0"
+abort_invalid_arguments() {
+    usage "%s: invalid number of arguments\n" "$0"
     exit 2
 }
 
@@ -51,7 +51,7 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -ne $arg_count ]; then
-	abort_wrong_arguments
+	abort_invalid_arguments
     fi
 
     if [ $# -gt 0 ]; then
