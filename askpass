@@ -55,7 +55,7 @@ parse_arguments() {
     fi
 
     if [ $# -gt 0 ]; then
-	program=$1
+	askpass_helper=$1
     fi
 }
 
@@ -66,7 +66,7 @@ usage() {
     fi
 
     cat >&2 <<-EOM
-	Usage: $0 PROGRAM
+	Usage: $0 ASKPASS_HELPER
 	       $0 -h
 	       $0 -q
 	EOM
@@ -77,5 +77,5 @@ parse_arguments "$@"
 if [ $is_query = true ]; then
     get-askpass
 else
-    set-askpass $program
+    set-askpass $askpass_helper
 fi
