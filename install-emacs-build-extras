@@ -44,7 +44,7 @@ get_path() {
 
 script_dir=$(get_path "$(dirname "$0")")
 
-eval $(sh -eu $script_dir/get-os-release -X)
+eval $($script_dir/get-os-release -X)
 
 case "$kernel_name" in
     (Linux)
@@ -71,11 +71,11 @@ case "$kernel_name" in
 	;;
 esac
 
-install_cmd=$(sh -eu $script_dir/get-pattern-install-command)
-install_opts=$(sh -eu $script_dir/get-package-install-options)
-installer=$(sh -eu $script_dir/get-package-manager)
-packages=$(sh -eu $script_dir/get-emacs-build-extras)
-pattern=$(sh -eu $script_dir/get-devel-pattern)
+install_cmd=$($script_dir/get-pattern-install-command)
+install_opts=$($script_dir/get-package-install-options)
+installer=$($script_dir/get-package-manager)
+packages=$($script_dir/get-emacs-build-extras)
+pattern=$($script_dir/get-devel-pattern)
 
 if [ -n "$pattern" ]; then
     $installer $install_cmd $install_opts "$pattern"
