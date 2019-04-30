@@ -42,7 +42,7 @@ get_path() {
     fi
 }
 
-script_dir=$(realpath "$(dirname "$0")")
+script_dir=$(get_path "$(dirname "$0")")
 
 eval $($script_dir/get-os-release -X)
 

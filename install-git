@@ -25,6 +25,19 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_path() {
+    assert [ -d "$1" ]
+    command=$(type -p realpath)
+
+    if [ -n "$command" ]; then
+	$command -s "$1"
+    elif expr "$1" : '/.*' >/dev/null; then
+	printf "%s\n" "$1"
+    else
+	printf "%s\n" "$PWD/${1#./}"
+    fi
+}
+
 install_git() {
     if ! git --version >/dev/null; then
 	kernel_name=$(sh -eu $script_dir/get-os-release -k)
@@ -39,19 +52,5 @@ install_git() {
     fi
 }
 
-realpath() {
-    assert [ -d "$1" ]
-
-    if [ -x /usr/bin/realpath ]; then
-	/usr/bin/realpath "$1"
-    else
-	if expr "$1" : '/.*' >/dev/null; then
-	    printf "%s\n" "$1"
-	else
-	    printf "%s\n" "$PWD/${1#./}"
-	fi
-    fi
-}
-
-script_dir=$(realpath "$(dirname "$0")")
+script_dir=$(get_path "$(dirname "$0")")
 install_git
