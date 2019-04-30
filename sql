@@ -44,7 +44,7 @@ exec_sql_cli() {
 
 get_path() {
     assert [ -d "$1" ]
-    command=$(type -p realpath)
+    command=$(which realpath)
 
     if [ -n "$command" ]; then
 	$command -s "$1"
