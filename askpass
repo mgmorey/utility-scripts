@@ -21,13 +21,12 @@ abort() {
     exit 1
 }
 
-abort_extra_arguments() {
-    usage "%s: extra arguments -- %s\n" "$0" "$*"
+abort_too_many_arguments() {
+    usage "%s: too many arguments -- %s\n" "$0" "$*"
     exit 2
 }
 
 parse_arguments() {
-    arg_count=1
     is_query=false
 
     while getopts hq opt; do
@@ -37,7 +36,6 @@ parse_arguments() {
 		exit 0
 		;;
 	    (q)
-		arg_count=0
 		is_query=true
 		;;
 	    (\?)
@@ -50,12 +48,10 @@ parse_arguments() {
 
     shift $(($OPTIND - 1))
 
-    if [ $# -ne $arg_count ]; then
-	abort_extra_arguments "$@"
-    fi
-
-    if [ $# -gt 0 ]; then
-	askpass_helper=$1
+    if [ is_query = true -a $# -gt 0 ]; then
+	abort_too_many_arguments "$@"
+    else
+	commands="$*"
     fi
 }
 
@@ -66,7 +62,7 @@ usage() {
     fi
 
     cat >&2 <<-EOM
-	Usage: $0 ASKPASS_HELPER
+	Usage: $0 [COMMAND [COMMAND] ...]
 	       $0 -h
 	       $0 -q
 	EOM
@@ -77,5 +73,5 @@ parse_arguments "$@"
 if [ $is_query = true ]; then
     get-askpass
 else
-    set-askpass $askpass_helper
+    set-askpass ${commands-}
 fi
