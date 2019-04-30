@@ -28,7 +28,7 @@ if [ -z "$askpass_helper" ]; then
 elif [ ! -x "$(which "$askpass_helper")" ]; then
     abort "%s: No such executable" "$askpass_helper"
 elif [ $# -gt 0 ]; then
-    commands="$@"
+    commands="$*"
 else
     commands="git ssh sudo"
 fi
