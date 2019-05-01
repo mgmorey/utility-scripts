@@ -36,8 +36,7 @@ fi
 for command in $commands; do
     case "$command" in
 	(git|ssh|sudo)
-	    var=${command}_askpass
-	    var=$(echo $var | to-upper)
+	    var=$(printf "%s\n" ${command}_askpass | tr '[:lower:]' '[:upper:]')
 
 	    case ${SHELL##*/} in
 		(bash|fish|ksh|ksh93|rbash|zsh)
