@@ -44,10 +44,10 @@ exec_sql_cli() {
 
 get_path() {
     assert [ -d "$1" ]
-    command=$(type -p realpath)
+    command=$(which realpath)
 
     if [ -n "$command" ]; then
-	$command -s "$1"
+	$command "$1"
     elif expr "$1" : '/.*' >/dev/null; then
 	printf "%s\n" "$1"
     else
