@@ -44,7 +44,7 @@ get_path() {
     command=$(which realpath)
 
     if [ -n "$command" ]; then
-	$command -s "$1"
+	$command "$1"
     elif expr "$1" : '/.*' >/dev/null; then
 	printf "%s\n" "$1"
     else
