@@ -79,8 +79,8 @@ parse_arg() {
 	return
     elif [ -e "$file" ]; then
 	script="$1"
-    elif [ -e "$sql_dir/$file.sql" ]; then
-	script="$sql_dir/$file.sql"
+    elif [ -e "$sql_dir/$file" ]; then
+	script="$sql_dir/$file"
     else
 	abort "%s: No such script file\n" "$file"
     fi
