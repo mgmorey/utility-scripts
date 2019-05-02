@@ -64,6 +64,7 @@ case "$kernel_name" in
 		add-apt-repository "$repository"
 		apt-get update
 		apt-get install "$@" docker-ce
+
 		if usermod -a -G docker $USER; then
 		    printf "Please restart before using docker\n"
 		fi
