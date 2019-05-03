@@ -32,7 +32,7 @@ exec_sql_cli() {
     case "$DATABASE_DIALECT" in
 	(mysql)
 	    ${1-} "$DATABASE_DIALECT" \
-		-h"${DATABASE_HOST:-$localhost}" \
+		-h"${DATABASE_HOST:-localhost}" \
 		-u"${DATABASE_USER:-$USER}" \
 		-p"${DATABASE_PASSWORD:-}"
 	    ;;
