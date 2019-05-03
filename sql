@@ -112,8 +112,8 @@ fi
 
 if [ -n "$scripts" ]; then
     for script in $scripts; do
-	if [ -f "$script" ]; then
-	    exec <"$script"
+	if [ -f $script ]; then
+	    exec <$script
 	    exec_sql_cli
 	elif [ -d $script ]; then
 	    abort "%s: Is a directory\n" "$script"
