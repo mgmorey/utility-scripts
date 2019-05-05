@@ -26,6 +26,8 @@ FREEBSD_PKGS="%s-pip %s-virtualenv"
 
 OPENSUSE_PKGS="%s-pip %s-virtualenv"
 
+REDHAT_PKGS="%s-pip %s-virtualenv"
+
 SUNOS_PKGS="pip-%s"
 
 abort() {
@@ -66,6 +68,9 @@ case "$kernel_name" in
 	    (fedora)
 	    	packages=$FEDORA_PKGS
 	    	;;
+	    (redhat|centos)
+		packages=$REDHAT_PKGS
+		;;
 	esac
 	;;
     (Darwin)
