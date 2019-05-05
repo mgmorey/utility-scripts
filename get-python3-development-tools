@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-pipenv-dependencies: install pipenv dependencies
+# get-pipenv-dependencies: get list of Python 3 development tools
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,13 +16,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+DARWIN_PKGS=""
+
+DEBIAN_PKGS="%s-pip %s-virtualenv"
+
+FEDORA_PKGS="%s-pip %s-virtualenv"
+
+FREEBSD_PKGS="%s-pip %s-virtualenv"
+
+OPENSUSE_PKGS="%s-pip %s-virtualenv"
+
+REDHAT_PKGS="%s-pip %s-virtualenv"
+
+SUNOS_PKGS="pip-%s"
+
 abort() {
     printf "$@" >&2
     exit 1
-}
-
-abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
 }
 
 assert() {
@@ -50,40 +60,43 @@ case "$kernel_name" in
     (Linux)
 	case "$ID" in
 	    (debian|ubuntu)
-		:
+	    	packages=$DEBIAN_PKGS
 	    	;;
 	    (opensuse-*)
-		:
+	    	packages=$OPENSUSE_PKGS
 	    	;;
 	    (fedora)
-		:
+	    	packages=$FEDORA_PKGS
 	    	;;
 	    (redhat|centos)
-		:
-		;;
-	    (*)
-		abort_not_supported Distro
+		packages=$REDHAT_PKGS
 		;;
 	esac
 	;;
-    (Darwin|FreeBSD|SunOS|CYGWIN_NT-*)
-	:
-    	;;
-    (*)
-	abort_not_supported "Operating system"
+    (Darwin)
+	packages=$DARWIN_PKGS
+	;;
+    (FreeBSD)
+	packages=$FREEBSD_PKGS
+	;;
+    (SunOS)
+	packages=$SUNOS_PKGS
 	;;
 esac
 
-install_cmd=$($script_dir/get-pattern-install-command)
-install_opts=$($script_dir/get-package-install-options)
-installer=$($script_dir/get-package-manager)
-packages=$($script_dir/get-pipenv-dependencies)
-pattern=$($script_dir/get-devel-pattern)
+data=$($script_dir/get-python-package)
+package_name=$(printf "%s" "$data" | awk '{print $1}')
+package_modifier=$(printf "%s" "$data" | awk '{print $2}')
 
-if [ -n "$pattern" ]; then
-    $installer $install_cmd $install_opts "$pattern"
-fi
+printf "%s\n" $package_name
 
-if [ -n "$packages" ]; then
-    $installer install $install_opts $packages
-fi
+for package in ${packages-}; do
+    case $package in
+	(*%s*)
+	    printf "$package\n" $package_modifier
+	    ;;
+	(*)
+	    printf "%s\n" $package
+	    ;;
+    esac
+done
