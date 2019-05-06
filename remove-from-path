@@ -1,0 +1,21 @@
+#!/bin/sh
+
+if [ $# -gt 0 ]; then
+    value="$(printf "%s\n" "$PATH" | sed "s|$1||")"
+
+    case ${SHELL##*/} in
+	(bash|fish|ksh|ksh93|rbash|zsh)
+	    printf "export %s=%s\n" PATH "$value"
+	    ;;
+	(csh|tcsh)
+	    printf "setenv %s %s;\n" PATH "$value"
+	    ;;
+	(sh)
+	    printf "%s=%s\n" PATH "$value"
+	    printf "export %s\n" PATH
+	    ;;
+	(*)
+	    abort "%s: %s: Shell not supported\n" "$0" "$SHELL"
+	    ;;
+    esac
+fi
