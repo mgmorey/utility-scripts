@@ -44,12 +44,12 @@ get_path() {
 
 script_dir=$(realpath "$(dirname "$0")")
 
-eval $($script_dir/get-os-release -X)
+eval $("$script_dir/get-os-release" -X)
 
-install_cmd=$($script_dir/get-pattern-install-command)
-install_opts=$($script_dir/get-package-install-options)
-installer=$($script_dir/get-package-manager)
-pattern=$($script_dir/get-devel-pattern)
+install_cmd=$("$script_dir/get-pattern-install-command")
+install_opts=$("$script_dir/get-package-install-options")
+installer=$("$script_dir/get-package-manager")
+pattern=$("$script_dir/get-devel-pattern")
 
 case "$kernel_name" in
     (Linux)

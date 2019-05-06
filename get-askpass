@@ -58,13 +58,13 @@ fi
 
 script_dir=$(get_path "$(dirname "$0")")
 
-desktop_name=$($script_dir/get-desktop-name)
+desktop_name=$("$script_dir/get-desktop-name")
 
 if [ -z "$desktop_name" ]; then
     abort_no_desktop
 fi
 
-eval $($script_dir/get-os-release -X)
+eval $("$script_dir/get-os-release" -X)
 
 case "$kernel_name" in
     (Linux)
@@ -189,7 +189,7 @@ case "$kernel_name" in
 esac
 
 if [ -z "${askpass_helper:-}" ]; then
-    askpass_helper=$($script_dir/get-package-filenames "$package" | egrep "$RE" | head -n 1)
+    askpass_helper=$("$script_dir/get-package-filenames" $package | egrep "$RE" | head -n 1)
 fi
 
 if [ -n "$askpass_helper" ]; then

@@ -44,7 +44,7 @@ get_path() {
 
 script_dir=$(get_path "$(dirname "$0")")
 
-eval $($script_dir/get-os-release -X)
+eval $("$script_dir/get-os-release" -X)
 
 case "$kernel_name" in
     (Linux)
@@ -63,6 +63,6 @@ case "$kernel_name" in
 	;;
 esac
 
-installer=$($script_dir/get-package-manager)
-install_opts=$($script_dir/get-package-install-options)
+installer=$("$script_dir/get-package-manager")
+install_opts=$("$script_dir/get-package-install-options")
 $installer build-dep $install_opts "$@"

@@ -50,7 +50,7 @@ get_path() {
 
 script_dir=$(get_path "$(dirname "$0")")
 
-eval $($script_dir/get-os-release -X)
+eval $("$script_dir/get-os-release" -X)
 
 case "$kernel_name" in
     (Linux)
@@ -77,7 +77,7 @@ case "$kernel_name" in
 	;;
 esac
 
-if [ -z "${package:-}" ] || ! $script_dir/install-build-deps "$@" $package; then
+if [ -z "${package:-}" ] || ! "$script_dir/install-build-deps" "$@" $package; then
     if [ -n "${packages:-}" ]; then
 	install-packages "$@" $packages
     fi

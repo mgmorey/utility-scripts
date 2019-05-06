@@ -92,7 +92,7 @@ parse_arguments "$@"
 script_dir=$(get_path "$(dirname "$0")")
 
 if [ $is_query = true ]; then
-    $script_dir/get-askpass
+    "$script_dir/get-askpass"
 else
-    $script_dir/set-askpass ${commands-}
+    "$script_dir/set-askpass" ${commands-}
 fi

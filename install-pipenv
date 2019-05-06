@@ -44,11 +44,11 @@ fi
 
 script_dir=$(get_path "$(dirname "$0")")
 
-pip=$($script_dir/get-python-command pip)
+pip=$("$script_dir/get-python-command" pip)
 
 if [ "$pip" != false ]; then
     if [ ! -d $HOME/.pyenv ]; then
-	$script_dir/install-pyenv
+	"$script_dir/install-pyenv"
     fi
 
     $pip install --upgrade --user pip pipenv

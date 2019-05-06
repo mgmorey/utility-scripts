@@ -49,7 +49,7 @@ fi
 dir=$PWD
 cd $HOME
 
-$script_dir/install-git
+"$script_dir/install-git"
 
 if [ ! -d Documents/git ]; then
     mkdir -p Documents
