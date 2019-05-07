@@ -21,7 +21,7 @@ DARWIN_PKGS="gdbm libffi openssl readline zlib"
 DEBIAN_PKGS="bash curl libbz2-dev libffi-dev libreadline-dev libsqlite3-dev \
 libssl-dev make %s-dev %s-setuptools %s-wheel zlib1g-dev"
 
-FEDORA_PKGS="bzip2-devel gcc libffi-devel make ncurses-devel \
+FEDORA_PKGS="bash bzip2-devel curl gcc libffi-devel make ncurses-devel \
 %s-devel %s-pip readline-devel sqlite-devel"
 
 FREEBSD_PKGS="bash curl gmake libffi ncurses readline sqlite3"
