@@ -1,0 +1,3 @@
+#!/bin/sh
+
+curl http://uwsgi.it/install | bash -s default /tmp/uwsgi
