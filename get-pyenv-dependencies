@@ -26,8 +26,8 @@ FEDORA_PKGS="bzip2-devel gcc libffi-devel make ncurses-devel \
 
 FREEBSD_PKGS="bash gmake libffi ncurses"
 
-OPENSUSE_PKGS="libbz2-devel libffi-devel libopenssl-devel %s-devel \
-readline-devel sqlite3-devel"
+OPENSUSE_PKGS="bash curl gcc libbz2-devel libffi-devel libopenssl-devel \
+make %s-devel %s-setuptools %s-wheel readline-devel sqlite3-devel"
 
 REDHAT_PKGS="bzip2-devel gcc libffi-devel make ncurses-devel \
 %s-devel readline-devel sqlite-devel"
