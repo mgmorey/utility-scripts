@@ -29,8 +29,8 @@ FREEBSD_PKGS="bash curl gmake libffi ncurses readline sqlite3"
 OPENSUSE_PKGS="bash curl gcc libbz2-devel libffi-devel libopenssl-devel \
 make %s-devel %s-setuptools %s-wheel readline-devel sqlite3-devel"
 
-REDHAT_PKGS="bzip2-devel gcc libffi-devel make ncurses-devel \
-%s-devel readline-devel sqlite-devel"
+REDHAT_PKGS="bash bzip2-devel curl gcc libffi-devel make ncurses-devel \
+%s-devel %s-setuptools readline-devel sqlite-devel"
 
 SUNOS_PKGS="bash gcc libffi make ncurses readline sqlite-3"
 
