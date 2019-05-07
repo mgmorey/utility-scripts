@@ -27,8 +27,26 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-if [ $(id -u) -eq 0 ]; then
-    abort "%s\n" "$0: Must be run as a non-privileged user"
+get_path() {
+    assert [ -d "$1" ]
+    command=$(which realpath)
+
+    if [ -n "$command" ]; then
+	$command "$1"
+    elif expr "$1" : '/.*' >/dev/null; then
+	printf "%s\n" "$1"
+    else
+	printf "%s\n" "$PWD/${1#./}"
+    fi
+}
+
+script_dir=$(get_path "$(dirname "$0")")
+
+if [ "$(id -u)" -eq 0 ]; then
+    sh="su $SUDO_USER"
+else
+    sh="sh"
 fi
 
-curl -L $BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer | bash
+. "$script_dir/install-pyenv-dependencies"
+curl -L $BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer | $sh -c bash
