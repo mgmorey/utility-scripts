@@ -1,0 +1,9 @@
+#!/bin/sh
+
+eval $(get-os-release -X)
+
+case "$kernel_name" in
+    (Darwin)
+	softwareupdate --clear-catalog
+	;;
+esac
