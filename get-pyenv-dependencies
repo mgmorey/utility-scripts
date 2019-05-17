@@ -37,8 +37,8 @@ OPENSUSE_PKGS="bash curl gcc libbz2-devel libffi-devel libopenssl-devel \
 make ncurses-devel openssl-devel readline-devel sqlite3-devel tk-devel \
 zlib-devel"
 
-REDHAT_PKGS="bash bzip2-devel curl gcc libffi-devel make ncurses-devel \
-%s-devel %s-setuptools readline-devel sqlite-devel"
+REDHAT_PKGS="bash bzip2 bzip2-devel curl gcc libffi-devel make ncurses-devel \
+openssl-devel readline-devel sqlite sqlite-devel tk-devel wget zlib-devel"
 
 SUNOS_PKGS="bash gcc libffi make ncurses readline sqlite-3"
 
