@@ -66,8 +66,11 @@ case "$kernel_name" in
 		;;
 	esac
 	;;
-    (Darwin|FreeBSD|SunOS|NT)
-	installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
+    (Darwin)
+	sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
+    	;;
+    (FreeBSD|SunOS|NT)
+	:
     	;;
     (*)
 	abort_not_supported "Operating system"
