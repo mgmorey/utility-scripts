@@ -16,6 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+DARWIN_PKG_DIR=/Library/Developer/CommandLineTools/Packages/
+DARWIN_PKG_NAME=macOS_SDK_headers_for_macOS_10.14.pkg
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -67,7 +70,7 @@ case "$kernel_name" in
 	esac
 	;;
     (Darwin)
-	sudo installer -pkg /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg -target /
+	sudo installer -pkg $DARWIN_PKG_DIR/$DARWIN_PKG_NAME -target /
     	;;
     (FreeBSD|SunOS|NT)
 	:
