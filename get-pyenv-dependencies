@@ -21,12 +21,12 @@
 DARWIN_PKGS="bash curl gdbm libffi openssl readline sqlite xz zlib"
 
 DEBIAN_9_PKGS="bash curl libbz2-dev libffi-dev libncurses5-dev \
-libreadline-dev libsqlite3-dev libssl1.0-dev libxml2-dev \
-liblzma-dev make tk-dev wget zlib1g-dev"
+libncursesw5-dev libreadline-dev libsqlite3-dev libssl1.0-dev libxml2-dev \
+liblzma-dev llvm make tk-dev wget xz-utils zlib1g-dev"
 
 DEBIAN_10_PKGS="bash curl libbz2-dev libffi-dev libncurses5-dev \
-libreadline-dev libsqlite3-dev libssl-dev libxml2-dev libxmlsec1-dev \
-liblzma-dev make tk-dev wget zlib1g-dev"
+libncursesw5-dev libreadline-dev libsqlite3-dev libssl-dev libxml2-dev \
+libxmlsec1-dev liblzma-dev llvm make tk-dev wget xz-utils zlib1g-dev"
 
 FEDORA_PKGS="bash bzip2 bzip2-devel curl gcc libffi-devel make ncurses-devel \
 openssl-devel readline-devel sqlite sqlite-devel tk-devel wget zlib-devel"
