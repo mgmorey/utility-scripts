@@ -93,5 +93,5 @@ fi
 
 if [ ! -r "$build_dir/config.status" ]; then
     cd "$build_dir"
-    "$src_dir/configure" "$@"
+    "$src_dir/configure" --enable-optimizations --enable-shared "$@"
 fi
