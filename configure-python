@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 BASE_URL=https://www.python.org/ftp
-VERSION=3.6.8
+: ${PYTHON_VERSION:=3.6.8}
 
 abort() {
     printf "$@" >&2
@@ -45,7 +45,7 @@ get_path() {
     fi
 }
 
-basename=Python-$VERSION
+basename=Python-$PYTHON_VERSION
 
 archive_dir="$HOME/Downloads/Python"
 build_dir="$HOME/Documents/build/$basename"
@@ -54,7 +54,7 @@ src_dir="$HOME/Documents/src/Python/$basename"
 filename=$basename.tar.xz
 
 pathname=$archive_dir/$filename
-url=$BASE_URL/python/$VERSION/$filename
+url=$BASE_URL/python/$PYTHON_VERSION/$filename
 
 script_dir=$(get_path "$(dirname "$0")")
 
@@ -91,7 +91,26 @@ if [ ! -r "$src_dir/configure" ]; then
     tar -xvf "$pathname"
 fi
 
-if [ ! -r "$build_dir/config.status" ]; then
-    cd "$build_dir"
-    "$src_dir/configure" --enable-optimizations --enable-shared "$@"
+configure=$src_dir/configure
+options="--enable-optimizations --enable-shared --prefix=/usr/local"
+
+if [ -r "$build_dir/config.status" ]; then
+    exit 0
 fi
+
+cd "$build_dir"
+
+case "$kernel_name" in
+    (Linux)
+	"$configure" $options LDFLAGS="-Wl,--rpath=/usr/local/lib"
+	;;
+    (FreeBSD)
+	"$configure" $options LDFLAGS="-R/usr/local/lib"
+	;;
+    (SunOS)
+	"$configure" $options LDFLAGS="-R/usr/local/lib"
+	;;
+    (*)
+	"$configure"
+	;;
+esac
