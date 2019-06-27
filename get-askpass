@@ -39,24 +39,28 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_path() {
-    assert [ -d "$1" ]
-    command=$(which realpath)
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
 
-    if [ -n "$command" ]; then
-	$command "$1"
-    elif expr "$1" : '/.*' >/dev/null; then
-	printf "%s\n" "$1"
+    if [ -n "$realpath" ]; then
+    	$realpath "$@"
     else
-	printf "%s\n" "$PWD/${1#./}"
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
     fi
-}
+)
 
 if [ -z "${DISPLAY:-}" ]; then
     abort "%s: No DISPLAY variable set\n" "$0"
 fi
 
-script_dir=$(get_path "$(dirname "$0")")
+script_dir=$(get_realpath "$(dirname "$0")")
 
 desktop_name=$("$script_dir/get-desktop-name")
 

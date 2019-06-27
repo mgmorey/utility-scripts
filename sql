@@ -42,18 +42,22 @@ exec_sql_cli() {
     esac
 }
 
-get_path() {
-    assert [ -d "$1" ]
-    command=$(which realpath)
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
 
-    if [ -n "$command" ]; then
-	$command "$1"
-    elif expr "$1" : '/.*' >/dev/null; then
-	printf "%s\n" "$1"
+    if [ -n "$realpath" ]; then
+    	$realpath "$@"
     else
-	printf "%s\n" "$PWD/${1#./}"
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
     fi
-}
+)
 
 parse_arg() {
     case "$1" in
@@ -90,7 +94,7 @@ parse_arg() {
     scripts="${scripts:+$scripts }$script"
 }
 
-script_dir=$(get_path "$(dirname "$0")")
+script_dir=$(get_realpath "$(dirname "$0")")
 
 source_dir=$script_dir/..
 
