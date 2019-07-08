@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 BASE_URL=https://www.python.org/ftp
-: ${PYTHON_VERSION:=3.6.8}
+: ${PYTHON_VERSION:=3.6.9}
 
 abort() {
     printf "$@" >&2
