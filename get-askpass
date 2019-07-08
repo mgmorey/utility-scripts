@@ -193,7 +193,7 @@ case "$kernel_name" in
 esac
 
 if [ -z "${askpass_helper:-}" ]; then
-    askpass_helper=$("$script_dir/get-package-filenames" $package | egrep "$RE" | head -n 1)
+    askpass_helper=$("$script_dir/get-package-filenames" $package | grep -E "$RE" | head -n 1)
 fi
 
 if [ -n "$askpass_helper" ]; then
