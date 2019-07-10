@@ -69,7 +69,7 @@ esac
 useradd --system hercules
 
 # Add hercules group to user's groups
-usermod -a -G hercules $USER
+usermod -a -G hercules $SUDO_USER
 
 # Install hercules and related packages
 apt install hercules herculesstudio
