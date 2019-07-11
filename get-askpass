@@ -65,7 +65,7 @@ script_dir=$(get_realpath "$(dirname "$0")")
 desktop_name=$("$script_dir/get-desktop-name")
 
 if [ -z "$desktop_name" ]; then
-    abort_no_desktop
+    exit 1
 fi
 
 eval $("$script_dir/get-os-release" -X)
