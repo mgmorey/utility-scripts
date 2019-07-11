@@ -55,10 +55,8 @@ case "$kernel_name" in
 	case "$ID" in
 	    (debian|ubuntu)
 		;;
-	    (fedora|redhat|centos)
-		;;
 	    (*)
-		abort_not_supported Distro
+		exit 1
 		;;
 	esac
 	;;
