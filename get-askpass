@@ -27,10 +27,6 @@ abort_desktop_not_supported() {
     abort "%s: %s: Desktop not supported\n" "$0" "$desktop_name"
 }
 
-abort_no_desktop() {
-    abort "%s: No desktop specified\n" "$0"
-}
-
 abort_not_supported() {
     abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
 }
