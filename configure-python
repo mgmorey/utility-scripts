@@ -17,6 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 BASE_URL=https://www.python.org/ftp
+PYTHON_PREFIX=/usr/local
 : ${PYTHON_VERSION:=3.6.9}
 
 abort() {
@@ -96,7 +97,7 @@ if [ ! -r "$src_dir/configure" ]; then
 fi
 
 configure=$src_dir/configure
-options="--enable-optimizations --enable-shared --prefix=/usr/local"
+options="--enable-optimizations --enable-shared --prefix=$PYTHON_PREFIX"
 
 if [ -r "$build_dir/config.status" ]; then
     exit 0
@@ -106,13 +107,13 @@ cd "$build_dir"
 
 case "$kernel_name" in
     (Linux)
-	"$configure" $options LDFLAGS="-Wl,--rpath=/usr/local/lib"
+	"$configure" $options "$@" LDFLAGS="-Wl,--rpath=$PYTHON_PREFIX/lib"
 	;;
     (FreeBSD)
-	"$configure" $options LDFLAGS="-R/usr/local/lib"
+	"$configure" $options "$@" LDFLAGS="-R$PYTHON_PREFIX/lib"
 	;;
     (SunOS)
-	"$configure" $options LDFLAGS="-R/usr/local/lib"
+	"$configure" $options "$@" LDFLAGS="-R$PYTHON_PREFIX/lib"
 	;;
     (*)
 	"$configure"
