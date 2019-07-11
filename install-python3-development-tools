@@ -63,7 +63,15 @@ case "$kernel_name" in
 		:
 	    	;;
 	    (redhat|centos)
-		:
+                case "$VERSION_ID" in
+                    (7)
+		        /usr/local/bin/pip3 install --upgrade pip virtualenv
+			exit $?
+                        ;;
+		    (*)
+			:
+			;;
+                esac
 		;;
 	    (*)
 		abort_not_supported Distro
