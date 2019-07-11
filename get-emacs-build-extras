@@ -18,7 +18,7 @@
 
 DEBIAN_PKGS="libgnutls28-dev libgpm-dev libwebkit2gtk-4.0-dev"
 
-FEDORA_PKGS="GConf2-devel giflib-devel gnutls-devel gpm-devel gtk3-devel \
+REDHAT_PKGS="GConf2-devel giflib-devel gnutls-devel gpm-devel gtk3-devel \
 ImageMagick-devel lcms2-devel libacl-devel libICE-devel libpng-devel \
 libSM-devel libtiff-devel libX11-devel libXaw-devel libXext-devel \
 libXi-devel libXmu-devel libXpm-devel libXrandr-devel libXt-devel \
@@ -74,7 +74,7 @@ case "$kernel_name" in
 		packages=$OPENSUSE_PKGS
 		;;
 	    (fedora|centos)
-		packages=$FEDORA_PKGS
+		packages=$REDHAT_PKGS
 	    	;;
 	esac
 	;;
