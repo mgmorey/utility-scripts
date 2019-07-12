@@ -136,7 +136,7 @@ parse_arguments() {
     python_prefix=$PYTHON_PREFIX
     python_version=$PYTHON_VERSION
 
-    while getopts efp:v:h opt; do
+    while getopts defp:v:h opt; do
 	case $opt in
 	    (d)
 		is_optimizing=false
