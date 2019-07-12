@@ -16,21 +16,101 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-BASE_URL=https://www.python.org/ftp
-PYTHON_PREFIX=/usr/local
-: ${PYTHON_VERSION:=3.6.9}
+PYTHON_BASE_URL=https://www.python.org/ftp
+
+if [ -z "${PYTHON_PREFIX-}" ]; then
+    PYTHON_PREFIX=/usr/local
+fi
+
+if [ -z "${PYTHON_VERSION-}" ]; then
+    PYTHON_VERSION=3.6.9
+fi
 
 abort() {
     printf "$@" >&2
     exit 1
 }
 
+abort_invalid_prefix() {
+    usage "%s: invalid prefix -- %s\n" "$0" "$*"
+    exit 2
+}
+
+abort_invalid_version() {
+    usage "%s: invalid version -- %s\n" "$0" "$*"
+    exit 2
+}
+
 abort_not_supported() {
     abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
 }
 
+abort_too_many_arguments() {
+    usage "%s: too many arguments -- %s\n" "$0" "$*"
+    exit 2
+}
+
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+
+configure_python() {
+    basename=Python-$python_version
+
+    archive_dir="$HOME/Downloads/Python"
+    build_dir="$HOME/Documents/build/$basename"
+    src_dir="$HOME/Documents/src/Python/$basename"
+
+    filename=$basename.tar.xz
+
+    pathname=$archive_dir/$filename
+    url=$PYTHON_BASE_URL/python/$python_version/$filename
+
+    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
+
+    if [ ! -r "$pathname" ]; then
+	cd "$archive_dir"
+	wget $url
+    fi
+
+    if [ ! -r "$src_dir/configure" ]; then
+	cd $(dirname "$src_dir")
+	tar -xvf "$pathname"
+    fi
+
+    configure=$src_dir/configure
+
+    if [ "$is_optimizing" = true ]; then
+	options="--enable-optimizations"
+    else
+	options="--disable-optimizations"
+    fi
+
+    options="$options --enable-shared --prefix=$python_prefix"
+
+    if [ "$is_forcing" = true ]; then
+	/bin/rm -f "$build_dir/config.status"
+    elif [ -r "$build_dir/config.status" ]; then
+	exit 0
+    fi
+
+    cd "$build_dir"
+
+    case "$kernel_name" in
+	(Linux)
+	    "$configure" $options "$@" LDFLAGS="-Wl,--rpath=$python_prefix/lib"
+	    ;;
+	(FreeBSD)
+	    "$configure" $options "$@" LDFLAGS="-R$python_prefix/lib"
+	    ;;
+	(SunOS)
+	    "$configure" $options "$@" LDFLAGS="-R$python_prefix/lib"
+	    ;;
+	(*)
+	    "$configure"
+	    ;;
+    esac
 }
 
 get_realpath() (
@@ -50,16 +130,87 @@ get_realpath() (
     fi
 )
 
-basename=Python-$PYTHON_VERSION
+parse_arguments() {
+    is_forcing=false
+    is_optimizing=false
+    python_prefix=$PYTHON_PREFIX
+    python_version=$PYTHON_VERSION
 
-archive_dir="$HOME/Downloads/Python"
-build_dir="$HOME/Documents/build/$basename"
-src_dir="$HOME/Documents/src/Python/$basename"
+    while getopts efp:v:h opt; do
+	case $opt in
+	    (d)
+		is_optimizing=false
+		;;
+	    (e)
+		is_optimizing=true
+		;;
+	    (f)
+		is_forcing=true
+		;;
+	    (p)
+		case $OPTARG in
+		    (/?*)
+			if [ -d $OPTARG ]; then
+			    python_prefix=$OPTARG
+			else
+			    abort_invalid_prefix $OPTARG
+			fi
+			;;
+		    (*)
+			abort_invalid_prefix $OPTARG
+			;;
+		esac
 
-filename=$basename.tar.xz
+		;;
+	    (v)
+		case $OPTARG in
+		    (3.[0-9].[0-9])
+			python_version=$OPTARG
+			;;
+		    (3.[0-9].[1-9][0-9])
+			python_version=$OPTARG
+			;;
+		    (3.[1-9][0-9].[0-9])
+			python_version=$OPTARG
+			;;
+		    (3.[1-9][0-9].[1-9][0-9])
+			python_version=$OPTARG
+			;;
+		    (*)
+			abort_invalid_version $OPTARG
+			;;
+		esac
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
 
-pathname=$archive_dir/$filename
-url=$BASE_URL/python/$PYTHON_VERSION/$filename
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	abort_too_many_arguments "$@"
+    fi
+}
+
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
+    fi
+
+    cat >&2 <<-EOM
+	Usage: $0 [-d|-e][-f][-p PREFIX][-v VERSION]
+	       $0 -h
+	EOM
+}
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
@@ -84,38 +235,5 @@ case "$kernel_name" in
 	;;
 esac
 
-mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
-
-if [ ! -r "$pathname" ]; then
-    cd "$archive_dir"
-    wget $url
-fi
-
-if [ ! -r "$src_dir/configure" ]; then
-    cd $(dirname "$src_dir")
-    tar -xvf "$pathname"
-fi
-
-configure=$src_dir/configure
-options="--enable-optimizations --enable-shared --prefix=$PYTHON_PREFIX"
-
-if [ -r "$build_dir/config.status" ]; then
-    exit 0
-fi
-
-cd "$build_dir"
-
-case "$kernel_name" in
-    (Linux)
-	"$configure" $options "$@" LDFLAGS="-Wl,--rpath=$PYTHON_PREFIX/lib"
-	;;
-    (FreeBSD)
-	"$configure" $options "$@" LDFLAGS="-R$PYTHON_PREFIX/lib"
-	;;
-    (SunOS)
-	"$configure" $options "$@" LDFLAGS="-R$PYTHON_PREFIX/lib"
-	;;
-    (*)
-	"$configure"
-	;;
-esac
+parse_arguments "$@"
+configure_python
