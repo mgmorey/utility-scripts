@@ -20,7 +20,7 @@
 
 DARWIN_PKGS="bash curl gdbm libffi openssl readline sqlite xz zlib"
 
-DEBIAN_9_PKGS="bash curl libbz2-dev libffi-dev libncurses5-dev \
+DEBIAN_9_PKGS="bash curl libbz2-dev libffi-dev libgdbm-dev libncurses5-dev \
 libncursesw5-dev libreadline-dev libsqlite3-dev libssl1.0-dev libxml2-dev \
 liblzma-dev llvm make tk-dev wget xz-utils zlib1g-dev"
 
