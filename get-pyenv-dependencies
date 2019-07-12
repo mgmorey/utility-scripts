@@ -28,18 +28,15 @@ DEBIAN_10_PKGS="bash curl libbz2-dev libffi-dev libgdbm-dev libncurses5-dev \
 libncursesw5-dev libreadline-dev libsqlite3-dev libssl-dev libxml2-dev \
 libxmlsec1-dev liblzma-dev llvm make tk-dev wget xz-utils zlib1g-dev"
 
-FEDORA_PKGS="bash bzip2 bzip2-devel curl gcc libffi-devel make ncurses-devel \
-openssl-devel readline-devel sqlite sqlite-devel tk-devel wget zlib-devel"
-
 FREEBSD_PKGS="bash bzip2 curl gmake libffi ncurses readline sqlite3"
 
 OPENSUSE_PKGS="bash curl gcc libbz2-devel libffi-devel libopenssl-devel \
 make ncurses-devel openssl-devel readline-devel sqlite3-devel tk-devel \
 zlib-devel"
 
-REDHAT_PKGS="bash bzip2 bzip2-devel curl gcc gdbm-devel libffi-devel make \
-ncurses-devel openssl-devel readline-devel sqlite sqlite-devel tk-devel \
-wget zlib-devel"
+REDHAT_PKGS="bash bzip2 bzip2-devel curl gcc gdbm-devel libffi-devel \
+lzma-sdk-devel make ncurses-devel openssl-devel readline-devel sqlite-devel \
+tk-devel wget zlib-devel"
 
 SUNOS_PKGS="bash gcc libffi make ncurses readline sqlite-3"
 
@@ -99,12 +96,9 @@ case "$kernel_name" in
 	    (opensuse-*)
 	    	packages=$OPENSUSE_PKGS
 	    	;;
-	    (fedora)
-	    	packages=$FEDORA_PKGS
+	    (fedora|redhat|centos)
+	    	packages=$REDHAT_PKGS
 	    	;;
-	    (redhat|centos)
-		packages=$REDHAT_PKGS
-		;;
 	esac
 	;;
     (Darwin)
