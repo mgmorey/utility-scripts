@@ -149,7 +149,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    (/opt/*|/usr|/usr/local)
+		    (/opt/*|/usr|/usr/local|$HOME)
 			if [ -d $OPTARG ]; then
 			    python_prefix=$OPTARG
 			else
