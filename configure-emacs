@@ -1,4 +1,4 @@
-#!/bin/sh -eux
+#!/bin/sh -eu
 
 # configure-emacs: download and configure emacs
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
@@ -16,20 +16,72 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-BASE_URL=https://mirrors.ocf.berkeley.edu/gnu
-VERSION=26.2
+GNU_BASE_URL=https://mirrors.ocf.berkeley.edu/gnu
+
+if [ -z "${EMACS_PREFIX-}" ]; then
+    EMACS_PREFIX=/usr/local
+fi
+
+if [ -z "${EMACS_VERSION-}" ]; then
+    EMACS_VERSION=26.2
+fi
 
 abort() {
     printf "$@" >&2
     exit 1
 }
 
+abort_invalid_prefix() {
+    usage "%s: invalid prefix -- %s\n" "$0" "$*"
+    exit 2
+}
+
+abort_invalid_version() {
+    usage "%s: invalid version -- %s\n" "$0" "$*"
+    exit 2
+}
+
 abort_not_supported() {
     abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
 }
 
+abort_too_many_arguments() {
+    usage "%s: too many arguments -- %s\n" "$0" "$*"
+    exit 2
+}
+
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+configure_emacs() {
+    basename=emacs-$EMACS_VERSION
+
+    archive_dir="$HOME/Downloads/GNU"
+    build_dir="$HOME/Documents/build/$basename"
+    src_dir="$HOME/Documents/src/GNU/$basename"
+
+    filename=$basename.tar.xz
+
+    pathname=$archive_dir/$filename
+    url=$GNU_BASE_URL/emacs/$filename
+
+    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
+
+    if [ ! -r "$pathname" ]; then
+	cd "$archive_dir"
+	wget $url
+    fi
+
+    if [ ! -r "$src_dir/configure" ]; then
+	cd "$(dirname "$src_dir")"
+	tar -xvf "$pathname"
+    fi
+
+    if [ ! -r "$build_dir/config.status" ]; then
+	cd "$build_dir"
+	"$src_dir/configure" "$@"
+    fi
 }
 
 get_realpath() (
@@ -49,16 +101,70 @@ get_realpath() (
     fi
 )
 
-basename=emacs-$VERSION
+parse_arguments() {
+    is_forcing=false
+    emacs_prefix=$EMACS_PREFIX
+    emacs_version=$EMACS_VERSION
 
-archive_dir="$HOME/Downloads/GNU"
-build_dir="$HOME/Documents/build/$basename"
-src_dir="$HOME/Documents/src/GNU/$basename"
+    while getopts fp:v:h opt; do
+	case $opt in
+	    (f)
+		is_forcing=true
+		;;
+	    (p)
+		case $OPTARG in
+		    ($HOME|/opt/*|/usr|/usr/local)
+			if [ -d $OPTARG ]; then
+			    emacs_prefix=$OPTARG
+			else
+			    abort_invalid_prefix $OPTARG
+			fi
+			;;
+		    (*)
+			abort_invalid_prefix $OPTARG
+			;;
+		esac
+		;;
+	    (v)
+		case $OPTARG in
+		    (2[6789].[0-9]|2[6789].[1-9][0-9])
+			emacs_version=$OPTARG
+			;;
+		    (*)
+			abort_invalid_version $OPTARG
+			;;
+		esac
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
 
-filename=$basename.tar.xz
+    shift $(($OPTIND - 1))
 
-pathname=$archive_dir/$filename
-url=$BASE_URL/emacs/$filename
+    if [ $# -gt 0 ]; then
+	abort_too_many_arguments "$@"
+    fi
+}
+
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
+    fi
+
+    cat >&2 <<-EOM
+	Usage: $0 [-f][-p PREFIX][-v VERSION]
+	       $0 -h
+	EOM
+}
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
@@ -83,19 +189,5 @@ case "$kernel_name" in
 	;;
 esac
 
-mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
-
-if [ ! -r "$pathname" ]; then
-    cd "$archive_dir"
-    wget $url
-fi
-
-if [ ! -r "$src_dir/configure" ]; then
-    cd $(dirname "$src_dir")
-    tar -xvf "$pathname"
-fi
-
-if [ ! -r "$build_dir/config.status" ]; then
-    cd "$build_dir"
-    "$src_dir/configure" "$@"
-fi
+parse_arguments "$@"
+configure_emacs
