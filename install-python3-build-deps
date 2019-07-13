@@ -85,10 +85,6 @@ case "$kernel_name" in
 	;;
 esac
 
-if [ -n "${package:-}" ]; then
-    "$script_dir/install-build-deps" "$@" $package
-fi
-
 install_cmd=$("$script_dir/get-pattern-install-command")
 install_opts=$("$script_dir/get-package-install-options")
 installer=$("$script_dir/get-package-manager")
@@ -97,6 +93,10 @@ pattern=$("$script_dir/get-devel-pattern")
 
 if [ -n "$pattern" ]; then
      $installer $install_cmd $install_opts "$pattern"
+fi
+
+if [ -n "${package:-}" ]; then
+    "$script_dir/install-build-deps" "$@" $package
 fi
 
 if [ -n "$packages" ]; then
