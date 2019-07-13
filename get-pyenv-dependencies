@@ -29,7 +29,8 @@ DEBIAN_10_PKGS="bash curl libbz2-dev libffi-dev libgdbm-dev libncurses5-dev \
 libncursesw5-dev libreadline-dev libsqlite3-dev libssl-dev libxml2-dev \
 libxmlsec1-dev liblzma-dev llvm make tk-dev uuid-dev wget xz-utils zlib1g-dev"
 
-FREEBSD_PKGS="bash bzip2 curl gdbm gmake libffi lzma ncurses readline sqlite3"
+FREEBSD_PKGS="bash bzip2 curl gdbm gmake libffi lzma ncurses readline sqlite3 \
+wget"
 
 OPENSUSE_PKGS="bash curl gcc libbz2-devel libffi-devel libopenssl-devel \
 make ncurses-devel openssl-devel readline-devel sqlite3-devel tk-devel \
