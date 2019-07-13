@@ -1,4 +1,4 @@
-#!/bin/sh -eux
+#!/bin/sh -eu
 
 # configure-python: download and configure python
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
@@ -75,7 +75,7 @@ configure_python() {
     fi
 
     if [ ! -r "$src_dir/configure" ]; then
-	cd $(dirname "$src_dir")
+	cd "$(dirname "$src_dir")"
 	tar -xvf "$pathname"
     fi
 
