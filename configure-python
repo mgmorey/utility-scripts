@@ -149,7 +149,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    (/?*)
+		    (/opt/*|/usr|/usr/local)
 			if [ -d $OPTARG ]; then
 			    python_prefix=$OPTARG
 			else
@@ -160,7 +160,6 @@ parse_arguments() {
 			abort_invalid_prefix $OPTARG
 			;;
 		esac
-
 		;;
 	    (v)
 		case $OPTARG in
