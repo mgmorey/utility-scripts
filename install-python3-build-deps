@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-python3-build-deps: install Python3 build dependencies
+# install-python3-build-deps: install Python 3 build dependencies
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKG=python3-defaults
+DARWIN_PKG_DIR=/Library/Developer/CommandLineTools/Packages/
+DARWIN_PKG_NAME=macOS_SDK_headers_for_macOS_10.14.pkg
 
-OPENSUSE_PKGS="gcc"
+DEBIAN_PKG=python3-defaults
 
 REDHAT_PKG=python
 
@@ -61,11 +62,11 @@ case "$kernel_name" in
 	case "$ID" in
 	    (debian|ubuntu)
 		package=$DEBIAN_PKG
-		;;
+	    	;;
 	    (opensuse-*)
-		packages=$OPENSUSE_PKGS
-		;;
-	    (fedora|centos)
+		:
+	    	;;
+	    (fedora|redhat|centos)
 		package=$REDHAT_PKG
 		;;
 	    (*)
@@ -73,7 +74,10 @@ case "$kernel_name" in
 		;;
 	esac
 	;;
-    (FreeBSD|SunOS|CYGWIN_NT-*)
+    (Darwin)
+	sudo installer -pkg $DARWIN_PKG_DIR/$DARWIN_PKG_NAME -target /
+    	;;
+    (FreeBSD|SunOS|NT)
 	:
     	;;
     (*)
@@ -81,8 +85,20 @@ case "$kernel_name" in
 	;;
 esac
 
-if [ -z "${package:-}" ] || ! "$script_dir/install-build-deps" "$@" $package; then
-    if [ -n "${packages:-}" ]; then
-	install-packages "$@" $packages
-    fi
+if [ -n "${package:-}" ]; then
+    "$script_dir/install-build-deps" "$@" $package
+fi
+
+install_cmd=$("$script_dir/get-pattern-install-command")
+install_opts=$("$script_dir/get-package-install-options")
+installer=$("$script_dir/get-package-manager")
+packages=$("$script_dir/get-python3-build-deps")
+pattern=$("$script_dir/get-devel-pattern")
+
+if [ -n "$pattern" ]; then
+     $installer $install_cmd $install_opts "$pattern"
+fi
+
+if [ -n "$packages" ]; then
+    $installer install $install_opts $packages
 fi

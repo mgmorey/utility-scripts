@@ -86,6 +86,32 @@ case "$kernel_name" in
 	;;
 esac
 
+case "$kernel_name" in
+    (Linux)
+	case "$ID" in
+	    (debian|ubuntu)
+		package=$DEBIAN_PKG
+		;;
+	    (fedora|centos)
+		package=$REDHAT_PKG
+		;;
+	    (*)
+		abort_not_supported Distro
+		;;
+	esac
+	;;
+    (FreeBSD|SunOS|CYGWIN_NT-*)
+	:
+    	;;
+    (*)
+	abort_not_supported "Operating system"
+	;;
+esac
+
+if [ -n "${package:-}" ]; then
+    "$script_dir/install-build-deps" "$@" $package
+fi
+
 install_cmd=$("$script_dir/get-pattern-install-command")
 install_opts=$("$script_dir/get-package-install-options")
 installer=$("$script_dir/get-package-manager")
