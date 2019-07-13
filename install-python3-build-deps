@@ -21,8 +21,6 @@ DARWIN_PKG_NAME=macOS_SDK_headers_for_macOS_10.14.pkg
 
 DEBIAN_PKG=python3-defaults
 
-REDHAT_PKG=python
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -67,7 +65,7 @@ case "$kernel_name" in
 		:
 	    	;;
 	    (fedora|redhat|centos)
-		package=$REDHAT_PKG
+		:
 		;;
 	    (*)
 		abort_not_supported Distro
