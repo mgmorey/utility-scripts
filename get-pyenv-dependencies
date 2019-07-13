@@ -1,4 +1,3 @@
-
 #!/bin/sh -eu
 
 # get-pyenv-dependencies: get list of pyenv dependencies
