@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-python3-deps: get list of Python 3 build dependencies
+# get-python3-build-deps: get list of Python 3 build dependencies
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -22,21 +22,21 @@ DARWIN_PKGS="bash curl gdbm libffi openssl readline sqlite xz zlib"
 
 DEBIAN_9_PKGS="bash curl libbz2-dev libffi-dev libgdbm-dev libncurses5-dev \
 libncursesw5-dev libreadline-dev libsqlite3-dev libssl1.0-dev libxml2-dev \
-liblzma-dev llvm make tk-dev uuid-dev wget xz-utils zlib1g-dev"
+liblzma-dev llvm make uuid-dev wget xz-utils zlib1g-dev"
 
 DEBIAN_10_PKGS="bash curl libbz2-dev libffi-dev libgdbm-dev libncurses5-dev \
 libncursesw5-dev libreadline-dev libsqlite3-dev libssl-dev libxml2-dev \
-libxmlsec1-dev liblzma-dev llvm make tk-dev uuid-dev wget xz-utils zlib1g-dev"
+libxmlsec1-dev liblzma-dev llvm make uuid-dev wget xz-utils zlib1g-dev"
 
 FREEBSD_PKGS="bash bzip2 curl gdbm gmake libffi lzma ncurses readline sqlite3 \
-tcl86 tcl87 tk86 tk87 wget"
+wget"
 
 OPENSUSE_PKGS="bash curl gcc gdbm-devel libbz2-devel libffi-devel \
 libopenssl-devel lzma-sdk-devel make ncurses-devel openssl-devel \
-readline-devel sqlite3-devel tk-devel uuid-devel wget zlib-devel"
+readline-devel sqlite3-devel uuid-devel wget zlib-devel"
 
 REDHAT_PKGS="bash bzip2-devel curl gcc gdbm-devel libffi-devel lzma-sdk-devel \
-make ncurses-devel openssl-devel readline-devel sqlite-devel tk-devel wget \
+make ncurses-devel openssl-devel readline-devel sqlite-devel wget \
 zlib-devel"
 
 SUNOS_PKGS="bash gcc libffi make ncurses readline sqlite-3"
