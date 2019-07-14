@@ -58,7 +58,7 @@ pattern=$("$script_dir/get-devel-pattern")
 case "$kernel_name" in
     (Linux)
 	case "$ID" in
-	    (debian|ubuntu|opensuse-*|fedora|redhat|centos)
+	    (debian|raspbian|ubuntu|opensuse-*|fedora|redhat|centos)
 		$installer $install_cmd $install_opts "$pattern"
 	    	;;
 	    (*)

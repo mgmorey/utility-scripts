@@ -59,7 +59,7 @@ case "$kernel_name" in
 	docker_url="$DOCKER_BASE_URL/linux/$ID"
 
 	case "$ID" in
-	    (debian|ubuntu)
+	    (debian|raspbian|ubuntu)
 		codename="$(lsb_release -cs)"
 		repository="deb [arch=amd64] $docker_url $codename stable"
 		apt-get remove -qqy docker docker.io || true

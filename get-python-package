@@ -69,7 +69,7 @@ eval $("$script_dir/get-os-release" -X)
 case "$kernel_name" in
     (Linux)
 	case "$ID" in
-	    (debian)
+	    (debian|raspbian)
 		printf "%s %s\n" $DEBIAN_INFO
 		;;
 	    (opensuse-*)

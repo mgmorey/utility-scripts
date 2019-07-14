@@ -43,7 +43,7 @@ get_installed_packages() {
     case "$kernel_name" in
 	(Linux)
 	    case "$ID" in
-		(debian|ubuntu)
+		(debian|raspbian|ubuntu)
 		    dpkg-query -Wf '${Package}\n'
 		    ;;
 		(opensuse-*)
