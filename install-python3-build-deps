@@ -56,7 +56,7 @@ script_dir=$(get_realpath "$(dirname "$0")")
 eval $("$script_dir/get-os-release" -X)
 
 case "$kernel_name" in
-    (Linux)
+    (Linux|GNU)
 	case "$ID" in
 	    (debian|raspbian|ubuntu)
 		package=$DEBIAN_PKG
@@ -75,7 +75,7 @@ case "$kernel_name" in
     (Darwin)
 	sudo installer -pkg $DARWIN_PKG_DIR/$DARWIN_PKG_NAME -target /
     	;;
-    (FreeBSD|SunOS|NT)
+    (FreeBSD|SunOS|NT|GNU)
 	:
     	;;
     (*)

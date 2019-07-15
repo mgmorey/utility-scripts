@@ -55,7 +55,7 @@ script_dir=$(get_realpath "$(dirname "$0")")
 eval $("$script_dir/get-os-release" -X)
 
 case "$kernel_name" in
-    (Linux)
+    (Linux|GNU)
 	docker_url="$DOCKER_BASE_URL/linux/$ID"
 
 	case "$ID" in

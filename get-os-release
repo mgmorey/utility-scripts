@@ -39,7 +39,7 @@ collect_data() {
     kernel_release=${input#* }
 
     case "$kernel_name" in
-	(Linux)
+	(Linux|GNU)
 	    . $FILE_OS
 	    ;;
 

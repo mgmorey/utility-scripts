@@ -65,7 +65,7 @@ if [ -z "${desktop_name:-}" ]; then
 fi
 
 case "$kernel_name" in
-    (Linux)
+    (Linux|GNU)
 	case "$ID" in
 	    (debian|raspbian)
 		case "$desktop_name" in

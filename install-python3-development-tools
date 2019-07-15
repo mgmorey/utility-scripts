@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+DEBIAN_PKG=python3-defaults
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -51,7 +53,7 @@ script_dir=$(get_realpath "$(dirname "$0")")
 eval $("$script_dir/get-os-release" -X)
 
 case "$kernel_name" in
-    (Linux)
+    (Linux|GNU)
 	case "$ID" in
 	    (debian|raspbian|ubuntu)
 		:
@@ -87,7 +89,7 @@ case "$kernel_name" in
 esac
 
 case "$kernel_name" in
-    (Linux)
+    (Linux|GNU)
 	case "$ID" in
 	    (debian|raspbian|ubuntu)
 		package=$DEBIAN_PKG
@@ -108,10 +110,6 @@ case "$kernel_name" in
 	;;
 esac
 
-if [ -n "${package:-}" ]; then
-    "$script_dir/install-build-deps" "$@" $package
-fi
-
 install_cmd=$("$script_dir/get-pattern-install-command")
 install_opts=$("$script_dir/get-package-install-options")
 installer=$("$script_dir/get-package-manager")
@@ -124,4 +122,8 @@ fi
 
 if [ -n "$packages" ]; then
     $installer install $install_opts $packages
+fi
+
+if [ -n "${package:-}" ]; then
+    "$script_dir/install-build-deps" "$@" $package
 fi

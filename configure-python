@@ -98,7 +98,7 @@ configure_python() {
     cd "$build_dir"
 
     case "$kernel_name" in
-	(Linux)
+	(Linux|GNU)
 	    "$configure" $options "$@" LDFLAGS="-Wl,--rpath=$python_prefix/lib"
 	    ;;
 	(FreeBSD)
@@ -216,7 +216,7 @@ script_dir=$(get_realpath "$(dirname "$0")")
 eval $("$script_dir/get-os-release" -X)
 
 case "$kernel_name" in
-    (Linux)
+    (Linux|GNU)
 	case "$ID" in
 	    (debian|raspbian|ubuntu|opensuse-*|fedora|redhat|centos)
 		:
