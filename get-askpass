@@ -52,7 +52,11 @@ get_realpath() (
     fi
 )
 
-if [ -z "${DISPLAY:-}" ]; then
+if [ "${XDG_SESSION_TYPE-}" = tty ]; then
+    abort "%s: Teletype has no desktop\n" "$0"
+fi
+
+if [ -z "${DISPLAY-}" ]; then
     abort "%s: No DISPLAY variable set\n" "$0"
 fi
 
