@@ -75,7 +75,7 @@ case "$kernel_name" in
 	case "$ID" in
 	    (debian|raspbian|ubuntu)
 		case "$desktop_name" in
-		    (GNOME*|*:GNOME|'')
+		    (GNOME*|*:GNOME|LXDE|'')
 			package=ssh-askpass-gnome
 			;;
 		    (KDE*)
