@@ -58,7 +58,7 @@ script_dir=$(get_realpath "$(dirname "$0")")
 eval $("$script_dir/get-os-release" -X)
 
 case "$kernel_name" in
-    (Linux/GNU)
+    (Linux|GNU)
 	case "$ID" in
 	    (debian|raspbian|ubuntu)
 		package=$DEBIAN_PKG
