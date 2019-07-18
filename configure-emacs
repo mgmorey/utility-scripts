@@ -173,7 +173,7 @@ eval $("$script_dir/get-os-release" -X)
 case "$kernel_name" in
     (Linux|GNU)
 	case "$ID" in
-	    (debian|raspbian|ubuntu|opensuse-*|fedora|redhat|centos)
+	    (debian|raspbian|ubuntu|opensuse-*|fedora|redhat|centos|ol)
 		:
 	    	;;
 	    (*)

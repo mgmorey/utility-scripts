@@ -62,7 +62,7 @@ case "$kernel_name" in
 	    (debian|raspbian|ubuntu)
 		dpkg --listfiles "$1"
 		;;
-	    (opensuse-*|fedora|redhat|centos)
+	    (opensuse-*|fedora|redhat|centos|ol)
 		rpm --query --list "$1"
 		;;
 	    (*)

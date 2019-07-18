@@ -64,7 +64,7 @@ case "$kernel_name" in
 	    (opensuse-*)
 		:
 	    	;;
-	    (fedora|redhat|centos)
+	    (fedora|redhat|centos|ol)
 		:
 		;;
 	    (*)

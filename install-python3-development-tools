@@ -64,7 +64,7 @@ case "$kernel_name" in
 	    (fedora)
 		:
 	    	;;
-	    (redhat|centos)
+	    (redhat|centos|ol)
                 case "$VERSION_ID" in
                     (7)
 		        /usr/local/bin/pip3 install --upgrade pip virtualenv
@@ -94,7 +94,7 @@ case "$kernel_name" in
 	    (debian|raspbian|ubuntu)
 		package=$DEBIAN_PKG
 		;;
-	    (fedora|centos)
+	    (fedora|redhat|centos|ol)
 		package=$REDHAT_PKG
 		;;
 	    (*)

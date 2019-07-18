@@ -78,7 +78,7 @@ case "$kernel_name" in
 	    (fedora)
 		printf "%s %s\n" $FEDORA_INFO
 		;;
-	    (redhat|centos)
+	    (redhat|centos|ol)
 		printf "%s %s\n" $REDHAT_INFO
 		;;
 	    (ubuntu)

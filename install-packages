@@ -62,7 +62,7 @@ case "$kernel_name" in
 	    (fedora)
 		:
 		;;
-	    (redhat|centos)
+	    (redhat|centos|ol)
 		:
 		;;
 	    (*)

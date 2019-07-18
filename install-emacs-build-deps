@@ -67,7 +67,7 @@ case "$kernel_name" in
 	    (opensuse-*)
 		packages=$OPENSUSE_PKGS
 		;;
-	    (fedora|centos)
+	    (fedora|redhat|centos|ol)
 		package=$REDHAT_PKG
 		;;
 	    (*)
