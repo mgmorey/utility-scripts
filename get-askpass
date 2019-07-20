@@ -52,10 +52,6 @@ get_realpath() (
     fi
 )
 
-if [ "${XDG_SESSION_TYPE-}" = tty ]; then
-    abort "%s: Teletype has no desktop\n" "$0"
-fi
-
 if [ -z "${DISPLAY-}" ]; then
     abort "%s: No DISPLAY variable set\n" "$0"
 fi
@@ -63,10 +59,6 @@ fi
 script_dir=$(get_realpath "$(dirname "$0")")
 
 desktop_name=$("$script_dir/get-desktop-name")
-
-if [ -z "$desktop_name" ]; then
-    exit 1
-fi
 
 eval $("$script_dir/get-os-release" -X)
 
