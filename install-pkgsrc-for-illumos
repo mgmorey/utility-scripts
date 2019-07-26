@@ -1,0 +1,22 @@
+#!/bin/sh
+
+BOOTSTRAP_TAR="bootstrap-trunk-x86_64-20190317.tar.gz"
+BOOTSTRAP_SHA="cda0f6cd27b2d8644e24bc54d19e489d89786ea7"
+
+cd /var/tmp
+
+# Download the bootstrap kit to the current directory.
+curl -O https://pkgsrc.joyent.com/packages/SmartOS/bootstrap/${BOOTSTRAP_TAR}
+
+# Verify the SHA1 checksum.
+[ "${BOOTSTRAP_SHA}" = "$(/bin/digest -a sha1 ${BOOTSTRAP_TAR})" ] || echo "ERROR: checksum failure"
+
+# Verify PGP signature.  This step is optional, and requires gpg.
+if [ -n "$(which gpg 2>/dev/null)" ]; then
+   curl -O https://pkgsrc.joyent.com/packages/SmartOS/bootstrap/${BOOTSTRAP_TAR}.asc
+   curl -sS https://pkgsrc.joyent.com/pgp/DE817B8E.asc | gpg --import || true
+   gpg --verify ${BOOTSTRAP_TAR}{.asc,} || true
+fi
+
+# Install bootstrap kit to /opt/local
+tar -zxpf ${BOOTSTRAP_TAR} -C /

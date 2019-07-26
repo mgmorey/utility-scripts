@@ -1,0 +1,28 @@
+#!/bin/sh
+
+UPGRADE_TAR="bootstrap-trunk-x86_64-20190317-upgrade.tar.gz"
+UPGRADE_SHA="3b0fdc5bb32ad1b62fc909742c98ceaef471a69e"
+
+cd /var/tmp
+
+# Download the upgrade kit to the current directory.
+curl -O https://pkgsrc.joyent.com/packages/SmartOS/bootstrap-upgrade/${UPGRADE_TAR}
+
+# Verify the SHA1 checksum.
+[ "${UPGRADE_SHA}" = "$(/bin/digest -a sha1 ${UPGRADE_TAR})" ] || echo "ERROR: checksum failure"
+
+# Verify PGP signature.  This step is optional, and requires gpg.
+if [ -n "$(which gpg 2>/dev/null)" ]; then
+   curl -O https://pkgsrc.joyent.com/packages/SmartOS/bootstrap-upgrade/${UPGRADE_TAR}.asc
+   curl -sS https://pkgsrc.joyent.com/pgp/DE817B8E.asc | gpg --import
+   gpg --verify ${UPGRADE_TAR}{.asc,}
+fi
+
+# Ensure you are running the latest package tools.
+PKG_PATH=http://pkgsrc.joyent.com/packages/SmartOS/trunk/x86_64/All pkg_add -U pkg_install pkgin
+
+# Unpack upgrade kit to /opt/local
+tar -zxpf ${UPGRADE_TAR} -C /
+
+# Upgrade all packages.
+pkgin full-upgrade
