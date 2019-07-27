@@ -75,7 +75,13 @@ case "$kernel_name" in
     (Darwin)
 	sudo installer -pkg $DARWIN_PKG_DIR/$DARWIN_PKG_NAME -target /
     	;;
-    (FreeBSD|SunOS|NT|GNU)
+    (FreeBSD)
+	:
+    	;;
+    (NetBSD)
+	:
+    	;;
+    (SunOS)
 	:
     	;;
     (*)
