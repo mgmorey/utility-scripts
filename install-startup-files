@@ -75,7 +75,7 @@ if [ ! -d startup-files ]; then
     git clone $STARTUP_FILES
 fi
 
-cd ..
+cd
 
 if [ ! -e .profile ]; then
     printf "Installing %s\n" .profile
