@@ -70,10 +70,16 @@ case "$kernel_name" in
 		;;
 	esac
 	;;
-    (FreeBSD|SunOS)
+    (Darwin)
 	:
 	;;
-    (Darwin)
+    (FreeBSD)
+	:
+	;;
+    (NetBSD)
+	:
+	;;
+    (SunOS)
 	:
 	;;
     (*)
