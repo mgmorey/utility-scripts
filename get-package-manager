@@ -73,7 +73,13 @@ case "$kernel_name" in
     (Darwin)
 	printf "%s\n" brew
 	;;
-    (FreeBSD|SunOS)
+    (FreeBSD)
+	printf "%s\n" pkg
+	;;
+    (NetBSD)
+	printf "%s\n" pkgin
+	;;
+    (SunOS)
 	printf "%s\n" pkg
 	;;
     (*)
