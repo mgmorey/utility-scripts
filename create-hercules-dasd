@@ -67,15 +67,15 @@ esac
 mkdir -p $DIR
 cd $DIR
 
-for CUU in 120 122; do
+for CUU in 120 121 122 130 131 132; do
     FILE=$MODEL.LINUX.$INSTANCE$CUU
 
     case $CUU in
-	(*0) TYPE=9
+	(??0) TYPE=9
 		 ;;
-	(*1) TYPE=3
+	(??1) TYPE=3
 	       ;;
-	(*2) TYPE=2
+	(??2) TYPE=2
 	       ;;
     esac
 
