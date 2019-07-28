@@ -60,6 +60,9 @@ get_installed_packages() {
 	(FreeBSD)
 	    pkg info | awk "$FREEBSD_AWK"
 	    ;;
+	(NetBSD)
+	    pkgin list -s | awk '{print $1}'
+	    ;;
 	(SunOS)
 	    pkg list -s | awk '{print $1}'
 	    ;;
