@@ -50,35 +50,54 @@ get_realpath() (
     fi
 )
 
+install_docker_ce() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    docker_url="$DOCKER_BASE_URL/linux/$ID"
+
+	    case "$ID" in
+		(debian|raspbian|ubuntu)
+		    codename="$(lsb_release -cs)"
+		    repository="deb [arch=amd64] $docker_url $codename stable"
+		    apt-get remove -qqy docker docker.io || true
+		    apt-get install "$@" $DEBIAN_PKGS
+		    curl -fsSL $docker_url/gpg | apt-key add -
+		    add-apt-repository "$repository"
+		    apt-get update
+		    apt-get install "$@" docker-ce
+
+		    if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
+			install_docker_group
+		    fi
+		    ;;
+		(*)
+		    abort_not_supported Distro
+		    ;;
+	    esac
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
+
+install_docker_group() {
+    if ! getent group docker >/dev/null; then
+	groupadd docker
+    fi
+
+    if [ "$invoke_usermod" = true ]; then
+	members="$(getent group docker | awk -F: '{print $4}')"
+
+	if ! printf "%s\n" "$members" | grep -q "\<$SUDO_USER\>"; then
+	    usermod -a -G docker $SUDO_USER
+	    printf "Please restart the machine before using docker\n"
+	fi
+    fi
+}
+
 script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
 
-case "$kernel_name" in
-    (Linux|GNU)
-	docker_url="$DOCKER_BASE_URL/linux/$ID"
-
-	case "$ID" in
-	    (debian|raspbian|ubuntu)
-		codename="$(lsb_release -cs)"
-		repository="deb [arch=amd64] $docker_url $codename stable"
-		apt-get remove -qqy docker docker.io || true
-		apt-get install "$@" $DEBIAN_PKGS
-		curl -fsSL $docker_url/gpg | apt-key add -
-		add-apt-repository "$repository"
-		apt-get update
-		apt-get install "$@" docker-ce
-
-		if usermod -a -G docker $USER; then
-		    printf "Please restart machine before using docker\n"
-		fi
-		;;
-	    (*)
-		abort_not_supported Distro
-		;;
-	esac
-	;;
-    (*)
-	abort_not_supported "Operating system"
-	;;
-esac
+install_docker_ce "$@"
