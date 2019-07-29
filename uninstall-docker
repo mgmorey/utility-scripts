@@ -79,16 +79,6 @@ install_docker_ce() {
 	(*)
 	    printf "No Docker package installed\n"
     esac
-
-    if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
-	remove_docker_group
-    fi
-}
-
-remove_docker_group() {
-    if getent group docker >/dev/null; then
-	grouprm docker
-    fi
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
