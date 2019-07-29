@@ -46,17 +46,38 @@ get_realpath() (
     fi
 )
 
-install_docker_ce() {
+uninstall_docker() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
 		(debian|raspbian|ubuntu)
 		    :
 		    ;;
+		(opensuse-*)
+		    :
+		    ;;
+		(fedora)
+		    :
+		    ;;
+		(redhat|centos|ol)
+		    :
+		    ;;
 		(*)
 		    abort_not_supported Distro
 		    ;;
 	    esac
+	    ;;
+	(Darwin)
+	    :
+	    ;;
+	(FreeBSD)
+	    :
+	    ;;
+	(NetBSD)
+	    :
+	    ;;
+	(SunOS)
+	    :
 	    ;;
 	(*)
 	    abort_not_supported "Operating system"
@@ -69,7 +90,7 @@ install_docker_ce() {
 	(docker|docker.io)
 	    printf "Removing $installed_package\n"
 
-	    if ! apt-get remove $installed_package; then
+	    if ! "$script_dir/uninstall-packages" $installed_package; then
 		exit $?
 	    fi
 	    ;;
@@ -85,4 +106,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
 
-install_docker_ce "$@"
+uninstall_docker "$@"
