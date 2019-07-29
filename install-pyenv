@@ -44,13 +44,17 @@ get_realpath() (
     fi
 )
 
+install_pyenv() {
+    if [ "$(id -u)" -eq 0 ]; then
+	sh="su $SUDO_USER"
+    else
+	sh="sh"
+    fi
+
+    "$script_dir/install-python3-build-deps"
+    curl -L $BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer | $sh -c bash
+}
+
 script_dir=$(get_realpath "$(dirname "$0")")
 
-if [ "$(id -u)" -eq 0 ]; then
-    sh="su $SUDO_USER"
-else
-    sh="sh"
-fi
-
-. "$script_dir/install-python3-build-deps"
-curl -L $BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer | $sh -c bash
+install_pyenv "$@"
