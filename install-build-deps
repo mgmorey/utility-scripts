@@ -46,25 +46,29 @@ get_realpath() (
     fi
 )
 
+install_build_deps() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu)
+		;;
+		(*)
+		    exit 1
+		    ;;
+	    esac
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+
+    installer=$("$script_dir/get-package-manager")
+    install_opts=$("$script_dir/get-package-install-options")
+    $installer build-dep $install_opts "$@"
+}
+
 script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
 
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (debian|raspbian|ubuntu)
-		;;
-	    (*)
-		exit 1
-		;;
-	esac
-	;;
-    (*)
-	abort_not_supported "Operating system"
-	;;
-esac
-
-installer=$("$script_dir/get-package-manager")
-install_opts=$("$script_dir/get-package-install-options")
-$installer build-dep $install_opts "$@"
+install_build_deps "$@"
