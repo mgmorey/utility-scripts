@@ -48,82 +48,86 @@ get_realpath() (
     fi
 )
 
+install_python3_development_tools() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu)
+		    :
+	    	    ;;
+		(opensuse-*)
+		    :
+	    	    ;;
+		(fedora)
+		    :
+	    	    ;;
+		(redhat|centos|ol)
+                    case "$VERSION_ID" in
+			(7)
+		            /usr/local/bin/pip3 install --upgrade pip virtualenv
+			    exit $?
+                            ;;
+			(*)
+			    :
+			    ;;
+                    esac
+		    ;;
+		(*)
+		    abort_not_supported Distro
+		    ;;
+	    esac
+	    ;;
+	(Darwin|FreeBSD|SunOS|CYGWIN_NT-*)
+	    :
+    	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu)
+		    package=$DEBIAN_PKG
+		    ;;
+		(fedora|redhat|centos|ol)
+		    package=$REDHAT_PKG
+		    ;;
+		(*)
+		    abort_not_supported Distro
+		    ;;
+	    esac
+	    ;;
+	(FreeBSD|SunOS|CYGWIN_NT-*)
+	    :
+    	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+
+    install_cmd=$("$script_dir/get-pattern-install-command")
+    install_opts=$("$script_dir/get-package-install-options")
+    installer=$("$script_dir/get-package-manager")
+    packages=$("$script_dir/get-python3-development-tools")
+    pattern=$("$script_dir/get-devel-pattern")
+
+    if [ -n "$pattern" ]; then
+	$installer $install_cmd $install_opts "$pattern"
+    fi
+
+    if [ -n "$packages" ]; then
+	$installer install $install_opts $packages
+    fi
+
+    if [ -n "${package:-}" ]; then
+	"$script_dir/install-build-deps" "$@" $package
+    fi
+}
+
 script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
 
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (debian|raspbian|ubuntu)
-		:
-	    	;;
-	    (opensuse-*)
-		:
-	    	;;
-	    (fedora)
-		:
-	    	;;
-	    (redhat|centos|ol)
-                case "$VERSION_ID" in
-                    (7)
-		        /usr/local/bin/pip3 install --upgrade pip virtualenv
-			exit $?
-                        ;;
-		    (*)
-			:
-			;;
-                esac
-		;;
-	    (*)
-		abort_not_supported Distro
-		;;
-	esac
-	;;
-    (Darwin|FreeBSD|SunOS|CYGWIN_NT-*)
-	:
-    	;;
-    (*)
-	abort_not_supported "Operating system"
-	;;
-esac
-
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (debian|raspbian|ubuntu)
-		package=$DEBIAN_PKG
-		;;
-	    (fedora|redhat|centos|ol)
-		package=$REDHAT_PKG
-		;;
-	    (*)
-		abort_not_supported Distro
-		;;
-	esac
-	;;
-    (FreeBSD|SunOS|CYGWIN_NT-*)
-	:
-    	;;
-    (*)
-	abort_not_supported "Operating system"
-	;;
-esac
-
-install_cmd=$("$script_dir/get-pattern-install-command")
-install_opts=$("$script_dir/get-package-install-options")
-installer=$("$script_dir/get-package-manager")
-packages=$("$script_dir/get-python3-development-tools")
-pattern=$("$script_dir/get-devel-pattern")
-
-if [ -n "$pattern" ]; then
-    $installer $install_cmd $install_opts "$pattern"
-fi
-
-if [ -n "$packages" ]; then
-    $installer install $install_opts $packages
-fi
-
-if [ -n "${package:-}" ]; then
-    "$script_dir/install-build-deps" "$@" $package
-fi
+install_python3_development_tools "$@"
