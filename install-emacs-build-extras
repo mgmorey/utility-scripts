@@ -46,45 +46,49 @@ get_realpath() (
     fi
 )
 
+install_emacs_build_extras() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu)
+		    :
+		    ;;
+		(opensuse-*)
+		    :
+		    ;;
+		(fedora|redhat|centos|ol)
+		    :
+	    	    ;;
+		(*)
+		    abort_not_supported Distro
+		    ;;
+	    esac
+	    ;;
+	(FreeBSD|SunOS|CYGWIN_NT-*)
+	    :
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+
+    install_cmd=$("$script_dir/get-pattern-install-command")
+    install_opts=$("$script_dir/get-package-install-options")
+    installer=$("$script_dir/get-package-manager")
+    packages=$("$script_dir/get-emacs-build-extras")
+    pattern=$("$script_dir/get-devel-pattern")
+
+    if [ -n "$pattern" ]; then
+	$installer $install_cmd $install_opts "$pattern"
+    fi
+
+    if [ -n "$packages" ]; then
+	$installer install $install_opts $packages
+    fi
+}
+
 script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
 
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (debian|raspbian|ubuntu)
-		:
-		;;
-	    (opensuse-*)
-		:
-		;;
-	    (fedora|redhat|centos|ol)
-		:
-	    	;;
-	    (*)
-		abort_not_supported Distro
-		;;
-	esac
-	;;
-    (FreeBSD|SunOS|CYGWIN_NT-*)
-	:
-	;;
-    (*)
-	abort_not_supported "Operating system"
-	;;
-esac
-
-install_cmd=$("$script_dir/get-pattern-install-command")
-install_opts=$("$script_dir/get-package-install-options")
-installer=$("$script_dir/get-package-manager")
-packages=$("$script_dir/get-emacs-build-extras")
-pattern=$("$script_dir/get-devel-pattern")
-
-if [ -n "$pattern" ]; then
-    $installer $install_cmd $install_opts "$pattern"
-fi
-
-if [ -n "$packages" ]; then
-    $installer install $install_opts $packages
-fi
+install_emacs_build_extras "$@"
