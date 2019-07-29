@@ -16,9 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKGS="apt-transport-https ca-certificates curl gnupg2 \
-software-properties-common"
 DOCKER_BASE_URL=https://download.docker.com
+DOCKER_PACKAGE=docker-ce
 
 abort() {
     printf "$@" >&2
@@ -38,7 +37,7 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
@@ -53,22 +52,12 @@ get_realpath() (
 install_docker_ce() {
     case "$kernel_name" in
 	(Linux|GNU)
+	    distro_codename="$(lsb_release -cs)"
 	    docker_url="$DOCKER_BASE_URL/linux/$ID"
 
 	    case "$ID" in
 		(debian|raspbian|ubuntu)
-		    codename="$(lsb_release -cs)"
-		    repository="deb [arch=amd64] $docker_url $codename stable"
-		    apt-get remove -qqy docker docker.io || true
-		    apt-get install "$@" $DEBIAN_PKGS
-		    curl -fsSL $docker_url/gpg | apt-key add -
-		    add-apt-repository "$repository"
-		    apt-get update
-		    apt-get install "$@" docker-ce
-
-		    if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
-			install_docker_group
-		    fi
+		    :
 		    ;;
 		(*)
 		    abort_not_supported Distro
@@ -79,6 +68,38 @@ install_docker_ce() {
 	    abort_not_supported "Operating system"
 	    ;;
     esac
+
+    installed_package=$("$script_dir/get-installed-docker-package")
+
+    case $installed_package in
+	(docker|docker.io)
+	    printf "Removing $installed_package\n"
+
+	    if ! apt-get remove $installed_package; then
+		exit $?
+	    fi
+	    ;;
+	(docker-ce)
+	    printf "Docker CE package is installed\n"
+	    ;;
+	(*)
+	    printf "No Docker package installed\n"
+    esac
+
+    dependencies=$("$script_dir/get-docker-packages")
+    docker_repo="deb [arch=amd64] $docker_url $distro_codename stable"
+    apt-get install "$@" $dependencies
+    curl -fsSL $docker_url/gpg | apt-key add -
+    add-apt-repository "$docker_repo"
+    apt-get update
+
+    if ! apt-get install "$@" $DOCKER_PACKAGE; then
+	exit $?
+    fi
+
+    if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
+	install_docker_group
+    fi
 }
 
 install_docker_group() {
