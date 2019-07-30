@@ -50,6 +50,14 @@ get_realpath() (
     fi
 )
 
+grep_docker() {
+    grep -q '^\(docker\|docker.io\)$'
+}
+
+grep_docker_ce() {
+    grep -q '^\(docker-ce\|docker-ce-cli\)$'
+}
+
 install_docker_ce() {
     case "$kernel_name" in
 	(Linux|GNU)
@@ -69,6 +77,21 @@ install_docker_ce() {
 	    abort_not_supported "Operating system"
 	    ;;
     esac
+
+    installed_packages=$("$script_dir/get-installed-docker-packages")
+
+    if printf "%s\n" $installed_packages | grep_docker; then
+	printf "Removing native Docker packages\n"
+
+	if ! "$script_dir/uninstall-packages" $installed_packages; then
+	    exit $?
+	fi
+    elif printf "%s\n" $installed_packages | grep_docker_ce; then
+	printf "Docker CE packages are installed\n"
+	exit 0
+    else
+	printf "No Docker packages installed\n"
+    fi
 
     dependencies=$("$script_dir/get-docker-packages")
     docker_repo="deb [arch=amd64] $docker_url $distro_codename stable"
