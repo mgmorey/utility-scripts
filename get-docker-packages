@@ -29,22 +29,22 @@ assert() {
 }
 
 get_docker_packages() {
-    package=$("$script_dir/get-installed-docker-package")
+    package=$("$script_dir/get-installed-docker-packages")
 
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
 		(debian|raspbian)
 		    case "$VERSION_ID" in
-			(10)
-			    packages="${package:-$DEBIAN_10_PKG} $DEBIAN_PKGS"
+			(9|10)
+			    packages="$DEBIAN_PKGS"
 			    ;;
 		    esac
 		    ;;
 		(ubuntu)
 		    case "$VERSION_ID" in
 			(18.04|19.04)
-			    packages="${package:-$DEBIAN_10_PKG}"
+			    packages="$DEBIAN_PKGS"
 			    ;;
 		    esac
 		    ;;

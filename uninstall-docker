@@ -46,6 +46,14 @@ get_realpath() (
     fi
 )
 
+grep_docker() {
+    grep -q '^\(docker\|docker.io\)$'
+}
+
+grep_docker_ce() {
+    grep -q '^\(docker-ce\|docker-ce-cli\)$'
+}
+
 uninstall_docker() {
     case "$kernel_name" in
 	(Linux|GNU)
@@ -84,22 +92,19 @@ uninstall_docker() {
 	    ;;
     esac
 
-    installed_package=$("$script_dir/get-installed-docker-package")
+    installed_packages=$("$script_dir/get-installed-docker-packages")
 
-    case $installed_package in
-	(docker|docker.io)
-	    printf "Removing $installed_package\n"
+    if printf "%s\n" $installed_packages | grep_docker; then
+	printf "Removing native Docker packages\n"
+    elif printf "%s\n" $installed_packages | grep_docker_ce; then
+	printf "Removing Docker CE packages\n"
+    else
+	printf "No Docker package installed\n"
+    fi
 
-	    if ! "$script_dir/uninstall-packages" $installed_package; then
-		exit $?
-	    fi
-	    ;;
-	(docker-ce)
-	    printf "Docker CE package is installed\n"
-	    ;;
-	(*)
-	    printf "No Docker package installed\n"
-    esac
+    if [ -n "$installed_packages" ]; then
+	"$script_dir/uninstall-packages" $installed_packages
+    fi
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")

@@ -70,23 +70,6 @@ install_docker_ce() {
 	    ;;
     esac
 
-    installed_package=$("$script_dir/get-installed-docker-package")
-
-    case $installed_package in
-	(docker|docker.io)
-	    printf "Removing $installed_package\n"
-
-	    if ! apt-get remove $installed_package; then
-		exit $?
-	    fi
-	    ;;
-	(docker-ce)
-	    printf "Docker CE package is installed\n"
-	    ;;
-	(*)
-	    printf "No Docker package installed\n"
-    esac
-
     dependencies=$("$script_dir/get-docker-packages")
     docker_repo="deb [arch=amd64] $docker_url $distro_codename stable"
     apt-get install "$@" $dependencies
