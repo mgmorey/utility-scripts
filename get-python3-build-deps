@@ -81,9 +81,6 @@ case "$kernel_name" in
 	case "$ID" in
 	    (debian|raspbian)
 		case "$VERSION_ID" in
-		    (9)
-	    		packages=$DEBIAN_9_PKGS
-			;;
 		    (10)
 	    		packages=$DEBIAN_10_PKGS
 			;;
@@ -99,7 +96,7 @@ case "$kernel_name" in
 	    (ubuntu)
 		case "$VERSION_ID" in
 		    (18.04)
-	    		packages=$DEBIAN_9_PKGS
+	    		packages=$DEBIAN_10_PKGS
 			;;
 		    (19.04)
 	    		packages=$DEBIAN_10_PKGS
@@ -109,7 +106,7 @@ case "$kernel_name" in
 	    (linuxmint)
 		case "$VERSION_ID" in
 		    (19.2)
-	    		packages=$DEBIAN_9_PKGS
+	    		packages=$DEBIAN_10_PKGS
 			;;
 		esac
 		;;
