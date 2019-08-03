@@ -83,9 +83,9 @@ case "$kernel_name" in
 			;;
 		esac
 		;;
-	    (ubuntu)
+	    (ubuntu|linuxmint)
 		case "$desktop_name" in
-		    (GNOME*|*:GNOME)
+		    (GNOME*|*:GNOME|X-Cinnamon)
 			software-properties-gtk
 			;;
 		    (KDE*)

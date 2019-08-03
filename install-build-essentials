@@ -55,7 +55,7 @@ install_build_essentials() {
     case "$kernel_name" in
 	(Linux)
 	    case "$ID" in
-		(debian|raspbian|ubuntu|opensuse-*|fedora|redhat|centos|ol)
+		(debian|raspbian|ubuntu|linuxmint|opensuse-*|fedora|redhat|centos|ol)
 		    $installer $install_cmd $install_opts "$pattern"
 	    	    ;;
 		(*)

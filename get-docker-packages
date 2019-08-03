@@ -48,6 +48,13 @@ get_docker_packages() {
 			    ;;
 		    esac
 		    ;;
+		(linuxmint)
+		    case "$VERSION_ID" in
+			(19.2)
+			    packages="$DEBIAN_PKGS"
+			    ;;
+		    esac
+		    ;;
 	    esac
 	    ;;
     esac

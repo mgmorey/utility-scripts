@@ -82,7 +82,7 @@ case "$kernel_name" in
 			;;
 		esac
 		;;
-	    (ubuntu)
+	    (ubuntu|linuxmint)
 	    	packages=$DEBIAN_10_PKGS
 		;;
 	    (opensuse-*)

@@ -60,7 +60,7 @@ eval $("$script_dir/get-os-release" -X)
 case "$kernel_name" in
     (Linux|GNU)
 	case "$ID" in
-	    (debian|raspbian|ubuntu)
+	    (debian|raspbian|ubuntu|linuxmint)
 		package=$DEBIAN_PKG
 		packages=$DEBIAN_PKGS
 		;;
