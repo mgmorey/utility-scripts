@@ -20,8 +20,6 @@
 
 DARWIN_PKGS=""
 
-DEBIAN_9_PKGS="tk-dev"
-
 DEBIAN_10_PKGS="tk-dev"
 
 FREEBSD_PKGS="tcl86 tk86"
