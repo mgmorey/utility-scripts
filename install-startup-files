@@ -82,6 +82,11 @@ if [ ! -e .profile ]; then
     /bin/cp $HOME/git/startup-files/.profile .
 fi
 
+if [ ! -d .emacs.d ]; then
+    printf "Creating %s\n" .emacs.d
+    mkdir .emacs.d
+fi
+
 if [ -d .emacs.d ]; then
     cd .emacs.d
 
