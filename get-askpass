@@ -65,7 +65,7 @@ eval $("$script_dir/get-os-release" -X)
 case "$kernel_name" in
     (Linux|GNU)
 	case "$ID" in
-	    (debian|raspbian|ubuntu|linuxmint)
+	    (debian|raspbian|ubuntu|linuxmint|neon)
 		case "$desktop_name" in
 		    (GNOME*|*:GNOME|LXDE|X-Cinnamon|'')
 			package=ssh-askpass-gnome

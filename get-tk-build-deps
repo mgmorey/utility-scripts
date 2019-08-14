@@ -77,7 +77,7 @@ case "$kernel_name" in
 			;;
 		esac
 		;;
-	    (ubuntu|linuxmint)
+	    (ubuntu|linuxmint|neon)
 	    	packages=$DEBIAN_10_PKGS
 		;;
 	    (opensuse-*)

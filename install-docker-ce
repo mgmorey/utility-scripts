@@ -65,7 +65,7 @@ install_docker_ce() {
 	    docker_url="$DOCKER_BASE_URL/linux/$ID"
 
 	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint)
+		(debian|raspbian|ubuntu|linuxmint|neon)
 		    :
 		    ;;
 		(*)

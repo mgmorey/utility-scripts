@@ -55,7 +55,7 @@ install_python3_build_deps() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint)
+		(debian|raspbian|ubuntu|linuxmint|neon)
 		    package=$DEBIAN_PKG
 	    	    ;;
 		(opensuse-*)
@@ -97,7 +97,7 @@ install_python3_build_deps() {
     fi
 
     if [ -n "${package:-}" ]; then
-	"$script_dir/install-build-deps" "$@" $package
+	"$script_dir/install-build-deps" "$@" $package || true
     fi
 
     if [ -n "$packages" ]; then

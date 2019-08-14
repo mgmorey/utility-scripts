@@ -81,7 +81,7 @@ case "$kernel_name" in
 	    (redhat|centos|ol)
 		printf "%s %s\n" $REDHAT_INFO
 		;;
-	    (ubuntu|linuxmint)
+	    (ubuntu|linuxmint|neon)
 		printf "%s %s\n" $UBUNTU_INFO
 		;;
 	esac

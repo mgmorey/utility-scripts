@@ -83,7 +83,7 @@ case "$kernel_name" in
 			;;
 		esac
 		;;
-	    (ubuntu|linuxmint)
+	    (ubuntu|linuxmint|neon)
 		case "$desktop_name" in
 		    (GNOME*|*:GNOME|X-Cinnamon)
 			software-properties-gtk
