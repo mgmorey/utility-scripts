@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-RE='/.+/(bin|lib|libexec)/.+(askpass|askpass2)$'
+AWK_RE='\/.+\/(bin|lib|libexec)\/.+(askpass|askpass2)$'
 
 abort() {
     printf "$@" >&2
@@ -33,6 +33,14 @@ abort_not_supported() {
 
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_filenames() {
+    "$script_dir/get-package-filenames" $1
+}
+
+get_helper() {
+    awk '$1 ~ /'"$AWK_RE"'/ {print $0; exit 0}'
 }
 
 get_realpath() (
@@ -120,7 +128,7 @@ case "$kernel_name" in
 	    (nixos)
 		case "$desktop_name" in
 		    (KDE*)
-			askpass_helper=ksshaskpass
+			helper=ksshaskpass
 			;;
 		    (*)
 			abort_desktop_not_supported
@@ -165,18 +173,18 @@ case "$kernel_name" in
     (CYGWIN_NT-*)
 	case "$desktop_name" in
 	    (MATE|X-Cygwin|'')
-		askpass_helper=/usr/libexec/gnome-ssh-askpass.exe
+		helper=/usr/libexec/gnome-ssh-askpass.exe
 		;;
 	    (*)
 		abort_desktop_not_supported
 		;;
 	esac
 
-	if [ -x "$askpass_helper" ]; then
-	    printf "%s\n" "${askpass_helper%.exe}"
+	if [ -x "$helper" ]; then
+	    printf "%s\n" "${helper%.exe}"
 	    exit 0
 	else
-	    abort "%s: No such askpass helper\n" "$askpass_helper"
+	    abort "%s: No such askpass helper\n" "$helper"
 	fi
 	;;
     (*)
@@ -184,18 +192,18 @@ case "$kernel_name" in
 	;;
 esac
 
-if [ -z "${askpass_helper:-}" ]; then
-    askpass_helper=$("$script_dir/get-package-filenames" $package | grep -E "$RE" | head -n 1)
+if [ -z "${helper:-}" ]; then
+    helper=$(get_filenames $package 2>/dev/null | get_helper)
 fi
 
-if [ -n "$askpass_helper" ]; then
-    if [ -x "$(which "$askpass_helper")" ]; then
+if [ -n "$helper" ]; then
+    if [ -x "$(which "$helper")" ]; then
 	if [ -n "${package:-}" ]; then
 	    printf "# %s package %s:\n" "$PRETTY_NAME" $package
 	fi
 
-	printf "%s\n" "${askpass_helper%.exe}"
+	printf "%s\n" "${helper%.exe}"
     else
-	abort "%s: No such askpass helper\n" "$askpass_helper"
+	abort "%s: No such askpass helper\n" "$helper"
     fi
 fi
