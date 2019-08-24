@@ -158,7 +158,7 @@ case "$kernel_name" in
 	    (openindiana)
 		case "$desktop_name" in
 		    (MATE|'')
-			package=ssh-askpass
+			package=network/ssh-askpass
 			;;
 		    (*)
 			abort_desktop_not_supported
