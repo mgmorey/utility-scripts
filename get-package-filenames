@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-AWK_EXPR='{ printf("/%s\n", $0) }'
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -76,7 +74,7 @@ case "$kernel_name" in
     (SunOS)
 	case "$ID" in
 	    (openindiana)
-		pkg search -H -o search.match "basename:$1" | awk "$AWK_EXPR"
+		pkg contents $1 | awk 'NR > 1 {printf("/%s\n", $0)}'
 		;;
 	    (*)
 		abort_not_supported Distro
