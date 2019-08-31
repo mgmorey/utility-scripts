@@ -55,6 +55,8 @@ assert() {
 }
 
 configure_emacs() {
+    eval $(get-os-release -X)
+
     basename=emacs-$EMACS_VERSION
 
     archive_dir="$HOME/Downloads/GNU"
@@ -80,8 +82,21 @@ configure_emacs() {
 
     if [ ! -r "$build_dir/config.status" ]; then
 	cd "$build_dir"
-	"$src_dir/configure" "$@"
+        options=$(get_configure_options)
+	"$src_dir/configure" ${options-} "$@"
     fi
+}
+
+get_configure_options() {
+    case "$kernel_name" in
+        (Linux)
+            case "$ID" in
+                (ol)
+                    printf "%s\n" "--with-gif=no"
+                    ;;
+            esac
+	    ;;
+    esac
 }
 
 get_realpath() (
