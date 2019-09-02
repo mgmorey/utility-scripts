@@ -125,6 +125,14 @@ install_pkgsrc() {
     verify_signature || true
     eval tar -C $target -zxpf $boot_tar
     eval /bin/rm -f $boot_tar
+
+    case "$kernel_name" in
+	(Darwin)
+	    # Reload PATH/MANPATH (pkgsrc installs
+	    # /etc/paths.d/10-pkgsrc for new sessions)
+	    eval $(/usr/libexec/path_helper)
+	    ;;
+    esac
 }
 
 verify_checksum() {
