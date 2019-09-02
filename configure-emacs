@@ -23,7 +23,7 @@ if [ -z "${EMACS_PREFIX-}" ]; then
 fi
 
 if [ -z "${EMACS_VERSION-}" ]; then
-    EMACS_VERSION=26.2
+    EMACS_VERSION=26.3
 fi
 
 abort() {
