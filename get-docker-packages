@@ -55,6 +55,13 @@ get_docker_packages() {
 			    ;;
 		    esac
 		    ;;
+		(kali)
+		    case "$VERSION_ID" in
+			(2019.3)
+	    		    packages=$DEBIAN_PKGS
+			    ;;
+		    esac
+		    ;;
 	    esac
 	    ;;
     esac
