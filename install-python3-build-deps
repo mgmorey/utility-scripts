@@ -55,32 +55,72 @@ install_python3_build_deps() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    package=$DEBIAN_PKG
-	    	    ;;
+		(debian|raspbian)
+		    case "$VERSION_ID" in
+			(10)
+			    package=$DEBIAN_PKG
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(ubuntu|neon)
+		    case "$VERSION_ID" in
+			(18.04)
+			    package=$DEBIAN_PKG
+			    ;;
+			(19.04)
+			    package=$DEBIAN_PKG
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(linuxmint)
+		    case "$VERSION_ID" in
+			(19.2)
+			    package=$DEBIAN_PKG
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(kali)
+		    case "$VERSION_ID" in
+			(2019.3)
+			    package=$DEBIAN_PKG
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
 		(opensuse-*)
-		    :
+	    	    :
 	    	    ;;
 		(fedora|ol|centos)
-		    :
-		    ;;
+	    	    :
+	    	    ;;
 		(*)
 		    abort_not_supported Distro
 		    ;;
 	    esac
 	    ;;
 	(Darwin)
-	    sudo installer -pkg $DARWIN_PKG_DIR/$DARWIN_PKG_NAME -target /
+	    installer -pkg $DARWIN_PKG_DIR/$DARWIN_PKG_NAME -target /
     	    ;;
 	(FreeBSD)
 	    :
-    	    ;;
+	    ;;
 	(NetBSD)
 	    :
-    	    ;;
+	    ;;
 	(SunOS)
 	    :
-    	    ;;
+	    ;;
 	(*)
 	    abort_not_supported "Operating system"
 	    ;;
