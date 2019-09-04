@@ -72,7 +72,7 @@ case "$kernel_name" in
 	    (fedora)
 	    	packages=$FEDORA_PKGS
 	    	;;
-	    (redhat|centos|ol)
+	    (ol|centos)
 		packages=$REDHAT_PKGS
 		;;
 	esac

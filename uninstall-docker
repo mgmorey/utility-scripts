@@ -67,7 +67,7 @@ uninstall_docker() {
 		(fedora)
 		    :
 		    ;;
-		(redhat|centos|ol)
+		(ol|centos)
 		    :
 		    ;;
 		(*)

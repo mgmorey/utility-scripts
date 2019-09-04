@@ -56,7 +56,7 @@ install_emacs_build_extras() {
 		(opensuse-*)
 		    :
 		    ;;
-		(fedora|redhat|centos|ol)
+		(fedora|ol|centos)
 		    :
 	    	    ;;
 		(*)

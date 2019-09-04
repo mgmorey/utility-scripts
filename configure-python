@@ -221,7 +221,7 @@ case "$kernel_name" in
 	    (debian|raspbian|ubuntu|linuxmint|neon)
 		:
 	    	;;
-	    (opensuse-*|fedora|redhat|centos|ol)
+	    (opensuse-*|fedora|ol|centos)
 		:
 	    	;;
 	    (*)

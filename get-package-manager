@@ -62,7 +62,7 @@ case "$kernel_name" in
 	    (fedora)
 		printf "%s\n" dnf
 		;;
-	    (redhat|centos|ol)
+	    (ol|centos)
 		printf "%s\n" yum
 		;;
 	    (*)

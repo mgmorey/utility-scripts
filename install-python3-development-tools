@@ -61,7 +61,7 @@ install_python3_development_tools() {
 		(fedora)
 		    :
 	    	    ;;
-		(redhat|centos|ol)
+		(ol|centos)
                     case "$VERSION_ID" in
 			(7)
 		            /usr/local/bin/pip3 install --upgrade pip virtualenv
@@ -91,7 +91,7 @@ install_python3_development_tools() {
 		(debian|raspbian|ubuntu|linuxmint|neon)
 		    package=$DEBIAN_PKG
 		    ;;
-		(fedora|redhat|centos|ol)
+		(fedora|ol|centos)
 		    package=$REDHAT_PKG
 		    ;;
 		(*)

@@ -61,7 +61,7 @@ install_python3_build_deps() {
 		(opensuse-*)
 		    :
 	    	    ;;
-		(fedora|redhat|centos|ol)
+		(fedora|ol|centos)
 		    :
 		    ;;
 		(*)

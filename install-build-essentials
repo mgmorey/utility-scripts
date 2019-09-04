@@ -58,7 +58,7 @@ install_build_essentials() {
 		(debian|raspbian|ubuntu|linuxmint|neon)
 		    $installer $install_cmd $install_opts "$pattern"
 	    	    ;;
-		(opensuse-*|fedora|redhat|centos|ol)
+		(opensuse-*|fedora|ol|centos)
 		    $installer $install_cmd $install_opts "$pattern"
 	    	    ;;
 		(*)

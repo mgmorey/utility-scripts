@@ -59,7 +59,7 @@ install_packages() {
 		(fedora)
 		    :
 		    ;;
-		(redhat|centos|ol)
+		(ol|centos)
 		    :
 		    ;;
 		(*)

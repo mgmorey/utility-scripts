@@ -108,7 +108,7 @@ case "$kernel_name" in
 	    (opensuse-*)
 	    	packages=$OPENSUSE_PKGS
 	    	;;
-	    (fedora|redhat|centos|ol)
+	    (fedora|ol|centos)
 	    	packages=$REDHAT_PKGS
 	    	;;
 	esac
