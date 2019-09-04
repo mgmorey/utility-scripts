@@ -188,7 +188,7 @@ eval $("$script_dir/get-os-release" -X)
 case "$kernel_name" in
     (Linux|GNU)
 	case "$ID" in
-	    (debian|raspbian|ubuntu|linuxmint|neon)
+	    (debian|raspbian|ubuntu|linuxmint|neon|kali)
 		:
 	    	;;
 	    (opensuse-*|fedora|ol|centos)
@@ -199,7 +199,7 @@ case "$kernel_name" in
 		;;
 	esac
 	;;
-    (FreeBSD|SunOS|CYGWIN_NT-*)
+    (FreeBSD|SunOS)
 	:
 	;;
     (*)
