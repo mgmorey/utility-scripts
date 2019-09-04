@@ -73,9 +73,9 @@ eval $("$script_dir/get-os-release" -X)
 case "$kernel_name" in
     (Linux|GNU)
 	case "$ID" in
-	    (debian|raspbian|ubuntu|linuxmint|neon)
+	    (debian|raspbian|ubuntu|linuxmint|neon|kali)
 		case "$desktop_name" in
-		    (GNOME*|*:GNOME|LXDE|X-Cinnamon|'')
+		    (GNOME|GNOME*|*:GNOME|LXDE|X-Cinnamon|'')
 			package=ssh-askpass-gnome
 			;;
 		    (KDE*)
@@ -88,7 +88,7 @@ case "$kernel_name" in
 		;;
 	    (opensuse-*)
 		case "$desktop_name" in
-		    (GNOME*|*:GNOME|'')
+		    (GNOME|GNOME*|*:GNOME|'')
 			package=openssh-askpass-gnome
 			;;
 		    (KDE*)
@@ -101,7 +101,7 @@ case "$kernel_name" in
 		;;
 	    (fedora)
 		case "$desktop_name" in
-		    (GNOME*|*:GNOME|'')
+		    (GNOME|GNOME*|*:GNOME|'')
 			package=openssh-askpass
 			;;
 		    (KDE*)
@@ -114,7 +114,7 @@ case "$kernel_name" in
 		;;
 	    (redhat|centos|ol)
 		case "$desktop_name" in
-		    (GNOME*|*:GNOME|'')
+		    (GNOME|GNOME*|*:GNOME|'')
 			package=openssh-askpass
 			;;
 		    (KDE*)
@@ -142,7 +142,7 @@ case "$kernel_name" in
 	;;
     (FreeBSD)
 	case "$desktop_name" in
-	    (GNOME*|MATE|'')
+	    (GNOME|GNOME*|MATE|'')
 		package=gnome-ssh-askpass
 		;;
 	    (KDE*)
