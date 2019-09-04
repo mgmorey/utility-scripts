@@ -37,21 +37,21 @@ get_docker_packages() {
 		(debian|raspbian)
 		    case "$VERSION_ID" in
 			(9|10)
-			    packages="$DEBIAN_PKGS"
+			    packages=$DEBIAN_PKGS
 			    ;;
 		    esac
 		    ;;
 		(ubuntu|neon)
 		    case "$VERSION_ID" in
 			(18.04|19.04)
-			    packages="$DEBIAN_PKGS"
+			    packages=$DEBIAN_PKGS
 			    ;;
 		    esac
 		    ;;
 		(linuxmint)
 		    case "$VERSION_ID" in
 			(19.2)
-			    packages="$DEBIAN_PKGS"
+			    packages=$DEBIAN_PKGS
 			    ;;
 		    esac
 		    ;;
