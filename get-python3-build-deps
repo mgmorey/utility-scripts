@@ -105,6 +105,13 @@ case "$kernel_name" in
 			;;
 		esac
 		;;
+	    (kali)
+		case "$VERSION_ID" in
+		    (2019.3)
+	    		packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
 	    (opensuse-*)
 	    	packages=$OPENSUSE_PKGS
 	    	;;
