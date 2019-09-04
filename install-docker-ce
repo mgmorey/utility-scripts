@@ -65,8 +65,61 @@ install_docker_ce() {
 	    docker_url="$DOCKER_BASE_URL/linux/$ID"
 
 	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon)
-		    :
+		(debian|raspbian)
+		    case "$VERSION_ID" in
+			(10)
+			    :
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(ubuntu)
+		    case "$VERSION_ID" in
+			(18.04)
+			    :
+			    ;;
+			(19.04)
+			    :
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(neon)
+		    case "$VERSION_ID" in
+			(18.04)
+			    :
+			    ;;
+			(19.04)
+			    :
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(linuxmint)
+		    case "$VERSION_ID" in
+			(19.2)
+			    :
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(kali)
+		    case "$VERSION_ID" in
+			(2019.3)
+	    		    :
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
 		    ;;
 		(*)
 		    abort_not_supported Distro

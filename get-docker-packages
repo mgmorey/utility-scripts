@@ -41,7 +41,14 @@ get_docker_packages() {
 			    ;;
 		    esac
 		    ;;
-		(ubuntu|neon)
+		(ubuntu)
+		    case "$VERSION_ID" in
+			(18.04|19.04)
+			    packages=$DEBIAN_PKGS
+			    ;;
+		    esac
+		    ;;
+		(neon)
 		    case "$VERSION_ID" in
 			(18.04|19.04)
 			    packages=$DEBIAN_PKGS

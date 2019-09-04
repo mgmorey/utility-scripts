@@ -81,7 +81,17 @@ case "$kernel_name" in
 			;;
 		esac
 		;;
-	    (ubuntu|neon)
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.04)
+	    		packages=$DEBIAN_10_PKGS
+			;;
+		    (19.04)
+	    		packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (neon)
 		case "$VERSION_ID" in
 		    (18.04)
 	    		packages=$DEBIAN_10_PKGS
