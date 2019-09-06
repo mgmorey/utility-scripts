@@ -23,6 +23,10 @@ OPENSUSE_PKGS="gcc"
 
 REDHAT_PKG=emacs
 
+UBUNTU_18_PKG=emacs25
+UBUNTU_19_PKG=emacs
+UBUNTU_PKGS="libgif-dev libjpeg-dev libncurses5-dev libtiff5-dev libxpm-dev"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -60,9 +64,20 @@ eval $("$script_dir/get-os-release" -X)
 case "$kernel_name" in
     (Linux|GNU)
 	case "$ID" in
-	    (debian|raspbian|ubuntu|linuxmint|neon|kali)
+	    (debian|raspbian|linuxmint|neon|kali)
 		package=$DEBIAN_PKG
 		packages=$DEBIAN_PKGS
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.*)
+			package=$UBUNTU_18_PKG
+			;;
+		    (19.*)
+			package=$UBUNTU_19_PKG
+			;;
+		esac
+		packages=$UBUNTU_PKGS
 		;;
 	    (opensuse-*)
 		packages=$OPENSUSE_PKGS
