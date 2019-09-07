@@ -64,11 +64,11 @@ eval $("$script_dir/get-os-release" -X)
 case "$kernel_name" in
     (Linux|GNU)
 	case "$ID" in
-	    (debian|raspbian|linuxmint|neon|kali)
+	    (debian|raspbian|linuxmint|kali)
 		package=$DEBIAN_PKG
 		packages=$DEBIAN_PKGS
 		;;
-	    (ubuntu)
+	    (ubuntu|neon)
 		case "$VERSION_ID" in
 		    (18.*)
 			package=$UBUNTU_18_PKG
