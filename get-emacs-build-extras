@@ -18,6 +18,13 @@
 
 DEBIAN_PKGS="libgnutls28-dev libgpm-dev libwebkit2gtk-4.0-dev"
 
+FEDORA_PKGS="GConf2-devel giflib-devel gnutls-devel gpm-devel gtk3-devel \
+ImageMagick-devel lcms2-devel libacl-devel libICE-devel libjpeg-turbo-devel \
+libpng-devel libSM-devel libtiff-devel libX11-devel libXaw-devel \
+libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
+libXt-devel libXtst-devel libXv-devel libxml2-devel make m17n-lib-devel \
+openjpeg-devel ncurses-devel zlib-devel webkit2gtk3-devel Xaw3d-devel"
+
 REDHAT_PKGS="GConf2-devel giflib-devel gnutls-devel gpm-devel gtk3-devel \
 ImageMagick-devel lcms2-devel libacl-devel libICE-devel libjpeg-turbo-devel \
 libpng-devel libSM-devel libtiff-devel libungif-devel libX11-devel \
@@ -73,7 +80,10 @@ case "$kernel_name" in
 	    (opensuse-*)
 		packages=$OPENSUSE_PKGS
 		;;
-	    (fedora|ol|centos)
+	    (fedora)
+		packages=$FEDORA_PKGS
+	    	;;
+	    (ol|centos)
 		packages=$REDHAT_PKGS
 	    	;;
 	esac
