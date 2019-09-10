@@ -16,7 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKG=emacs
+DEBIAN_9_PKG=emacs25
+DEBIAN_10_PKG=emacs
 DEBIAN_PKGS="libgif-dev libjpeg-dev libncurses5-dev libtiff5-dev libxpm-dev"
 
 OPENSUSE_PKGS="gcc"
@@ -65,7 +66,15 @@ case "$kernel_name" in
     (Linux|GNU)
 	case "$ID" in
 	    (debian|raspbian|linuxmint|kali)
-		package=$DEBIAN_PKG
+		case "$VERSION_ID" in
+		    (9)
+			package=$DEBIAN_9_PKG
+			;;
+		    (10)
+			package=$DEBIAN_10_PKG
+			;;
+		esac
+
 		packages=$DEBIAN_PKGS
 		;;
 	    (ubuntu|neon)
@@ -77,6 +86,7 @@ case "$kernel_name" in
 			package=$UBUNTU_19_PKG
 			;;
 		esac
+
 		packages=$UBUNTU_PKGS
 		;;
 	    (opensuse-*)
