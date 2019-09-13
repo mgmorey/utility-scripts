@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-package-manager: get name of package manager utility
+# get-python-metadata: get Python package name and prefix
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+DARWIN_INFO=":python36 py36"
+
+DEBIAN_INFO="python3 python3"
+
+FEDORA_INFO="python3 python3"
+
+FREEBSD_INFO="python3 py36"
+
+NETBSD_INFO="python36 py36"
+
+OPENSUSE_INFO="python3 python3"
+
+REDHAT_7_INFO=":python36 py36"
+REDHAT_8_INFO="python3 python3"
+
+SUNOS_INFO=":python36 py36"
+
+UBUNTU_INFO="python3 python3"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -29,26 +48,29 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_package_manager() {
+get_python_package() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    printf "%s\n" apt-get
+		(debian|raspbian|kali)
+		    printf "%s %s\n" $DEBIAN_INFO
+		    ;;
+		(ubuntu|linuxmint|neon)
+		    printf "%s %s\n" $UBUNTU_INFO
 		    ;;
 		(opensuse-*)
-		    printf "%s\n" zypper
+		    printf "%s %s\n" $OPENSUSE_INFO
 		    ;;
 		(fedora)
-		    printf "%s\n" dnf
+		    printf "%s %s\n" $FEDORA_INFO
 		    ;;
 		(ol|centos)
 		    case "$VERSION_ID" in
 			(7|7.*)
-			    printf "%s\n" yum /usr/pkg/bin/pkgin
+			    printf "%s %s\n" $REDHAT_7_INFO
 			    ;;
 			(8|8.*)
-			    printf "%s\n" dnf
+			    printf "%s %s\n" $REDHAT_8_INFO
 			    ;;
 		    esac
 		    ;;
@@ -58,16 +80,16 @@ get_package_manager() {
 	    esac
 	    ;;
 	(Darwin)
-	    printf "%s\n" /usr/local/bin/brew /opt/pkg/bin/pkgin
+	    printf "%s %s\n" $DARWIN_INFO
 	    ;;
 	(FreeBSD)
-	    printf "%s\n" pkg
+	    printf "%s %s\n" $FREEBSD_INFO
 	    ;;
 	(NetBSD)
-	    printf "%s\n" pkgin
+	    printf "%s %s\n" $NETBSD_INFO
 	    ;;
 	(SunOS)
-	    printf "%s\n" pkg pkgin
+	    printf "%s %s\n" $SUNOS_INFO
 	    ;;
 	(*)
 	    abort_not_supported "Operating system"
@@ -80,7 +102,7 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
@@ -96,4 +118,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
 
-get_package_manager
+get_python_package

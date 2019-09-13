@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-package-manager: get name of package manager utility
+# get-python3-development-tools: get list of Python 3 development tools
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,63 +16,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+DARWIN_PKGS=""
+
+DEBIAN_PKGS="%s-pip %s-virtualenv"
+
+FEDORA_PKGS="%s-pip %s-virtualenv"
+
+FREEBSD_PKGS="%s-pip %s-virtualenv"
+
+OPENSUSE_PKGS="%s-pip %s-virtualenv"
+
+REDHAT_PKGS=":%s-pip :%s-virtualenv"
+
+SUNOS_PKGS="pip-%s"
+
 abort() {
     printf "$@" >&2
     exit 1
 }
 
-abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
-}
-
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
-}
-
-get_package_manager() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    printf "%s\n" apt-get
-		    ;;
-		(opensuse-*)
-		    printf "%s\n" zypper
-		    ;;
-		(fedora)
-		    printf "%s\n" dnf
-		    ;;
-		(ol|centos)
-		    case "$VERSION_ID" in
-			(7|7.*)
-			    printf "%s\n" yum /usr/pkg/bin/pkgin
-			    ;;
-			(8|8.*)
-			    printf "%s\n" dnf
-			    ;;
-		    esac
-		    ;;
-		(*)
-		    abort_not_supported Distro
-		    ;;
-	    esac
-	    ;;
-	(Darwin)
-	    printf "%s\n" /usr/local/bin/brew /opt/pkg/bin/pkgin
-	    ;;
-	(FreeBSD)
-	    printf "%s\n" pkg
-	    ;;
-	(NetBSD)
-	    printf "%s\n" pkgin
-	    ;;
-	(SunOS)
-	    printf "%s\n" pkg pkgin
-	    ;;
-	(*)
-	    abort_not_supported "Operating system"
-	    ;;
-    esac
 }
 
 get_realpath() (
@@ -96,4 +60,47 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
 
-get_package_manager
+case "$kernel_name" in
+    (Linux|GNU)
+	case "$ID" in
+	    (debian|raspbian|ubuntu|linuxmint|neon)
+	    	packages=$DEBIAN_PKGS
+	    	;;
+	    (opensuse-*)
+	    	packages=$OPENSUSE_PKGS
+	    	;;
+	    (fedora)
+	    	packages=$FEDORA_PKGS
+	    	;;
+	    (ol|centos)
+		packages=$REDHAT_PKGS
+		;;
+	esac
+	;;
+    (Darwin)
+	packages=$DARWIN_PKGS
+	;;
+    (FreeBSD)
+	packages=$FREEBSD_PKGS
+	;;
+    (SunOS)
+	packages=$SUNOS_PKGS
+	;;
+esac
+
+data=$("$script_dir/get-python-metadata")
+package_name=$(printf "%s" "$data" | awk '{print $1}')
+package_modifier=$(printf "%s" "$data" | awk '{print $2}')
+
+# printf "%s\n" $package_name
+
+for package in ${packages-}; do
+    case $package in
+	(*%s*)
+	    printf "$package\n" $package_modifier
+	    ;;
+	(*)
+	    printf "%s\n" $package
+	    ;;
+    esac
+done

@@ -137,7 +137,7 @@ case "$kernel_name" in
 	;;
 esac
 
-data=$("$script_dir/get-python-package")
+data=$("$script_dir/get-python-metadata")
 package_name=$(printf "%s" "$data" | awk '{print $1}')
 package_modifier=$(printf "%s" "$data" | awk '{print $2}')
 

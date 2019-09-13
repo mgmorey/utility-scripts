@@ -47,20 +47,29 @@ get_realpath() (
 )
 
 install_packages() {
+    install_opts=$("$script_dir/get-package-install-options")
+    installers=$("$script_dir/get-package-manager")
+    installer1=$(printf "%s\n" $installers | awk 'NR == 1 {print $0}')
+    installer2=$(printf "%s\n" $installers | awk 'NR == 2 {print $0}')
+
+    parse_arguments "$@"
+
+    if [ -n "$packages" ]; then
+	packages1=$(printf "%s\n" $packages | awk -F: 'NF == 1 {print $0}
+						       NF == 2 {print $1}')
+	packages2=$(printf "%s\n" $packages | awk -F: 'NF == 2 {print $2}')
+    fi
+
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
 		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    :
+		    install_pattern_from_args
+		    install_packages_from_args
 		    ;;
-		(opensuse-*)
-		    :
-		    ;;
-		(fedora)
-		    :
-		    ;;
-		(ol|centos)
-		    :
+		(opensuse-*|fedora|ol|centos)
+		    install_pattern_from_args
+		    install_packages_from_args
 		    ;;
 		(*)
 		    abort_not_supported Distro
@@ -68,28 +77,91 @@ install_packages() {
 	    esac
 	    ;;
 	(Darwin)
-	    :
+	    install_packages_from_args
 	    ;;
 	(FreeBSD)
-	    :
+	    install_packages_from_args
 	    ;;
 	(NetBSD)
-	    :
+	    install_packages_from_args
 	    ;;
 	(SunOS)
-	    :
+	    install_packages_from_args
 	    ;;
 	(*)
 	    abort_not_supported "Operating system"
 	    ;;
     esac
+}
 
-    package_manager=$("$script_dir/get-package-manager")
-
-    if [ -n "$package_manager" ]; then
-	install_opts=$("$script_dir/get-package-install-options")
-	$package_manager install $install_opts "$@"
+install_packages_from_args() {
+    if [ -z "$packages" ]; then
+	return 0
     fi
+
+    if [ -n "$installer1" -a -n "$packages1" ]; then
+	invoke_installer $installer1 install $install_opts $packages1
+    fi
+
+    if [ -n "$installer2" -a -n "$packages2" ]; then
+	if [ -n "$(which $installer2 2>/dev/null)" ]; then
+	    invoke_installer $installer2 install $packages2
+	fi
+    fi
+}
+
+install_pattern_from_args() {
+    if [ -z "$pattern" ]; then
+	return 0
+    fi
+
+    pattern_opts=$("$script_dir/get-pattern-install-options")
+    invoke_installer $installer1 install $install_opts $pattern_opts "$pattern"
+}
+
+invoke_installer() (
+    if [ "$1" = /usr/local/bin/brew ]; then
+	run_unpriv -c "$*"
+    else
+	"$@"
+    fi
+)
+
+parse_arguments() {
+    packages=
+    pattern=
+
+    while getopts hp: opt; do
+	case $opt in
+	    (p)
+		pattern=$("$script_dir/get-uninstalled-packages" "$OPTARG")
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+    packages=$("$script_dir/get-uninstalled-packages" "$@")
+}
+
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
+    fi
+
+    cat <<-EOF >&2
+	Usage: $0: [-p PATTERN]
+	       $0: -h
+	EOF
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")

@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-python-package: get Python3 package name
+# get-pattern-install-options: get pattern installation options
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,29 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DARWIN_INFO="python python"
-
-DEBIAN_INFO="python3 python3"
-
-FEDORA_INFO="python36 python3"
-
-FREEBSD_INFO="python3 py36"
-
-OPENSUSE_INFO="python3 python3"
-
-REDHAT_INFO="python36 python36"
-
-SUNOS_INFO="python-34 34"
-
-UBUNTU_INFO="python3 python3"
-
 abort() {
     printf "$@" >&2
     exit 1
-}
-
-abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
 }
 
 assert() {
@@ -50,7 +30,7 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
@@ -69,30 +49,9 @@ eval $("$script_dir/get-os-release" -X)
 case "$kernel_name" in
     (Linux|GNU)
 	case "$ID" in
-	    (debian|raspbian)
-		printf "%s %s\n" $DEBIAN_INFO
-		;;
 	    (opensuse-*)
-		printf "%s %s\n" $OPENSUSE_INFO
-		;;
-	    (fedora)
-		printf "%s %s\n" $FEDORA_INFO
-		;;
-	    (ol|centos)
-		printf "%s %s\n" $REDHAT_INFO
-		;;
-	    (ubuntu|linuxmint|neon)
-		printf "%s %s\n" $UBUNTU_INFO
+		printf "%s\n" "-t pattern"
 		;;
 	esac
-	;;
-    (Darwin)
-	printf "%s %s\n" $DARWIN_INFO
-	;;
-    (FreeBSD)
-	printf "%s %s\n" $FREEBSD_INFO
-	;;
-    (SunOS)
-	printf "%s %s\n" $SUNOS_INFO
 	;;
 esac
