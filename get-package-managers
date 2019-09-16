@@ -21,15 +21,11 @@ abort() {
     exit 1
 }
 
-abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
-}
-
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_package_manager() {
+get_package_managers() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
@@ -52,9 +48,6 @@ get_package_manager() {
 			    ;;
 		    esac
 		    ;;
-		(*)
-		    abort_not_supported Distro
-		    ;;
 	    esac
 	    ;;
 	(Darwin)
@@ -68,9 +61,6 @@ get_package_manager() {
 	    ;;
 	(SunOS)
 	    printf "%s\n" pkg pkgin
-	    ;;
-	(*)
-	    abort_not_supported "Operating system"
 	    ;;
     esac
 }
@@ -96,4 +86,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
 
-get_package_manager
+get_package_managers
