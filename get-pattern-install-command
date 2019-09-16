@@ -58,6 +58,9 @@ case "$kernel_name" in
 	    (ol)
 		printf "%s\n" "groupinstall"
 		;;
+	    (centos)
+		printf "%s\n" "groupinstall"
+		;;
 	    (*)
 		printf "%s\n" "install"
 		;;
