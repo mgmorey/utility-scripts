@@ -72,18 +72,10 @@ install_emacs_build_extras() {
 	    ;;
     esac
 
-    install_cmd=$("$script_dir/get-pattern-install-command")
-    install_opts=$("$script_dir/get-package-install-options")
-    installer=$("$script_dir/get-package-managers")
     packages=$("$script_dir/get-emacs-build-extras")
-    pattern=$("$script_dir/get-devel-pattern")
-
-    if [ -n "$pattern" ]; then
-	$installer $install_cmd $install_opts "$pattern"
-    fi
 
     if [ -n "$packages" ]; then
-	$installer install $install_opts $packages
+	"$script_dir/install-packages" $packages
     fi
 }
 
