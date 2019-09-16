@@ -126,22 +126,15 @@ install_python3_build_deps() {
 	    ;;
     esac
 
-    install_cmd=$("$script_dir/get-pattern-install-command")
-    install_opts=$("$script_dir/get-package-install-options")
-    installer=$("$script_dir/get-package-managers")
     packages=$("$script_dir/get-python-build-deps")
     pattern=$("$script_dir/get-devel-pattern")
 
-    if [ -n "$pattern" ]; then
-	$installer $install_cmd $install_opts "$pattern"
+    if [ -n "$packages" ]; then
+	"$script_dir/install-packages" ${pattern:+-p "$pattern" }$packages
     fi
 
     if [ -n "${package:-}" ]; then
 	"$script_dir/install-build-deps" "$@" $package || true
-    fi
-
-    if [ -n "$packages" ]; then
-	$installer install $install_opts $packages
     fi
 }
 
