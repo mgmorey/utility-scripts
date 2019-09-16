@@ -51,7 +51,7 @@ install_pyenv() {
 	sh="sh"
     fi
 
-    "$script_dir/install-python3-build-deps"
+    "$script_dir/install-python-build-deps"
     curl -L $BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer | $sh -c bash
 }
 

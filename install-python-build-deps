@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-python3-build-deps: install Python 3 build dependencies
+# install-python-build-deps: install Python 3 build dependencies
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -129,7 +129,7 @@ install_python3_build_deps() {
     install_cmd=$("$script_dir/get-pattern-install-command")
     install_opts=$("$script_dir/get-package-install-options")
     installer=$("$script_dir/get-package-managers")
-    packages=$("$script_dir/get-python3-build-deps")
+    packages=$("$script_dir/get-python-build-deps")
     pattern=$("$script_dir/get-devel-pattern")
 
     if [ -n "$pattern" ]; then
