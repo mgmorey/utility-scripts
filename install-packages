@@ -115,8 +115,8 @@ install_pattern_from_args() {
 	return 0
     fi
 
-    pattern_opts=$("$script_dir/get-pattern-install-options")
-    invoke_installer $installer1 install $install_opts $pattern_opts "$pattern"
+    pattern_cmd=$("$script_dir/get-pattern-install-command")
+    invoke_installer $installer1 $pattern_cmd $install_opts "$pattern"
 }
 
 invoke_installer() (
