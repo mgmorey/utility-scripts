@@ -128,7 +128,7 @@ install_python3_build_deps() {
 
     install_cmd=$("$script_dir/get-pattern-install-command")
     install_opts=$("$script_dir/get-package-install-options")
-    installer=$("$script_dir/get-package-manager")
+    installer=$("$script_dir/get-package-managers")
     packages=$("$script_dir/get-python3-build-deps")
     pattern=$("$script_dir/get-devel-pattern")
 

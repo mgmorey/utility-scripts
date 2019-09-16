@@ -84,7 +84,7 @@ uninstall_packages() {
 	    ;;
     esac
 
-    package_manager=$("$script_dir/get-package-manager")
+    package_manager=$("$script_dir/get-package-managers")
 
     if [ -n "$package_manager" ]; then
 	$package_manager remove "$@"

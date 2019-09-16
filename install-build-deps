@@ -62,7 +62,7 @@ install_build_deps() {
 	    ;;
     esac
 
-    installer=$("$script_dir/get-package-manager")
+    installer=$("$script_dir/get-package-managers")
     install_opts=$("$script_dir/get-package-install-options")
     $installer build-dep $install_opts "$@"
 }
