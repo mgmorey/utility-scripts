@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-pattern-install-options: get pattern installation options
+# get-pattern-install-options: get pattern installation command
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -50,7 +50,19 @@ case "$kernel_name" in
     (Linux|GNU)
 	case "$ID" in
 	    (opensuse-*)
-		printf "%s\n" "-t pattern"
+		printf "%s\n" "install -t pattern"
+		;;
+	    (fedora)
+		printf "%s\n" "groupinstall"
+		;;
+	    (ol)
+		printf "%s\n" "groupinstall"
+		;;
+	    (centos)
+		printf "%s\n" "groupinstall"
+		;;
+	    (*)
+		printf "%s\n" "install"
 		;;
 	esac
 	;;
