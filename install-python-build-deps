@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-python-build-deps: install Python 3 build dependencies
+# install-python-build-deps: install Python build dependencies
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -51,7 +51,7 @@ get_realpath() (
     fi
 )
 
-install_python3_build_deps() {
+install_python_build_deps() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
@@ -142,4 +142,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
 
-install_python3_build_deps "$@"
+install_python_build_deps "$@"
