@@ -21,7 +21,7 @@ FILE_OS=/etc/os-release
 IS_SHELL_FORMAT=false
 LOWERCASE="tr '[:upper:]' '[:lower:]'"
 VARS_STANDARD="ID NAME PRETTY_NAME VERSION VERSION_ID"
-VARS_EXTENDED="kernel_name kernel_release"
+VARS_EXTENDED="debian_version kernel_name kernel_release redhat_release"
 
 abort_conflicting_option() {
     usage "%s: conflicting option -- %s\n" "$0" "$1"
@@ -101,12 +101,12 @@ output_data() {
 
     if [ "$is_shell_format" = true ]; then
 	for var in $vars; do
-	    eval val="\$$var"
+	    eval val="\${$var-}"
 	    printf "%s=\"%s\"\n" "$var" "$val"
 	done
     else
 	for var in $vars; do
-	    eval val="\$$var"
+	    eval val="\${$var-}"
 	    printf "%s\n" "$val"
 	done
     fi
