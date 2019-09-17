@@ -21,7 +21,8 @@ FILE_OS=/etc/os-release
 IS_SHELL_FORMAT=false
 LOWERCASE="tr '[:upper:]' '[:lower:]'"
 VARS_STANDARD="ID NAME PRETTY_NAME VERSION VERSION_ID"
-VARS_EXTENDED="debian_version kernel_name kernel_release os_version_id redhat_release"
+VARS_EXTENDED="debian_version kernel_name kernel_release os_version \
+os_version_id redhat_release"
 
 abort_conflicting_option() {
     usage "%s: conflicting option -- %s\n" "$0" "$1"
@@ -49,7 +50,7 @@ collect_data() {
 		    ;;
 		(fedora|ol|centos)
 		    redhat_release=$(cat /etc/redhat-release)
-		    os_version_id=
+		    os_version_id=$(awk '{print $4}' /etc/redhat-release)
 		    ;;
 	    esac
 	    ;;
@@ -93,6 +94,10 @@ collect_data() {
 
     if [ -z "${PRETTY_NAME-}" ]; then
 	PRETTY_NAME="$NAME $VERSION"
+    fi
+
+    if [ -z "${os_version-}" ]; then
+	os_version=$os_version_id
     fi
 }
 
