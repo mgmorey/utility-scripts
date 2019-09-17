@@ -41,6 +41,12 @@ collect_data() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    . $FILE_OS
+
+	    case "$ID" in
+		(ol|centos)
+		    PRETTY_NAME=$(cat /etc/redhat-release)
+		    ;;
+	    esac
 	    ;;
 
 	(SunOS)
