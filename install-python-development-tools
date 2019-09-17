@@ -90,7 +90,7 @@ install_python_development_tools() {
 		(debian|raspbian|ubuntu|linuxmint|neon)
 		    package=$DEBIAN_PKG
 		    ;;
-		(fedora|ol|centos)
+		(opensuse-*|fedora|ol|centos)
 		    :
 		    ;;
 		(*)
