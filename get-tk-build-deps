@@ -68,13 +68,6 @@ case "$kernel_name" in
 		    (10)
 	    		packages=$DEBIAN_10_PKGS
 			;;
-		    ('')
-			case "$(cat /etc/debian_version)" in
-			    (buster/sid)
-	    			packages=$DEBIAN_10_PKGS
-				;;
-			esac
-			;;
 		esac
 		;;
 	    (ubuntu|linuxmint|neon)

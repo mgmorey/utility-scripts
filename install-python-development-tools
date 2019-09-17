@@ -52,7 +52,7 @@ install_python_development_tools() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon)
+		(debian|raspbian|ubuntu|linuxmint|neon|kali)
 		    :
 	    	    ;;
 		(opensuse-*)
@@ -87,7 +87,7 @@ install_python_development_tools() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon)
+		(debian|raspbian|ubuntu|linuxmint|neon|kali)
 		    package=$DEBIAN_PKG
 		    ;;
 		(opensuse-*|fedora|ol|centos)

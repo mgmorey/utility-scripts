@@ -75,20 +75,7 @@ install_docker_ce() {
 			    ;;
 		    esac
 		    ;;
-		(ubuntu)
-		    case "$VERSION_ID" in
-			(18.04)
-			    :
-			    ;;
-			(19.04)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(neon)
+		(ubuntu|neon)
 		    case "$VERSION_ID" in
 			(18.04)
 			    :

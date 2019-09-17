@@ -43,8 +43,11 @@ collect_data() {
 	    . $FILE_OS
 
 	    case "$ID" in
-		(ol|centos)
-		    PRETTY_NAME=$(cat /etc/redhat-release)
+		(debian|raspbian|ubuntu|linuxmint|neon|kali)
+		    debian_version=$(cat /etc/debian_version)
+		    ;;
+		(fedora|ol|centos)
+		    redhat_release=$(cat /etc/redhat-release)
 		    ;;
 	    esac
 	    ;;
