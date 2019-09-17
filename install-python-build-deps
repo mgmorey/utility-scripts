@@ -121,7 +121,7 @@ install_python_build_deps() {
 	(SunOS)
 	    :
 	    ;;
-	(CYGWIN_NT-10.*)
+	(CYGWIN_NT-*)
 	    :
 	    ;;
 	(*)
