@@ -121,6 +121,9 @@ install_python_build_deps() {
 	(SunOS)
 	    :
 	    ;;
+	(CYGWIN_NT-10.*)
+	    :
+	    ;;
 	(*)
 	    abort_not_supported "Operating system"
 	    ;;
