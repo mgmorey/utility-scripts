@@ -96,6 +96,10 @@ collect_data() {
 	PRETTY_NAME="$NAME $VERSION"
     fi
 
+    if [ -z "${os_version_id-}" ]; then
+	os_version_id=$VERSION_ID
+    fi
+
     if [ -z "${os_version-}" ]; then
 	os_version=$os_version_id
     fi
