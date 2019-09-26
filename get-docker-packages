@@ -19,6 +19,8 @@
 DEBIAN_PKGS="apt-transport-https ca-certificates curl gnupg2 \
 software-properties-common"
 
+REDHAT_PKGS="redhat-lsb-core"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -64,6 +66,9 @@ get_docker_packages() {
 	    		    packages=$DEBIAN_PKGS
 			    ;;
 		    esac
+		    ;;
+		(ol|centos)
+		    packages=$REDHAT_PKGS
 		    ;;
 	    esac
 	    ;;
