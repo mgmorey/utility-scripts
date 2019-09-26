@@ -58,12 +58,14 @@ grep_docker_ce() {
     grep -q '^\(docker-ce\|docker-ce-cli\)$'
 }
 
+install_dependencies() {
+    dependencies=$("$script_dir/get-docker-packages")
+    apt-get install "$@" $dependencies
+}
+
 install_docker_ce() {
     case "$kernel_name" in
 	(Linux|GNU)
-	    distro_codename="$(lsb_release -cs)"
-	    docker_url="$DOCKER_BASE_URL/linux/$ID"
-
 	    case "$ID" in
 		(debian|raspbian)
 		    case "$VERSION_ID" in
@@ -133,12 +135,8 @@ install_docker_ce() {
 	printf "No Docker packages installed\n"
     fi
 
-    dependencies=$("$script_dir/get-docker-packages")
-    docker_repo="deb [arch=amd64] $docker_url $distro_codename stable"
-    apt-get install "$@" $dependencies
-    curl -fsSL $docker_url/gpg | apt-key add -
-    add-apt-repository "$docker_repo"
-    apt-get update
+    install_dependencies
+    install_docker_repo
 
     if ! apt-get install "$@" $DOCKER_PACKAGE; then
 	exit $?
@@ -160,6 +158,15 @@ install_docker_group() {
 	usermod -a -G $DOCKER_GROUP_ID $SUDO_USER
 	printf "Please restart the machine before using docker\n"
     fi
+}
+
+install_docker_repo() {
+    distro_codename="$(lsb_release -cs)"
+    docker_url="$DOCKER_BASE_URL/linux/$ID"
+    docker_repo="deb [arch=amd64] $docker_url $distro_codename stable"
+    curl -fsSL $docker_url/gpg | apt-key add -
+    add-apt-repository "$docker_repo"
+    apt-get update
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
