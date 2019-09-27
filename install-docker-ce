@@ -199,8 +199,8 @@ install_docker_repo() {
 		    apt-get update
 		    ;;
 		(ol|centos)
+		    docker_url="$DOCKER_BASE_URL/linux/centos"
 		    yum-config-manager --add-repo $docker_url/docker-ce.repo
-		    yum update
 		    ;;
 	    esac
 	    ;;
