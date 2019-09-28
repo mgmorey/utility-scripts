@@ -46,7 +46,27 @@ get_realpath() (
     fi
 )
 
+invoke_manager() (
+    if [ "$1" = /usr/local/bin/brew ]; then
+	run_unpriv -c "$*"
+    else
+	"$@"
+    fi
+)
+
 uninstall_packages() {
+    managers=$("$script_dir/get-package-managers")
+    manager1=$(printf "%s\n" $managers | awk 'NR == 1 {print $0}')
+    manager2=$(printf "%s\n" $managers | awk 'NR == 2 {print $0}')
+
+    if [ $# -eq 0 ]; then
+	return 0
+    fi
+
+    packages1=$(printf "%s\n" "$@" | awk -F: 'NF == 1 {print $0}
+    					      NF == 2 {print $1}')
+    packages2=$(printf "%s\n" "$@" | awk -F: 'NF == 2 {print $2}')
+
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
@@ -84,10 +104,14 @@ uninstall_packages() {
 	    ;;
     esac
 
-    package_manager=$("$script_dir/get-package-managers")
+    if [ -n "$manager1" -a -n "$packages1" ]; then
+	invoke_manager $manager1 remove $packages1
+    fi
 
-    if [ -n "$package_manager" ]; then
-	$package_manager remove "$@"
+    if [ -n "$manager2" -a -n "$packages2" ]; then
+	if [ -n "$(which $manager2 2>/dev/null)" ]; then
+	    invoke_manager $manager2 remove $packages2
+	fi
     fi
 }
 
