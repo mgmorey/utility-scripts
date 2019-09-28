@@ -118,6 +118,8 @@ install_docker_ce() {
 		(ol)
 		    case "$VERSION_ID" in
 			(7.7)
+			    yum-config-manager --enable ol7_optional_latest
+			    yum-config-manager --enable ol7_addons
 			    packages=$DOCKER_PKGS_REDHAT
 			    ;;
 			(*)
