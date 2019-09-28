@@ -169,6 +169,16 @@ install_docker_ce() {
 	exit $?
     fi
 
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(ol)
+		    semanage permissive -a container_runtime_t
+		    ;;
+	    esac
+	    ;;
+    esac
+
     if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
 	install_docker_group
     fi
