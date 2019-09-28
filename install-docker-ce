@@ -53,7 +53,7 @@ get_realpath() (
 )
 
 grep_docker() {
-    grep -q '^\(docker\|docker.io\)$'
+    grep -q '^\(docker\|docker-common\|docker.io\)$'
 }
 
 grep_docker_ce() {
