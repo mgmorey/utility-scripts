@@ -34,7 +34,7 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
@@ -64,7 +64,7 @@ uninstall_packages() {
     fi
 
     packages1=$(printf "%s\n" "$@" | awk -F: 'NF == 1 {print $0}
-    					      NF == 2 {print $1}')
+					      NF == 2 {print $1}')
     packages2=$(printf "%s\n" "$@" | awk -F: 'NF == 2 {print $2}')
 
     case "$kernel_name" in
