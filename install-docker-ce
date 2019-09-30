@@ -63,7 +63,7 @@ grep_docker_ce() {
 install_docker_ce() {
     preinstall_docker
 
-    if ! apt-get install "$@" $DOCKER_PACKAGE; then
+    if ! "$script_dir/install-packages" $packages; then
 	exit $?
     fi
 
