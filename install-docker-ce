@@ -22,6 +22,8 @@ DOCKER_GROUP_ID=docker
 DOCKER_PKGS_DEBIAN=docker-ce
 DOCKER_PKGS_REDHAT="docker-ce docker-ce-cli containerd.io"
 
+ORACLE_LINUX_REPOS="ol7_addons ol7_optional_latest"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -42,8 +44,9 @@ enable_additional_repositories() {
 		(ol)
 		    case "$VERSION_ID" in
 			(7.7)
-			    yum-config-manager --enable ol7_optional_latest
-			    yum-config-manager --enable ol7_addons
+			    for repo in $ORACLE_LINUX_REPOS; do
+				yum-config-manager --enable $repo >/dev/null
+			    done
 			    ;;
 			(*)
 			    abort_not_supported Distro
@@ -243,10 +246,10 @@ remove_native_docker_packages() {
 	    exit $?
 	fi
     elif printf "%s\n" $installed_packages | grep_docker_ce; then
-	printf "Docker CE packages are installed\n"
+	printf "All Docker CE packages are installed\n"
 	exit 0
     else
-	printf "No Docker packages installed\n"
+	printf "No Docker packages are installed\n"
     fi
 }
 
