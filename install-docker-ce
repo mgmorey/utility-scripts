@@ -230,7 +230,6 @@ remove_native_docker_packages() {
     fi
 }
 
-
 script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
