@@ -18,7 +18,9 @@
 
 DOCKER_BASE_URL=https://download.docker.com
 DOCKER_GROUP_ID=docker
-DOCKER_PACKAGE=docker-ce
+
+DOCKER_PKGS_DEBIAN=docker-ce
+DOCKER_PKGS_REDHAT="docker-ce docker-ce-cli containerd.io"
 
 abort() {
     printf "$@" >&2
@@ -51,7 +53,7 @@ get_realpath() (
 )
 
 grep_docker() {
-    grep -q '^\(docker\|docker.io\)$'
+    grep -q '^\(docker\|docker-common\|docker.io\)$'
 }
 
 grep_docker_ce() {
@@ -83,16 +85,32 @@ install_docker_group() {
 
 install_docker_dependencies() {
     dependencies=$("$script_dir/get-docker-packages")
-    apt-get install "$@" $dependencies
+
+    if [ -n "$dependencies" ]; then
+	"$script_dir/install-packages" $dependencies
+    fi
 }
 
 install_docker_repositories() {
     distro_codename="$(lsb_release -cs)"
     docker_url="$DOCKER_BASE_URL/linux/$ID"
-    docker_repo="deb [arch=amd64] $docker_url $distro_codename stable"
-    curl -fsSL $docker_url/gpg | apt-key add -
-    add-apt-repository "$docker_repo"
-    apt-get update
+
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu)
+		    docker_repo="deb [arch=amd64] $docker_url $distro_codename stable"
+		    curl -fsSL $docker_url/gpg | apt-key add -
+		    add-apt-repository "$docker_repo"
+		    apt-get update
+		    ;;
+		(ol|centos)
+		    docker_url="$DOCKER_BASE_URL/linux/centos"
+		    yum-config-manager --add-repo $docker_url/docker-ce.repo
+		    ;;
+	    esac
+	    ;;
+    esac
 }
 
 preinstall_docker() {
@@ -102,7 +120,7 @@ preinstall_docker() {
 		(debian|raspbian)
 		    case "$VERSION_ID" in
 			(10)
-			    :
+			    packages=$DOCKER_PKGS_DEBIAN
 			    ;;
 			(*)
 			    abort_not_supported Release
@@ -112,10 +130,10 @@ preinstall_docker() {
 		(ubuntu|neon)
 		    case "$VERSION_ID" in
 			(18.04)
-			    :
+			    packages=$DOCKER_PKGS_DEBIAN
 			    ;;
 			(19.04)
-			    :
+			    packages=$DOCKER_PKGS_DEBIAN
 			    ;;
 			(*)
 			    abort_not_supported Release
@@ -125,7 +143,7 @@ preinstall_docker() {
 		(linuxmint)
 		    case "$VERSION_ID" in
 			(19.2)
-			    :
+			    packages=$DOCKER_PKGS_DEBIAN
 			    ;;
 			(*)
 			    abort_not_supported Release
@@ -135,10 +153,32 @@ preinstall_docker() {
 		(kali)
 		    case "$VERSION_ID" in
 			(2019.3)
-	    		    :
+			    packages=$DOCKER_PKGS_DEBIAN
 			    ;;
 			(*)
 			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(ol)
+		    case "$VERSION_ID" in
+			(7.7)
+			    yum-config-manager --enable ol7_optional_latest
+			    yum-config-manager --enable ol7_addons
+			    packages=$DOCKER_PKGS_REDHAT
+			    ;;
+			(*)
+			    abort_not_supported Distro
+			    ;;
+		    esac
+		    ;;
+		(centos)
+		    case "$VERSION_ID" in
+			(7)
+			    packages=$DOCKER_PKGS_REDHAT
+			    ;;
+			(*)
+			    abort_not_supported Distro
 			    ;;
 		    esac
 		    ;;
@@ -158,6 +198,16 @@ preinstall_docker() {
 }
 
 postinstall_docker() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(ol)
+		    semanage permissive -a container_runtime_t
+		    ;;
+	    esac
+	    ;;
+    esac
+
     if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
 	install_docker_group
     fi
@@ -179,6 +229,7 @@ remove_native_docker_packages() {
 	printf "No Docker packages installed\n"
     fi
 }
+
 
 script_dir=$(get_realpath "$(dirname "$0")")
 

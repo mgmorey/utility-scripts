@@ -52,7 +52,7 @@ install_git() {
 		;;
 	esac
 
-	install-packages git
+	"$script_dir/install-packages" git
     fi
 }
 
