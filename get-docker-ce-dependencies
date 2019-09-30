@@ -1,0 +1,103 @@
+#!/bin/sh -eu
+
+# get-docker-packages: list Docker CE dependency package names
+# Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+DEBIAN_PKGS="apt-transport-https ca-certificates curl gnupg2 \
+software-properties-common"
+
+REDHAT_PKGS="device-mapper-persistent-data lvm2 redhat-lsb-core yum-utils"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_docker_packages() {
+    package=$("$script_dir/get-installed-docker-packages")
+
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian)
+		    case "$VERSION_ID" in
+			(10)
+			    packages=$DEBIAN_PKGS
+			    ;;
+		    esac
+		    ;;
+		(ubuntu|neon)
+		    case "$VERSION_ID" in
+			(18.04)
+			    packages=$DEBIAN_PKGS
+			    ;;
+			(19.04)
+			    packages=$DEBIAN_PKGS
+			    ;;
+		    esac
+		    ;;
+		(linuxmint)
+		    case "$VERSION_ID" in
+			(19.2)
+			    packages=$DEBIAN_PKGS
+			    ;;
+		    esac
+		    ;;
+		(kali)
+		    case "$VERSION_ID" in
+			(2019.3)
+	    		    packages=$DEBIAN_PKGS
+			    ;;
+		    esac
+		    ;;
+		(ol|centos)
+		    packages=$REDHAT_PKGS
+		    ;;
+	    esac
+	    ;;
+    esac
+
+    if [ -n "${packages-}" ]; then
+	printf "%s\n" ${packages-}
+    fi
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -X)
+
+get_docker_packages
