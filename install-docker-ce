@@ -121,6 +121,12 @@ install_docker_ce() {
     if printf "%s\n" $installed_packages | grep_docker; then
 	printf "Removing conflicting packages\n"
 	remove_native_docker_packages $installed_packages
+    fi
+
+    installed_packages=$("$script_dir/get-installed-docker-packages")
+
+    if printf "%s\n" $installed_packages | grep_docker; then
+	abort "%s: Conflicting packages installed\n" "$0"
     elif printf "%s\n" $installed_packages | grep_docker_ce; then
 	printf "Docker CE packages already installed\n"
 	exit 0
