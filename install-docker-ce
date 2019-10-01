@@ -48,15 +48,16 @@ add_gpg_key() {
 add_repositories() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
+    repo="$(get_docker_repo $1)"
 
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
 		(debian|raspbian|ubuntu)
-		    add-apt-repository "$(get_docker_repo $1)"
+		    add-apt-repository "$repo"
 		    ;;
 		(ol|centos)
-		    yum-config-manager --add-repo "$(get_docker_repo $1)"
+		    yum-config-manager --add-repo "$repo" >/dev/null
 		    ;;
 	    esac
 	    ;;
