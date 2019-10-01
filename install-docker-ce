@@ -56,10 +56,10 @@ add_repositories() {
 	(Linux|GNU)
 	    case "$ID" in
 		(debian|raspbian|ubuntu)
-		    add-apt-repository "$(get_debian_repo $1)"
+		    add-apt-repository "$(get_docker_repo $1)"
 		    ;;
 		(ol|centos)
-		    yum-config-manager --add-repo "$(get_redhat_repo $1)"
+		    yum-config-manager --add-repo "$(get_docker_repo $1)"
 		    ;;
 	    esac
 	    ;;
@@ -77,8 +77,6 @@ enable_additional_repositories() {
 		(ol)
 		    case "$VERSION_ID" in
 			(7.7)
-			    printf "Enabling additional repositories\n"
-
 			    for repo in $ORACLE_LINUX_REPOS; do
 				yum-config-manager --enable $repo >/dev/null
 			    done
@@ -90,23 +88,43 @@ enable_additional_repositories() {
     esac
 }
 
+get_architecture() {
+    machine=$(uname -m)
+
+    case "$machine" in
+	(x86_64)
+	    printf "%s\n" amd64
+	    ;;
+	(*)
+	    printf "%s\n" $machine
+	    ;;
+    esac
+}
+
 get_codename() {
-    printf "%s\n" "$(lsb_release -cs)"
+    lsb_release -cs
 }
 
-get_debian_repo() {
+get_docker_repo() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    printf "%s\n" "deb [arch=amd64] $1 $(get_codename) stable"
+    arch=$(get_architecture)
+
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu)
+		    printf "%s\n" "deb [arch=$arch] $1 $(get_codename) stable"
+		    ;;
+		(ol|centos)
+		    printf "%s\n" "$DOCKER_BASE_URL/linux/centos/docker-ce.repo"
+		    ;;
+	    esac
+	    ;;
+    esac
 }
 
-get_redhat_repo() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    printf "%s\n" "$DOCKER_BASE_URL/linux/centos/docker-ce.repo"
-}
-
-get_url() {
+get_docker_url() {
     printf "%s\n" "$DOCKER_BASE_URL/linux/$ID"
 }
 
@@ -158,20 +176,20 @@ install_docker_ce() {
     if printf "%s\n" $installed_packages | grep_docker; then
 	abort "%s: Conflicting packages installed\n" "$0"
     elif printf "%s\n" $installed_packages | grep_docker_ce; then
-	printf "Docker CE packages already installed\n"
+	printf "Docker CE already installed\n"
 	exit 0
-    else
-	packages=$("$script_dir/get-docker-ce-packages")
+    fi
 
-	if [ -n "$packages" ]; then
-	    preinstall_docker
-	    printf "Installing Docker CE packages\n"
+    packages=$("$script_dir/get-docker-ce-packages")
 
-	    if "$script_dir/install-packages" $packages; then
-		postinstall_docker
-	    else
-		exit $?
-	    fi
+    if [ -n "$packages" ]; then
+	preinstall_docker
+	printf "Installing Docker CE packages\n"
+
+	if "$script_dir/install-packages" $packages; then
+	    postinstall_docker
+	else
+	    exit $?
 	fi
     fi
 }
@@ -190,10 +208,10 @@ install_docker_group() {
 }
 
 preinstall_docker() {
-    url=$(get_url)
+    docker_url=$(get_docker_url)
     install_dependencies
-    add_gpg_key "$url"
-    add_repositories "$url"
+    add_gpg_key "$docker_url"
+    add_repositories "$docker_url"
     enable_additional_repositories
 }
 
@@ -220,6 +238,17 @@ remove_native_docker_packages() {
 }
 
 validate_platform() {
+    arch=$(get_architecture)
+
+    case "$arch" in
+	(amd64)
+	    :
+	    ;;
+	(*)
+	    abort "%s: %s: Architecture not supported" "$0" "$arch"
+	    ;;
+    esac
+
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
