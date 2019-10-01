@@ -50,12 +50,9 @@ collect_data() {
 		    debian_version=$(cat /etc/debian_version)
 		    ;;
 		(fedora)
-		    os_version_id=$(awk '{print $4}' /etc/redhat-release)
 		    redhat_release=$(cat /etc/redhat-release)
 		    ;;
 		(ol)
-		    os_version=$VERSION
-		    os_version_id=$VERSION_ID
 		    redhat_release=$(cat /etc/redhat-release)
 		    ;;
 		(centos)
@@ -111,7 +108,7 @@ collect_data() {
     fi
 
     if [ -z "${os_version-}" ]; then
-	os_version=$os_version_id
+	os_version=$VERSION
     fi
 }
 
