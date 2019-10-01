@@ -67,6 +67,17 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+configure_platform() {
+    case "$kernel_name" in
+	(FreeBSD)
+	    invoke_usermod=false
+	    ;;
+	(*)
+	    invoke_usermod=true
+	    ;;
+    esac
+}
+
 enable_additional_repositories() {
     case "$kernel_name" in
 	(Linux|GNU)
@@ -163,6 +174,7 @@ install_dependencies() {
 
 install_docker_ce() {
     validate_platform
+    configure_platform
     installed_packages=$("$script_dir/get-installed-docker-packages")
 
     if printf "%s\n" $installed_packages | grep_docker; then
@@ -194,7 +206,11 @@ install_docker_ce() {
 }
 
 install_docker_group() {
-    if ! getent group docker >/dev/null; then
+    if [ "$invoke_usermod" = false ]; then
+	return 0
+    fi
+
+    if ! getent group $DOCKER_GROUP_ID >/dev/null; then
 	groupadd $DOCKER_GROUP_ID
     fi
 
