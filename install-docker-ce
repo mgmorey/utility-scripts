@@ -33,29 +33,33 @@ abort_not_supported() {
     abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
 }
 
-add_docker_ce_gpg_key() {
-    docker_url=$(get_docker_url)
+add_gpg_key() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
 
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
 		(debian|raspbian|ubuntu)
-		    curl -fsSL $docker_url/gpg | apt-key add -
+		    curl -fsSL $1/gpg | apt-key add - >/dev/null 2>&1
 		    ;;
 	    esac
 	    ;;
     esac
 }
 
-add_docker_ce_repositories() {
+add_repositories() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
 		(debian|raspbian|ubuntu)
-		    add-apt-repository "$(get_docker_debian_repo)"
+		    add-apt-repository "$(get_debian_repo $1)"
 		    ;;
 		(ol|centos)
-		    yum-config-manager --add-repo "$(get_docker_redhat_repo)"
+		    yum-config-manager --add-repo "$(get_redhat_repo $1)"
 		    ;;
 	    esac
 	    ;;
@@ -86,19 +90,23 @@ enable_additional_repositories() {
     esac
 }
 
-get_distro_codename() {
+get_codename() {
     printf "%s\n" "$(lsb_release -cs)"
 }
 
-get_docker_debian_repo() {
-    printf "%s\n" "deb [arch=amd64] $(get_docker_url) $(get_distro_codename) stable"
+get_debian_repo() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf "%s\n" "deb [arch=amd64] $1 $(get_codename) stable"
 }
 
-get_docker_redhat_repo() {
+get_redhat_repo() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
     printf "%s\n" "$DOCKER_BASE_URL/linux/centos/docker-ce.repo"
 }
 
-get_docker_url() {
+get_url() {
     printf "%s\n" "$DOCKER_BASE_URL/linux/$ID"
 }
 
@@ -182,9 +190,10 @@ install_docker_group() {
 }
 
 preinstall_docker() {
+    url=$(get_url)
     install_dependencies
-    add_docker_ce_gpg_key
-    add_docker_ce_repositories
+    add_gpg_key "$url"
+    add_repositories "$url"
     enable_additional_repositories
 }
 
