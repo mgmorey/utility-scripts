@@ -160,7 +160,6 @@ install_dependencies() {
     dependencies=$("$script_dir/get-docker-ce-dependencies")
 
     if [ -n "$dependencies" ]; then
-	printf "Installing dependencies\n"
 	"$script_dir/install-packages" $dependencies
     fi
 }
