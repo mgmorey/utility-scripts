@@ -45,8 +45,9 @@ collect_data() {
 
 	    case "$ID" in
 		(debian|raspbian|ubuntu|linuxmint|neon|kali)
+		    os_version=$VERSION
+		    os_version_id=$VERSION_ID
 		    debian_version=$(cat /etc/debian_version)
-		    os_version_id=$debian_version
 		    ;;
 		(fedora)
 		    os_version_id=$(awk '{print $4}' /etc/redhat-release)
