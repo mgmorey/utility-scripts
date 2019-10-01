@@ -33,6 +33,29 @@ abort_not_supported() {
     abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
 }
 
+add_docker_ce_repositories() {
+    distro_codename="$(lsb_release -cs)"
+    docker_url="$DOCKER_BASE_URL/linux/$ID"
+    printf "Adding Docker CE repositories\n"
+
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu)
+		    docker_repo="deb [arch=amd64] $docker_url $distro_codename stable"
+		    curl -fsSL $docker_url/gpg | apt-key add -
+		    add-apt-repository "$docker_repo"
+		    apt-get update
+		    ;;
+		(ol|centos)
+		    docker_url="$DOCKER_BASE_URL/linux/centos"
+		    yum-config-manager --add-repo $docker_url/docker-ce.repo
+		    ;;
+	    esac
+	    ;;
+    esac
+}
+
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
@@ -44,12 +67,11 @@ enable_additional_repositories() {
 		(ol)
 		    case "$VERSION_ID" in
 			(7.7)
+			    printf "Enabling additional repositories\n"
+
 			    for repo in $ORACLE_LINUX_REPOS; do
 				yum-config-manager --enable $repo >/dev/null
 			    done
-			    ;;
-			(*)
-			    abort_not_supported Distro
 			    ;;
 		    esac
 		    ;;
@@ -83,45 +105,39 @@ grep_docker_ce() {
     grep -q '^\(docker-ce\|docker-ce-cli\)$'
 }
 
-install_docker_ce() {
-    preinstall_docker
-    packages=$("$script_dir/get-docker-ce-packages")
-
-    if ! "$script_dir/install-packages" $packages; then
-	exit $?
-    fi
-
-    postinstall_docker
-}
-
-install_docker_ce_dependencies() {
+install_dependencies() {
     dependencies=$("$script_dir/get-docker-ce-dependencies")
 
     if [ -n "$dependencies" ]; then
+	printf "Installing dependencies\n"
 	"$script_dir/install-packages" $dependencies
     fi
 }
 
-install_docker_ce_repositories() {
-    distro_codename="$(lsb_release -cs)"
-    docker_url="$DOCKER_BASE_URL/linux/$ID"
+install_docker_ce() {
+    validate_platform
+    installed_packages=$("$script_dir/get-installed-docker-packages")
 
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu)
-		    docker_repo="deb [arch=amd64] $docker_url $distro_codename stable"
-		    curl -fsSL $docker_url/gpg | apt-key add -
-		    add-apt-repository "$docker_repo"
-		    apt-get update
-		    ;;
-		(ol|centos)
-		    docker_url="$DOCKER_BASE_URL/linux/centos"
-		    yum-config-manager --add-repo $docker_url/docker-ce.repo
-		    ;;
-	    esac
-	    ;;
-    esac
+    if printf "%s\n" $installed_packages | grep_docker; then
+	printf "Removing conflicting packages\n"
+	remove_native_docker_packages $installed_packages
+    elif printf "%s\n" $installed_packages | grep_docker_ce; then
+	printf "Docker CE packages already installed\n"
+	exit 0
+    else
+	packages=$("$script_dir/get-docker-ce-packages")
+
+	if [ -n "$packages" ]; then
+	    preinstall_docker
+	    printf "Installing Docker CE packages\n"
+
+	    if "$script_dir/install-packages" $packages; then
+		postinstall_docker
+	    else
+		exit $?
+	    fi
+	fi
+    fi
 }
 
 install_docker_group() {
@@ -138,6 +154,34 @@ install_docker_group() {
 }
 
 preinstall_docker() {
+    install_dependencies
+    add_docker_ce_repositories
+    enable_additional_repositories
+}
+
+postinstall_docker() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(ol)
+		    semanage permissive -a container_runtime_t
+		    ;;
+	    esac
+	    ;;
+    esac
+
+    if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
+	install_docker_group
+    fi
+}
+
+remove_native_docker_packages() {
+    if ! "$script_dir/uninstall-packages" "$@"; then
+	exit $?
+    fi
+}
+
+validate_platform() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
@@ -213,44 +257,6 @@ preinstall_docker() {
 	    abort_not_supported "Operating system"
 	    ;;
     esac
-
-    remove_native_docker_packages
-    enable_additional_repositories
-    install_docker_ce_dependencies
-    install_docker_ce_repositories
-}
-
-postinstall_docker() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(ol)
-		    semanage permissive -a container_runtime_t
-		    ;;
-	    esac
-	    ;;
-    esac
-
-    if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
-	install_docker_group
-    fi
-}
-
-remove_native_docker_packages() {
-    installed_packages=$("$script_dir/get-installed-docker-packages")
-
-    if printf "%s\n" $installed_packages | grep_docker; then
-	printf "Removing native Docker packages\n"
-
-	if ! "$script_dir/uninstall-packages" $installed_packages; then
-	    exit $?
-	fi
-    elif printf "%s\n" $installed_packages | grep_docker_ce; then
-	printf "All Docker CE packages are installed\n"
-	exit 0
-    else
-	printf "No Docker packages are installed\n"
-    fi
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
