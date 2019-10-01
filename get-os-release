@@ -48,9 +48,18 @@ collect_data() {
 		    debian_version=$(cat /etc/debian_version)
 		    os_version_id=$debian_version
 		    ;;
-		(fedora|ol|centos)
-		    redhat_release=$(cat /etc/redhat-release)
+		(fedora)
 		    os_version_id=$(awk '{print $4}' /etc/redhat-release)
+		    redhat_release=$(cat /etc/redhat-release)
+		    ;;
+		(ol)
+		    os_version=$VERSION
+		    os_version_id=$VERSION_ID
+		    redhat_release=$(cat /etc/redhat-release)
+		    ;;
+		(centos)
+		    os_version_id=$(awk '{print $4}' /etc/redhat-release)
+		    redhat_release=$(cat /etc/redhat-release)
 		    ;;
 	    esac
 	    ;;
