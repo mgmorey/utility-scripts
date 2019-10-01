@@ -45,14 +45,9 @@ collect_data() {
 
 	    case "$ID" in
 		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    os_version=$VERSION
-		    os_version_id=$VERSION_ID
 		    debian_version=$(cat /etc/debian_version)
 		    ;;
-		(fedora)
-		    redhat_release=$(cat /etc/redhat-release)
-		    ;;
-		(ol)
+		(fedora|ol)
 		    redhat_release=$(cat /etc/redhat-release)
 		    ;;
 		(centos)
