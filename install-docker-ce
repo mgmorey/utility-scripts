@@ -19,9 +19,6 @@
 DOCKER_BASE_URL=https://download.docker.com
 DOCKER_GROUP_ID=docker
 
-DOCKER_PKGS_DEBIAN=docker-ce
-DOCKER_PKGS_REDHAT="docker-ce docker-ce-cli containerd.io"
-
 ORACLE_LINUX_REPOS="ol7_addons ol7_optional_latest"
 
 abort() {
