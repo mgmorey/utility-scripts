@@ -50,7 +50,7 @@ install_epel_8() {
     case "$kernel_name" in
 	(Linux)
 	    case "$ID" in
-		(ol)
+		(ol|centos)
 		    :
 		    ;;
 		(*)
