@@ -46,11 +46,11 @@ get_realpath() (
     fi
 )
 
-install_epel_8() {
+install_epel_7() {
     case "$kernel_name" in
 	(Linux)
 	    case "$ID" in
-		(ol)
+		(ol|centos)
 		    :
 		    ;;
 		(*)
@@ -75,4 +75,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
 
-install_epel_8
+install_epel_7
