@@ -47,6 +47,8 @@ get_realpath() (
 )
 
 install_vbox_guest_deps() {
+    validate_platform
+
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
@@ -54,24 +56,51 @@ install_vbox_guest_deps() {
 		    apt-get install build-essential dkms linux-headers-$(uname -r)
 		    ;;
 		(centos)
+		    "$script_dir/install-epel"
+
 		    case "$VERSION_ID" in
 			(7)
-			    rpm -Uvh http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 			    yum update kernel*
 			    printf "Please reboot the machine with the new kernel (if updated).\n"
 			    yum install make gcc perl dkms bzip2 kernel-headers kernel-devel
 			    export KERN_DIR=/usr/src/kernels/`uname -r`
-			    mount -r /dev/cdrom /media
-			    cd /media
-			    sh VBoxLinuxAdditions.run
+			    ;;
+		    esac
+
+		    if mount -r /dev/cdrom /media; then
+			cd /media
+			sh VBoxLinuxAdditions.run
+		    fi
+		    ;;
+	    esac
+	    ;;
+    esac
+}
+
+validate_platform() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu|neon|linuxmint|kali)
+		    :
+		    ;;
+		(centos)
+		    case "$VERSION_ID" in
+			(7)
+			    :
 			    ;;
 			(*)
-			    abort_not_supported Distro
+			    abort_not_supported Release
 			    ;;
 		    esac
 		    ;;
+		(*)
+		    abort_not_supported Distro
 		    ;;
 	    esac
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
 	    ;;
     esac
 }
