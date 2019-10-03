@@ -55,11 +55,11 @@ install_vbox_guest_deps() {
 		(debian|raspbian|ubuntu|neon|linuxmint|kali)
 		    apt-get install build-essential dkms linux-headers-$(uname -r)
 		    ;;
-		(centos)
+		(ol|centos)
 		    "$script_dir/install-epel"
 
 		    case "$VERSION_ID" in
-			(7)
+			(7|7.*)
 			    yum update kernel*
 			    printf "Please reboot the machine with the new kernel (if updated).\n"
 			    yum install make gcc perl dkms bzip2 kernel-headers kernel-devel
@@ -84,9 +84,9 @@ validate_platform() {
 		(debian|raspbian|ubuntu|neon|linuxmint|kali)
 		    :
 		    ;;
-		(centos)
+		(ol|centos)
 		    case "$VERSION_ID" in
-			(7)
+			(7|7.*)
 			    :
 			    ;;
 			(*)
