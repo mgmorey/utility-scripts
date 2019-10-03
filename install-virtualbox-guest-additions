@@ -46,9 +46,25 @@ get_realpath() (
     fi
 )
 
-install_vbox_guest_deps() {
+install_virtualbox_guest() {
     validate_platform
+    preinstall_virtualbox_guest
 
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(ol|centos)
+		    if mount -r /dev/cdrom /media; then
+			cd /media
+			sh VBoxLinuxAdditions.run
+		    fi
+		    ;;
+	    esac
+	    ;;
+    esac
+}
+
+preinstall_virtualbox_guest() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
@@ -60,17 +76,19 @@ install_vbox_guest_deps() {
 
 		    case "$VERSION_ID" in
 			(7|7.*)
-			    yum update kernel*
+			    if ! yum update 'kernel*'; then
+				exit $?
+			    fi
+
 			    printf "Please reboot the machine with the new kernel (if updated).\n"
-			    yum install make gcc perl dkms bzip2 kernel-headers kernel-devel
+
+			    if ! yum install make gcc perl dkms bzip2 kernel-headers kernel-devel; then
+				exit $?
+			    fi
+
 			    export KERN_DIR=/usr/src/kernels/`uname -r`
 			    ;;
 		    esac
-
-		    if mount -r /dev/cdrom /media; then
-			cd /media
-			sh VBoxLinuxAdditions.run
-		    fi
 		    ;;
 	    esac
 	    ;;
@@ -113,4 +131,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
 
-install_vbox_guest_deps
+install_virtualbox_guest
