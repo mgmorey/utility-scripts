@@ -58,6 +58,13 @@ case "$kernel_name" in
 	    (fedora)
 		printf "%s\n" "--allowerasing"
 		;;
+	    (ol)
+		case "$VERSION_ID" in
+		    (8.0)
+			printf "%s\n" "--nobest"
+			;;
+		esac
+		;;
 	esac
 	;;
 esac
