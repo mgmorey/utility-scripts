@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+PACKAGE_DIR=VBox_GAs_6.0.12
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -54,8 +56,12 @@ install_virtualbox_guest() {
 	(Linux|GNU)
 	    case "$ID" in
 		(ol|centos)
-		    if mount -r /dev/cdrom /media; then
-			cd /media
+		    if [ ! -d /run/media/mgmorey/$PACKAGE_DIR ]; then
+			mount -r /dev/cdrom /run/media/mgmorey/$PACKAGE_DIR
+		    fi
+
+		    if [ -d /run/media/mgmorey/$PACKAGE_DIR ]; then
+			cd /run/media/mgmorey/$PACKAGE_DIR
 			sh VBoxLinuxAdditions.run
 		    fi
 		    ;;
@@ -75,7 +81,7 @@ preinstall_virtualbox_guest() {
 		    "$script_dir/install-epel"
 
 		    case "$VERSION_ID" in
-			(7|7.*)
+			(7|7.*|8|8.*)
 			    if ! yum update 'kernel*'; then
 				exit $?
 			    fi
@@ -105,6 +111,9 @@ validate_platform() {
 		(ol|centos)
 		    case "$VERSION_ID" in
 			(7|7.*)
+			    :
+			    ;;
+			(8|8.*)
 			    :
 			    ;;
 			(*)
