@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -eu
 
 # install-docker: install Oracle VirtualBox Guest Additions dependencies
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
@@ -16,7 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-PACKAGE_DIR=VBox_GAs_6.0.12
+DEBIAN_PKGS="build-essential dkms linux-headers-$(uname -r)"
+
+REDHAT_PKGS="bzip2 dkms gcc kernel-headers kernel-devel make perl"
+
+VBOX_DIR=VBox_GAs_6.*
 
 abort() {
     printf "$@" >&2
@@ -29,6 +33,26 @@ abort_not_supported() {
 
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+configure_platform() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu|neon|linuxmint|kali)
+		    packages=$DEBIAN_PKGS
+		    ;;
+		(ol|centos)
+		    export KERN_DIR=/usr/src/kernels/`uname -r`
+		    packages=$REDHAT_PKGS
+		    ;;
+	    esac
+	    ;;
+    esac
+}
+
+get_package_directory() {
+    ls -drv /run/media/$USER/$VBOX_DIR | head -n 1
 }
 
 get_realpath() (
@@ -50,20 +74,20 @@ get_realpath() (
 
 install_virtualbox_guest() {
     validate_platform
+    configure_platform
     preinstall_virtualbox_guest
+    package_dir=$(get_package_directory)
 
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
 		(ol|centos)
-		    if [ ! -d /run/media/mgmorey/$PACKAGE_DIR ]; then
-			mount -r /dev/cdrom /run/media/mgmorey/$PACKAGE_DIR
+		    if [ ! -d $package_dir ]; then
+			mount -r /dev/cdrom $package_dir
 		    fi
 
-		    if [ -d /run/media/mgmorey/$PACKAGE_DIR ]; then
-			cd /run/media/mgmorey/$PACKAGE_DIR
-			sh VBoxLinuxAdditions.run
-		    fi
+		    cd $package_dir
+		    sh VBoxLinuxAdditions.run
 		    ;;
 	    esac
 	    ;;
@@ -74,31 +98,20 @@ preinstall_virtualbox_guest() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
-		(debian|raspbian|ubuntu|neon|linuxmint|kali)
-		    apt-get install build-essential dkms linux-headers-$(uname -r)
-		    ;;
 		(ol|centos)
 		    "$script_dir/install-epel"
 
-		    case "$VERSION_ID" in
-			(7|7.*|8|8.*)
-			    if ! yum update 'kernel*'; then
-				exit $?
-			    fi
+		    if ! yum update 'kernel*'; then
+			exit $?
+		    fi
 
-			    printf "Please reboot the machine with the new kernel (if updated).\n"
-
-			    if ! yum install make gcc perl dkms bzip2 kernel-headers kernel-devel; then
-				exit $?
-			    fi
-
-			    export KERN_DIR=/usr/src/kernels/`uname -r`
-			    ;;
-		    esac
+		    printf "Please reboot the machine with the new kernel (if updated).\n"
 		    ;;
 	    esac
 	    ;;
     esac
+
+    "$script_dir/install-packages" $packages
 }
 
 validate_platform() {
