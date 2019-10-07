@@ -72,36 +72,58 @@ get_realpath() (
     fi
 )
 
-install_virtualbox_guest() {
-    validate_platform
-    configure_platform
-    preinstall_virtualbox_guest
-    package_dir=$(get_package_directory)
+install_kernel_packages() {
+    "$script_dir/install-packages" $packages
+}
 
+install_prerequisites() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
 		(ol|centos)
-		    if [ ! -d $package_dir ]; then
-			mount -r /dev/cdrom $package_dir
-		    fi
-
-		    cd $package_dir
-		    sh VBoxLinuxAdditions.run
+		    "$script_dir/install-epel"
 		    ;;
 	    esac
 	    ;;
     esac
 }
 
+install_virtualbox_guest() {
+    validate_platform
+    configure_platform
+    preinstall_virtualbox_guest
+    package_dir=$(get_package_directory)
+
+    until [ -n "$package_dir" ]; do
+	printf "Insert Oracle VirtualBox Guest Additions CD-ROM and press Enter: "
+	read INPUT
+	package_dir=$(get_package_directory)
+    done
+
+    printf "\n"
+
+    if [ ! -d $package_dir ]; then
+	mount -r /dev/cdrom $package_dir
+    fi
+
+    cd $package_dir
+    sh VBoxLinuxAdditions.run
+}
+
 preinstall_virtualbox_guest() {
+    install_prerequisites
+    update_kernel_packages
+    install_kernel_packages
+}
+
+update_kernel_packages() {
     case "$kernel_name" in
-	(Linux|GNU)
+	(Linux)
 	    case "$ID" in
 		(ol|centos)
-		    "$script_dir/install-epel"
+		    manager=$("$script_dir/get-package-managers" | awk 'NR == 1 {print $0}')
 
-		    if ! yum update 'kernel*'; then
+		    if ! $manager update 'kernel*'; then
 			exit $?
 		    fi
 
@@ -110,13 +132,11 @@ preinstall_virtualbox_guest() {
 	    esac
 	    ;;
     esac
-
-    "$script_dir/install-packages" $packages
 }
 
 validate_platform() {
     case "$kernel_name" in
-	(Linux|GNU)
+	(Linux)
 	    case "$ID" in
 		(debian|raspbian|ubuntu|neon|linuxmint|kali)
 		    :
