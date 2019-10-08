@@ -205,10 +205,10 @@ usage() {
 	printf "%s\n" "" >&2
     fi
 
-    cat >&2 <<-EOM
+    cat <<-EOF >&2
 	Usage: $0 [-d|-e][-f][-p PREFIX][-v VERSION]
 	       $0 -h
-	EOM
+	EOF
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")

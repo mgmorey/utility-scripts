@@ -84,11 +84,11 @@ usage() {
 	printf "%s\n" "" >&2
     fi
 
-    cat >&2 <<-EOM
+    cat <<-EOF >&2
 	Usage: $0 [COMMAND [COMMAND] ...]
 	       $0 -h
 	       $0 -q
-	EOM
+	EOF
 }
 
 parse_arguments "$@"

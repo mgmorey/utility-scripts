@@ -42,16 +42,13 @@ collect_data() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    . $FILE_OS
+	    os_version_id=$(get_os_version_id)
 
 	    case "$ID" in
 		(debian|raspbian|ubuntu|linuxmint|neon|kali)
 		    debian_version=$(cat /etc/debian_version)
 		    ;;
-		(fedora|ol)
-		    redhat_release=$(cat /etc/redhat-release)
-		    ;;
-		(centos)
-		    os_version_id=$(awk '{print $4}' /etc/redhat-release)
+		(fedora|ol|centos)
 		    redhat_release=$(cat /etc/redhat-release)
 		    ;;
 	    esac
@@ -105,6 +102,24 @@ collect_data() {
     if [ -z "${os_version-}" ]; then
 	os_version=$VERSION
     fi
+}
+
+get_os_version_id() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian)
+		    cat /etc/debian_version
+		    ;;
+		(ubuntu)
+		    printf "%s\n" "$VERSION" | awk '{print $1}'
+		    ;;
+		(centos)
+		    awk '{print $4}' /etc/redhat-release
+		    ;;
+	    esac
+	    ;;
+    esac
 }
 
 output_data() {
@@ -197,12 +212,12 @@ usage() {
 	printf "%s\n" "" >&2
     fi
 
-    cat >&2 <<-EOM
-	Usage: $0 [-i] [-k] [-n] [-p] [-r] [-v]
-	       $0 -h
-	       $0 -x
-	       $0 -X
-	EOM
+    cat <<-EOF >&2
+	Usage: $0: [-i] [-k] [-n] [-p] [-r] [-v]
+	       $0: -x
+	       $0: -X
+	       $0: -h
+	EOF
 }
 
 parse_arguments "$@"
