@@ -127,6 +127,7 @@ update_kernel_packages() {
 			exit $?
 		    fi
 
+		    trap "printf '\n'" INT
 		    printf "Please reboot the machine with the new kernel (if updated).\n"
 		    ;;
 	    esac
@@ -141,12 +142,25 @@ validate_platform() {
 		(debian|raspbian|ubuntu|neon|linuxmint|kali)
 		    :
 		    ;;
-		(ol|centos)
+		(ol)
 		    case "$VERSION_ID" in
-			(7|7.*)
+			(7.*)
 			    :
 			    ;;
-			(8|8.*)
+			(8.*)
+			    :
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(centos)
+		    case "$VERSION_ID" in
+			(7)
+			    :
+			    ;;
+			(8)
 			    :
 			    ;;
 			(*)
