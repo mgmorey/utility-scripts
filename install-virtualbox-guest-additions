@@ -52,7 +52,7 @@ configure_platform() {
 }
 
 get_package_directory() {
-    ls -drv /run/media/$USER/$VBOX_DIR | head -n 1
+    ls -drv /run/media/$USER/$VBOX_DIR 2>/dev/null | head -n 1
 }
 
 get_realpath() (
@@ -127,7 +127,7 @@ update_kernel_packages() {
 			exit $?
 		    fi
 
-		    trap "printf '\n'" INT
+		    trap "printf '\n'; exit 0" INT
 		    printf "Please reboot the machine with the new kernel (if updated).\n"
 		    ;;
 	    esac
