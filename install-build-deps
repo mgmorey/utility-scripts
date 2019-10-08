@@ -62,9 +62,9 @@ install_build_deps() {
 	    ;;
     esac
 
-    installer=$("$script_dir/get-package-managers")
     install_opts=$("$script_dir/get-package-install-options")
-    $installer build-dep $install_opts "$@"
+    manager=$("$script_dir/get-package-managers")
+    $manager build-dep $install_opts "$@"
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")

@@ -49,17 +49,17 @@ get_realpath() (
 install_build_essentials() {
     install_cmd=$("$script_dir/get-pattern-install-command")
     install_opts=$("$script_dir/get-package-install-options")
-    installer=$("$script_dir/get-package-managers")
+    manager=$("$script_dir/get-package-managers" | awk 'NR == 1 {print $0}')
     pattern=$("$script_dir/get-devel-pattern")
 
     case "$kernel_name" in
 	(Linux)
 	    case "$ID" in
 		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    $installer $install_cmd $install_opts "$pattern"
+		    $manager $install_cmd $install_opts "$pattern"
 	    	    ;;
 		(opensuse-*|fedora|ol|centos)
-		    $installer $install_cmd $install_opts "$pattern"
+		    $manager $install_cmd $install_opts "$pattern"
 	    	    ;;
 		(*)
 		    abort_not_supported Distro
@@ -67,7 +67,7 @@ install_build_essentials() {
 	    esac
 	    ;;
 	(SunOS)
-	    $installer $install_cmd $install_opts "$pattern"
+	    $manager $install_cmd $install_opts "$pattern"
     	    ;;
 	(*)
 	    abort_not_supported "Operating system"
