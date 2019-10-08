@@ -127,7 +127,7 @@ update_kernel_packages() {
 			exit $?
 		    fi
 
-		    trap "printf '\n'; exit 0" INT
+		    trap "printf '\n'; exit 0" INT QUIT
 		    printf "Please reboot the machine with the new kernel (if updated).\n"
 		    ;;
 	    esac
