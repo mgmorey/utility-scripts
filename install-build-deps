@@ -63,7 +63,7 @@ install_build_deps() {
     esac
 
     install_opts=$("$script_dir/get-package-install-options")
-    manager=$("$script_dir/get-package-managers")
+    manager=$("$script_dir/get-package-managers" | awk 'NR == 1 {print $0}')
     $manager build-dep $install_opts "$@"
 }
 
