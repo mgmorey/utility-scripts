@@ -116,8 +116,8 @@ install_pattern_from_args() {
 	return 0
     fi
 
-    pattern_cmd=$("$script_dir/get-pattern-install-command")
-    invoke_manager $manager1 $pattern_cmd $options "$pattern"
+    command=$("$script_dir/get-pattern-install-command")
+    invoke_manager $manager1 $command $options "$pattern"
 }
 
 invoke_manager() (
