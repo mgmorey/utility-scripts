@@ -49,14 +49,7 @@ get_realpath() (
 )
 
 install_homebrew() {
-    case "$kernel_name" in
-	(Darwin)
-	    :
-	    ;;
-	(*)
-	    abort_not_supported "Operating system"
-	    ;;
-    esac
+    validate_platform
 
     if brew --version >/dev/null 2>&1; then
 	brew update
@@ -66,12 +59,23 @@ install_homebrew() {
     fi
 }
 
+validate_platform() {
+    case "$kernel_name" in
+	(Darwin)
+	    :
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
+
 if [ $# -gt 0 ]; then
     abort "%s: Too many arguments\n" "$0"
 fi
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-eval $("$script_dir/get-os-release.sh" -X)
+eval $("$script_dir/get-os-release" -X)
 
 install_homebrew
