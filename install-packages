@@ -54,7 +54,7 @@ get_manager() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     assert [ $1 -ge 1 -a -$1 -le 2 ]
-    awk 'NR == '"$1"' {print $0}'
+    printf "%s\n" $managers | awk 'NR == '"$1"' {print $0}'
 }
 
 get_packages() {
@@ -62,7 +62,7 @@ get_packages() {
     assert [ -n "$1" ]
     assert [ $1 -ge 1 -a -$1 -le 2 ]
 
-    case "$1" in
+    printf "%s\n" $packages | case "$1" in
 	(1)
 	    awk -F: 'NF == 1 {print $0} NF == 2 {print $1}'
 	    ;;
@@ -92,18 +92,14 @@ get_realpath() (
 install_packages() {
     validate_platform
     configure_platform
+    managers=$("$script_dir/get-package-managers")
+    options=$("$script_dir/get-package-install-options")
 
     if [ $# -eq 0 ]; then
 	return 0
     fi
 
     parse_arguments "$@"
-    managers=$("$script_dir/get-package-managers")
-    manager1=$(printf "%s\n" $managers | get_manager 1)
-    manager2=$(printf "%s\n" $managers | get_manager 2)
-    options=$("$script_dir/get-package-install-options")
-    packages1=$(printf "%s\n" $packages | get_packages 1)
-    packages2=$(printf "%s\n" $packages | get_packages 2)
 
     if [ "$IS_PATTERN_SUPPORTED" = true ]; then
 	install_pattern_from_args
@@ -117,15 +113,8 @@ install_packages_from_args() {
 	return 0
     fi
 
-    if [ -n "$manager1" -a -n "$packages1" ]; then
-	invoke_manager $manager1 install $options $packages1
-    fi
-
-    if [ -n "$manager2" -a -n "$packages2" ]; then
-	if [ -n "$(which $manager2 2>/dev/null)" ]; then
-	    invoke_manager $manager2 install $packages2
-	fi
-    fi
+    invoke_manager "$(get_manager 1)" install $options $(get_packages 1)
+    invoke_manager "$(get_manager 2)" install $(get_packages 2)
 }
 
 install_pattern_from_args() {
@@ -134,13 +123,13 @@ install_pattern_from_args() {
     fi
 
     command=$("$script_dir/get-pattern-install-command")
-    invoke_manager $manager1 $command $options "$pattern"
+    invoke_manager "$(get_manager 1)" $command $options "$pattern"
 }
 
 invoke_manager() (
     if [ "$1" = /usr/local/bin/brew ]; then
 	run_unpriv -c "$*"
-    else
+    elif [ -n "$1" ]; then
 	"$@"
     fi
 )
