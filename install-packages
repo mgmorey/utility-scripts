@@ -67,6 +67,28 @@ configure_platform() {
     esac
 }
 
+get_manager() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    assert [ $1 -ge 1 -a -$1 -le 2 ]
+    awk 'NR == '"$1"' {print $0}'
+}
+
+get_packages() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    assert [ $1 -ge 1 -a -$1 -le 2 ]
+
+    case "$1" in
+	(1)
+	    awk -F: 'NF == 1 {print $0} NF == 2 {print $1}'
+	    ;;
+	(2)
+	    awk -F: 'NF == 2 {print $2}'
+	    ;;
+    esac
+}
+
 install_packages() {
     validate_platform
     configure_platform
@@ -77,12 +99,11 @@ install_packages() {
 
     parse_arguments "$@"
     managers=$("$script_dir/get-package-managers")
-    manager1=$(printf "%s\n" $managers | awk 'NR == 1 {print $0}')
-    manager2=$(printf "%s\n" $managers | awk 'NR == 2 {print $0}')
+    manager1=$(printf "%s\n" $managers | get_manager 1)
+    manager2=$(printf "%s\n" $managers | get_manager 2)
     options=$("$script_dir/get-package-install-options")
-    packages1=$(printf "%s\n" $packages | awk -F: 'NF == 1 {print $0}
-						   NF == 2 {print $1}')
-    packages2=$(printf "%s\n" $packages | awk -F: 'NF == 2 {print $2}')
+    packages1=$(printf "%s\n" $packages | get_packages 1)
+    packages2=$(printf "%s\n" $packages | get_packages 2)
 
     if [ "$IS_PATTERN_SUPPORTED" = true ]; then
 	install_pattern_from_args
