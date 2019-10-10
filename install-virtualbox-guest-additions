@@ -177,6 +177,17 @@ validate_platform() {
 	    abort_not_supported "Operating system"
 	    ;;
     esac
+
+    vendor=$(lscpu | "$script_dir/get-hypervisor-vendor")
+
+    case "$vendor" in
+	(KVM)
+	    :
+	    ;;
+	(*)
+	    abort "%s: %s: Hypervisor not supported" "$0" "$vendor"
+	    ;;
+    esac
 }
 
 if [ $# -gt 0 ]; then
