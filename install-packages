@@ -46,53 +46,49 @@ get_realpath() (
     fi
 )
 
+configure_platform() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu|linuxmint|neon|kali)
+		    IS_PATTERN_SUPPORTED=true
+		    ;;
+		(opensuse-*|fedora|ol|centos)
+		    IS_PATTERN_SUPPORTED=true
+		    ;;
+		(*)
+		    IS_PATTERN_SUPPORTED=false
+		    ;;
+	    esac
+	    ;;
+	(*)
+	    IS_PATTERN_SUPPORTED=false
+	    ;;
+    esac
+}
+
 install_packages() {
-    managers=$("$script_dir/get-package-managers")
-    manager1=$(printf "%s\n" $managers | awk 'NR == 1 {print $0}')
-    manager2=$(printf "%s\n" $managers | awk 'NR == 2 {print $0}')
-    options=$("$script_dir/get-package-install-options")
+    validate_platform
+    configure_platform
 
     if [ $# -eq 0 ]; then
 	return 0
     fi
 
     parse_arguments "$@"
+    managers=$("$script_dir/get-package-managers")
+    manager1=$(printf "%s\n" $managers | awk 'NR == 1 {print $0}')
+    manager2=$(printf "%s\n" $managers | awk 'NR == 2 {print $0}')
+    options=$("$script_dir/get-package-install-options")
     packages1=$(printf "%s\n" $packages | awk -F: 'NF == 1 {print $0}
 						   NF == 2 {print $1}')
     packages2=$(printf "%s\n" $packages | awk -F: 'NF == 2 {print $2}')
 
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    install_pattern_from_args
-		    install_packages_from_args
-		    ;;
-		(opensuse-*|fedora|ol|centos)
-		    install_pattern_from_args
-		    install_packages_from_args
-		    ;;
-		(*)
-		    abort_not_supported Distro
-		    ;;
-	    esac
-	    ;;
-	(Darwin)
-	    install_packages_from_args
-	    ;;
-	(FreeBSD)
-	    install_packages_from_args
-	    ;;
-	(NetBSD)
-	    install_packages_from_args
-	    ;;
-	(SunOS)
-	    install_packages_from_args
-	    ;;
-	(*)
-	    abort_not_supported "Operating system"
-	    ;;
-    esac
+    if [ "$IS_PATTERN_SUPPORTED" = true ]; then
+	install_pattern_from_args
+    fi
+
+    install_packages_from_args
 }
 
 install_packages_from_args() {
@@ -163,6 +159,39 @@ usage() {
 	Usage: $0: [-p PATTERN]
 	       $0: -h
 	EOF
+}
+
+validate_platform() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu|linuxmint|neon|kali)
+		    :
+		    ;;
+		(opensuse-*|fedora|ol|centos)
+		    :
+		    ;;
+		(*)
+		    abort_not_supported Distro
+		    ;;
+	    esac
+	    ;;
+	(Darwin)
+	    :
+	    ;;
+	(FreeBSD)
+	    :
+	    ;;
+	(NetBSD)
+	    :
+	    ;;
+	(SunOS)
+	    :
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
