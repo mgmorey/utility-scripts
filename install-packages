@@ -141,7 +141,7 @@ parse_arguments() {
     while getopts hp: opt; do
 	case $opt in
 	    (p)
-		pattern=$("$script_dir/get-uninstalled-packages" "$OPTARG")
+		pattern=$OPTARG
 		;;
 	    (h)
 		usage
