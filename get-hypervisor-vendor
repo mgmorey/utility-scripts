@@ -22,6 +22,6 @@ BEGIN {
 
 $1 == "Hypervisor vendor" {
     vendor = $2;
-    sub("^ +", "", vendor);
+    sub(/^ +/, "", vendor);
     print vendor;
 }
