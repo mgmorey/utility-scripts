@@ -140,7 +140,11 @@ install_pattern_from_args() (
 )
 
 install_using() (
-    if [ $# -lt 3 ]; then
+    assert [ $# -ge 3 ]
+
+    if [ $# -eq 3 ]; then
+	return 0
+    elif [ -z "$1" ]; then
 	return 0
     fi
 
@@ -148,12 +152,6 @@ install_using() (
     installer_command=$2
     installer_options=$3
     shift 3
-
-    if [ -z "$installer" ]; then
-	return 0
-    elif [ $# -eq 0 ]; then
-	return 0
-    fi
 
     if [ "$installer" = /usr/local/bin/brew ]; then
 	run_unpriv -c "$installer $installer_command $installer_options $*"
