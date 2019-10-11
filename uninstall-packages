@@ -29,6 +29,30 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_manager() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    assert [ $1 -ge 1 -a -$1 -le 2 ]
+    printf "%s\n" $managers | awk 'NR == '"$1"' {print $0}'
+}
+
+get_packages() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    assert [ $1 -ge 1 -a -$1 -le 2 ]
+
+    case "$1" in
+	(1)
+	    awk_expr='NF == 1 {print $0} NF == 2 {print $1}'
+	    ;;
+	(2)
+	    awk_expr='NF == 2 {print $2}'
+	    ;;
+    esac
+
+    printf "%s\n" $packages | awk -F: "$awk_expr"
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -54,32 +78,64 @@ invoke_manager() (
     fi
 )
 
+parse_arguments() {
+    packages="$@"
+}
+
 uninstall_packages() {
+    validate_platform
     managers=$("$script_dir/get-package-managers")
-    manager1=$(printf "%s\n" $managers | awk 'NR == 1 {print $0}')
-    manager2=$(printf "%s\n" $managers | awk 'NR == 2 {print $0}')
 
     if [ $# -eq 0 ]; then
 	return 0
     fi
 
-    packages1=$(printf "%s\n" "$@" | awk -F: 'NF == 1 {print $0}
-					      NF == 2 {print $1}')
-    packages2=$(printf "%s\n" "$@" | awk -F: 'NF == 2 {print $2}')
+    parse_arguments "$@"
+    uninstall_packages_from_args
+}
 
+uninstall_packages_from_args() (
+    if [ -z "$packages" ]; then
+	return 0
+    fi
+
+    index=1
+
+    while [ $index -le 2 ]; do
+	uninstall_using "$(get_manager $index)" remove \
+			$(get_packages $index)
+	index=$((index + 1))
+    done
+)
+
+uninstall_using() (
+    assert [ $# -ge 2 ]
+
+    if [ $# -eq 2 ]; then
+	return 0
+    elif [ -z "$1" ]; then
+	return 0
+    fi
+
+    uninstaller=$1
+    uninstaller_command=$2
+    shift 2
+
+    if [ "$uninstaller" = /usr/local/bin/brew ]; then
+	run_unpriv -c "$uninstaller $uninstaller_command $*"
+    else
+	$uninstaller $uninstaller_command "$@"
+    fi
+)
+
+validate_platform() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
 		(debian|raspbian|ubuntu|linuxmint|neon|kali)
 		    :
 		    ;;
-		(opensuse-*)
-		    :
-		    ;;
-		(fedora)
-		    :
-		    ;;
-		(ol|centos)
+		(opensuse-*|fedora|ol|centos)
 		    :
 		    ;;
 		(*)
@@ -103,16 +159,6 @@ uninstall_packages() {
 	    abort_not_supported "Operating system"
 	    ;;
     esac
-
-    if [ -n "$manager1" -a -n "$packages1" ]; then
-	invoke_manager $manager1 remove $packages1
-    fi
-
-    if [ -n "$manager2" -a -n "$packages2" ]; then
-	if [ -n "$(which $manager2 2>/dev/null)" ]; then
-	    invoke_manager $manager2 remove $packages2
-	fi
-    fi
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
