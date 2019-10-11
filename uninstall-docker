@@ -55,19 +55,30 @@ grep_docker_ce() {
 }
 
 uninstall_docker() {
+    validate_platform
+    installed_packages=$("$script_dir/get-installed-docker-packages")
+
+    if printf "%s\n" $installed_packages | grep_docker; then
+	printf "Removing native Docker packages\n"
+    elif printf "%s\n" $installed_packages | grep_docker_ce; then
+	printf "Removing Docker CE packages\n"
+    else
+	printf "No Docker package installed\n"
+    fi
+
+    if [ -n "$installed_packages" ]; then
+	"$script_dir/uninstall-packages" $installed_packages
+    fi
+}
+
+validate_platform() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
 		(debian|raspbian|ubuntu|linuxmint|neon|kali)
 		    :
 		    ;;
-		(opensuse-*)
-		    :
-		    ;;
-		(fedora)
-		    :
-		    ;;
-		(ol|centos)
+		(opensuse-*|fedora|ol|centos)
 		    :
 		    ;;
 		(*)
@@ -91,20 +102,6 @@ uninstall_docker() {
 	    abort_not_supported "Operating system"
 	    ;;
     esac
-
-    installed_packages=$("$script_dir/get-installed-docker-packages")
-
-    if printf "%s\n" $installed_packages | grep_docker; then
-	printf "Removing native Docker packages\n"
-    elif printf "%s\n" $installed_packages | grep_docker_ce; then
-	printf "Removing Docker CE packages\n"
-    else
-	printf "No Docker package installed\n"
-    fi
-
-    if [ -n "$installed_packages" ]; then
-	"$script_dir/uninstall-packages" $installed_packages
-    fi
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
