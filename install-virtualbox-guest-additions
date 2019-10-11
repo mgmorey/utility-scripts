@@ -121,18 +121,22 @@ update_kernel_packages() {
 	(Linux)
 	    case "$ID" in
 		(ol|centos)
-		    manager=$("$script_dir/get-package-managers" | awk 'NR == 1 {print $0}')
-
-		    if ! $manager update 'kernel*'; then
-			exit $?
-		    fi
-
-		    trap "printf '\n'; exit 0" INT QUIT
-		    printf "Please reboot the machine with the new kernel (if updated).\n"
+		    update_redhat_kernel_packages
 		    ;;
 	    esac
 	    ;;
     esac
+}
+
+update_redhat_kernel_packages() {
+    manager=$("$script_dir/get-package-managers" | awk 'NR == 1 {print $0}')
+
+    if ! $manager update 'kernel*'; then
+	exit $?
+    fi
+
+    trap "printf '\n'; exit 0" INT QUIT
+    printf "Please reboot the machine with the new kernel (if updated).\n"
 }
 
 validate_platform() {
