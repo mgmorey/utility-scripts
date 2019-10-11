@@ -69,14 +69,16 @@ get_packages() {
     assert [ -n "$1" ]
     assert [ $1 -ge 1 -a -$1 -le 2 ]
 
-    printf "%s\n" $packages | case "$1" in
+    case "$1" in
 	(1)
-	    awk -F: 'NF == 1 {print $0} NF == 2 {print $1}'
+	    awk_expr='NF == 1 {print $0} NF == 2 {print $1}'
 	    ;;
 	(2)
-	    awk -F: 'NF == 2 {print $2}'
+	    awk_expr='NF == 2 {print $2}'
 	    ;;
     esac
+
+    printf "%s\n" $packages | awk -F: "$awk_expr"
 }
 
 get_realpath() (
