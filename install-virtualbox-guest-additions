@@ -192,7 +192,7 @@ validate_platform() {
 	    exit 0
 	    ;;
 	(*)
-	    abort "%s: %s: Hypervisor not supported\n" "$0" "$vendor"
+	    abort "%s: %s hypervisor not supported\n" "$0" "$vendor"
 	    ;;
     esac
 }
