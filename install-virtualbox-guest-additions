@@ -40,10 +40,12 @@ configure_platform() {
 	(Linux|GNU)
 	    case "$ID" in
 		(debian|raspbian|ubuntu|neon|linuxmint|kali)
+		    mount_dir=/media/cdrom0
 		    packages=$DEBIAN_PKGS
 		    ;;
 		(ol|centos)
 		    export KERN_DIR=/usr/src/kernels/`uname -r`
+		    mount_dir=/run/media/$USER/$VBOX_DIR
 		    packages=$REDHAT_PKGS
 		    ;;
 	    esac
@@ -52,7 +54,7 @@ configure_platform() {
 }
 
 get_package_directory() {
-    ls -drv /run/media/$USER/$VBOX_DIR 2>/dev/null | head -n 1
+    ls -drv $mount_dir 2>/dev/null | head -n 1
 }
 
 get_realpath() (
