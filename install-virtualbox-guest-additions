@@ -188,6 +188,9 @@ validate_platform() {
 	(KVM)
 	    :
 	    ;;
+	('')
+	    exit 0
+	    ;;
 	(*)
 	    abort "%s: %s: Hypervisor not supported\n" "$0" "$vendor"
 	    ;;
