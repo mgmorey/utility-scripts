@@ -83,6 +83,7 @@ install_docker() {
     case $installed_package in
 	(docker|docker.io)
 	    printf "Package $installed_package is installed\n"
+	    exit 0
 	    ;;
 	(docker-ce)
 	    printf "Removing $installed_package\n"
