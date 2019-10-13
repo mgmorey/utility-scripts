@@ -42,6 +42,22 @@ configure_platform() {
     esac
 }
 
+get_architecture() {
+    machine=$(uname -m)
+
+    case "$machine" in
+	(x86_64)
+	    printf "%s\n" amd64
+	    ;;
+	(armv7l)
+	    printf "%s\n" armhf
+	    ;;
+	(*)
+	    printf "%s\n" $machine
+	    ;;
+    esac
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -116,6 +132,17 @@ postinstall_docker() {
 }
 
 validate_platform() {
+    arch=$(get_architecture)
+
+    case "$arch" in
+	(amd64)
+	    :
+	    ;;
+	(*)
+	    abort "%s: %s: Architecture not supported" "$0" "$arch"
+	    ;;
+    esac
+
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
@@ -208,8 +235,6 @@ validate_platform() {
 	    esac
 	    ;;
 	(FreeBSD)
-	    invoke_usermod=false
-
 	    case "$VERSION_ID" in
 		(11.*)
 		    :
