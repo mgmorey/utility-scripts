@@ -108,7 +108,7 @@ get_os_version_id() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
-		(debian)
+		(debian|raspbian)
 		    cat /etc/debian_version
 		    ;;
 		(ubuntu)
