@@ -56,6 +56,7 @@ assert() {
 
 
 configure_python() {
+    parse_arguments "$@"
     basename=Python-$python_version
 
     archive_dir="$HOME/Downloads/Python"
@@ -237,5 +238,4 @@ case "$kernel_name" in
 	;;
 esac
 
-parse_arguments "$@"
-configure_python
+configure_python "$@"
