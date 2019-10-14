@@ -47,6 +47,30 @@ get_realpath() (
 )
 
 install_emacs_build_extras() {
+    validate_platform
+    preinstall_emacs_build_extras
+
+    packages=$("$script_dir/get-emacs-build-extras")
+
+    if [ -n "$packages" ]; then
+	"$script_dir/install-packages" $packages
+    fi
+}
+
+preinstall_emacs_build_extras() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(ol|centos)
+		    "$script_dir/install-epel"
+	    	    ;;
+	    esac
+	    ;;
+    esac
+
+}
+
+validate_platform() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
@@ -72,11 +96,6 @@ install_emacs_build_extras() {
 	    ;;
     esac
 
-    packages=$("$script_dir/get-emacs-build-extras")
-
-    if [ -n "$packages" ]; then
-	"$script_dir/install-packages" $packages
-    fi
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
