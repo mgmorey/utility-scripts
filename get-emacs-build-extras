@@ -25,12 +25,11 @@ libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
 libXt-devel libXtst-devel libXv-devel libxml2-devel make m17n-lib-devel \
 openjpeg-devel ncurses-devel zlib-devel webkit2gtk3-devel Xaw3d-devel"
 
-REDHAT_7_PKGS="GConf2-devel giflib-devel gnutls-devel gpm-devel gtk3-devel \
-ImageMagick-devel lcms2-devel libacl-devel libICE-devel libjpeg-turbo-devel \
-libpng-devel libSM-devel libtiff-devel libX11-devel libXaw-devel \
-libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
-libXt-devel libXtst-devel libXv-devel libxml2-devel make m17n-lib-devel \
-openjpeg-devel ncurses-devel zlib-devel"
+REDHAT_7_PKGS="gnutls-devel gpm-devel gtk3-devel libacl-devel libICE-devel \
+libjpeg-turbo-devel libpng-devel libSM-devel libtiff-devel libX11-devel \
+libXaw-devel libXext-devel libXi-devel libXmu-devel libXpm-devel \
+libXrandr-devel libXt-devel libXtst-devel libXv-devel libxml2-devel make \
+ncurses-devel zlib-devel"
 
 REDHAT_8_PKGS="gnutls-devel gpm-devel gtk3-devel libacl-devel libICE-devel \
 libjpeg-turbo-devel libpng-devel libSM-devel libtiff-devel libX11-devel \
