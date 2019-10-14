@@ -83,7 +83,7 @@ configure_emacs() {
     if [ ! -r "$build_dir/config.status" ]; then
 	cd "$build_dir"
         options=$(get_configure_options)
-	"$src_dir/configure" ${options-} "$@"
+	"$src_dir/configure" ${options-}
     fi
 }
 
@@ -91,7 +91,7 @@ get_configure_options() {
     case "$kernel_name" in
         (Linux)
             case "$ID" in
-                (ol)
+                (ol|centos)
                     printf "%s\n" "--with-gif=no"
                     ;;
             esac
