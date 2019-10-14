@@ -55,7 +55,8 @@ assert() {
 }
 
 configure_emacs() {
-    eval $(get-os-release -X)
+    validate_platform
+    parse_arguments "$@"
 
     basename=emacs-$EMACS_VERSION
 
@@ -92,8 +93,12 @@ get_configure_options() {
         (Linux)
             case "$ID" in
                 (ol|centos)
-                    printf "%s\n" "--with-gif=no"
-                    ;;
+		    case "$VERSION_ID" in
+			(8|8.0)
+			    printf "%s\n" "--with-gif=no"
+			    ;;
+		    esac
+		    ;;
             esac
 	    ;;
     esac
@@ -181,31 +186,33 @@ usage() {
 	EOF
 }
 
+validate_platform() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu|linuxmint|neon|kali)
+		    :
+	    	    ;;
+		(opensuse-*|fedora|ol|centos)
+		    :
+	    	    ;;
+		(*)
+		    abort_not_supported Distro
+		    ;;
+	    esac
+	    ;;
+	(FreeBSD|SunOS)
+	    :
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
+
 script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
-
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (debian|raspbian|ubuntu|linuxmint|neon|kali)
-		:
-	    	;;
-	    (opensuse-*|fedora|ol|centos)
-		:
-	    	;;
-	    (*)
-		abort_not_supported Distro
-		;;
-	esac
-	;;
-    (FreeBSD|SunOS)
-	:
-	;;
-    (*)
-	abort_not_supported "Operating system"
-	;;
-esac
 
 parse_arguments "$@"
 configure_emacs
