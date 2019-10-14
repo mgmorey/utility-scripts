@@ -88,7 +88,7 @@ install_docker() {
 	(docker-ce)
 	    printf "Removing $installed_package\n"
 
-	    if ! apt-get remove $installed_package; then
+	    if ! "$script_dir/uninstall-packages" $installed_package; then
 		exit $?
 	    fi
 	    ;;
