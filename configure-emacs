@@ -168,10 +168,6 @@ parse_arguments() {
     done
 
     shift $(($OPTIND - 1))
-
-    if [ $# -gt 0 ]; then
-	abort_too_many_arguments "$@"
-    fi
 }
 
 usage() {
