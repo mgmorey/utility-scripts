@@ -25,12 +25,18 @@ libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
 libXt-devel libXtst-devel libXv-devel libxml2-devel make m17n-lib-devel \
 openjpeg-devel ncurses-devel zlib-devel webkit2gtk3-devel Xaw3d-devel"
 
-REDHAT_PKGS="GConf2-devel giflib-devel gnutls-devel gpm-devel gtk3-devel \
+REDHAT_7_PKGS="GConf2-devel giflib-devel gnutls-devel gpm-devel gtk3-devel \
 ImageMagick-devel lcms2-devel libacl-devel libICE-devel libjpeg-turbo-devel \
 libpng-devel libSM-devel libtiff-devel libX11-devel libXaw-devel \
 libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
 libXt-devel libXtst-devel libXv-devel libxml2-devel make m17n-lib-devel \
 openjpeg-devel ncurses-devel zlib-devel"
+
+REDHAT_8_PKGS="gnutls-devel gpm-devel gtk3-devel libacl-devel libICE-devel \
+libjpeg-turbo-devel libpng-devel libSM-devel libtiff-devel libX11-devel \
+libXaw-devel libXext-devel libXi-devel libXmu-devel libXpm-devel \
+libXrandr-devel libXt-devel libXtst-devel libXv-devel libxml2-devel make \
+ncurses-devel zlib-devel"
 
 OPENSUSE_PKGS="gconf2-devel giflib-devel gpm-devel gtk3-devel \
 ImageMagick-devel libacl-devel libgnutls-devel libjpeg62-devel \
@@ -47,6 +53,49 @@ abort() {
 
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+
+get_emacs_build_extras() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu|linuxmint|neon|kali)
+		    packages=$DEBIAN_PKGS
+		    ;;
+		(opensuse-*)
+		    packages=$OPENSUSE_PKGS
+		    ;;
+		(fedora)
+		    packages=$FEDORA_PKGS
+	    	    ;;
+		(ol)
+		    case "$VERSION_ID" in
+			(7.7)
+			    packages=$REDHAT_7_PKGS
+			    ;;
+		    esac
+		    ;;
+		(centos)
+		    case "$VERSION_ID" in
+			(7)
+			    packages=$REDHAT_7_PKGS
+			    ;;
+			(8)
+			    packages=$REDHAT_8_PKGS
+			    ;;
+		    esac
+		    ;;
+	    esac
+	    ;;
+	(FreeBSD|SunOS|CYGWIN_NT-*)
+	    :
+	    ;;
+    esac
+
+    if [ -n "${packages-}" ]; then
+	printf "%s\n" $packages
+    fi
 }
 
 get_realpath() (
@@ -70,28 +119,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
 
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (debian|raspbian|ubuntu|linuxmint|neon|kali)
-		packages=$DEBIAN_PKGS
-		;;
-	    (opensuse-*)
-		packages=$OPENSUSE_PKGS
-		;;
-	    (fedora)
-		packages=$FEDORA_PKGS
-	    	;;
-	    (ol|centos)
-		packages=$REDHAT_PKGS
-	    	;;
-	esac
-	;;
-    (FreeBSD|SunOS|CYGWIN_NT-*)
-	:
-	;;
-esac
-
-if [ -n "${packages-}" ]; then
-    printf "%s\n" $packages
-fi
+get_emacs_build_extras
