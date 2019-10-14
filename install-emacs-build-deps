@@ -58,58 +58,109 @@ get_realpath() (
     fi
 )
 
+configure_platform() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|linuxmint|kali)
+		    case "$VERSION_ID" in
+			(9)
+			    package=$DEBIAN_9_PKG
+			    ;;
+			(10)
+			    package=$DEBIAN_10_PKG
+			    ;;
+		    esac
+
+		    packages=$DEBIAN_PKGS
+		    ;;
+		(ubuntu|neon)
+		    case "$VERSION_ID" in
+			(18.*)
+			    package=$UBUNTU_18_PKG
+			    ;;
+			(19.*)
+			    package=$UBUNTU_19_PKG
+			    ;;
+		    esac
+
+		    packages=$UBUNTU_PKGS
+		    ;;
+		(opensuse-*)
+		    packages=$OPENSUSE_PKGS
+		    ;;
+		(fedora|ol|centos)
+		    package=$REDHAT_PKG
+		    ;;
+	    esac
+	    ;;
+    esac
+}
+
+install_emacs_build_deps() {
+    validate_platform
+    configure_platform
+
+    if [ -z "${package:-}" ] || ! "$script_dir/install-build-deps" "$@" $package; then
+	if [ -n "${packages:-}" ]; then
+	    "$script_dir/install-packages" "$@" $packages
+	fi
+    fi
+}
+
+validate_platform() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|linuxmint|kali)
+		    case "$VERSION_ID" in
+			(9)
+			    :
+			    ;;
+			(10)
+			    :
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(ubuntu|neon)
+		    case "$VERSION_ID" in
+			(18.*)
+			    :
+			    ;;
+			(19.*)
+			    :
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(opensuse-*)
+		    :
+		    ;;
+		(fedora|ol|centos)
+		    :
+		    ;;
+		(*)
+		    abort_not_supported Distro
+		    ;;
+	    esac
+	    ;;
+	(FreeBSD|SunOS|CYGWIN_NT-*)
+	    :
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
+
+
 script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
 
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (debian|raspbian|linuxmint|kali)
-		case "$VERSION_ID" in
-		    (9)
-			package=$DEBIAN_9_PKG
-			;;
-		    (10)
-			package=$DEBIAN_10_PKG
-			;;
-		esac
-
-		packages=$DEBIAN_PKGS
-		;;
-	    (ubuntu|neon)
-		case "$VERSION_ID" in
-		    (18.*)
-			package=$UBUNTU_18_PKG
-			;;
-		    (19.*)
-			package=$UBUNTU_19_PKG
-			;;
-		esac
-
-		packages=$UBUNTU_PKGS
-		;;
-	    (opensuse-*)
-		packages=$OPENSUSE_PKGS
-		;;
-	    (fedora|ol|centos)
-		package=$REDHAT_PKG
-		;;
-	    (*)
-		abort_not_supported Distro
-		;;
-	esac
-	;;
-    (FreeBSD|SunOS|CYGWIN_NT-*)
-	:
-	;;
-    (*)
-	abort_not_supported "Operating system"
-	;;
-esac
-
-if [ -z "${package:-}" ] || ! "$script_dir/install-build-deps" "$@" $package; then
-    if [ -n "${packages:-}" ]; then
-	"$script_dir/install-packages" "$@" $packages
-    fi
-fi
+install_emacs_build_deps
