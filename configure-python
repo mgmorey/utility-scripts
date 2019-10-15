@@ -100,13 +100,13 @@ configure_python() {
 
     case "$kernel_name" in
 	(Linux|GNU)
-	    "$configure" $options "$@" LDFLAGS="-Wl,--rpath=$python_prefix/lib"
+	    "$configure" $options LDFLAGS="-Wl,--rpath=$python_prefix/lib"
 	    ;;
 	(FreeBSD)
-	    "$configure" $options "$@" LDFLAGS="-R$python_prefix/lib"
+	    "$configure" $options LDFLAGS="-R$python_prefix/lib"
 	    ;;
 	(SunOS)
-	    "$configure" $options "$@" LDFLAGS="-R$python_prefix/lib"
+	    "$configure" $options LDFLAGS="-R$python_prefix/lib"
 	    ;;
 	(*)
 	    "$configure"
