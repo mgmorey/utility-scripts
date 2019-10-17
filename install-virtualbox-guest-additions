@@ -18,6 +18,8 @@
 
 DEBIAN_PKGS="build-essential dkms linux-headers-$(uname -r)"
 
+FEDORA_PKGS="bzip2 dkms gcc kernel-headers kernel-devel make perl"
+
 REDHAT_PKGS="bzip2 dkms gcc kernel-headers kernel-devel make perl"
 
 VBOX_DIR=VBox_GAs_6.*
@@ -41,12 +43,19 @@ configure_platform() {
 	(Linux|GNU)
 	    case "$ID" in
 		(debian|raspbian|ubuntu|neon|linuxmint|kali)
+		    cdrom_dev=/dev/cdrom
 		    mount_dir=/media/cdrom0
 		    packages=$DEBIAN_PKGS
 		    ;;
+		(fedora)
+		    cdrom_dev=/dev/cdrom
+		    mount_dir=/run/media/${SUDO_USER-USER}/$VBOX_DIR
+		    packages=$FEDORA_PKGS
+		    ;;
 		(ol|centos)
 		    export KERN_DIR=/usr/src/kernels/`uname -r`
-		    mount_dir=/run/media/$USER/$VBOX_DIR
+		    cdrom_dev=/dev/cdrom
+		    mount_dir=/run/media/${SUDO_USER-USER}/$VBOX_DIR
 		    packages=$REDHAT_PKGS
 		    ;;
 	    esac
@@ -112,7 +121,7 @@ mount_package_directory() {
     package_dir=$(get_package_directory)
 
     if [ ! -r $package_dir/$VBOX_FILE ]; then
-	if ! mount -r /dev/cdrom $package_dir 2>/dev/null; then
+	if ! mount -r $cdrom_dev $package_dir 2>/dev/null; then
 	    return 1
 	fi
     fi
@@ -163,6 +172,16 @@ validate_platform() {
 			    :
 			    ;;
 			(8.*)
+			    :
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(fedora)
+		    case "$VERSION_ID" in
+			(30)
 			    :
 			    ;;
 			(*)
