@@ -73,6 +73,9 @@ install_python_build_deps() {
 			(19.04)
 			    package=$DEBIAN_PKG
 			    ;;
+			(19.10)
+			    package=$DEBIAN_PKG
+			    ;;
 			(*)
 			    abort_not_supported Release
 			    ;;
