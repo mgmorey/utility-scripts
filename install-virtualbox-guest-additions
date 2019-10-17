@@ -21,6 +21,7 @@ DEBIAN_PKGS="build-essential dkms linux-headers-$(uname -r)"
 REDHAT_PKGS="bzip2 dkms gcc kernel-headers kernel-devel make perl"
 
 VBOX_DIR=VBox_GAs_6.*
+VBOX_FILE=VBoxLinuxAdditions.run
 
 abort() {
     printf "$@" >&2
@@ -94,22 +95,30 @@ install_virtualbox_guest() {
     validate_platform
     configure_platform
     preinstall_virtualbox_guest
-    package_dir=$(get_package_directory)
 
-    until [ -n "$package_dir" ]; do
-	printf "Insert Oracle VirtualBox Guest Additions CD-ROM and press Enter: "
+    until mount_package_directory; do
+	printf "Insert VirtualBox Guest Additions CD-ROM and press Enter: "
 	read INPUT
-	package_dir=$(get_package_directory)
     done
 
     printf "\n"
 
-    if [ ! -d $package_dir ]; then
-	mount -r /dev/cdrom $package_dir
+    if [ -r $VBOX_FILE ]; then
+	sh $VBOX_FILE
+    fi
+}
+
+mount_package_directory() {
+    package_dir=$(get_package_directory)
+
+    if [ ! -r $package_dir/$VBOX_FILE ]; then
+	if ! mount -r /dev/cdrom $package_dir 2>/dev/null; then
+	    return 1
+	fi
     fi
 
     cd $package_dir
-    sh VBoxLinuxAdditions.run
+    return 0
 }
 
 preinstall_virtualbox_guest() {
