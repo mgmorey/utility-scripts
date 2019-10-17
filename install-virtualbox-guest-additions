@@ -101,11 +101,11 @@ install_virtualbox_guest() {
 	read INPUT
     done
 
-    printf "\n"
+    install_virtualbox_package
+}
 
-    if [ -r $VBOX_FILE ]; then
-	sh $VBOX_FILE
-    fi
+install_virtualbox_package() {
+    sh $VBOX_FILE
 }
 
 mount_package_directory() {
