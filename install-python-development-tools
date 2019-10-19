@@ -106,7 +106,7 @@ install_python_development_tools() {
 	    ;;
     esac
 
-    packages=$("$script_dir/get-python-development-tools")
+    packages=$("$script_dir/get-python-devel-packages")
     pattern=$("$script_dir/get-devel-pattern")
 
     if [ -n "$packages" ]; then
