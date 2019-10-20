@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 : ${DATABASE_DIALECT:=sqlite}
-: ${DATABASE_FILENAME:=${DATABASE_SCHEMA:+/tmp/$DATABASE_SCHEMA.sqlite}}
+: ${DATABASE_FILENAME:=}
 
 abort() {
     printf "$@" >&2
@@ -32,9 +32,11 @@ exec_sql_cli() {
     case "$DATABASE_DIALECT" in
 	(mysql)
 	    ${1+$1 }$DATABASE_DIALECT \
-		-h${DATABASE_HOST:-localhost} \
-		-u${DATABASE_USER:-$USER} \
-		-p${DATABASE_PASSWORD:-}
+		--protocol=${DATABASE_PROTOCOL:-TCP} \
+		--host=${DATABASE_HOST:-localhost} \
+		--port=${DATABASE_PORT:-3306} \
+		--user=${DATABASE_USER:-$USER} \
+		--password=${DATABASE_PASSWORD:-}
 	    ;;
 	(sqlite)
 	    ${1+$1 }sqlite3 $DATABASE_FILENAME
@@ -47,7 +49,7 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
@@ -80,7 +82,7 @@ parse_arg() {
     esac
 
     if [ -z "${file:-}" ]; then
-	return
+	return 1
     elif [ -e "$file" ]; then
 	script="$1"
     elif [ -e "$sql_dir/$file" ]; then
