@@ -44,9 +44,9 @@ SUNOS_PKGS=":%s-codestyle :%s-packaging :%s-pip :%s-pylint :%s-test \
 UBUNTU_18_04_PKGS="pylint3 %s-openssl %s-packaging %s-pip %s-pycodestyle \
 %s-pytest %s-venv %s-virtualenv virtualenv"
 UBUNTU_19_04_PKGS="pylint3 %s-openssl %s-packaging %s-pip %s-pycodestyle \
-%s-pytest %s-venv %s-virtualenv"
+%s-pytest %s-venv %s-virtualenv virtualenv"
 UBUNTU_19_10_PKGS="pylint %s-openssl %s-packaging %s-pip %s-pycodestyle \
-%s-pytest %s-venv %s-virtualenv"
+%s-pytest %s-venv %s-virtualenv virtualenv"
 
 abort() {
     printf "$@" >&2
