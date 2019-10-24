@@ -20,7 +20,7 @@ DARWIN_PKGS=":%s-codestyle :%s-packaging :%s-pip :%s-pylint :%s-test \
 :%s-virtualenv"
 
 DEBIAN_10_PKGS="pylint3 %s-openssl %s-packaging %s-pip %s-pycodestyle \
-%s-pytest %s-venv %s-virtualenv"
+%s-pytest %s-venv %s-virtualenv virtualenv"
 
 FREEBSD_PKGS="pylint-%s %s-packaging %s-pip %s-pycodestyle %s-pytest \
 %s-virtualenv"
