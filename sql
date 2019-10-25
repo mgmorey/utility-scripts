@@ -61,7 +61,7 @@ get_realpath() (
     fi
 )
 
-parse_arg() {
+parse_argument() {
     case "$1" in
 	(*.sql)
 	    file=$1
@@ -96,13 +96,38 @@ parse_arg() {
     scripts="${scripts:+$scripts }$script"
 }
 
+parse_arguments() {
+    scripts=
+
+    if [ $# -gt 0 ]; then
+	for arg; do
+	    parse_argument $arg
+	done
+    fi
+}
+
+run_sql() {
+    if [ -n "$scripts" ]; then
+	for script in $scripts; do
+	    if [ -f $script ]; then
+		exec <$script
+		exec_sql_cli
+	    elif [ -d $script ]; then
+		abort "%s: Is a directory\n" "$script"
+	    else
+		abort "%s: No such script file\n" "$script"
+	    fi
+	done
+    else
+	exec_sql_cli exec
+    fi
+}
+
 script_dir=$(get_realpath "$(dirname "$0")")
 
 source_dir=$script_dir/..
 
 sql_dir=$source_dir/sql
-
-scripts=
 
 if [ -r .env ]; then
     . ./.env
@@ -112,23 +137,5 @@ elif [ -r "$HOME/.env" ]; then
     . "$HOME/.env"
 fi
 
-if [ $# -gt 0 ]; then
-    for arg; do
-	parse_arg $arg
-    done
-fi
-
-if [ -n "$scripts" ]; then
-    for script in $scripts; do
-	if [ -f $script ]; then
-	    exec <$script
-	    exec_sql_cli
-	elif [ -d $script ]; then
-	    abort "%s: Is a directory\n" "$script"
-	else
-	    abort "%s: No such script file\n" "$script"
-	fi
-    done
-else
-    exec_sql_cli exec
-fi
+parse_arguments "$@"
+run_sql
