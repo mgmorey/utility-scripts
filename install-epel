@@ -84,7 +84,14 @@ validate_platform() {
 	(Linux)
 	    case "$ID" in
 		(ol|centos|rhel)
-		    :
+		    case "$VERSION_ID" in
+			(7|7.*)
+			    :
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
 		    ;;
 		(*)
 		    abort_not_supported Distro
