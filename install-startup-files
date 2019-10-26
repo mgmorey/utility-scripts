@@ -77,6 +77,11 @@ fi
 
 cd
 
+if [ ! -e .editorconfig ]; then
+    printf "Installing %s\n" .editorconfig
+    /bin/cp $HOME/git/startup-files/.editorconfig .
+fi
+
 if [ ! -e .profile ]; then
     printf "Installing %s\n" .profile
     /bin/cp $HOME/git/startup-files/.profile .
