@@ -18,7 +18,7 @@
 
 DARWIN_PKG="docker"
 
-DEBIAN_10_PKG="docker.io"
+DEBIAN_PKG="docker.io"
 
 FEDORA_PKG="docker"
 
@@ -29,6 +29,8 @@ OPENSUSE_PKG="docker"
 
 REDHAT_PKG="podman"
 REDHAT_PKGS="podman-docker"
+
+UBUNTU_PKG="docker.io"
 
 abort() {
     printf "$@" >&2
@@ -48,12 +50,12 @@ get_docker_packages() {
 		(debian|raspbian|kali)
 		    case "$VERSION_ID" in
 			(10)
-			    packages="${package:-$DEBIAN_10_PKG} ${DEBIAN_10_PKGS-}"
+			    packages="${package:-$DEBIAN_PKG} ${DEBIAN_PKGS-}"
 			    ;;
 		    esac
 		    ;;
 		(ubuntu|linuxmint|neon)
-		    packages="${package:-$DEBIAN_10_PKG} ${DEBIAN_10_PKGS-}"
+		    packages="${package:-$UBUNTU_PKG} $UBUNTU_PKGS"
 		    ;;
 		(opensuse-leap)
 		    packages="${package:-$OPENSUSE_PKG} ${OPENSUSE_LP_PKGS-}"
