@@ -66,9 +66,6 @@ get_docker_packages() {
 		    ;;
 		(ol|rhel)
 		    case "$VERSION_ID" in
-			(7|7.*)
-			    packages="${package:-$REDHAT_PKG} ${REDHAT_PKGS-}"
-			    ;;
 			(8|8.*)
 			    packages="${package:-$REDHAT_PKG} ${REDHAT_PKGS-}"
 			    ;;
