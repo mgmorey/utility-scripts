@@ -107,7 +107,7 @@ set_common_parameters() {
 
     # prepend GNU binaries to PATH
     if [ -d /usr/gnu/bin ] && ! grep_path /usr/gnu/bin "$PATH"; then
-	export PATH="/usr/gnu/bin${PATH:+:$PATH}"
+	PATH="/usr/gnu/bin${PATH:+:$PATH}"
     fi
 
     # set PATH so it includes /usr/local/sbin if it exists
