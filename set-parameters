@@ -72,6 +72,7 @@ print_parameters() {
 }
 
 set_common_parameters() {
+    # initialize INFOPATH parameter
     if [ -z "${INFOPATH-}" ]; then
 	INFOPATH=/usr/share/info
 
@@ -82,6 +83,7 @@ set_common_parameters() {
 	done
     fi
 
+    # initialize MANPATH parameter
     if [ -z "${MANPATH-}" ]; then
 	MANPATH=/usr/share/man
 
@@ -107,6 +109,22 @@ set_common_parameters() {
 	PATH="$dir/sbin${PATH:+:$PATH}"
     done
 
+    # add user info directory to INFOPATH (if it exists)
+    if [ -d "$HOME/info" ] && ! grep_path "$HOME/info" "$PATH"; then
+        INFOPATH="$HOME/info${INFOPATH:+:$INFOPATH}"
+    fi
+
+    # add user man directory to MANPATH (if it exists)
+    if [ -d "$HOME/man" ] && ! grep_path "$HOME/man" "$PATH"; then
+        MANPATH="$HOME/man${MANPATH:+:$MANPATH}"
+    fi
+
+    # add user binary directories to PATH (if they exist)
+    for dir in "$HOME/bin" "$HOME/.local/bin"; do
+	if [ -d $dir ] && ! grep_path $dir "$PATH"; then
+	    PATH="$dir${PATH:+:$PATH}"
+	fi
+    done
 }
 
 set_macos_parameters() {
