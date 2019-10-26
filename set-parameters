@@ -92,12 +92,14 @@ set_common_parameters() {
 	done
     fi
 
-    # set PATH so it includes /usr/lib/cups/bin if it exists
-    if [ -d /usr/lib/cups/bin ] ; then
-	PATH="/usr/lib/cups/bin${PATH:+:$PATH}"
-    fi
+    # add common binary directories to PATH (if they exist)
+    for dir in /usr/local/sbin /usr/lib/cups/bin /usr/gnu/bin; do
+	if [ -d $dir ] && ! grep_path $dir "$PATH"; then
+	    PATH="$dir${PATH:+:$PATH}"
+	fi
+    done
 
-    # set paths so they include include pkgsrc directories (if they exist)
+    # add pkgsrc directory to INFOPATH, MANPATH and PATH (if it exists)
     for dir in $(ls -d /opt/local /opt/pkg /usr/pkg 2>/dev/null || true); do
 	INFOPATH="$dir/info${INFOPATH:+:$INFOPATH}"
 	MANPATH="$dir/man${MANPATH:+:$MANPATH}"
@@ -105,15 +107,6 @@ set_common_parameters() {
 	PATH="$dir/sbin${PATH:+:$PATH}"
     done
 
-    # prepend GNU binaries to PATH
-    if [ -d /usr/gnu/bin ] && ! grep_path /usr/gnu/bin "$PATH"; then
-	PATH="/usr/gnu/bin${PATH:+:$PATH}"
-    fi
-
-    # set PATH so it includes /usr/local/sbin if it exists
-    if [ -d /usr/local/sbin ] && ! grep_path /usr/local/sbin "$PATH"; then
-	PATH="/usr/local/sbin${PATH:+:$PATH}"
-    fi
 }
 
 set_macos_parameters() {
