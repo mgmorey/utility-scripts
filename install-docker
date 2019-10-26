@@ -33,11 +33,21 @@ assert() {
 
 configure_platform() {
     case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(rhel)
+		    install_group=false
+		    ;;
+		(*)
+		    install_group=true
+		    ;;
+	    esac
+	    ;;
 	(FreeBSD)
-	    invoke_usermod=false
+	    install_group=false
 	    ;;
 	(*)
-	    invoke_usermod=true
+	    install_group=true
 	    ;;
     esac
 }
@@ -110,7 +120,7 @@ install_docker() {
 }
 
 install_docker_group() {
-    if [ "$invoke_usermod" = false ]; then
+    if [ "$install_group" = false ]; then
 	return 0
     fi
 
@@ -220,6 +230,16 @@ validate_platform() {
 			    ;;
 			(*)
 			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(rhel)
+		    case "$VERSION_ID" in
+			(7.[6789])
+			    :
+			    ;;
+			(8.*)
+			    :
 			    ;;
 		    esac
 		    ;;
