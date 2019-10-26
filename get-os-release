@@ -48,7 +48,7 @@ collect_data() {
 		(debian|raspbian|ubuntu|linuxmint|neon|kali)
 		    debian_version=$(cat /etc/debian_version)
 		    ;;
-		(fedora|ol|centos)
+		(fedora|ol|centos|rhel)
 		    redhat_release=$(cat /etc/redhat-release)
 		    ;;
 	    esac
@@ -114,7 +114,7 @@ get_os_version_id() {
 		(ubuntu)
 		    printf "%s\n" "$VERSION" | awk '{print $1}'
 		    ;;
-		(centos)
+		(centos|rhel)
 		    awk '{print $4}' /etc/redhat-release
 		    ;;
 	    esac

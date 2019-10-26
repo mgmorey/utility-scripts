@@ -48,26 +48,11 @@ get_realpath() (
 
 install_emacs_build_extras() {
     validate_platform
-    preinstall_emacs_build_extras
-
     packages=$("$script_dir/get-emacs-build-extras")
 
     if [ -n "$packages" ]; then
 	"$script_dir/install-packages" $packages
     fi
-}
-
-preinstall_emacs_build_extras() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(ol|centos)
-		    "$script_dir/install-epel"
-	    	    ;;
-	    esac
-	    ;;
-    esac
-
 }
 
 validate_platform() {
@@ -80,7 +65,7 @@ validate_platform() {
 		(opensuse-*)
 		    :
 		    ;;
-		(fedora|ol|centos)
+		(fedora|ol|centos|rhel)
 		    :
 	    	    ;;
 		(*)

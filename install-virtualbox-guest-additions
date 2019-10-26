@@ -52,7 +52,7 @@ configure_platform() {
 		    mount_dir=/run/media/${SUDO_USER-USER}/$VBOX_DIR
 		    packages=$FEDORA_PKGS
 		    ;;
-		(ol|centos)
+		(ol|centos|rhel)
 		    export KERN_DIR=/usr/src/kernels/`uname -r`
 		    cdrom_dev=/dev/cdrom
 		    mount_dir=/run/media/${SUDO_USER-USER}/$VBOX_DIR
@@ -140,7 +140,7 @@ update_kernel_packages() {
     case "$kernel_name" in
 	(Linux)
 	    case "$ID" in
-		(ol|centos)
+		(ol|centos|rhel)
 		    update_redhat_kernel_packages
 		    ;;
 	    esac
@@ -189,12 +189,12 @@ validate_platform() {
 			    ;;
 		    esac
 		    ;;
-		(centos)
+		(ol|centos)
 		    case "$VERSION_ID" in
-			(7)
+			(7|7.*)
 			    :
 			    ;;
-			(8)
+			(8|8.*)
 			    :
 			    ;;
 			(*)

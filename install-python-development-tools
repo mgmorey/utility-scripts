@@ -48,7 +48,53 @@ get_realpath() (
     fi
 )
 
+configure_platform() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu|linuxmint|neon|kali)
+		    package=$DEBIAN_PKG
+		    ;;
+	    esac
+	    ;;
+    esac
+}
+
 install_python_development_tools() {
+    validate_platform
+    configure_platform
+    preinstall_python_development_tools
+
+    packages=$("$script_dir/get-python-devel-packages")
+    pattern=$("$script_dir/get-devel-pattern")
+
+    if [ -n "$packages" ]; then
+	"$script_dir/install-packages" ${pattern:+-p "$pattern" }$packages
+    fi
+
+    if [ -n "${package:-}" ]; then
+	"$script_dir/install-build-deps" "$@" $package
+    fi
+}
+
+preinstall_python_development_tools() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(ol|centos|rhel)
+                    case "$VERSION_ID" in
+			(7|7.*)
+			    "$script_dir/install-epel"
+                            ;;
+		    esac
+	    	    ;;
+	    esac
+	    ;;
+    esac
+
+}
+
+validate_platform() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
@@ -61,13 +107,16 @@ install_python_development_tools() {
 		(fedora)
 		    :
 	    	    ;;
-		(ol|centos)
+		(ol|centos|rhel)
                     case "$VERSION_ID" in
 			(7|7.*)
 			    :
                             ;;
-			(*)
+			(8|8.*)
 			    :
+			    ;;
+			(*)
+			    abort_not_supported Distro
 			    ;;
                     esac
 		    ;;
@@ -83,39 +132,6 @@ install_python_development_tools() {
 	    abort_not_supported "Operating system"
 	    ;;
     esac
-
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    package=$DEBIAN_PKG
-		    ;;
-		(opensuse-*|fedora|ol|centos)
-		    :
-		    ;;
-		(*)
-		    abort_not_supported Distro
-		    ;;
-	    esac
-	    ;;
-	(FreeBSD|SunOS|CYGWIN_NT-*)
-	    :
-    	    ;;
-	(*)
-	    abort_not_supported "Operating system"
-	    ;;
-    esac
-
-    packages=$("$script_dir/get-python-devel-packages")
-    pattern=$("$script_dir/get-devel-pattern")
-
-    if [ -n "$packages" ]; then
-	"$script_dir/install-packages" ${pattern:+-p "$pattern" }$packages
-    fi
-
-    if [ -n "${package:-}" ]; then
-	"$script_dir/install-build-deps" "$@" $package
-    fi
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")

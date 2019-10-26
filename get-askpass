@@ -112,7 +112,7 @@ case "$kernel_name" in
 			;;
 		esac
 		;;
-	    (ol|centos)
+	    (ol|centos|rhel)
 		case "$desktop_name" in
 		    (GNOME|GNOME*|*:GNOME|'')
 			package=openssh-askpass

@@ -38,7 +38,7 @@ get_package_managers() {
 		(fedora)
 		    printf "%s\n" dnf
 		    ;;
-		(ol|centos)
+		(ol|centos|rhel)
 		    case "$VERSION_ID" in
 			(7|7.*)
 			    printf "%s\n" yum /usr/pkg/bin/pkgin

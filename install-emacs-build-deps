@@ -141,7 +141,7 @@ validate_platform() {
 		(opensuse-*)
 		    :
 		    ;;
-		(fedora|ol|centos)
+		(fedora|ol|centos|rhel)
 		    :
 		    ;;
 		(*)
@@ -157,7 +157,6 @@ validate_platform() {
 	    ;;
     esac
 }
-
 
 script_dir=$(get_realpath "$(dirname "$0")")
 

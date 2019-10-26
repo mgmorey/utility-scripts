@@ -52,13 +52,7 @@ case "$kernel_name" in
 	    (opensuse-*)
 		printf "%s\n" "install -t pattern"
 		;;
-	    (fedora)
-		printf "%s\n" "groupinstall"
-		;;
-	    (ol)
-		printf "%s\n" "groupinstall"
-		;;
-	    (centos)
+	    (fedora|ol|centos|rhel)
 		printf "%s\n" "groupinstall"
 		;;
 	    (*)

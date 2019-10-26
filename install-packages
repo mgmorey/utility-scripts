@@ -36,7 +36,7 @@ configure_platform() {
 		(debian|raspbian|ubuntu|linuxmint|neon|kali)
 		    IS_PATTERN_SUPPORTED=true
 		    ;;
-		(opensuse-*|fedora|ol|centos)
+		(opensuse-*|fedora|ol|centos|rhel)
 		    IS_PATTERN_SUPPORTED=true
 		    ;;
 		(*)
@@ -206,7 +206,7 @@ validate_platform() {
 		(debian|raspbian|ubuntu|linuxmint|neon|kali)
 		    :
 		    ;;
-		(opensuse-*|fedora|ol|centos)
+		(opensuse-*|fedora|ol|centos|rhel)
 		    :
 		    ;;
 		(*)
