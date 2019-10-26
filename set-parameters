@@ -1,0 +1,184 @@
+#!/bin/sh -eu
+
+# set-parameters: print statements to set profile parameters
+# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+print_parameters() {
+    for var; do
+	eval value=\${$var-}
+
+	if [ -z "$value" ]; then
+	    continue
+	fi
+
+	case ${SHELL##*/} in
+	    (bash|fish|ksh|ksh93|rbash|zsh)
+		printf "export %s=%s\n" "$var" "$value"
+		;;
+	    (csh|tcsh)
+		printf "setenv %s %s;\n" "$var" "$value"
+		;;
+	    (sh)
+		printf "%s=%s\n" "$var" "$value"
+		printf "export %s\n" "$var"
+		;;
+	esac
+    done
+}
+
+set_common_parameters() {
+    if [ -z "${INFOPATH-}" ]; then
+        INFOPATH=/usr/share/info
+
+        for dir in /usr/share/local/info /usr/local/info; do
+            if [ -d $dir ]; then
+                INFOPATH=$dir:$INFOPATH
+            fi
+        done
+    fi
+
+    if [ -z "${MANPATH-}" ]; then
+        MANPATH=/usr/share/man
+
+        for dir in /usr/share/local/man /usr/local/man; do
+            if [ -d $dir ]; then
+                MANPATH=$dir:$MANPATH
+            fi
+        done
+    fi
+
+    # set PATH so it includes /usr/lib/cups/bin if it exists
+    if [ -d /usr/lib/cups/bin ] ; then
+	PATH="/usr/lib/cups/bin${PATH:+:$PATH}"
+    fi
+
+    # set paths so they include include pkgsrc directories (if they exist)
+    for dir in $(ls -d /opt/local /opt/pkg /usr/pkg 2>/dev/null || true); do
+        INFOPATH="$dir/info${INFOPATH:+:$INFOPATH}"
+        MANPATH="$dir/man${MANPATH:+:$MANPATH}"
+        PATH="$dir/bin${PATH:+:$PATH}"
+        PATH="$dir/sbin${PATH:+:$PATH}"
+    done
+
+    # prepend GNU binaries to PATH
+    if [ -d /usr/gnu/bin ] ; then
+        export PATH="/usr/gnu/bin${PATH:+:$PATH}"
+    fi
+
+    # set PATH so it includes /usr/local/sbin if it exists
+    if [ -d /usr/local/sbin ] ; then
+        PATH="/usr/local/sbin${PATH:+:$PATH}"
+    fi
+}
+
+set_macos_parameters() {
+    # configure environment for Homebrew packages
+    MANPATH=${MANPATH:-$(manpath)}
+
+    prefix=/usr/local/opt
+
+    for pkg in $($HOME/bin/brew-list-keg-only 2>/dev/null || true); do
+        if [ -d $prefix/$pkg ]; then
+      if [ -d $prefix/$pkg/include ]; then
+          CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
+      fi
+      if [ -d $prefix/$pkg/lib ]; then
+          LDFLAGS="-L$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
+      fi
+      if [ -d $prefix/$pkg/lib/$pkg/man ] ; then
+          MANPATH="$prefix/$pkg/lib/$pkg/man${MANPATH:+:$MANPATH}"
+      fi
+      if [ -d $prefix/$pkg/share/man ] ; then
+          MANPATH="$prefix/$pkg/share/man${MANPATH:+:$MANPATH}"
+      fi
+      if [ -d $prefix/$pkg/bin ]; then
+          PATH="$prefix/$pkg/bin${PATH:+:$PATH}"
+      fi
+      if [ -d $prefix/$pkg/lib/pkgconfig ]; then
+          PKG_CONFIG_PATH="$prefix/$pkg/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+      fi
+        fi
+    done
+
+    # set PATH so it includes user's private Python 3 bin if it exists
+    for version in 3.8 3.7 3.6; do
+      if [ -d "$HOME/Library/Python/$version/bin" ] ; then
+          PATH="$HOME/Library/Python/$version/bin${PATH:+:$PATH}"
+          break
+      fi
+    done
+}
+
+set_parameters() {
+    validate_parameters
+
+    case "$kernel_name" in
+	(Darwin)
+	    set_macos_parameters
+	    ;;
+    esac
+
+    print_parameters CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH
+}
+
+validate_parameters() {
+    case ${SHELL##*/} in
+	(bash|fish|ksh|ksh93|rbash|zsh)
+	    :
+	    ;;
+	(csh|tcsh)
+	    :
+	    ;;
+	(sh)
+	    :
+	    ;;
+	(*)
+	    abort "%s: %s: Shell not supported\n" "$0" "$SHELL"
+	    ;;
+    esac
+}
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -X)
+
+set_parameters
