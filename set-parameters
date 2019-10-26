@@ -42,6 +42,12 @@ get_realpath() (
     fi
 )
 
+grep_path() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    printf "%s\n" "$2" | grep -Eq '(^|:)'$1'(:|$)'
+}
+
 print_parameters() {
     for var; do
 	eval value=\${$var-}
@@ -67,23 +73,23 @@ print_parameters() {
 
 set_common_parameters() {
     if [ -z "${INFOPATH-}" ]; then
-        INFOPATH=/usr/share/info
+	INFOPATH=/usr/share/info
 
-        for dir in /usr/share/local/info /usr/local/info; do
-            if [ -d $dir ]; then
-                INFOPATH=$dir:$INFOPATH
-            fi
-        done
+	for dir in /usr/share/local/info /usr/local/info; do
+	    if [ -d $dir ]; then
+		INFOPATH=$dir:$INFOPATH
+	    fi
+	done
     fi
 
     if [ -z "${MANPATH-}" ]; then
-        MANPATH=/usr/share/man
+	MANPATH=/usr/share/man
 
-        for dir in /usr/share/local/man /usr/local/man; do
-            if [ -d $dir ]; then
-                MANPATH=$dir:$MANPATH
-            fi
-        done
+	for dir in /usr/share/local/man /usr/local/man; do
+	    if [ -d $dir ]; then
+		MANPATH=$dir:$MANPATH
+	    fi
+	done
     fi
 
     # set PATH so it includes /usr/lib/cups/bin if it exists
@@ -93,20 +99,20 @@ set_common_parameters() {
 
     # set paths so they include include pkgsrc directories (if they exist)
     for dir in $(ls -d /opt/local /opt/pkg /usr/pkg 2>/dev/null || true); do
-        INFOPATH="$dir/info${INFOPATH:+:$INFOPATH}"
-        MANPATH="$dir/man${MANPATH:+:$MANPATH}"
-        PATH="$dir/bin${PATH:+:$PATH}"
-        PATH="$dir/sbin${PATH:+:$PATH}"
+	INFOPATH="$dir/info${INFOPATH:+:$INFOPATH}"
+	MANPATH="$dir/man${MANPATH:+:$MANPATH}"
+	PATH="$dir/bin${PATH:+:$PATH}"
+	PATH="$dir/sbin${PATH:+:$PATH}"
     done
 
     # prepend GNU binaries to PATH
-    if [ -d /usr/gnu/bin ] ; then
-        export PATH="/usr/gnu/bin${PATH:+:$PATH}"
+    if [ -d /usr/gnu/bin ] && ! grep_path /usr/gnu/bin "$PATH"; then
+	export PATH="/usr/gnu/bin${PATH:+:$PATH}"
     fi
 
     # set PATH so it includes /usr/local/sbin if it exists
-    if [ -d /usr/local/sbin ] ; then
-        PATH="/usr/local/sbin${PATH:+:$PATH}"
+    if [ -d /usr/local/sbin ] && ! grep_path /usr/local/sbin "$PATH"; then
+	PATH="/usr/local/sbin${PATH:+:$PATH}"
     fi
 }
 
@@ -117,39 +123,40 @@ set_macos_parameters() {
     prefix=/usr/local/opt
 
     for pkg in $($HOME/bin/brew-list-keg-only 2>/dev/null || true); do
-        if [ -d $prefix/$pkg ]; then
-      if [ -d $prefix/$pkg/include ]; then
-          CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
-      fi
-      if [ -d $prefix/$pkg/lib ]; then
-          LDFLAGS="-L$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
-      fi
-      if [ -d $prefix/$pkg/lib/$pkg/man ] ; then
-          MANPATH="$prefix/$pkg/lib/$pkg/man${MANPATH:+:$MANPATH}"
-      fi
-      if [ -d $prefix/$pkg/share/man ] ; then
-          MANPATH="$prefix/$pkg/share/man${MANPATH:+:$MANPATH}"
-      fi
-      if [ -d $prefix/$pkg/bin ]; then
-          PATH="$prefix/$pkg/bin${PATH:+:$PATH}"
-      fi
-      if [ -d $prefix/$pkg/lib/pkgconfig ]; then
-          PKG_CONFIG_PATH="$prefix/$pkg/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-      fi
-        fi
+	if [ -d $prefix/$pkg ]; then
+	    if [ -d $prefix/$pkg/include ]; then
+		CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
+	    fi
+	    if [ -d $prefix/$pkg/lib ]; then
+		LDFLAGS="-L$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
+	    fi
+	    if [ -d $prefix/$pkg/lib/$pkg/man ] ; then
+		MANPATH="$prefix/$pkg/lib/$pkg/man${MANPATH:+:$MANPATH}"
+	    fi
+	    if [ -d $prefix/$pkg/share/man ] ; then
+		MANPATH="$prefix/$pkg/share/man${MANPATH:+:$MANPATH}"
+	    fi
+	    if [ -d $prefix/$pkg/bin ]; then
+		PATH="$prefix/$pkg/bin${PATH:+:$PATH}"
+	    fi
+	    if [ -d $prefix/$pkg/lib/pkgconfig ]; then
+		PKG_CONFIG_PATH="$prefix/$pkg/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+	    fi
+	fi
     done
 
     # set PATH so it includes user's private Python 3 bin if it exists
     for version in 3.8 3.7 3.6; do
-      if [ -d "$HOME/Library/Python/$version/bin" ] ; then
-          PATH="$HOME/Library/Python/$version/bin${PATH:+:$PATH}"
-          break
-      fi
+	if [ -d "$HOME/Library/Python/$version/bin" ] ; then
+	    PATH="$HOME/Library/Python/$version/bin${PATH:+:$PATH}"
+	    break
+	fi
     done
 }
 
 set_parameters() {
     validate_parameters
+    set_common_parameters
 
     case "$kernel_name" in
 	(Darwin)
