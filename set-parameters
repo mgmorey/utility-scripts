@@ -58,13 +58,13 @@ print_parameters() {
 
 	case ${SHELL##*/} in
 	    (bash|fish|ksh|ksh93|rbash|zsh)
-		printf "export %s=%s\n" "$var" "$value"
+		printf "export %s=\"%s\"\n" "$var" "$value"
 		;;
 	    (csh|tcsh)
-		printf "setenv %s %s;\n" "$var" "$value"
+		printf "setenv %s \"%s\";\n" "$var" "$value"
 		;;
 	    (sh)
-		printf "%s=%s\n" "$var" "$value"
+		printf "%s=\"%s\"\n" "$var" "$value"
 		printf "export %s\n" "$var"
 		;;
 	esac
