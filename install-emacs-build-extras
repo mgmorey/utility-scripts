@@ -61,7 +61,7 @@ preinstall_emacs_build_extras() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
-		(ol|centos)
+		(ol|centos|rhel)
 		    "$script_dir/install-epel"
 	    	    ;;
 	    esac
@@ -80,7 +80,7 @@ validate_platform() {
 		(opensuse-*)
 		    :
 		    ;;
-		(fedora|ol|centos)
+		(fedora|ol|centos|rhel)
 		    :
 	    	    ;;
 		(*)

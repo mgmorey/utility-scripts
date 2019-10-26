@@ -58,7 +58,7 @@ get_installed_packages() {
 		(fedora)
 		    $manager1 list installed | awk '{print $1}' | awk -F. '{print $1}'
 		    ;;
-		(ol|centos)
+		(ol|centos|rhel)
 		    case "$VERSION_ID" in
 			(7|7.*)
 			    $manager1 list installed | awk '{print $1}' | awk -F. '{print $1}'
