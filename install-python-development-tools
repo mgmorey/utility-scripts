@@ -81,7 +81,7 @@ preinstall_python_development_tools() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
-		(ol|centos|rhel)
+		(ol|centos)
 		    "$script_dir/install-epel"
 	    	    ;;
 	    esac
