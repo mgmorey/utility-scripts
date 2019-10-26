@@ -91,7 +91,7 @@ install_docker() {
     installed_package=$("$script_dir/get-installed-docker-package")
 
     case $installed_package in
-	(docker|docker.io)
+	(docker|docker.io|podman)
 	    printf "Package $installed_package is installed\n"
 	    exit 0
 	    ;;
@@ -235,11 +235,11 @@ validate_platform() {
 		    ;;
 		(ol|rhel)
 		    case "$VERSION_ID" in
-			(7.[6789])
+			(8|8.*)
 			    :
 			    ;;
-			(8.*)
-			    :
+			(*)
+			    abort_not_supported Release
 			    ;;
 		    esac
 		    ;;
