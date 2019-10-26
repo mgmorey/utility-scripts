@@ -35,7 +35,7 @@ configure_platform() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
-		(rhel)
+		(ol|rhel)
 		    install_group=false
 		    ;;
 		(*)
@@ -233,7 +233,7 @@ validate_platform() {
 			    ;;
 		    esac
 		    ;;
-		(rhel)
+		(ol|rhel)
 		    case "$VERSION_ID" in
 			(7.[6789])
 			    :

@@ -64,7 +64,7 @@ get_docker_packages() {
 		(fedora)
 		    packages="${package:-$FEDORA_PKG} ${FEDORA_PKGS-}"
 		    ;;
-		(rhel)
+		(ol|rhel)
 		    case "$VERSION_ID" in
 			(7|7.*)
 			    packages="${package:-$REDHAT_PKG} ${REDHAT_PKGS-}"
