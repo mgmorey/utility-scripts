@@ -141,7 +141,7 @@ validate_platform() {
 		(opensuse-*)
 		    :
 		    ;;
-		(fedora|ol|centos)
+		(fedora|ol|centos|rhel)
 		    :
 		    ;;
 		(*)
