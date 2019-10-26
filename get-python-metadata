@@ -60,7 +60,7 @@ get_python_package() {
 		(fedora)
 		    printf "%s %s\n" $FEDORA_INFO
 		    ;;
-		(ol|centos)
+		(ol|centos|rhel)
 		    case "$VERSION_ID" in
 			(7|7.*)
 			    printf "%s %s\n" $REDHAT_7_INFO

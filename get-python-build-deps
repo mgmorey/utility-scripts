@@ -103,7 +103,7 @@ get_python_build_deps() {
 		(fedora)
 	    	    packages=$FEDORA_PKGS
 	    	    ;;
-		(ol)
+		(ol|rhel)
 		    case "$VERSION_ID" in
 			(7.*)
 			    packages=$REDHAT_7_PKGS

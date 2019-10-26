@@ -104,7 +104,7 @@ install_python_build_deps() {
 		(opensuse-*)
 	    	    :
 	    	    ;;
-		(fedora|ol|centos)
+		(fedora|ol|centos|rhel)
 	    	    :
 	    	    ;;
 		(*)

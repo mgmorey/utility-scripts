@@ -72,7 +72,7 @@ case "$kernel_name" in
 	    (fedora)
 	    	pattern=$FEDORA_PATT
 	    	;;
-	    (ol|centos)
+	    (ol|centos|rhel)
 		pattern=$REDHAT_PATT
 		;;
 	esac

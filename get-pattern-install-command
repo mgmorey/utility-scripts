@@ -61,6 +61,9 @@ case "$kernel_name" in
 	    (centos)
 		printf "%s\n" "groupinstall"
 		;;
+	    (rhel)
+		printf "%s\n" "groupinstall"
+		;;
 	    (*)
 		printf "%s\n" "install"
 		;;
