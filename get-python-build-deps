@@ -31,7 +31,7 @@ wget xz-devel zlib-devel"
 
 FREEBSD_11_PKGS="bash bzip2 curl gdbm gmake libffi llvm50 lzma ncurses \
 readline sqlite3 wget"
-FREEBSD_12_PKGS="bash bzip2 curl gdbm gmake libffi llvm50 lzma ncurses \
+FREEBSD_12_PKGS="bash bzip2 curl gdbm gmake libffi llvm60 lzma ncurses \
 readline sqlite3 wget"
 
 NETBSD_PKGS="bash bzip2 curl gdbm gmake libffi lzma ncurses readline \
