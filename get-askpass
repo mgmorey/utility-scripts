@@ -35,6 +35,144 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_askpass() {
+    desktop_name=$("$script_dir/get-desktop-name")
+
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu|linuxmint|neon|kali)
+		    case "$desktop_name" in
+			(GNOME|GNOME*|*:GNOME|LXDE|X-Cinnamon|'')
+			    package=ssh-askpass-gnome
+			    ;;
+			(KDE*)
+			    package=ksshaskpass
+			    ;;
+			(*)
+			    abort_desktop_not_supported
+			    ;;
+		    esac
+		    ;;
+		(opensuse-*)
+		    case "$desktop_name" in
+			(GNOME|GNOME*|*:GNOME|'')
+			    package=openssh-askpass-gnome
+			    ;;
+			(KDE*)
+			    package=ksshaskpass5
+			    ;;
+			(*)
+			    abort_desktop_not_supported
+			    ;;
+		    esac
+		    ;;
+		(fedora)
+		    case "$desktop_name" in
+			(GNOME|GNOME*|*:GNOME|'')
+			    package=openssh-askpass
+			    ;;
+			(KDE*)
+			    package=ksshaskpass
+			    ;;
+			(*)
+			    abort_desktop_not_supported
+			    ;;
+		    esac
+		    ;;
+		(ol|centos|rhel)
+		    case "$desktop_name" in
+			(GNOME|GNOME*|*:GNOME|'')
+			    package=openssh-askpass
+			    ;;
+			(KDE*)
+			    package=ksshaskpass
+			    ;;
+			(*)
+			    abort_desktop_not_supported
+			    ;;
+		    esac
+		    ;;
+		(nixos)
+		    case "$desktop_name" in
+			(KDE*)
+			    helper=ksshaskpass
+			    ;;
+			(*)
+			    abort_desktop_not_supported
+			    ;;
+		    esac
+		    ;;
+		(*)
+		    abort_not_supported Distro
+		    ;;
+	    esac
+	    ;;
+	(FreeBSD)
+	    case "$desktop_name" in
+		(GNOME|GNOME*|MATE|'')
+		    package=gnome-ssh-askpass
+		    ;;
+		(KDE*)
+		    package=ksshaskpass
+		    ;;
+		(*)
+		    abort_desktop_not_supported
+		    ;;
+	    esac
+	    ;;
+	(SunOS)
+	    case "$ID" in
+		(openindiana)
+		    case "$desktop_name" in
+			(MATE|'')
+			    helper=/usr/lib/ssh/ssh-askpass
+			    ;;
+			(*)
+			    abort_desktop_not_supported
+			    ;;
+		    esac
+		    ;;
+		(*)
+		    abort_not_supported Distro
+		    ;;
+	    esac
+	    ;;
+	(CYGWIN_NT-*)
+	    case "$desktop_name" in
+		(MATE|X-Cygwin|'')
+		    helper=/usr/libexec/gnome-ssh-askpass.exe
+		    ;;
+		(*)
+		    abort_desktop_not_supported
+		    ;;
+	    esac
+
+	    if [ -x "$helper" ]; then
+		printf "%s\n" "${helper%.exe}"
+		exit 0
+	    else
+		abort "%s: No such askpass helper\n" "$helper"
+	    fi
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+
+    if [ -z "${helper:-}" ]; then
+	helper=$(get_filenames $package 2>/dev/null | get_helper)
+    fi
+
+    if [ -n "${helper-}" ]; then
+	if [ -n "${package:-}" ]; then
+	    printf "# %s package %s:\n" "$PRETTY_NAME" $package
+	fi
+
+	printf "%s\n" "${helper%.exe}"
+    fi
+}
+
 get_filenames() {
     "$script_dir/get-package-filenames" $1
 }
@@ -60,150 +198,8 @@ get_realpath() (
     fi
 )
 
-if [ -z "${DISPLAY-}" ]; then
-    abort "%s: No DISPLAY variable set\n" "$0"
-fi
-
 script_dir=$(get_realpath "$(dirname "$0")")
-
-desktop_name=$("$script_dir/get-desktop-name")
 
 eval $("$script_dir/get-os-release" -X)
 
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (debian|raspbian|ubuntu|linuxmint|neon|kali)
-		case "$desktop_name" in
-		    (GNOME|GNOME*|*:GNOME|LXDE|X-Cinnamon|'')
-			package=ssh-askpass-gnome
-			;;
-		    (KDE*)
-			package=ksshaskpass
-			;;
-		    (*)
-			abort_desktop_not_supported
-			;;
-		esac
-		;;
-	    (opensuse-*)
-		case "$desktop_name" in
-		    (GNOME|GNOME*|*:GNOME|'')
-			package=openssh-askpass-gnome
-			;;
-		    (KDE*)
-			package=ksshaskpass5
-			;;
-		    (*)
-			abort_desktop_not_supported
-			;;
-		esac
-		;;
-	    (fedora)
-		case "$desktop_name" in
-		    (GNOME|GNOME*|*:GNOME|'')
-			package=openssh-askpass
-			;;
-		    (KDE*)
-			package=ksshaskpass
-			;;
-		    (*)
-			abort_desktop_not_supported
-			;;
-		esac
-		;;
-	    (ol|centos|rhel)
-		case "$desktop_name" in
-		    (GNOME|GNOME*|*:GNOME|'')
-			package=openssh-askpass
-			;;
-		    (KDE*)
-			package=ksshaskpass
-			;;
-		    (*)
-			abort_desktop_not_supported
-			;;
-		esac
-		;;
-	    (nixos)
-		case "$desktop_name" in
-		    (KDE*)
-			helper=ksshaskpass
-			;;
-		    (*)
-			abort_desktop_not_supported
-			;;
-		esac
-		;;
-	    (*)
-		abort_not_supported Distro
-		;;
-	esac
-	;;
-    (FreeBSD)
-	case "$desktop_name" in
-	    (GNOME|GNOME*|MATE|'')
-		package=gnome-ssh-askpass
-		;;
-	    (KDE*)
-		package=ksshaskpass
-		;;
-	    (*)
-		abort_desktop_not_supported
-		;;
-	esac
-	;;
-    (SunOS)
-	case "$ID" in
-	    (openindiana)
-		case "$desktop_name" in
-		    (MATE|'')
-			helper=/usr/lib/ssh/ssh-askpass
-			;;
-		    (*)
-			abort_desktop_not_supported
-			;;
-		    esac
-		;;
-	    (*)
-		abort_not_supported Distro
-		;;
-	esac
-	;;
-    (CYGWIN_NT-*)
-	case "$desktop_name" in
-	    (MATE|X-Cygwin|'')
-		helper=/usr/libexec/gnome-ssh-askpass.exe
-		;;
-	    (*)
-		abort_desktop_not_supported
-		;;
-	esac
-
-	if [ -x "$helper" ]; then
-	    printf "%s\n" "${helper%.exe}"
-	    exit 0
-	else
-	    abort "%s: No such askpass helper\n" "$helper"
-	fi
-	;;
-    (*)
-	abort_not_supported "Operating system"
-	;;
-esac
-
-if [ -z "${helper:-}" ]; then
-    helper=$(get_filenames $package 2>/dev/null | get_helper)
-fi
-
-if [ -n "$helper" ]; then
-    if [ -x "$(which "$helper")" ]; then
-	if [ -n "${package:-}" ]; then
-	    printf "# %s package %s:\n" "$PRETTY_NAME" $package
-	fi
-
-	printf "%s\n" "${helper%.exe}"
-    else
-	abort "%s: No such askpass helper\n" "$helper"
-    fi
-fi
+get_askpass
