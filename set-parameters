@@ -16,6 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
+COMMON_BINDIRS="/usr/local/sbin /usr/lib/cups/bin /usr/gnu/bin"
+PKGSRC_PKGDIRS="/opt/local /opt/pkg /usr/pkg"
+PROFILE_DIRS=". .cargo .local .pyenv"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -42,35 +47,6 @@ get_realpath() (
     fi
 )
 
-grep_path() {
-    assert [ $# -eq 2 ]
-    assert [ -n "$1" ]
-    printf "%s\n" "$2" | grep -Eq '(^|:)'$1'(:|$)'
-}
-
-print_parameters() {
-    for var; do
-	eval value=\${$var-}
-
-	if [ -z "$value" ]; then
-	    continue
-	fi
-
-	case ${SHELL##*/} in
-	    (bash|fish|ksh|ksh93|rbash|zsh)
-		printf "export %s=\"%s\"\n" "$var" "$value"
-		;;
-	    (csh|tcsh)
-		printf "setenv %s \"%s\";\n" "$var" "$value"
-		;;
-	    (sh)
-		printf "%s=\"%s\"\n" "$var" "$value"
-		printf "export %s\n" "$var"
-		;;
-	esac
-    done
-}
-
 include_common_directories() {
     # initialize INFOPATH parameter
     if [ -z "${INFOPATH-}" ]; then
@@ -95,8 +71,8 @@ include_common_directories() {
     fi
 
     # add common binary directories to PATH (if they exist)
-    for dir in /usr/local/sbin /usr/lib/cups/bin /usr/gnu/bin; do
-	if [ -d $dir ] && ! grep_path $dir "$PATH"; then
+    for dir in $COMMON_BINDIRS; do
+	if is_to_be_included $dir "${PATH-}"; then
 	    PATH="$dir${PATH:+:$PATH}"
 	fi
     done
@@ -109,25 +85,23 @@ include_macos_directories() {
     prefix=/usr/local/opt
 
     for pkg in $($HOME/bin/brew-list-keg-only 2>/dev/null || true); do
-	if [ -d $prefix/$pkg ]; then
-	    if [ -d $prefix/$pkg/include ]; then
-		CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
-	    fi
-	    if [ -d $prefix/$pkg/lib ]; then
-		LDFLAGS="-L$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
-	    fi
-	    if [ -d $prefix/$pkg/lib/$pkg/man ] ; then
-		MANPATH="$prefix/$pkg/lib/$pkg/man${MANPATH:+:$MANPATH}"
-	    fi
-	    if [ -d $prefix/$pkg/share/man ] ; then
-		MANPATH="$prefix/$pkg/share/man${MANPATH:+:$MANPATH}"
-	    fi
-	    if [ -d $prefix/$pkg/bin ]; then
-		PATH="$prefix/$pkg/bin${PATH:+:$PATH}"
-	    fi
-	    if [ -d $prefix/$pkg/lib/pkgconfig ]; then
-		PKG_CONFIG_PATH="$prefix/$pkg/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-	    fi
+	if [ -d $prefix/$pkg/include ]; then
+	    CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
+	fi
+	if [ -d $prefix/$pkg/lib ]; then
+	    LDFLAGS="-L$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
+	fi
+	if is_to_be_included $prefix/$pkg/lib/$pkg/man "${MANPATH-}"; then
+	    MANPATH="$prefix/$pkg/lib/$pkg/man${MANPATH:+:$MANPATH}"
+	fi
+	if is_to_be_included $prefix/$pkg/share/man "${MANPATH-}"; then
+	    MANPATH="$prefix/$pkg/share/man${MANPATH:+:$MANPATH}"
+	fi
+	if is_to_be_included $prefix/$pkg/bin "${PATH-}"; then
+	    PATH="$prefix/$pkg/bin${PATH:+:$PATH}"
+	fi
+	if is_to_be_included $prefix/$pkg/lib/pkgconfig "${PKG_CONFIG_PATH-}"; then
+	    PKG_CONFIG_PATH="$prefix/$pkg/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 	fi
     done
 
@@ -142,11 +116,19 @@ include_macos_directories() {
 
 include_pkgsrc_directories() {
     # add pkgsrc directory to INFOPATH, MANPATH and PATH (if it exists)
-    for dir in $(ls -d /opt/local /opt/pkg /usr/pkg 2>/dev/null || true); do
-	INFOPATH="$dir/info${INFOPATH:+:$INFOPATH}"
-	MANPATH="$dir/man${MANPATH:+:$MANPATH}"
-	PATH="$dir/bin${PATH:+:$PATH}"
-	PATH="$dir/sbin${PATH:+:$PATH}"
+    for dir in $(ls -d $PKGSRC_PKGDIRS 2>/dev/null || true); do
+	if is_to_be_included "$dir/info" "${PATH-}"; then
+	    INFOPATH="$dir/info${INFOPATH:+:$INFOPATH}"
+	fi
+	if is_to_be_included "$dir/man" "${PATH-}"; then
+	    MANPATH="$dir/man${MANPATH:+:$MANPATH}"
+	fi
+	if is_to_be_included "$dir/bin" "${PATH-}"; then
+	    PATH="$dir/bin${PATH:+:$PATH}"
+	fi
+	if is_to_be_included "$dir/sbin" "${PATH-}"; then
+	    PATH="$dir/sbin${PATH:+:$PATH}"
+	fi
     done
 }
 
@@ -158,22 +140,59 @@ include_platform_directories() {
     esac
 }
 
-include_user_directories() {
+include_profile_directories() {
     # add user info directory to INFOPATH (if it exists)
-    if [ -d "$HOME/info" ] && ! grep_path "$HOME/info" "$PATH"; then
-        INFOPATH="$HOME/info${INFOPATH:+:$INFOPATH}"
+    if is_to_be_included "$HOME/info" "${PATH-}"; then
+	INFOPATH="$HOME/info${INFOPATH:+:$INFOPATH}"
     fi
 
     # add user man directory to MANPATH (if it exists)
-    if [ -d "$HOME/man" ] && ! grep_path "$HOME/man" "$PATH"; then
-        MANPATH="$HOME/man${MANPATH:+:$MANPATH}"
+    if is_to_be_included "$HOME/man" "${PATH-}"; then
+	MANPATH="$HOME/man${MANPATH:+:$MANPATH}"
     fi
 
     # add user binary directories to PATH (if they exist)
-    for dir in "$HOME/bin" "$HOME/.local/bin"; do
-	if [ -d $dir ] && ! grep_path $dir "$PATH"; then
-	    PATH="$dir${PATH:+:$PATH}"
+    for dir in $PROFILE_DIRS; do
+	if is_to_be_included "$HOME/$dir/bin" "${PATH-}"; then
+	    PATH="$HOME/$dir/bin${PATH:+:$PATH}"
 	fi
+    done
+}
+
+is_included() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    printf "%s\n" "$2" | grep -Eq '(^|:)'$1'(:|$)'
+}
+
+is_to_be_included() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    test -d $1 && ! is_included $1 "$2"
+}
+
+print_parameters() {
+    assert [ $# -gt 0 ]
+
+    for var; do
+	eval value=\${$var-}
+
+	if [ -z "$value" ]; then
+	    continue
+	fi
+
+	case ${SHELL##*/} in
+	    (bash|fish|ksh|ksh93|rbash|zsh)
+		printf "export %s=\"%s\"\n" "$var" "$value"
+		;;
+	    (csh|tcsh)
+		printf "setenv %s \"%s\";\n" "$var" "$value"
+		;;
+	    (sh)
+		printf "%s=\"%s\"\n" "$var" "$value"
+		printf "export %s\n" "$var"
+		;;
+	esac
     done
 }
 
@@ -182,8 +201,8 @@ set_parameters() {
     include_common_directories
     include_pkgsrc_directories
     include_platform_directories
-    include_user_directories
-    print_parameters CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH
+    include_profile_directories
+    print_parameters $ALL_PARAMETERS
 }
 
 validate_parameters() {
