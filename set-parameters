@@ -204,7 +204,13 @@ print_parameters() {
     done
 }
 
-set_parameters() {
+set_askpass_parameters() {
+    if [ -n "$DISPLAY" ]; then
+	$script_dir/askpass 2>/dev/null || true
+    fi
+}
+
+set_profile_parameters() {
     validate_parameters
     include_common_directories
     include_pkgsrc_directories
@@ -234,4 +240,5 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
 
-set_parameters
+set_askpass_parameters
+set_profile_parameters
