@@ -71,6 +71,14 @@ print_parameters() {
     done
 }
 
+set_all_parameters() {
+    validate_parameters
+    set_common_parameters
+    set_platform_parameters
+    set_user_parameters
+    print_parameters CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH
+}
+
 set_common_parameters() {
     # initialize INFOPATH parameter
     if [ -z "${INFOPATH-}" ]; then
@@ -107,23 +115,6 @@ set_common_parameters() {
 	MANPATH="$dir/man${MANPATH:+:$MANPATH}"
 	PATH="$dir/bin${PATH:+:$PATH}"
 	PATH="$dir/sbin${PATH:+:$PATH}"
-    done
-
-    # add user info directory to INFOPATH (if it exists)
-    if [ -d "$HOME/info" ] && ! grep_path "$HOME/info" "$PATH"; then
-        INFOPATH="$HOME/info${INFOPATH:+:$INFOPATH}"
-    fi
-
-    # add user man directory to MANPATH (if it exists)
-    if [ -d "$HOME/man" ] && ! grep_path "$HOME/man" "$PATH"; then
-        MANPATH="$HOME/man${MANPATH:+:$MANPATH}"
-    fi
-
-    # add user binary directories to PATH (if they exist)
-    for dir in "$HOME/bin" "$HOME/.local/bin"; do
-	if [ -d $dir ] && ! grep_path $dir "$PATH"; then
-	    PATH="$dir${PATH:+:$PATH}"
-	fi
     done
 }
 
@@ -165,17 +156,31 @@ set_macos_parameters() {
     done
 }
 
-set_parameters() {
-    validate_parameters
-    set_common_parameters
-
+set_platform_parameters() {
     case "$kernel_name" in
 	(Darwin)
 	    set_macos_parameters
 	    ;;
     esac
+}
 
-    print_parameters CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH
+set_user_parameters() {
+    # add user info directory to INFOPATH (if it exists)
+    if [ -d "$HOME/info" ] && ! grep_path "$HOME/info" "$PATH"; then
+        INFOPATH="$HOME/info${INFOPATH:+:$INFOPATH}"
+    fi
+
+    # add user man directory to MANPATH (if it exists)
+    if [ -d "$HOME/man" ] && ! grep_path "$HOME/man" "$PATH"; then
+        MANPATH="$HOME/man${MANPATH:+:$MANPATH}"
+    fi
+
+    # add user binary directories to PATH (if they exist)
+    for dir in "$HOME/bin" "$HOME/.local/bin"; do
+	if [ -d $dir ] && ! grep_path $dir "$PATH"; then
+	    PATH="$dir${PATH:+:$PATH}"
+	fi
+    done
 }
 
 validate_parameters() {
@@ -199,4 +204,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -X)
 
-set_parameters
+set_all_parameters
