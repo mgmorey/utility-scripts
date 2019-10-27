@@ -16,7 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-STARTUP_FILES=https://mgmorey@github.com/mgmorey/startup-files.git
+STARTUP_FILES=".bashrc .editorconfig .profile"
+STARTUP_FILES_URL=https://mgmorey@github.com/mgmorey/startup-files.git
+
 
 abort() {
     printf "$@" >&2
@@ -32,7 +34,7 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
@@ -44,61 +46,76 @@ get_realpath() (
     fi
 )
 
+install_startup_files() {
+    if [ ! -h $0 ]; then
+	abort "Please change from source directory before running this script\n"
+    fi
+
+    if ! "$script_dir/install-git"; then
+	abort "%s: Unable to install git\n" "$0"
+    fi
+
+    cd
+
+    if [ ! -d Documents/git ]; then
+	mkdir -p Documents
+
+	if [ -d git ]; then
+	    /bin/mv git Documents/git
+	else
+	    mkdir Documents/git
+	fi
+    fi
+
+    if [ ! -e git ]; then
+	/bin/ln -s Documents/git git
+    fi
+
+    cd git
+
+    if [ ! -d startup-files ]; then
+	git clone $STARTUP_FILES_URL
+    fi
+
+    cd
+
+    for file in $STARTUP_FILES; do
+	if is_to_be_installed $file; then
+	    printf "Installing %s\n" $file
+	    install -b $HOME/git/startup-files/$file $file
+	fi
+    done
+
+    if [ ! -d .emacs.d ]; then
+	printf "Creating %s\n" .emacs.d
+	mkdir .emacs.d
+    fi
+
+    if [ -d .emacs.d ]; then
+	cd .emacs.d
+
+	if [ ! -e init.el ]; then
+	    printf "Installing %s\n" .emacs.d/init.el
+	    install -b $HOME/git/startup-files/.emacs.d/init.el .
+	fi
+    fi
+
+    cd
+
+    for file in .bash_profile .emacs; do
+	if [ -e $file ]; then
+	    printf "Renaming %s to %s\n" $file $file.orig
+	    /bin/mv -f $file $file.orig
+	fi
+    done
+
+    printf "Please log out and back in again to activate the new environment.\n"
+}
+
+is_to_be_installed() {
+    test ! -e .profile || test -r /etc/skel/$1 && diff /etc/skel/$1 $1 >/dev/null
+}
+
 script_dir=$(get_realpath "$(dirname "$0")")
 
-if [ ! -h $0 ]; then
-    abort "Please change from source directory before running this script\n"
-fi
-
-dir=$PWD
-cd $HOME
-
-"$script_dir/install-git"
-
-if [ ! -d Documents/git ]; then
-    mkdir -p Documents
-
-    if [ -d git ]; then
-	/bin/mv git Documents/git
-    else
-	mkdir Documents/git
-    fi
-fi
-
-if [ ! -e git ]; then
-    /bin/ln -s Documents/git git
-fi
-
-cd git
-
-if [ ! -d startup-files ]; then
-    git clone $STARTUP_FILES
-fi
-
-cd
-
-if [ ! -e .editorconfig ]; then
-    printf "Installing %s\n" .editorconfig
-    /bin/cp $HOME/git/startup-files/.editorconfig .
-fi
-
-if [ ! -e .profile ]; then
-    printf "Installing %s\n" .profile
-    /bin/cp $HOME/git/startup-files/.profile .
-fi
-
-if [ ! -d .emacs.d ]; then
-    printf "Creating %s\n" .emacs.d
-    mkdir .emacs.d
-fi
-
-if [ -d .emacs.d ]; then
-    cd .emacs.d
-
-    if [ ! -e init.el ]; then
-	printf "Installing %s\n" .emacs.d/init.el
-	/bin/cp $HOME/git/startup-files/.emacs.d/init.el .
-    fi
-fi
-
-printf "Please log out and back in again to activate the new environment\n"
+install_startup_files
