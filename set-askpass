@@ -48,7 +48,7 @@ set_askpass() {
     if [ -z "$askpass_helper" ]; then
 	exit 0
     elif [ ! -x "$askpass_helper" ]; then
-	abort "%s: No such executable\n" "$askpass_helper"
+	exit 0
     elif [ $# -eq 0 ]; then
 	commands="git ssh sudo"
     else
