@@ -21,40 +21,71 @@ abort() {
     exit 1
 }
 
-askpass_helper=$(get-askpass | awk '! /^#/')
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
 
-if [ -z "$askpass_helper" ]; then
-    exit 0
-elif [ ! -x "$(which "$askpass_helper")" ]; then
-    abort "%s: No such executable" "$askpass_helper"
-elif [ $# -gt 0 ]; then
-    commands="$*"
-else
-    commands="git ssh sudo"
-fi
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
 
-for command in $commands; do
-    case "$command" in
-	(git|ssh|sudo)
-	    var=$(printf "%s\n" ${command}_askpass | tr '[:lower:]' '[:upper:]')
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
 
-	    case ${SHELL##*/} in
-		(bash|fish|ksh|ksh93|rbash|zsh)
-		    printf "export %s=%s\n" "$var" "$askpass_helper"
-		    ;;
-		(csh|tcsh)
-		    printf "setenv %s %s;\n" "$var" "$askpass_helper"
-		    ;;
-		(sh)
-		    printf "%s=%s\n" "$var" "$askpass_helper"
-		    printf "export %s\n" "$var"
-		    ;;
-		(*)
-		    abort "%s: %s: Shell not supported\n" "$0" "$SHELL"
-		    ;;
-	    esac
-	    ;;
-	(*)
-	    abort "%s: %s: Not a valid command\n" "$0" "$command"
-    esac
-done
+set_askpass() {
+    askpass_helper=$("$script_dir/get-askpass" | awk '! /^#/')
+
+    if [ -z "$askpass_helper" ]; then
+	exit 0
+    elif [ ! -x "$askpass_helper" ]; then
+	abort "%s: No such executable\n" "$askpass_helper"
+    elif [ $# -eq 0 ]; then
+	commands="git ssh sudo"
+    else
+	commands="$*"
+    fi
+
+    for command in $commands; do
+	case "$command" in
+	    (git|ssh|sudo)
+		var=$(printf "%s\n" ${command}_askpass | to_upper)
+
+		case ${SHELL##*/} in
+		    (bash|fish|ksh|ksh93|rbash|zsh)
+			printf "export %s=%s\n" "$var" "$askpass_helper"
+			;;
+		    (csh|tcsh)
+			printf "setenv %s %s;\n" "$var" "$askpass_helper"
+			;;
+		    (sh)
+			printf "%s=%s\n" "$var" "$askpass_helper"
+			printf "export %s\n" "$var"
+			;;
+		    (*)
+			abort "%s: %s: Shell not supported\n" "$0" "$SHELL"
+			;;
+		esac
+		;;
+	    (*)
+		abort "%s: %s: Not a valid command\n" "$0" "$command"
+	esac
+    done
+}
+
+to_upper() {
+    tr '[:lower:]' '[:upper:]'
+}
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+set_askpass
