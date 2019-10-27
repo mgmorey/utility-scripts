@@ -113,7 +113,13 @@ install_startup_files() {
 }
 
 is_to_be_installed() {
-    test ! -e .profile || test -r /etc/skel/$1 && diff /etc/skel/$1 $1 >/dev/null
+    if [ ! -e $1 ]; then
+	return 0;
+    elif [ ! -r /etc/skel/$1 ]; then
+	return 1
+    elif diff /etc/skel/$1 $1 >/dev/null; then
+	return 0
+    fi
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
