@@ -205,8 +205,8 @@ print_parameters() {
 }
 
 set_askpass_parameters() {
-    if [ -n "$DISPLAY" ]; then
-	$script_dir/askpass 2>/dev/null || true
+    if [ -n "${DISPLAY-}" ]; then
+	$script_dir/set-askpass || true
     fi
 }
 
