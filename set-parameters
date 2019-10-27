@@ -17,9 +17,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
+
 COMMON_BINDIRS="/usr/local/sbin /usr/lib/cups/bin /usr/gnu/bin"
 PKGSRC_PKGDIRS="/opt/local /opt/pkg /usr/pkg"
-PROFILE_DIRS=". .cargo .local .pyenv"
+
+PROFILE_BINDIRS="bin .cargo/bin .local/bin .pyenv/bin"
 
 abort() {
     printf "$@" >&2
@@ -142,19 +144,19 @@ include_platform_directories() {
 
 include_profile_directories() {
     # add user info directory to INFOPATH (if it exists)
-    if is_to_be_included "$HOME/info" "${PATH-}"; then
+    if is_not_included "$HOME/info" "${PATH-}"; then
 	INFOPATH="$HOME/info${INFOPATH:+:$INFOPATH}"
     fi
 
     # add user man directory to MANPATH (if it exists)
-    if is_to_be_included "$HOME/man" "${PATH-}"; then
+    if is_not_included "$HOME/man" "${PATH-}"; then
 	MANPATH="$HOME/man${MANPATH:+:$MANPATH}"
     fi
 
     # add user binary directories to PATH (if they exist)
-    for dir in $PROFILE_DIRS; do
-	if is_to_be_included "$HOME/$dir/bin" "${PATH-}"; then
-	    PATH="$HOME/$dir/bin${PATH:+:$PATH}"
+    for dir in $PROFILE_BINDIRS; do
+	if is_not_included "$HOME/$dir" "${PATH-}"; then
+	    PATH="$HOME/$dir${PATH:+:$PATH}"
 	fi
     done
 }
@@ -163,6 +165,12 @@ is_included() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
     printf "%s\n" "$2" | grep -Eq '(^|:)'$1'(:|$)'
+}
+
+is_not_included() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    ! is_included $1 "$2"
 }
 
 is_to_be_included() {
