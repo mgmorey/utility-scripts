@@ -35,7 +35,7 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_askpass() {
+configure_platform() {
     desktop_name=$("$script_dir/get-desktop-name")
 
     case "$kernel_name" in
@@ -159,6 +159,10 @@ get_askpass() {
 	    abort_not_supported "Operating system"
 	    ;;
     esac
+}
+
+get_askpass() {
+    configure_platform
 
     if [ -z "${helper:-}" ]; then
 	helper=$(get_filenames $package 2>/dev/null | get_helper)
