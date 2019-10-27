@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+COMMANDS="git ssh sudo"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -42,37 +44,45 @@ get_realpath() (
     fi
 )
 
+parse_arguments() {
+    commands="$*"
+
+    for command in ${commands:-$COMMANDS}; do
+	case "$command" in
+	    (git|ssh|sudo)
+		:
+		;;
+	    (*)
+		abort "%s: %s: Not a valid command\n" "$0" "$command"
+	esac
+    done
+}
+
 set_askpass() {
+    validate_parameters
     askpass_helper=$("$script_dir/get-askpass" | awk '! /^#/')
 
     if [ -z "$askpass_helper" ]; then
 	exit 0
     elif [ ! -x "$askpass_helper" ]; then
 	exit 0
-    elif [ $# -eq 0 ]; then
-	commands="git ssh sudo"
-    else
-	commands="$*"
     fi
 
-    for command in $commands; do
+    for command in ${commands:-$COMMANDS}; do
 	case "$command" in
 	    (git|ssh|sudo)
 		var=$(printf "%s\n" ${command}_askpass | to_upper)
 
 		case ${SHELL##*/} in
 		    (bash|fish|ksh|ksh93|rbash|zsh)
-			printf "export %s=%s\n" "$var" "$askpass_helper"
+			printf 'export %s="%s"\n' "$var" "$askpass_helper"
 			;;
 		    (csh|tcsh)
-			printf "setenv %s %s;\n" "$var" "$askpass_helper"
+			printf 'setenv %s "%s";\n' "$var" "$askpass_helper"
 			;;
 		    (sh)
-			printf "%s=%s\n" "$var" "$askpass_helper"
-			printf "export %s\n" "$var"
-			;;
-		    (*)
-			abort "%s: %s: Shell not supported\n" "$0" "$SHELL"
+			printf '%s="%s"\n' "$var" "$askpass_helper"
+			printf 'export %s\n' "$var"
 			;;
 		esac
 		;;
@@ -86,6 +96,24 @@ to_upper() {
     tr '[:lower:]' '[:upper:]'
 }
 
+validate_parameters() {
+    case ${SHELL##*/} in
+	(bash|fish|ksh|ksh93|rbash|zsh)
+	    :
+	    ;;
+	(csh|tcsh)
+	    :
+	    ;;
+	(sh)
+	    :
+	    ;;
+	(*)
+	    abort "%s: %s: Shell not supported\n" "$0" "$SHELL"
+	    ;;
+    esac
+}
+
 script_dir=$(get_realpath "$(dirname "$0")")
 
+parse_arguments "$@"
 set_askpass
