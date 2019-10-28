@@ -104,7 +104,7 @@ collect_data_default() {
     PRETTY_NAME=$input
 }
 
-collect_data_for_cywgin() {
+collect_data_for_cygwin() {
     kernel_release=$(printf "%s\n" "${input#* }" | sed -e 's/(.*)//')
     NAME="Microsoft Windows"
     VERSION=${kernel_name#*-}
