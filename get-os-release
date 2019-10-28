@@ -55,44 +55,23 @@ collect_data() {
 
     case "$kernel_name" in
 	(Linux|GNU)
-	    . $FILE_OS_RELEASE
-	    os_version_id=$(get_os_version_id)
-
-	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    debian_version=$(cat /etc/debian_version)
-		    ;;
-		(fedora|rhel|ol|centos)
-		    redhat_release=$(cat /etc/redhat-release)
-		    ;;
-	    esac
+	    collect_data_for_gnu
 	    ;;
 
 	(SunOS)
-	    input=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE_RELEASE)
-	    NAME=${input%:*}
-	    VERSION=${input#*:}
-	    ID=$(printf "%s\n" "${NAME% *}" | $LOWERCASE)
+	    collect_data_for_sunos
 	    ;;
 
 	(Darwin)
-	    NAME=$(sw_vers -productName)
-	    VERSION=$(sw_vers -productVersion)
-	    ID=macos
+	    collect_data_for_macos
 	    ;;
 
 	(CYGWIN_NT-*)
-	    kernel_release=$(printf "%s\n" "${input#* }" | sed -e 's/(.*)//')
-	    NAME="Microsoft Windows"
-	    VERSION=${kernel_name#*-}
-	    ID=ms-windows
+	    collect_data_for_cygwin
 	    ;;
 
 	(*)
-	    NAME=$kernel_name
-	    VERSION=$kernel_release
-	    ID=$(printf "%s\n" "$NAME" | $LOWERCASE)
-	    PRETTY_NAME=$input
+	    collect_data_default
 	    ;;
 
     esac
@@ -118,6 +97,47 @@ collect_data() {
     fi
 }
 
+collect_data_default() {
+    NAME=$kernel_name
+    VERSION=$kernel_release
+    ID=$(printf "%s\n" "$NAME" | $LOWERCASE)
+    PRETTY_NAME=$input
+}
+
+collect_data_for_cywgin() {
+    kernel_release=$(printf "%s\n" "${input#* }" | sed -e 's/(.*)//')
+    NAME="Microsoft Windows"
+    VERSION=${kernel_name#*-}
+    ID=ms-windows
+}
+
+collect_data_for_gnu() {
+    . $FILE_OS_RELEASE
+    os_version_id=$(get_os_version_id)
+
+    case "$ID" in
+	(debian|raspbian|ubuntu|linuxmint|neon|kali)
+	    debian_version=$(cat /etc/debian_version)
+	    ;;
+	(fedora|rhel|ol|centos)
+	    redhat_release=$(cat /etc/redhat-release)
+	    ;;
+    esac
+}
+
+collect_data_for_macos() {
+    NAME=$(sw_vers -productName)
+    VERSION=$(sw_vers -productVersion)
+    ID=macos
+}
+
+collect_data_for_sunos() {
+    input=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE_RELEASE)
+    NAME=${input%:*}
+    VERSION=${input#*:}
+    ID=$(printf "%s\n" "${NAME% *}" | $LOWERCASE)
+}
+
 get_os_version_id() {
     case "$kernel_name" in
 	(Linux|GNU)
@@ -129,9 +149,7 @@ get_os_version_id() {
 		    printf "%s\n" "$VERSION" | awk '{print $1}'
 		    ;;
 		(fedora|rhel|ol|centos)
-		    if [ -r /etc/redhat-release ]; then
-			"$script_dir/get-redhat-version" /etc/redhat-release
-		    fi
+		    "$script_dir/get-redhat-version" /etc/redhat-release
 		    ;;
 	    esac
 	    ;;
