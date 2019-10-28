@@ -1,0 +1,4 @@
+#!/usr/bin/awk -f
+# -*- mode: awk -*-
+
+/^CentOS Linux release .* (.*)/ {print $4}
