@@ -114,7 +114,7 @@ get_os_version_id() {
 		(ubuntu)
 		    printf "%s\n" "$VERSION" | awk '{print $1}'
 		    ;;
-		(rhel)
+		(rhel|ol)
 		    awk '{print $6}' /etc/redhat-release
 		    ;;
 		(centos)
