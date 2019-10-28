@@ -123,6 +123,11 @@ get_os_version_id() {
 		(centos)
 		    awk '{print $4}' /etc/redhat-release
 		    ;;
+		(*)
+		    if [ -r /etc/redhat-release ]; then
+			"$script_dir/get-redhat-version" /etc/redhat-release
+		    fi
+		    ;;
 	    esac
 	    ;;
     esac
