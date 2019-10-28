@@ -121,6 +121,9 @@ configure_platform() {
 		    ;;
 	    esac
 	    ;;
+	(NetBSD)
+	    helper=/usr/X11R7/bin/ssh-askpass
+	    ;;
 	(SunOS)
 	    case "$ID" in
 		(openindiana)
