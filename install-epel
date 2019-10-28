@@ -83,9 +83,9 @@ validate_platform() {
     case "$kernel_name" in
 	(Linux)
 	    case "$ID" in
-		(ol|centos|rhel)
+		(rhel|ol|centos)
 		    case "$VERSION_ID" in
-			(7|7.*)
+			(7|7.[78])
 			    :
 			    ;;
 			(*)

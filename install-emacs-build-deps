@@ -89,7 +89,7 @@ configure_platform() {
 		(opensuse-*)
 		    packages=$OPENSUSE_PKGS
 		    ;;
-		(fedora|ol|centos)
+		(fedora|rhel|ol|centos)
 		    package=$REDHAT_PKG
 		    ;;
 	    esac
@@ -141,7 +141,7 @@ validate_platform() {
 		(opensuse-*)
 		    :
 		    ;;
-		(fedora|ol|centos|rhel)
+		(fedora|rhel|ol|centos)
 		    :
 		    ;;
 		(*)

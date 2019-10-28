@@ -56,7 +56,7 @@ add_repositories() {
 		(debian|raspbian|ubuntu)
 		    add-apt-repository "$repo"
 		    ;;
-		(ol|centos)
+		(rhel|ol|centos)
 		    yum-config-manager --add-repo "$repo" >/dev/null
 		    ;;
 	    esac
@@ -128,7 +128,7 @@ get_docker_repo() {
 		(debian|raspbian|ubuntu)
 		    printf "%s\n" "deb [arch=$arch] $1 $(get_codename) stable"
 		    ;;
-		(ol|centos)
+		(rhel|ol|centos)
 		    printf "%s\n" "$DOCKER_BASE_URL/linux/centos/docker-ce.repo"
 		    ;;
 	    esac

@@ -60,12 +60,12 @@ get_python_package() {
 		(fedora)
 		    printf "%s %s\n" $FEDORA_INFO
 		    ;;
-		(ol|centos|rhel)
+		(rhel|ol|centos)
 		    case "$VERSION_ID" in
-			(7|7.*)
+			(7|7.[78])
 			    printf "%s %s\n" $REDHAT_7_INFO
 			    ;;
-			(8|8.*)
+			(8|8.[01])
 			    printf "%s %s\n" $REDHAT_8_INFO
 			    ;;
 		    esac

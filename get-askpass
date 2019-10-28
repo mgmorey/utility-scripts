@@ -80,7 +80,7 @@ configure_platform() {
 			    ;;
 		    esac
 		    ;;
-		(ol|centos|rhel)
+		(rhel|ol|centos)
 		    case "$desktop_name" in
 			(GNOME|GNOME*|*:GNOME|'')
 			    package=openssh-askpass

@@ -92,9 +92,9 @@ get_configure_options() {
     case "$kernel_name" in
         (Linux)
             case "$ID" in
-                (ol|centos|rhel)
+                (rhel|ol|centos)
 		    case "$VERSION_ID" in
-			(8|8.*)
+			(8|8.[01])
 			    printf "%s\n" "--with-gif=no"
 			    ;;
 		    esac
@@ -189,7 +189,7 @@ validate_platform() {
 		(debian|raspbian|ubuntu|linuxmint|neon|kali)
 		    :
 	    	    ;;
-		(opensuse-*|fedora|ol|centos|rhel)
+		(opensuse-*|fedora|rhel|ol|centos)
 		    :
 	    	    ;;
 		(*)

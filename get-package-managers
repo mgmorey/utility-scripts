@@ -38,12 +38,12 @@ get_package_managers() {
 		(fedora)
 		    printf "%s\n" dnf
 		    ;;
-		(ol|centos|rhel)
+		(rhel|ol|centos)
 		    case "$VERSION_ID" in
-			(7|7.*)
+			(7|7.[78])
 			    printf "%s\n" yum /usr/pkg/bin/pkgin
 			    ;;
-			(8|8.*)
+			(8|8.[01])
 			    printf "%s\n" dnf
 			    ;;
 		    esac

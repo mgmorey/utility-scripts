@@ -58,7 +58,7 @@ install_build_essentials() {
 		(debian|raspbian|ubuntu|linuxmint|neon|kali)
 		    $manager $command $options "$pattern"
 	    	    ;;
-		(opensuse-*|fedora|ol|centos|rhel)
+		(opensuse-*|fedora|rhel|ol|centos)
 		    $manager $command $options "$pattern"
 	    	    ;;
 		(*)

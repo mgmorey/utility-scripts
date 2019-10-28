@@ -70,7 +70,7 @@ get_docker_packages() {
 			    ;;
 		    esac
 		    ;;
-		(ol|centos)
+		(rhel|ol|centos)
 		    packages=$REDHAT_PKGS
 		    ;;
 	    esac

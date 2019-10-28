@@ -58,13 +58,13 @@ get_installed_packages() {
 		(fedora)
 		    $manager1 list installed | awk '{print $1}' | awk -F. '{print $1}'
 		    ;;
-		(ol|centos|rhel)
+		(rhel|ol|centos)
 		    case "$VERSION_ID" in
-			(7|7.*)
+			(7|7.[78])
 			    $manager1 list installed | awk '{print $1}' | awk -F. '{print $1}'
 			    $manager2 list | awk '{print ":" $1}'
 			    ;;
-			(8|8.*)
+			(8|8.[01])
 			    $manager1 list installed | awk '{print $1}' | awk -F. '{print $1}'
 			    ;;
 		    esac

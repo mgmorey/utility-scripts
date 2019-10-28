@@ -48,7 +48,7 @@ collect_data() {
 		(debian|raspbian|ubuntu|linuxmint|neon|kali)
 		    debian_version=$(cat /etc/debian_version)
 		    ;;
-		(fedora|ol|centos|rhel)
+		(fedora|rhel|ol|centos)
 		    redhat_release=$(cat /etc/redhat-release)
 		    ;;
 	    esac

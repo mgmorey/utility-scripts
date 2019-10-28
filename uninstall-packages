@@ -135,7 +135,7 @@ validate_platform() {
 		(debian|raspbian|ubuntu|linuxmint|neon|kali)
 		    :
 		    ;;
-		(opensuse-*|fedora|ol|centos|rhel)
+		(opensuse-*|fedora|rhel|ol|centos)
 		    :
 		    ;;
 		(*)

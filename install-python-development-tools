@@ -81,9 +81,9 @@ preinstall_python_development_tools() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
-		(ol|centos|rhel)
+		(rhel|ol|centos)
                     case "$VERSION_ID" in
-			(7|7.*)
+			(7|7.[78])
 			    "$script_dir/install-epel"
                             ;;
 		    esac
@@ -107,12 +107,12 @@ validate_platform() {
 		(fedora)
 		    :
 	    	    ;;
-		(ol|centos|rhel)
+		(rhel|ol|centos)
                     case "$VERSION_ID" in
-			(7|7.*)
+			(7|7.[78])
 			    :
                             ;;
-			(8|8.*)
+			(8|8.[01])
 			    :
 			    ;;
 			(*)
