@@ -2,3 +2,4 @@
 # -*- mode: awk -*-
 
 /^CentOS Linux release .* (.*)/ {print $4}
+/^Red Hat Enterprise Linux Server release .* (.*)/ {print $7}
