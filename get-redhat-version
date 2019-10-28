@@ -18,4 +18,5 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 /^CentOS Linux release .* (.*)/ {print $4}
+/^Fedora release .* (.*)/ {print $3}
 /^Red Hat Enterprise Linux Server release .* (.*)/ {print $7}
