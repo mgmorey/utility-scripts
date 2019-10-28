@@ -16,13 +16,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-FILE=/etc/release
-FILE_OS=/etc/os-release
+FILE_DEBIAN_VERSION=/etc/debian_version
+FILE_OS_RELEASE=/etc/os-release
+FILE_REDHAT_RELEASE=/etc/redhat-release
+FILE_RELEASE=/etc/release
+
 IS_SHELL_FORMAT=false
+
 LOWERCASE="tr '[:upper:]' '[:lower:]'"
+
 VARS_STANDARD="ID NAME PRETTY_NAME VERSION VERSION_ID"
 VARS_EXTENDED="debian_version kernel_name kernel_release os_version \
 os_version_id redhat_release"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
 
 abort_conflicting_option() {
     usage "%s: conflicting option -- %s\n" "$0" "$1"
@@ -41,7 +55,7 @@ collect_data() {
 
     case "$kernel_name" in
 	(Linux|GNU)
-	    . $FILE_OS
+	    . $FILE_OS_RELEASE
 	    os_version_id=$(get_os_version_id)
 
 	    case "$ID" in
@@ -55,7 +69,7 @@ collect_data() {
 	    ;;
 
 	(SunOS)
-	    input=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE)
+	    input=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE_RELEASE)
 	    NAME=${input%:*}
 	    VERSION=${input#*:}
 	    ID=$(printf "%s\n" "${NAME% *}" | $LOWERCASE)
@@ -114,16 +128,7 @@ get_os_version_id() {
 		(ubuntu)
 		    printf "%s\n" "$VERSION" | awk '{print $1}'
 		    ;;
-		(fedora)
-		    awk '{print $3}' /etc/redhat-release
-		    ;;
-		(rhel|ol)
-		    awk '{print $6}' /etc/redhat-release
-		    ;;
-		(centos)
-		    awk '{print $4}' /etc/redhat-release
-		    ;;
-		(*)
+		(fedora|rhel|ol|centos)
 		    if [ -r /etc/redhat-release ]; then
 			"$script_dir/get-redhat-version" /etc/redhat-release
 		    fi
@@ -132,6 +137,23 @@ get_os_version_id() {
 	    ;;
     esac
 }
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
 
 output_data() {
     if [ -z "${vars-}" ]; then
@@ -230,6 +252,8 @@ usage() {
 	       $0: -h
 	EOF
 }
+
+script_dir=$(get_realpath "$(dirname "$0")")
 
 parse_arguments "$@"
 collect_data
