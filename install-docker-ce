@@ -85,7 +85,7 @@ enable_additional_repositories() {
 	    case "$ID" in
 		(ol)
 		    case "$VERSION_ID" in
-			(7.7)
+			(7.*)
 			    for repo in $ORACLE_LINUX_REPOS; do
 				yum-config-manager --enable $repo >/dev/null
 			    done
@@ -316,7 +316,7 @@ validate_platform() {
 		    ;;
 		(ol)
 		    case "$VERSION_ID" in
-			(7.7)
+			(7.*)
 			    :
 			    ;;
 			(*)

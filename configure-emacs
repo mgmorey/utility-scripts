@@ -94,7 +94,7 @@ get_configure_options() {
             case "$ID" in
                 (ol|centos|rhel)
 		    case "$VERSION_ID" in
-			(8|8.0)
+			(8|8.*)
 			    printf "%s\n" "--with-gif=no"
 			    ;;
 		    esac

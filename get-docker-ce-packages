@@ -68,7 +68,7 @@ get_docker_ce_packages() {
 		    ;;
 		(ol)
 		    case "$VERSION_ID" in
-			(7.7)
+			(7.*)
 			    packages=$REDHAT_PKGS
 			    ;;
 		    esac

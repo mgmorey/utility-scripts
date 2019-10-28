@@ -60,7 +60,7 @@ case "$kernel_name" in
 		;;
 	    (ol|rhel)
 		case "$VERSION_ID" in
-		    (8.0)
+		    (8.*)
 			printf "%s\n" "--nobest"
 			;;
 		esac
