@@ -28,27 +28,34 @@ assert() {
 get_package_managers() {
     case "$kernel_name" in
 	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    printf "%s\n" apt-get
-		    ;;
-		(opensuse-*)
-		    printf "%s\n" zypper
-		    ;;
-		(fedora)
-		    printf "%s\n" dnf
-		    ;;
-		(rhel|ol|centos)
-		    case "$VERSION_ID" in
-			(7|7.[78])
-			    printf "%s\n" yum /usr/pkg/bin/pkgin
-			    ;;
-			(8|8.[01])
-			    printf "%s\n" dnf
-			    ;;
-		    esac
-		    ;;
-	    esac
+	    for id in $ID $ID_LIKE; do
+		case "$id" in
+		    (debian)
+			printf "%s\n" apt-get
+			return
+			;;
+		    (opensuse-*)
+			printf "%s\n" zypper
+			return
+			;;
+		    (fedora)
+			printf "%s\n" dnf
+			return
+			;;
+		    (rhel|ol|centos)
+			case "$VERSION_ID" in
+			    (7|7.[78])
+				printf "%s\n" yum /usr/pkg/bin/pkgin
+				;;
+			    (8|8.[01])
+				printf "%s\n" dnf
+				;;
+			esac
+
+			return
+			;;
+		esac
+	    done
 	    ;;
 	(Darwin)
 	    printf "%s\n" /usr/local/bin/brew /opt/pkg/bin/pkgin
