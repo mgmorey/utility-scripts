@@ -120,7 +120,7 @@ collect_data_for_sunos() {
     NAME=${os_data%:*}
     VERSION=${os_data#*:}
     ID=$(printf "%s\n" "${NAME% *}" | to_lower)
-    family=sunos
+    family=unix
 }
 
 collect_data_for_unix() {
@@ -128,15 +128,7 @@ collect_data_for_unix() {
     VERSION=$kernel_release
     ID=$(printf "%s\n" "$NAME" | to_lower)
     PRETTY_NAME=$kernel_data
-
-    case "$kernel_name" in
-	(*BSD)
-	    family=bsd
-	    ;;
-	(*)
-	    family=unix
-	    ;;
-    esac
+    family=unix
 }
 
 collect_defaults() {
