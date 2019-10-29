@@ -83,7 +83,7 @@ collect_data_for_darwin() {
     NAME=$(sw_vers -productName)
     VERSION=$(sw_vers -productVersion)
     ID=macos
-    family=darwin
+    family=unix
 }
 
 collect_data_for_gnu() {
