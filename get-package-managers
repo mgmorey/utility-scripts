@@ -58,7 +58,11 @@ get_package_managers() {
 	    done
 	    ;;
 	(Darwin)
-	    printf "%s\n" /usr/local/bin/brew /opt/pkg/bin/pkgin
+	    case "$ID" in
+		(macos)
+		    printf "%s\n" /usr/local/bin/brew /opt/pkg/bin/pkgin
+		    ;;
+	    esac
 	    ;;
 	(FreeBSD)
 	    printf "%s\n" pkg
