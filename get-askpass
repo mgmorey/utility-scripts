@@ -60,6 +60,16 @@ configure_platform() {
 			;;
 		esac
 		;;
+	    (fedora|rhel)
+		case "$desktop_name" in
+		    (GNOME|GNOME*|*:GNOME|'')
+			package=openssh-askpass
+			;;
+		    (KDE*)
+			package=ksshaskpass
+			;;
+		esac
+		;;
 	esac
 
 	if [ -n "${package-}" ]; then
