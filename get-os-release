@@ -88,6 +88,10 @@ collect_data() {
 	PRETTY_NAME="$NAME $VERSION"
     fi
 
+    if [ "$is_extended_set" = false ]; then
+	return
+    fi
+
     if [ -z "${os_version_id-}" ]; then
 	os_version_id=$VERSION_ID
     fi
@@ -113,6 +117,11 @@ collect_data_for_cygwin() {
 
 collect_data_for_gnu() {
     . $FILE_OS_RELEASE
+
+    if [ "$is_extended_set" = false ]; then
+	return
+    fi
+
     os_version_id=$(get_os_version_id)
 
     case "$ID" in
@@ -193,6 +202,7 @@ output_data() {
 }
 
 parse_arguments() {
+    is_extended_set=false
     is_shell_format=$IS_SHELL_FORMAT
     vars=
 
@@ -220,6 +230,7 @@ parse_arguments() {
 		queue_vars $VARS_STANDARD
 		;;
 	    (X)
+		is_extended_set=true
 		queue_vars $VARS_STANDARD $VARS_EXTENDED
 		;;
 	    (h)
