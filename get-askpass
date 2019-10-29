@@ -79,7 +79,7 @@ configure_platform() {
 		;;
 	esac
 
-	if [ -n "${package-${helper}}" ]; then
+	if [ -n "${package-${helper-}}" ]; then
 	    return
 	fi
     done
