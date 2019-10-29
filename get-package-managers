@@ -29,46 +29,43 @@ get_package_managers() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
-		printf "%s\n" apt-get
-		return
+		managers="apt-get"
 		;;
 	    (opensuse)
-		printf "%s\n" zypper
-		return
+		managers="zypper"
 		;;
 	    (fedora)
-		printf "%s\n" dnf
-		return
+		managers="dnf"
 		;;
 	    (rhel|centos)
 		case "$VERSION_ID" in
 		    (7|7.[78])
-			printf "%s\n" yum /usr/pkg/bin/pkgin
+			managers="yum /usr/pkg/bin/pkgin"
 			;;
 		    (8|8.[01])
-			printf "%s\n" dnf
+			managers="dnf"
 			;;
 		esac
-
-		return
 		;;
 	    (macos)
-		printf "%s\n" /usr/local/bin/brew /opt/pkg/bin/pkgin
-		return
+		managers="/usr/local/bin/brew /opt/pkg/bin/pkgin"
 		;;
 	    (freebsd)
-		printf "%s\n" pkg
-		return
+		managers="pkg"
 		;;
 	    (netbsd)
-		printf "%s\n" pkgin
-		return
+		managers="pkgin"
 		;;
 	    (openindiana)
-		printf "%s\n" pkg pkgin
+		managers="pkg pkgin"
 		return
 		;;
 	esac
+
+	if [ -n "${managers-}" ]; then
+	    printf "%s\n" $managers
+	    return
+	fi
     done
 }
 
