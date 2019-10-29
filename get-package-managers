@@ -42,7 +42,7 @@ get_package_managers() {
 			printf "%s\n" dnf
 			return
 			;;
-		    (rhel|ol|centos)
+		    (rhel|centos)
 			case "$VERSION_ID" in
 			    (7|7.[78])
 				printf "%s\n" yum /usr/pkg/bin/pkgin
