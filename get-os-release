@@ -73,7 +73,7 @@ collect_data() {
 
 collect_data_for_cygwin() {
     kernel_release=$(printf "%s\n" "${kernel_data#* }" | sed -e 's/(.*)//')
-    os_family=cygwin
+    os_family=gnu-cygwin
     NAME="Microsoft Windows"
     VERSION=${kernel_name#*-}
     ID=ms-windows
@@ -87,8 +87,6 @@ collect_data_for_darwin() {
 }
 
 collect_data_for_gnu() {
-    . $FILE_OS_RELEASE
-
     case "$kernel_name" in
 	(GNU)
 	    os_family=gnu-hurd
@@ -97,6 +95,8 @@ collect_data_for_gnu() {
 	    os_family=gnu-linux
 	    ;;
     esac
+
+    . $FILE_OS_RELEASE
 
     if [ "$is_extended_set" = true ]; then
 	os_version_id=$(get_os_version_id)
