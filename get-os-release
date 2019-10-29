@@ -148,8 +148,14 @@ collect_defaults() {
 	return
     fi
 
+    case "$ID" in
+	(openindiana)
+	    os_id_like=sunos
+	    ;;
+    esac
+
     if [ -z "${os_id_like-}" ]; then
-	os_id_like="${ID_LIKE:-ID}"
+	os_id_like="$ID_LIKE"
     fi
 
     if [ -z "${os_version_id-}" ]; then
