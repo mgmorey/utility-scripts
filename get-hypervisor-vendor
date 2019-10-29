@@ -1,4 +1,5 @@
 #!/usr/bin/awk -f
+# -*- mode: awk -*-
 
 # get-hypervisor-vendor: print name of hypervisor vendor
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
