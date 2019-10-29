@@ -108,6 +108,9 @@ configure_platform() {
 		    ;;
 	    esac
 	    ;;
+	(Darwin)
+	    :
+	    ;;
 	(FreeBSD)
 	    case "$desktop_name" in
 		(GNOME|GNOME*|MATE|'')
@@ -167,7 +170,7 @@ configure_platform() {
 get_askpass() {
     configure_platform
 
-    if [ -z "${helper:-}" ]; then
+    if [ -z "${helper:-}" -a -n "${package-}" ]; then
 	helper=$(get_filenames $package 2>/dev/null | get_helper)
     fi
 
