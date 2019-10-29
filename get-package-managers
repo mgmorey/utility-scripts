@@ -72,7 +72,11 @@ get_package_managers() {
 	    esac
 	    ;;
 	(NetBSD)
-	    printf "%s\n" pkgin
+	    case "$ID" in
+		(netbsd)
+		    printf "%s\n" pkgin
+		    ;;
+	    esac
 	    ;;
 	(SunOS)
 	    printf "%s\n" pkg pkgin
