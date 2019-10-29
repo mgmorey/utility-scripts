@@ -34,7 +34,7 @@ get_package_managers() {
 			printf "%s\n" apt-get
 			return
 			;;
-		    (opensuse-*)
+		    (opensuse)
 			printf "%s\n" zypper
 			return
 			;;
