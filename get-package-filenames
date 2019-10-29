@@ -29,12 +29,37 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_package_filenames() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		dpkg --listfiles "$1"
+		return
+		;;
+	    (opensuse|fedora|rhel)
+		rpm --query --list "$1"
+		return
+		;;
+	    (freebsd)
+		pkg query %Fp "$1"
+		return
+		;;
+	    (openindiana)
+		pkg contents $1 | awk 'NR > 1 {printf("/%s\n", $0)}'
+		return
+		;;
+	esac
+    done
+
+    abort_not_supported "Operating system"
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
@@ -50,38 +75,12 @@ if [ $# -eq 0 ]; then
     abort "%s: Not enough arguments\n" "$0"
 fi
 
+if [ $# -gt 1 ]; then
+    abort "%s: Too many arguments\n" "$0"
+fi
+
 script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
 
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (debian|raspbian|ubuntu|linuxmint|neon|kali)
-		dpkg --listfiles "$1"
-		;;
-	    (opensuse-*|fedora|rhel|ol|centos)
-		rpm --query --list "$1"
-		;;
-	    (*)
-		abort_not_supported Distro
-		;;
-	esac
-	;;
-    (FreeBSD)
-	pkg query %Fp "$1"
-	;;
-    (SunOS)
-	case "$ID" in
-	    (openindiana)
-		pkg contents $1 | awk 'NR > 1 {printf("/%s\n", $0)}'
-		;;
-	    (*)
-		abort_not_supported Distro
-		;;
-	esac
-	;;
-    (*)
-	abort_not_supported "Operating system"
-	;;
-esac
+get_package_filenames "$@"
