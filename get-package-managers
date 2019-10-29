@@ -26,66 +26,50 @@ assert() {
 }
 
 get_package_managers() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    for id in $ID $ID_LIKE; do
-		case "$id" in
-		    (debian)
-			printf "%s\n" apt-get
-			return
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		printf "%s\n" apt-get
+		return
+		;;
+	    (opensuse)
+		printf "%s\n" zypper
+		return
+		;;
+	    (fedora)
+		printf "%s\n" dnf
+		return
+		;;
+	    (rhel|centos)
+		case "$VERSION_ID" in
+		    (7|7.[78])
+			printf "%s\n" yum /usr/pkg/bin/pkgin
 			;;
-		    (opensuse)
-			printf "%s\n" zypper
-			return
-			;;
-		    (fedora)
+		    (8|8.[01])
 			printf "%s\n" dnf
-			return
-			;;
-		    (rhel|centos)
-			case "$VERSION_ID" in
-			    (7|7.[78])
-				printf "%s\n" yum /usr/pkg/bin/pkgin
-				;;
-			    (8|8.[01])
-				printf "%s\n" dnf
-				;;
-			esac
-
-			return
 			;;
 		esac
-	    done
-	    ;;
-	(Darwin)
-	    case "$ID" in
-		(macos)
-		    printf "%s\n" /usr/local/bin/brew /opt/pkg/bin/pkgin
-		    ;;
-	    esac
-	    ;;
-	(FreeBSD)
-	    case "$ID" in
-		(freebsd)
-		    printf "%s\n" pkg
-		    ;;
-	    esac
-	    ;;
-	(NetBSD)
-	    case "$ID" in
-		(netbsd)
-		    printf "%s\n" pkgin
-		    ;;
-	    esac
-	    ;;
-	(SunOS)
-	    case "$ID" in
-		(openindiana)
-		    printf "%s\n" pkg pkgin
-		    ;;
-	    esac
-	    ;;
-    esac
+
+		return
+		;;
+	    (macos)
+		printf "%s\n" /usr/local/bin/brew /opt/pkg/bin/pkgin
+		return
+		;;
+	    (freebsd)
+		printf "%s\n" pkg
+		return
+		;;
+	    (netbsd)
+		printf "%s\n" pkgin
+		return
+		;;
+	    (openindiana)
+		printf "%s\n" pkg pkgin
+		return
+		;;
+	esac
+    done
 }
 
 get_realpath() (
