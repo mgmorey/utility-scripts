@@ -91,7 +91,7 @@ install_docker() {
     installed_package=$("$script_dir/get-installed-docker-package")
 
     case $installed_package in
-	(docker|docker.io|podman)
+	(docker|docker.io|podman-docker)
 	    printf "Package $installed_package is installed\n"
 	    exit 0
 	    ;;
