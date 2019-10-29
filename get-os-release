@@ -136,6 +136,19 @@ collect_defaults() {
 	return
     fi
 
+<<<<<<< HEAD
+=======
+    case "$ID" in
+	(openindiana)
+	    os_id_like="illumos solaris sunos"
+	    ;;
+    esac
+
+    if [ -z "${os_id_like-}" ]; then
+	os_id_like="$ID_LIKE"
+    fi
+
+>>>>>>> c927a7ea11ffce019dcaf2ca927dfbc9678b6edf
     if [ -z "${os_version_id-}" ]; then
 	os_version_id=$VERSION_ID
     fi
