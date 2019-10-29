@@ -79,7 +79,11 @@ get_package_managers() {
 	    esac
 	    ;;
 	(SunOS)
-	    printf "%s\n" pkg pkgin
+	    case "$ID" in
+		(openindiana)
+		    printf "%s\n" pkg pkgin
+		    ;;
+	    esac
 	    ;;
     esac
 }
