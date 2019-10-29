@@ -25,6 +25,34 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_package_install_options() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		options="--no-install-recommends"
+		;;
+	    (opensuse)
+		options="--no-recommends"
+		;;
+	    (fedora)
+		options="--allowerasing --nobest"
+		;;
+	    (rhel)
+		case "$VERSION_ID" in
+		    (8.*)
+			options="--allowerasing --nobest"
+			;;
+		esac
+		;;
+	esac
+
+	if [ -n "${options-}" ]; then
+	    printf "%s\n" $options
+	    return
+	fi
+    done
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -46,25 +74,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
 
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (debian|raspbian|ubuntu|linuxmint|neon|kali)
-		printf "%s\n" "--no-install-recommends"
-		;;
-	    (opensuse-*)
-		printf "%s\n" "--no-recommends"
-		;;
-	    (fedora)
-		printf "%s\n" "--allowerasing"
-		;;
-	    (ol|rhel)
-		case "$VERSION_ID" in
-		    (8.*)
-			printf "%s\n" "--nobest"
-			;;
-		esac
-		;;
-	esac
-	;;
-esac
+get_package_install_options
