@@ -65,7 +65,11 @@ get_package_managers() {
 	    esac
 	    ;;
 	(FreeBSD)
-	    printf "%s\n" pkg
+	    case "$ID" in
+		(freebsd)
+		    printf "%s\n" pkg
+		    ;;
+	    esac
 	    ;;
 	(NetBSD)
 	    printf "%s\n" pkgin
