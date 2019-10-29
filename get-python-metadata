@@ -16,24 +16,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DARWIN_INFO=":python36 py36"
+DARWIN_DATA=":python36 py36"
 
-DEBIAN_INFO="python3 python3"
+DEBIAN_DATA="python3 python3"
 
-FEDORA_INFO="python3 python3"
+FEDORA_DATA="python3 python3"
 
-FREEBSD_INFO="python3 py36"
+FREEBSD_DATA="python3 py36"
 
-NETBSD_INFO="python36 py36"
+NETBSD_DATA="python36 py36"
 
-OPENSUSE_INFO="python3 python3"
+OPENSUSE_DATA="python3 python3"
 
-REDHAT_7_INFO=":python36 py36"
-REDHAT_8_INFO="python3 python3"
+REDHAT_7_DATA=":python36 py36"
+REDHAT_8_DATA="python3 python3"
 
-SUNOS_INFO=":python36 py36"
+SUNOS_DATA=":python36 py36"
 
-UBUNTU_INFO="python3 python3"
+UBUNTU_DATA="python3 python3"
 
 abort() {
     printf "$@" >&2
@@ -44,47 +44,53 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_python_package() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|kali)
-		    printf "%s %s\n" $DEBIAN_INFO
-		    ;;
-		(ubuntu|linuxmint|neon)
-		    printf "%s %s\n" $UBUNTU_INFO
-		    ;;
-		(opensuse-*)
-		    printf "%s %s\n" $OPENSUSE_INFO
-		    ;;
-		(fedora)
-		    printf "%s %s\n" $FEDORA_INFO
-		    ;;
-		(rhel|ol|centos)
-		    case "$VERSION_ID" in
-			(7|7.[78])
-			    printf "%s %s\n" $REDHAT_7_INFO
-			    ;;
-			(8|8.[01])
-			    printf "%s %s\n" $REDHAT_8_INFO
-			    ;;
-		    esac
-		    ;;
-	    esac
-	    ;;
-	(Darwin)
-	    printf "%s %s\n" $DARWIN_INFO
-	    ;;
-	(FreeBSD)
-	    printf "%s %s\n" $FREEBSD_INFO
-	    ;;
-	(NetBSD)
-	    printf "%s %s\n" $NETBSD_INFO
-	    ;;
-	(SunOS)
-	    printf "%s %s\n" $SUNOS_INFO
-	    ;;
-    esac
+get_python_metadata() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian|raspbian|kali)
+		data="$DEBIAN_DATA"
+		;;
+	    (ubuntu|linuxmint|neon)
+		data="$UBUNTU_DATA"
+		;;
+	    (opensuse-*)
+		data="$OPENSUSE_DATA"
+		;;
+	    (fedora)
+		data="$FEDORA_DATA"
+		;;
+	    (rhel|centos)
+		case "$VERSION_ID" in
+		    (7|7.[78])
+			data="$REDHAT_7_DATA"
+			;;
+		    (8|8.[01])
+			data="$REDHAT_8_DATA"
+			;;
+		esac
+		;;
+	    (macos)
+		data="$DARWIN_DATA"
+		;;
+	    (freebsd)
+		data="$FREEBSD_DATA"
+		;;
+	    (netbsd)
+		data="$NETBSD_DATA"
+		;;
+	    (openindiana)
+		data="$SUNOS_DATA"
+		;;
+	esac
+
+	if [ -n "${data-}" ]; then
+	    break
+	fi
+    done
+
+    if [ -n "${data-}" ]; then
+	printf "%s %s\n" "$data"
+    fi
 }
 
 get_realpath() (
@@ -108,4 +114,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
 
-get_python_package
+get_python_metadata
