@@ -150,7 +150,7 @@ collect_defaults() {
 
     case "$ID" in
 	(openindiana)
-	    os_id_like=sunos
+	    os_id_like="illumos solaris sunos"
 	    ;;
     esac
 
