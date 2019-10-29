@@ -58,7 +58,6 @@ get_package_managers() {
 		;;
 	    (openindiana)
 		managers="pkg pkgin"
-		return
 		;;
 	esac
 
