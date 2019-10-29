@@ -160,6 +160,6 @@ validate_platform() {
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-eval $("$script_dir/get-os-release" -X)
+eval $("$script_dir/get-os-release" -x)
 
 install_emacs_build_deps

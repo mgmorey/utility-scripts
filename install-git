@@ -44,8 +44,6 @@ get_realpath() (
 
 install_git() {
     if ! git --version >/dev/null; then
-	kernel_name=$("$script_dir/get-os-release" -k)
-
 	case "$kernel_name" in
 	    (Darwin)
 		"$script_dir/install-homebrew"
@@ -57,5 +55,7 @@ install_git() {
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -x)
 
 install_git

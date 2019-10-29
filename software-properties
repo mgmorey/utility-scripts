@@ -56,7 +56,7 @@ fi
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-eval $("$script_dir/get-os-release" -X)
+eval $("$script_dir/get-os-release" -x)
 
 desktop_name=$("$script_dir/get-desktop-name")
 

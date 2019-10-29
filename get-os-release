@@ -25,8 +25,8 @@ IS_SHELL_FORMAT=false
 
 LOWERCASE="tr '[:upper:]' '[:lower:]'"
 
-VARS_STANDARD="ID NAME PRETTY_NAME VERSION VERSION_ID"
-VARS_EXTENDED="debian_version kernel_name kernel_release os_version \
+VARS_STANDARD="ID NAME PRETTY_NAME VERSION VERSION_ID kernel_name"
+VARS_EXTENDED="debian_version kernel_release os_version \
 os_version_id redhat_release redhat_version_id"
 
 abort() {
