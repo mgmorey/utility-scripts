@@ -21,9 +21,9 @@ FILE_OS_RELEASE=/etc/os-release
 FILE_REDHAT_RELEASE=/etc/redhat-release
 FILE_RELEASE=/etc/release
 
-VARS_STANDARD="ID NAME PRETTY_NAME VERSION VERSION_ID family kernel_name"
-VARS_EXTENDED="kernel_release os_id_like os_version os_version_id \
-debian_codename redhat_release redhat_version_id"
+SET_1="ID ID_LIKE NAME PRETTY_NAME VERSION VERSION_ID \
+kernel_name os_family"
+SET_2="kernel_release os_version_id"
 
 abort() {
     printf "$@" >&2
@@ -73,17 +73,17 @@ collect_data() {
 
 collect_data_for_cygwin() {
     kernel_release=$(printf "%s\n" "${kernel_data#* }" | sed -e 's/(.*)//')
+    os_family=cygwin
     NAME="Microsoft Windows"
     VERSION=${kernel_name#*-}
     ID=ms-windows
-    family=cygwin
 }
 
 collect_data_for_darwin() {
+    os_family=unix
     NAME=$(sw_vers -productName)
     VERSION=$(sw_vers -productVersion)
     ID=macos
-    family=unix
 }
 
 collect_data_for_gnu() {
@@ -91,44 +91,32 @@ collect_data_for_gnu() {
 
     case "$kernel_name" in
 	(GNU)
-	    family=gnu-hurd
+	    os_family=gnu-hurd
 	    ;;
 	(Linux)
-	    family=gnu-linux
+	    os_family=gnu-linux
 	    ;;
     esac
 
-    if [ "$is_extended_set" = false ]; then
-	return
+    if [ "$is_extended_set" = true ]; then
+	os_version_id=$(get_os_version_id)
     fi
-
-    os_version_id=$(get_os_version_id)
-
-    case "$ID" in
-	(debian|raspbian|ubuntu|linuxmint|neon|kali)
-	    debian_codename=$(cat /etc/debian_version)
-	    ;;
-	(fedora|rhel|ol|centos)
-	    redhat_release=$(cat /etc/redhat-release)
-	    redhat_version_id=$os_version_id
-	    ;;
-    esac
 }
 
 collect_data_for_sunos() {
     os_data=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE_RELEASE)
+    os_family=unix
     NAME=${os_data%:*}
     VERSION=${os_data#*:}
     ID=$(printf "%s\n" "${NAME% *}" | to_lower)
-    family=unix
 }
 
 collect_data_for_unix() {
+    os_family=unix
     NAME=$kernel_name
     VERSION=$kernel_release
     ID=$(printf "%s\n" "$NAME" | to_lower)
     PRETTY_NAME=$kernel_data
-    family=unix
 }
 
 collect_defaults() {
@@ -148,16 +136,8 @@ collect_defaults() {
 	return
     fi
 
-    if [ -z "${os_id_like-}" ]; then
-	os_id_like="${ID_LIKE:-ID}"
-    fi
-
     if [ -z "${os_version_id-}" ]; then
 	os_version_id=$VERSION_ID
-    fi
-
-    if [ -z "${os_version-}" ]; then
-	os_version=$VERSION
     fi
 }
 
@@ -240,11 +220,11 @@ parse_arguments() {
 		queue_vars VERSION_ID
 		;;
 	    (x)
-		queue_vars $VARS_STANDARD
+		queue_vars $SET_1
 		;;
 	    (X)
 		is_extended_set=true
-		queue_vars $VARS_STANDARD $VARS_EXTENDED
+		queue_vars $SET_1 $SET_2
 		;;
 	    (h)
 		usage
