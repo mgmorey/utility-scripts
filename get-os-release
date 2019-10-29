@@ -164,10 +164,10 @@ collect_defaults() {
 	(raspbian)
 	    os_id_like=debian
 	    ;;
-	(linuxmint|neon|kali)
+	(linuxmint|kali)
 	    os_id_like=ubuntu
 	    ;;
-	(ol|centos)
+	(centos)
 	    os_id_like=rhel
 	    ;;
     esac
