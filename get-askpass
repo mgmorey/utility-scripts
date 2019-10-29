@@ -40,6 +40,13 @@ configure_platform() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (ms-windows)
+		case "$desktop_name" in
+		    (MATE|X-Cygwin|'')
+			helper=/usr/libexec/gnome-ssh-askpass
+			;;
+		esac
+		;;
 	    (debian)
 		case "$desktop_name" in
 		    (GNOME|GNOME*|*:GNOME|LXDE|X-Cinnamon|'')
@@ -72,18 +79,10 @@ configure_platform() {
 		;;
 	esac
 
-	if [ -n "${package-}" ]; then
-	    break
-	elif [ -n "${helper-}" ]; then
-	    break
+	if [ -n "${package-${helper}}" ]; then
+	    return
 	fi
     done
-
-    if [ -n "${package-}" ]; then
-	return
-    elif [ -n "${helper-}" ]; then
-	return
-    fi
 
     case "$kernel_name" in
 	(Linux|GNU)
@@ -138,23 +137,6 @@ configure_platform() {
 		    abort_not_supported Distro
 		    ;;
 	    esac
-	    ;;
-	(CYGWIN_NT-*)
-	    case "$desktop_name" in
-		(MATE|X-Cygwin|'')
-		    helper=/usr/libexec/gnome-ssh-askpass.exe
-		    ;;
-		(*)
-		    abort_desktop_not_supported
-		    ;;
-	    esac
-
-	    if [ -x "$helper" ]; then
-		printf "%s\n" "${helper%.exe}"
-		exit 0
-	    else
-		abort "%s: No such askpass helper\n" "$helper"
-	    fi
 	    ;;
 	(*)
 	    abort_not_supported "Operating system"
