@@ -160,15 +160,6 @@ collect_defaults() {
 	return
     fi
 
-    case "$ID" in
-	(linuxmint|kali)
-	    os_id_like=ubuntu
-	    ;;
-	(centos)
-	    os_id_like=rhel
-	    ;;
-    esac
-
     if [ -z "${os_id_like-}" ]; then
 	os_id_like="${ID_LIKE:-ID}"
     fi
