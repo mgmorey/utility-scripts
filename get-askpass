@@ -50,7 +50,7 @@ configure_platform() {
 			;;
 		esac
 	    ;;
-	    (opensuse-*)
+	    (opensuse)
 		case "$desktop_name" in
 		    (GNOME|GNOME*|*:GNOME|'')
 			package=openssh-askpass-gnome
