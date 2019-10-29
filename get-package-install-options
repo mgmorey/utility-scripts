@@ -44,13 +44,18 @@ get_package_install_options() {
 			;;
 		esac
 		;;
+	    (centos)
+		break
 	esac
 
 	if [ -n "${options-}" ]; then
-	    printf "%s\n" $options
-	    return
+	    break
 	fi
     done
+
+    if [ -n "${options-}" ]; then
+	printf "%s\n" $options
+    fi
 }
 
 get_realpath() (
