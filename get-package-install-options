@@ -35,12 +35,12 @@ get_package_install_options() {
 		options="--no-recommends"
 		;;
 	    (fedora)
-		options="--allowerasing --nobest"
+		options="--allowerasing"
 		;;
-	    (rhel)
+	    (rhel|ol)
 		case "$VERSION_ID" in
 		    (8.*)
-			options="--allowerasing --nobest"
+			options="--nobest"
 			;;
 		esac
 		;;
