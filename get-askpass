@@ -88,58 +88,6 @@ configure_platform() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    case "$desktop_name" in
-			(GNOME|GNOME*|*:GNOME|LXDE|X-Cinnamon|'')
-			    package=ssh-askpass-gnome
-			    ;;
-			(KDE*)
-			    package=ksshaskpass
-			    ;;
-			(*)
-			    abort_desktop_not_supported
-			    ;;
-		    esac
-		    ;;
-		(opensuse-*)
-		    case "$desktop_name" in
-			(GNOME|GNOME*|*:GNOME|'')
-			    package=openssh-askpass-gnome
-			    ;;
-			(KDE*)
-			    package=ksshaskpass5
-			    ;;
-			(*)
-			    abort_desktop_not_supported
-			    ;;
-		    esac
-		    ;;
-		(fedora)
-		    case "$desktop_name" in
-			(GNOME|GNOME*|*:GNOME|'')
-			    package=openssh-askpass
-			    ;;
-			(KDE*)
-			    package=ksshaskpass
-			    ;;
-			(*)
-			    abort_desktop_not_supported
-			    ;;
-		    esac
-		    ;;
-		(rhel|ol|centos)
-		    case "$desktop_name" in
-			(GNOME|GNOME*|*:GNOME|'')
-			    package=openssh-askpass
-			    ;;
-			(KDE*)
-			    package=ksshaskpass
-			    ;;
-			(*)
-			    abort_desktop_not_supported
-			    ;;
-		    esac
-		    ;;
 		(nixos)
 		    case "$desktop_name" in
 			(KDE*)
