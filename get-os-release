@@ -25,9 +25,9 @@ IS_SHELL_FORMAT=false
 
 LOWERCASE="tr '[:upper:]' '[:lower:]'"
 
-VARS_STANDARD="ID NAME PRETTY_NAME VERSION VERSION_ID kernel_name"
-VARS_EXTENDED="debian_version kernel_release os_version \
-os_version_id redhat_release redhat_version_id"
+VARS_STANDARD="ID NAME PRETTY_NAME VERSION VERSION_ID family kernel_name"
+VARS_EXTENDED="kernel_release os_id_like os_version os_version_id \
+debian_codename redhat_release redhat_version_id"
 
 abort() {
     printf "$@" >&2
@@ -54,24 +54,20 @@ collect_data() {
     kernel_release=${input#* }
 
     case "$kernel_name" in
-	(Linux|GNU)
-	    collect_data_for_gnu
-	    ;;
-
-	(SunOS)
-	    collect_data_for_sunos
-	    ;;
-
-	(Darwin)
-	    collect_data_for_macos
-	    ;;
-
 	(CYGWIN_NT-*)
 	    collect_data_for_cygwin
 	    ;;
-
+	(Linux|GNU)
+	    collect_data_for_gnu
+	    ;;
+	(Darwin)
+	    collect_data_for_darwin
+	    ;;
+	(SunOS)
+	    collect_data_for_sunos
+	    ;;
 	(*)
-	    collect_data_default
+	    collect_data_for_unix
 	    ;;
 
     esac
@@ -101,22 +97,32 @@ collect_data() {
     fi
 }
 
-collect_data_default() {
-    NAME=$kernel_name
-    VERSION=$kernel_release
-    ID=$(printf "%s\n" "$NAME" | $LOWERCASE)
-    PRETTY_NAME=$input
-}
-
 collect_data_for_cygwin() {
     kernel_release=$(printf "%s\n" "${input#* }" | sed -e 's/(.*)//')
     NAME="Microsoft Windows"
     VERSION=${kernel_name#*-}
     ID=ms-windows
+    family=cygwin
+}
+
+collect_data_for_darwin() {
+    NAME=$(sw_vers -productName)
+    VERSION=$(sw_vers -productVersion)
+    ID=macos
+    family=darwin
 }
 
 collect_data_for_gnu() {
     . $FILE_OS_RELEASE
+
+    case "$kernel_name" in
+	(GNU)
+	    family=gnu-hurd
+	    ;;
+	(Linux)
+	    family=gnu-linux
+	    ;;
+    esac
 
     if [ "$is_extended_set" = false ]; then
 	return
@@ -126,19 +132,15 @@ collect_data_for_gnu() {
 
     case "$ID" in
 	(debian|raspbian|ubuntu|linuxmint|neon|kali)
-	    debian_version=$(cat /etc/debian_version)
+	    debian_codename=$(cat /etc/debian_version)
+	    os_id_like=debian
 	    ;;
 	(fedora|rhel|ol|centos)
+	    os_id_like=redhat
 	    redhat_release=$(cat /etc/redhat-release)
 	    redhat_version_id=$os_version_id
 	    ;;
     esac
-}
-
-collect_data_for_macos() {
-    NAME=$(sw_vers -productName)
-    VERSION=$(sw_vers -productVersion)
-    ID=macos
 }
 
 collect_data_for_sunos() {
@@ -146,6 +148,23 @@ collect_data_for_sunos() {
     NAME=${input%:*}
     VERSION=${input#*:}
     ID=$(printf "%s\n" "${NAME% *}" | $LOWERCASE)
+    family=sunos
+}
+
+collect_data_for_unix() {
+    NAME=$kernel_name
+    VERSION=$kernel_release
+    ID=$(printf "%s\n" "$NAME" | $LOWERCASE)
+    PRETTY_NAME=$input
+
+    case "$kernel_name" in
+	(*BSD)
+	    family=bsd
+	    ;;
+	(*)
+	    family=unix
+	    ;;
+    esac
 }
 
 get_os_version_id() {
