@@ -50,6 +50,16 @@ configure_platform() {
 			;;
 		esac
 	    ;;
+	    (opensuse-*)
+		case "$desktop_name" in
+		    (GNOME|GNOME*|*:GNOME|'')
+			package=openssh-askpass-gnome
+			;;
+		    (KDE*)
+			package=ksshaskpass5
+			;;
+		esac
+		;;
 	esac
 
 	if [ -n "${package-}" ]; then
