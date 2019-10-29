@@ -49,9 +49,9 @@ abort_too_many_arguments() {
 }
 
 collect_data() {
-    input=$(uname -sr)
-    kernel_name=${input% *}
-    kernel_release=${input#* }
+    kernel_data=$(uname -sr)
+    kernel_name=${kernel_data% *}
+    kernel_release=${kernel_data#* }
 
     case "$kernel_name" in
 	(CYGWIN_NT-*)
@@ -72,37 +72,11 @@ collect_data() {
 
     esac
 
-    if [ -z "${VERSION-}" ]; then
-	VERSION=
-    fi
-
-    if [ -z "${VERSION_ID-}" ]; then
-	VERSION_ID="$VERSION"
-    fi
-
-    if [ -z "${PRETTY_NAME-}" ]; then
-	PRETTY_NAME="$NAME $VERSION"
-    fi
-
-    if [ "$is_extended_set" = false ]; then
-	return
-    fi
-
-    if [ -z "${os_id_like-}" ]; then
-	os_id_like=$ID
-    fi
-
-    if [ -z "${os_version_id-}" ]; then
-	os_version_id=$VERSION_ID
-    fi
-
-    if [ -z "${os_version-}" ]; then
-	os_version=$VERSION
-    fi
+    collect_defaults
 }
 
 collect_data_for_cygwin() {
-    kernel_release=$(printf "%s\n" "${input#* }" | sed -e 's/(.*)//')
+    kernel_release=$(printf "%s\n" "${kernel_data#* }" | sed -e 's/(.*)//')
     NAME="Microsoft Windows"
     VERSION=${kernel_name#*-}
     ID=ms-windows
@@ -135,18 +109,6 @@ collect_data_for_gnu() {
     os_version_id=$(get_os_version_id)
 
     case "$ID" in
-	(raspbian)
-	    os_id_like=debian
-	    ;;
-	(linuxmint|neon|kali)
-	    os_id_like=ubuntu
-	    ;;
-	(ol|centos)
-	    os_id_like=rhel
-	    ;;
-    esac
-
-    case "$ID" in
 	(debian|raspbian|ubuntu|linuxmint|neon|kali)
 	    debian_codename=$(cat /etc/debian_version)
 	    ;;
@@ -158,9 +120,9 @@ collect_data_for_gnu() {
 }
 
 collect_data_for_sunos() {
-    input=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE_RELEASE)
-    NAME=${input%:*}
-    VERSION=${input#*:}
+    os_data=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE_RELEASE)
+    NAME=${os_data%:*}
+    VERSION=${os_data#*:}
     ID=$(printf "%s\n" "${NAME% *}" | $LOWERCASE)
     family=sunos
 }
@@ -169,7 +131,7 @@ collect_data_for_unix() {
     NAME=$kernel_name
     VERSION=$kernel_release
     ID=$(printf "%s\n" "$NAME" | $LOWERCASE)
-    PRETTY_NAME=$input
+    PRETTY_NAME=$kernel_data
 
     case "$kernel_name" in
 	(*BSD)
@@ -179,6 +141,48 @@ collect_data_for_unix() {
 	    family=unix
 	    ;;
     esac
+}
+
+collect_defaults() {
+    if [ -z "${VERSION-}" ]; then
+	VERSION=
+    fi
+
+    if [ -z "${VERSION_ID-}" ]; then
+	VERSION_ID="$VERSION"
+    fi
+
+    if [ -z "${PRETTY_NAME-}" ]; then
+	PRETTY_NAME="$NAME $VERSION"
+    fi
+
+    if [ "$is_extended_set" = false ]; then
+	return
+    fi
+
+    case "$ID" in
+	(raspbian)
+	    os_id_like=debian
+	    ;;
+	(linuxmint|neon|kali)
+	    os_id_like=ubuntu
+	    ;;
+	(ol|centos)
+	    os_id_like=rhel
+	    ;;
+    esac
+
+    if [ -z "${os_id_like-}" ]; then
+	os_id_like="${ID_LIKE:-ID}"
+    fi
+
+    if [ -z "${os_version_id-}" ]; then
+	os_version_id=$VERSION_ID
+    fi
+
+    if [ -z "${os_version-}" ]; then
+	os_version=$VERSION
+    fi
 }
 
 get_os_version_id() {
