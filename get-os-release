@@ -88,6 +88,10 @@ collect_data() {
 	return
     fi
 
+    if [ -z "${os_id_like-}" ]; then
+	os_id_like=$ID
+    fi
+
     if [ -z "${os_version_id-}" ]; then
 	os_version_id=$VERSION_ID
     fi
@@ -131,12 +135,22 @@ collect_data_for_gnu() {
     os_version_id=$(get_os_version_id)
 
     case "$ID" in
-	(debian|raspbian|ubuntu|linuxmint|neon|kali)
-	    debian_codename=$(cat /etc/debian_version)
+	(raspbian)
 	    os_id_like=debian
 	    ;;
+	(linuxmint|neon|kali)
+	    os_id_like=ubuntu
+	    ;;
+	(ol|centos)
+	    os_id_like=rhel
+	    ;;
+    esac
+
+    case "$ID" in
+	(debian|raspbian|ubuntu|linuxmint|neon|kali)
+	    debian_codename=$(cat /etc/debian_version)
+	    ;;
 	(fedora|rhel|ol|centos)
-	    os_id_like=redhat
 	    redhat_release=$(cat /etc/redhat-release)
 	    redhat_version_id=$os_version_id
 	    ;;
