@@ -161,9 +161,6 @@ collect_defaults() {
     fi
 
     case "$ID" in
-	(raspbian)
-	    os_id_like=debian
-	    ;;
 	(linuxmint|kali)
 	    os_id_like=ubuntu
 	    ;;
