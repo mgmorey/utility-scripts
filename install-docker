@@ -228,9 +228,9 @@ validate_platform() {
 			(30)
 			    :
 			    ;;
-			# (31)
-			#     :
-			#     ;;
+			(31)
+			    :
+			    ;;
 			(*)
 			    abort_not_supported Release
 			    ;;
