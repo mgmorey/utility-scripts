@@ -38,6 +38,33 @@ assert() {
 configure_platform() {
     desktop_name=$("$script_dir/get-desktop-name")
 
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		case "$desktop_name" in
+		    (GNOME|GNOME*|*:GNOME|LXDE|X-Cinnamon|'')
+			package=ssh-askpass-gnome
+			;;
+		    (KDE*)
+			package=ksshaskpass
+			;;
+		esac
+	    ;;
+	esac
+
+	if [ -n "${package-}" ]; then
+	    break
+	elif [ -n "${helper-}" ]; then
+	    break
+	fi
+    done
+
+    if [ -n "${package-}" ]; then
+	return
+    elif [ -n "${helper-}" ]; then
+	return
+    fi
+
     case "$kernel_name" in
 	(Linux|GNU)
 	    case "$ID" in
