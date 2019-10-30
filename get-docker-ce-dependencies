@@ -31,8 +31,6 @@ assert() {
 }
 
 get_docker_ce_dependencies() {
-    package=$("$script_dir/get-installed-docker-packages")
-
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
