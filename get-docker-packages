@@ -59,7 +59,7 @@ get_docker_packages() {
 		packages="${package:-$REDHAT_PKG} ${REDHAT_PKGS-}"
 		;;
 	    (ubuntu)
-		packages="${package:-$UBUNTU_PKG} $UBUNTU_PKGS"
+		packages="${package:-$UBUNTU_PKG} ${UBUNTU_PKGS-}"
 		;;
 	    (macos)
 		packages="${package:-$DARWIN_PKG} ${DARWIN_PKGS-}"
