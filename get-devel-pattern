@@ -16,13 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DARWIN_PATT=""
-
 DEBIAN_PATT="build-essential"
 
 FEDORA_PATT="Development Tools"
-
-FREEBSD_PATT=""
 
 OPENSUSE_PATT="devel_basis"
 
@@ -53,12 +49,6 @@ get_devel_pattern() {
 		;;
 	    (rhel|ol)
 		pattern=$REDHAT_PATT
-		;;
-	    (macos)
-		pattern=$DARWIN_PATT
-		;;
-	    (freebsd)
-		pattern=$FREEBSD_PATT
 		;;
 	    (openindiana)
 		pattern=$SUNOS_PATT
