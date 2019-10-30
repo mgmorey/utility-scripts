@@ -37,7 +37,7 @@ get_package_managers() {
 	    (opensuse)
 		managers="zypper"
 		;;
-	    (rhel|centos)
+	    (rhel|ol|centos)
 		case "$VERSION_ID" in
 		    (7|7.[78])
 			managers="yum /usr/pkg/bin/pkgin"
