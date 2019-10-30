@@ -93,6 +93,13 @@ configure_platform() {
 	    (netbsd)
 		helper=/usr/X11R7/bin/ssh-askpass
 		;;
+	    (openindiana)
+		case "$desktop_name" in
+		    (MATE|'')
+			helper=/usr/lib/ssh/ssh-askpass
+			;;
+		esac
+		;;
 	esac
 
 	if [ -n "${package-${helper-}}" ]; then
@@ -107,23 +114,6 @@ configure_platform() {
 		    case "$desktop_name" in
 			(KDE*)
 			    helper=ksshaskpass
-			    ;;
-			(*)
-			    abort_desktop_not_supported
-			    ;;
-		    esac
-		    ;;
-		(*)
-		    abort_not_supported Distro
-		    ;;
-	    esac
-	    ;;
-	(SunOS)
-	    case "$ID" in
-		(openindiana)
-		    case "$desktop_name" in
-			(MATE|'')
-			    helper=/usr/lib/ssh/ssh-askpass
 			    ;;
 			(*)
 			    abort_desktop_not_supported
