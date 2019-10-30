@@ -39,12 +39,48 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_devel_pattern() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		pattern=$DEBIAN_PATT
+		;;
+	    (fedora)
+		pattern=$FEDORA_PATT
+		;;
+	    (opensuse)
+		pattern=$OPENSUSE_PATT
+		;;
+	    (rhel|ol)
+		pattern=$REDHAT_PATT
+		;;
+	    (macos)
+		pattern=$DARWIN_PATT
+		;;
+	    (freebsd)
+		pattern=$FREEBSD_PATT
+		;;
+	    (openindiana)
+		pattern=$SUNOS_PATT
+		;;
+	esac
+
+	if [ -n "${pattern-}" ]; then
+	    break
+	fi
+    done
+
+    if [ -n "${pattern-}" ]; then
+	printf "%s\n" "$pattern"
+    fi
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
@@ -60,34 +96,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
 
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (debian|raspbian|ubuntu|linuxmint|neon|kali)
-	    	pattern=$DEBIAN_PATT
-	    	;;
-	    (opensuse-*)
-	    	pattern=$OPENSUSE_PATT
-	    	;;
-	    (fedora)
-	    	pattern=$FEDORA_PATT
-	    	;;
-	    (rhel|ol|centos)
-		pattern=$REDHAT_PATT
-		;;
-	esac
-	;;
-    (Darwin)
-	pattern=$DARWIN_PATT
-	;;
-    (FreeBSD)
-	pattern=$FREEBSD_PATT
-	;;
-    (SunOS)
-	pattern=$SUNOS_PATT
-	;;
-esac
-
-if [ -n "${pattern-}" ]; then
-    printf "%s\n" "$pattern"
-fi
+get_devel_pattern
