@@ -56,7 +56,7 @@ configure_platform() {
 			package=ksshaskpass
 			;;
 		esac
-	    ;;
+		;;
 	    (opensuse)
 		case "$desktop_name" in
 		    (GNOME|GNOME*|*:GNOME|'')
@@ -76,6 +76,9 @@ configure_platform() {
 			package=ksshaskpass
 			;;
 		esac
+		;;
+	    (macos)
+		return
 		;;
 	esac
 
@@ -101,9 +104,6 @@ configure_platform() {
 		    abort_not_supported Distro
 		    ;;
 	    esac
-	    ;;
-	(Darwin)
-	    :
 	    ;;
 	(FreeBSD)
 	    case "$desktop_name" in
