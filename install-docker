@@ -88,7 +88,7 @@ get_realpath() (
 install_docker() {
     validate_platform
     configure_platform
-    installed_package=$("$script_dir/get-installed-docker-package")
+    installed_package=$("$script_dir/get-installed-docker-packages")
 
     case $installed_package in
 	(docker|docker.io)
