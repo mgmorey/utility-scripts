@@ -90,6 +90,9 @@ configure_platform() {
 			;;
 		esac
 		;;
+	    (netbsd)
+		helper=/usr/X11R7/bin/ssh-askpass
+		;;
 	esac
 
 	if [ -n "${package-${helper-}}" ]; then
@@ -114,9 +117,6 @@ configure_platform() {
 		    abort_not_supported Distro
 		    ;;
 	    esac
-	    ;;
-	(NetBSD)
-	    helper=/usr/X11R7/bin/ssh-askpass
 	    ;;
 	(SunOS)
 	    case "$ID" in
