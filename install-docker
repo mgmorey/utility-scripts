@@ -69,23 +69,21 @@ get_architecture() {
 }
 
 get_docker_origin() {
-    if [ -n "$@" ]; then
-	for package in $@; do
-	    case $package in
-		(docker-ce|docker-ce-cli)
-		    origin=docker_ce
-		    ;;
-		(docker|docker.io|podman-docker)
-		    origin=native
-		    ;;
-	    esac
+    for package; do
+	case $package in
+	    (docker-ce|docker-ce-cli)
+		origin=docker.com
+		;;
+	    (docker|docker.io|podman-docker)
+		origin=native
+		;;
+	esac
 
-	    if [ -n "${origin-}" ]; then
-		printf "%s\n" "$origin"
-		return
-	    fi
-	done
-    fi
+	if [ -n "${origin-}" ]; then
+	    printf "%s\n" "$origin"
+	    return
+	fi
+    done
 }
 
 get_realpath() (
@@ -113,7 +111,7 @@ install_docker() {
 
     if [ -n "$origin" ]; then
 	case "$origin" in
-	    (docker_ce)
+	    (docker.com)
 		printf "Docker Community Edition is installed.\n"
 		printf "Removing $packages\n"
 
@@ -132,7 +130,7 @@ install_docker() {
     packages=$("$script_dir/get-docker-packages")
 
     if [ -n "$packages" ]; then
-	printf "Installing Docker\n"
+	printf "Installing native Docker.\n"
 
 	if "$script_dir/install-packages" $packages; then
 	    postinstall_docker
