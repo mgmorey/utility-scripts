@@ -50,14 +50,11 @@ get_python_metadata() {
 	    (debian|raspbian|kali)
 		data="$DEBIAN_DATA"
 		;;
-	    (ubuntu|linuxmint|neon)
-		data="$UBUNTU_DATA"
-		;;
-	    (opensuse-*)
-		data="$OPENSUSE_DATA"
-		;;
 	    (fedora)
 		data="$FEDORA_DATA"
+		;;
+	    (opensuse)
+		data="$OPENSUSE_DATA"
 		;;
 	    (rhel|centos)
 		case "$VERSION_ID" in
@@ -68,6 +65,9 @@ get_python_metadata() {
 			data="$REDHAT_8_DATA"
 			;;
 		esac
+		;;
+	    (ubuntu|linuxmint|neon)
+		data="$UBUNTU_DATA"
 		;;
 	    (macos)
 		data="$DARWIN_DATA"

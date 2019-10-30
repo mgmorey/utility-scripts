@@ -28,14 +28,16 @@ assert() {
 get_package_install_options() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (centos)
+		break
 	    (debian)
 		options="--no-install-recommends"
 		;;
-	    (opensuse)
-		options="--no-recommends"
-		;;
 	    (fedora)
 		options="--allowerasing"
+		;;
+	    (opensuse)
+		options="--no-recommends"
 		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
@@ -44,8 +46,6 @@ get_package_install_options() {
 			;;
 		esac
 		;;
-	    (centos)
-		break
 	esac
 
 	if [ -n "${options-}" ]; then

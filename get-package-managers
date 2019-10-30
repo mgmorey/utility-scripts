@@ -31,11 +31,11 @@ get_package_managers() {
 	    (debian)
 		managers="apt-get"
 		;;
-	    (opensuse)
-		managers="zypper"
-		;;
 	    (fedora)
 		managers="dnf"
+		;;
+	    (opensuse)
+		managers="zypper"
 		;;
 	    (rhel|centos)
 		case "$VERSION_ID" in

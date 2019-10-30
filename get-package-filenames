@@ -36,7 +36,7 @@ get_package_filenames() {
 		dpkg --listfiles "$1"
 		return
 		;;
-	    (opensuse|fedora|rhel)
+	    (rhel|fedora|opensuse)
 		rpm --query --list "$1"
 		return
 		;;

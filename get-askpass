@@ -67,7 +67,7 @@ configure_platform() {
 			;;
 		esac
 		;;
-	    (fedora|rhel)
+	    (rhel|fedora)
 		case "$desktop_name" in
 		    (GNOME|GNOME*|*:GNOME|'')
 			package=openssh-askpass
