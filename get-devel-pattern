@@ -16,15 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PATT="build-essential"
+DEBIAN_PATTERN="build-essential"
 
-FEDORA_PATT="Development Tools"
+FEDORA_PATTERN="Development Tools"
 
-OPENSUSE_PATT="devel_basis"
+OPENSUSE_PATTERN="devel_basis"
 
-REDHAT_PATT="Development Tools"
+REDHAT_PATTERN="Development Tools"
 
-SUNOS_PATT="build-essential"
+SUNOS_PATTERN="build-essential"
 
 abort() {
     printf "$@" >&2
@@ -39,19 +39,19 @@ get_devel_pattern() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
-		pattern=$DEBIAN_PATT
+		pattern=$DEBIAN_PATTERN
 		;;
 	    (fedora)
-		pattern=$FEDORA_PATT
+		pattern=$FEDORA_PATTERN
 		;;
 	    (opensuse)
-		pattern=$OPENSUSE_PATT
+		pattern=$OPENSUSE_PATTERN
 		;;
 	    (rhel|ol)
-		pattern=$REDHAT_PATT
+		pattern=$REDHAT_PATTERN
 		;;
 	    (openindiana)
-		pattern=$SUNOS_PATT
+		pattern=$SUNOS_PATTERN
 		;;
 	esac
 
