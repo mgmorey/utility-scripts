@@ -18,8 +18,6 @@
 
 DEBIAN_PATTERN="build-essential"
 
-FEDORA_PATTERN="Development Tools"
-
 OPENSUSE_PATTERN="devel_basis"
 
 REDHAT_PATTERN="Development Tools"
@@ -41,13 +39,10 @@ get_devel_pattern() {
 	    (debian)
 		pattern=$DEBIAN_PATTERN
 		;;
-	    (fedora)
-		pattern=$FEDORA_PATTERN
-		;;
 	    (opensuse)
 		pattern=$OPENSUSE_PATTERN
 		;;
-	    (rhel|ol)
+	    (rhel|ol|fedora)
 		pattern=$REDHAT_PATTERN
 		;;
 	    (openindiana)
