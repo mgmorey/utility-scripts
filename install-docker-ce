@@ -123,8 +123,11 @@ get_docker_origin() {
 	    (docker-ce|docker-ce-cli)
 		origin=docker.com
 		;;
-	    (docker|docker.io|podman-docker)
+	    (docker|docker.io)
 		origin=native
+		;;
+	    (podman-docker)
+		origin=podman
 		;;
 	esac
 
@@ -196,15 +199,21 @@ install_docker_ce() {
 		;;
 	    (native)
 		printf "Native Docker is installed.\n"
-		printf "Removing $packages\n"
-
-		if ! "$script_dir/uninstall-packages" $packages; then
-		    return $?
-		fi
+		;;
+	    (podman)
+		printf "Podman is installed.\n"
 		;;
 	esac
     else
 	printf "Docker is not installed.\n"
+    fi
+
+    if [ -n "$packages" ]; then
+	printf "Removing $packages\n"
+
+	if ! "$script_dir/uninstall-packages" $packages; then
+	    return $?
+	fi
     fi
 
     packages=$("$script_dir/get-docker-ce-packages")
