@@ -91,15 +91,15 @@ install_docker() {
     installed_package=$("$script_dir/get-installed-docker-package")
 
     case $installed_package in
-	(docker|docker.io|podman-docker)
+	(docker|docker.io)
 	    printf "Package $installed_package is installed\n"
-	    exit 0
+	    return 0
 	    ;;
-	(docker-ce)
+	(docker-ce|podman-docker)
 	    printf "Removing $installed_package\n"
 
 	    if ! "$script_dir/uninstall-packages" $installed_package; then
-		exit $?
+		return $?
 	    fi
 	    ;;
 	(*)
@@ -114,7 +114,7 @@ install_docker() {
 	if "$script_dir/install-packages" $packages; then
 	    postinstall_docker
 	else
-	    exit $?
+	    return $?
 	fi
     fi
 }
