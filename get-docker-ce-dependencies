@@ -30,52 +30,23 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_docker_packages() {
+get_docker_ce_dependencies() {
     package=$("$script_dir/get-installed-docker-packages")
 
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian)
-		    case "$VERSION_ID" in
-			(10)
-			    packages=$DEBIAN_PKGS
-			    ;;
-		    esac
-		    ;;
-		(ubuntu|neon)
-		    case "$VERSION_ID" in
-			(18.04)
-			    packages=$DEBIAN_PKGS
-			    ;;
-			(19.04)
-			    packages=$DEBIAN_PKGS
-			    ;;
-			(19.10)
-			    packages=$DEBIAN_PKGS
-			    ;;
-		    esac
-		    ;;
-		(linuxmint)
-		    case "$VERSION_ID" in
-			(19.2)
-			    packages=$DEBIAN_PKGS
-			    ;;
-		    esac
-		    ;;
-		(kali)
-		    case "$VERSION_ID" in
-			(2019.3)
-	    		    packages=$DEBIAN_PKGS
-			    ;;
-		    esac
-		    ;;
-		(rhel|ol|centos)
-		    packages=$REDHAT_PKGS
-		    ;;
-	    esac
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		packages=$DEBIAN_PKGS
+		;;
+	    (rhel|ol)
+		packages=$REDHAT_PKGS
+		;;
+	esac
+
+	if [ -n "${packages-}" ]; then
+	    break
+	fi
+    done
 
     if [ -n "${packages-}" ]; then
 	printf "%s\n" ${packages-}
@@ -103,4 +74,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
 
-get_docker_packages
+get_docker_ce_dependencies
