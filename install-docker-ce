@@ -220,7 +220,6 @@ install_docker_ce() {
 
     if [ -n "$packages" ]; then
 	preinstall_docker
-	printf "Installing Docker Community Edition\n"
 
 	if "$script_dir/install-packages" $packages; then
 	    postinstall_docker

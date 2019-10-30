@@ -139,8 +139,6 @@ install_docker() {
     packages=$("$script_dir/get-docker-packages")
 
     if [ -n "$packages" ]; then
-	printf "Installing native Docker.\n"
-
 	if "$script_dir/install-packages" $packages; then
 	    postinstall_docker
 	else
