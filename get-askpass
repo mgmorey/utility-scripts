@@ -78,7 +78,7 @@ configure_platform() {
 		esac
 		;;
 	    (macos)
-		return
+		break
 		;;
 	    (freebsd)
 		case "$desktop_name" in
@@ -103,32 +103,9 @@ configure_platform() {
 	esac
 
 	if [ -n "${package-${helper-}}" ]; then
-	    return
+	    break
 	fi
     done
-
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(nixos)
-		    case "$desktop_name" in
-			(KDE*)
-			    helper=ksshaskpass
-			    ;;
-			(*)
-			    abort_desktop_not_supported
-			    ;;
-		    esac
-		    ;;
-		(*)
-		    abort_not_supported Distro
-		    ;;
-	    esac
-	    ;;
-	(*)
-	    abort_not_supported "Operating system"
-	    ;;
-    esac
 }
 
 get_askpass() {
