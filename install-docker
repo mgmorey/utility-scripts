@@ -68,6 +68,26 @@ get_architecture() {
     esac
 }
 
+get_docker_origin() {
+    if [ -n "$@" ]; then
+	for package in $@; do
+	    case $package in
+		(docker-ce|docker-ce-cli)
+		    origin=docker_ce
+		    ;;
+		(docker|docker.io|podman-docker)
+		    origin=native
+		    ;;
+	    esac
+
+	    if [ -n "${origin-}" ]; then
+		printf "%s\n" "$origin"
+		return
+	    fi
+	done
+    fi
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -88,23 +108,26 @@ get_realpath() (
 install_docker() {
     validate_platform
     configure_platform
-    installed_package=$("$script_dir/get-installed-docker-packages")
+    packages=$("$script_dir/get-installed-docker-packages")
+    origin=$(get_docker_origin $packages)
 
-    case $installed_package in
-	(docker|docker.io)
-	    printf "Package $installed_package is installed\n"
-	    return 0
-	    ;;
-	(docker-ce|podman-docker)
-	    printf "Removing $installed_package\n"
+    if [ -n "$origin" ]; then
+	case "$origin" in
+	    (docker_ce)
+		printf "Docker Community Edition is installed.\n"
+		printf "Removing $packages\n"
 
-	    if ! "$script_dir/uninstall-packages" $installed_package; then
-		return $?
-	    fi
-	    ;;
-	(*)
-	    printf "No Docker package installed\n"
-    esac
+		if ! "$script_dir/uninstall-packages" $packages; then
+		    return $?
+		fi
+		;;
+	    (native)
+		printf "Native Docker is installed.\n"
+		;;
+	esac
+    else
+	printf "Docker is not installed.\n"
+    fi
 
     packages=$("$script_dir/get-docker-packages")
 
@@ -236,8 +259,11 @@ validate_platform() {
 			    ;;
 		    esac
 		    ;;
-		(ol|rhel)
+		(rhel|ol|centos)
 		    case "$VERSION_ID" in
+			(7|7.[78])
+			    :
+			    ;;
 			(8|8.[01])
 			    :
 			    ;;

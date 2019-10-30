@@ -27,8 +27,7 @@ FREEBSD_PKGS="docker"
 
 OPENSUSE_PKG="docker"
 
-REDHAT_PKG="podman"
-REDHAT_PKGS="podman-docker"
+REDHAT_PKG="podman-docker"
 
 UBUNTU_PKG="docker.io"
 
