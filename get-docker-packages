@@ -55,7 +55,7 @@ get_docker_packages() {
 	    (opensuse-tumbleweed)
 		packages="${package:-$OPENSUSE_PKG} ${OPENSUSE_TW_PKGS-}"
 		;;
-	    (rhel|ol)
+	    (rhel|fedora)
 		packages="${package:-$REDHAT_PKG} ${REDHAT_PKGS-}"
 		;;
 	    (ubuntu)

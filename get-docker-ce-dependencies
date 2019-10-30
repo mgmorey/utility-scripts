@@ -38,7 +38,7 @@ get_docker_ce_dependencies() {
 	    (debian)
 		packages=$DEBIAN_PKGS
 		;;
-	    (rhel|ol)
+	    (rhel|fedora)
 		packages=$REDHAT_PKGS
 		;;
 	esac

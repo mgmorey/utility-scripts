@@ -42,7 +42,7 @@ get_devel_pattern() {
 	    (opensuse)
 		pattern=$OPENSUSE_PATTERN
 		;;
-	    (rhel|ol|fedora)
+	    (rhel|fedora)
 		pattern=$REDHAT_PATTERN
 		;;
 	    (openindiana)
