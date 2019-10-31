@@ -56,7 +56,7 @@ get_architecture() {
     machine=$(uname -m)
 
     case "$machine" in
-	(x86_64)
+	(i86pc|x86_64)
 	    printf "%s\n" amd64
 	    ;;
 	(armv7l)
@@ -176,7 +176,7 @@ validate_platform() {
 	    :
 	    ;;
 	(*)
-	    abort "%s: %s: Architecture not supported" "$0" "$arch"
+	    abort "%s: %s: Architecture not supported\n" "$0" "$arch"
 	    ;;
     esac
 
