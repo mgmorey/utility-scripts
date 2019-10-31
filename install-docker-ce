@@ -236,22 +236,28 @@ install_docker_ce() {
     fi
 }
 
-install_docker_group() {
-    if [ "$invoke_usermod" = false ]; then
+install_group() {
+    if [ "$install_group" = false ]; then
 	return 0
     fi
 
     if ! getent group $DOCKER_GROUP_ID >/dev/null; then
 	groupadd $DOCKER_GROUP_ID
     fi
+}
+
+modify_user() (
+    if ! getent group $DOCKER_GROUP_ID >/dev/null; then
+	return 0
+    fi
 
     members="$(getent group $DOCKER_GROUP_ID | awk -F: '{print $4}')"
 
     if ! printf "%s\n" "$members" | grep -q "\<$SUDO_USER\>"; then
 	usermod -a -G $DOCKER_GROUP_ID $SUDO_USER
-	printf "Please restart the machine before using docker\n"
+	printf "Please restart the machine before using docker.\n"
     fi
-}
+)
 
 preinstall_docker() {
     docker_url=$(get_docker_url)
@@ -272,9 +278,12 @@ postinstall_docker() {
 	    ;;
     esac
 
-    if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
-	install_docker_group
+    if [ -z "${SUDO_USER-}" ] || [ "$(id -u)" -gt 0 ]; then
+	return 0
     fi
+
+    install_group
+    modify_user
 }
 
 remove_native_docker_packages() {
