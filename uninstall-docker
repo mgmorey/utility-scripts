@@ -67,6 +67,18 @@ get_realpath() (
     fi
 )
 
+postuninstall_docker() {
+    if [ -z "${SUDO_USER-}" ] || [ "$(id -u)" -gt 0 ]; then
+	return 0
+    fi
+
+    group=$("$script_dir/get-docker-group" "$@")
+
+    if [ -n "$group" ]; then
+	uninstall_group $group
+    fi
+}
+
 uninstall_docker() {
     validate_platform
     packages=$("$script_dir/get-installed-docker-packages")
@@ -89,11 +101,19 @@ uninstall_docker() {
     fi
 
     if [ -n "$packages" ]; then
-	printf "Removing $packages\n"
-
-	if ! "$script_dir/uninstall-packages" $packages; then
+	if "$script_dir/uninstall-packages" $packages; then
+	    postuninstall_docker
+	else
 	    return $?
 	fi
+    fi
+}
+
+uninstall_group() {
+    assert [ $# -eq 1 ]
+
+    if getent group $1 >/dev/null; then
+	groupdel $1
     fi
 }
 
