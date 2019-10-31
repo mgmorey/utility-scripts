@@ -147,10 +147,8 @@ install_docker() {
 	fi
     fi
 
-    packages=$("$script_dir/get-docker-packages")
-
-    if [ -n "$packages" ]; then
-	if "$script_dir/install-packages" $packages; then
+    if [ -n "$selected_packages" ]; then
+	if "$script_dir/install-packages" $selected_packages; then
 	    postinstall_docker
 	else
 	    return $?
