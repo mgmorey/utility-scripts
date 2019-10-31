@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DOCKER_GROUP_ID=docker
+DOCKER_GROUP=docker
 
 abort() {
     printf "$@" >&2
@@ -33,10 +33,10 @@ get_docker_group() {
     if [ -n "$origin" ]; then
 	case "$origin" in
 	    (docker.com)
-		printf "%s\n" "$DOCKER_GROUP_ID"
+		printf "%s\n" "$DOCKER_GROUP"
 		;;
 	    (native)
-		printf "%s\n" "$DOCKER_GROUP_ID"
+		printf "%s\n" "$DOCKER_GROUP"
 		;;
 	    (podman)
 		:
