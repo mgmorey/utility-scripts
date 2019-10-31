@@ -117,6 +117,16 @@ get_codename() {
     lsb_release -cs
 }
 
+get_difference() (
+    assert [ $# -eq 2 ]
+
+    for item in $1; do
+	if ! printf "%s\n" $2 | grep -Eq '^'$item'$'; then
+	    printf "%s\n" "$item"
+	fi
+    done
+)
+
 get_docker_origin() {
     for package; do
 	case $package in
@@ -189,8 +199,8 @@ install_dependencies() {
 install_docker_ce() {
     validate_platform
     configure_platform
-    packages=$("$script_dir/get-installed-docker-packages")
-    origin=$(get_docker_origin $packages)
+    installed_packages=$("$script_dir/get-installed-docker-packages")
+    origin=$(get_docker_origin $installed_packages)
 
     if [ -n "$origin" ]; then
 	case "$origin" in
@@ -208,21 +218,20 @@ install_docker_ce() {
 	printf "Docker is not installed.\n"
     fi
 
+    selected_packages=$("$script_dir/get-docker-packages")
+    packages=$(get_difference "$installed_packages" "$selected_packages")
+
     if [ -n "$packages" ]; then
 	if ! "$script_dir/uninstall-packages" $packages; then
 	    return $?
 	fi
     fi
 
-    packages=$("$script_dir/get-docker-ce-packages")
-
-    if [ -n "$packages" ]; then
-	preinstall_docker
-
-	if "$script_dir/install-packages" $packages; then
+    if [ -n "$selected_packages" ]; then
+	if "$script_dir/install-packages" $selected_packages; then
 	    postinstall_docker
 	else
-	    exit $?
+	    return $?
 	fi
     fi
 }
