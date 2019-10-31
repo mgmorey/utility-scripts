@@ -307,7 +307,9 @@ validate_platform() {
 	    return
 	    ;;
 	(ubuntu)
-	    return
+	    if [ "${VERSION_ID%.*}" -gt 18 ]; then
+		return
+	    fi
 	    ;;
     esac
 
