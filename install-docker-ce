@@ -67,14 +67,16 @@ assert() {
 }
 
 configure_platform() {
-    case "$kernel_name" in
-	(FreeBSD)
-	    is_docker_group=false
-	    ;;
-	(*)
-	    is_docker_group=true
-	    ;;
-    esac
+    has_daemon=true
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (freebsd)
+		has_daemon=false
+		return
+		;;
+	esac
+    done
 }
 
 enable_additional_repositories() {
@@ -278,7 +280,7 @@ postinstall_docker() {
 
     if [ -z "${SUDO_USER-}" ] || [ "$(id -u)" -gt 0 ]; then
 	return 0
-    elif [ "$is_docker_group" = false ]; then
+    elif [ "$has_daemon" = false ]; then
 	return 0
     fi
 

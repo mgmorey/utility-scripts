@@ -30,24 +30,20 @@ assert() {
 }
 
 configure_platform() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(ol|rhel)
-		    is_docker_group=false
-		    ;;
-		(*)
-		    is_docker_group=true
-		    ;;
-	    esac
-	    ;;
-	(FreeBSD)
-	    is_docker_group=false
-	    ;;
-	(*)
-	    is_docker_group=true
-	    ;;
-    esac
+    has_daemon=true
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (rhel|fedora)
+		has_daemon=false
+		return
+		;;
+	    (freebsd)
+		has_daemon=false
+		return
+		;;
+	esac
+    done
 }
 
 get_architecture() {
@@ -180,7 +176,7 @@ modify_user() (
 postinstall_docker() {
     if [ -z "${SUDO_USER-}" ] || [ "$(id -u)" -gt 0 ]; then
 	return 0
-    elif [ "$is_docker_group" = false ]; then
+    elif [ "$has_daemon" = false ]; then
 	return 0
     fi
 
