@@ -20,14 +20,15 @@ DARWIN_PKG="docker"
 
 DEBIAN_PKG="docker.io"
 
-FEDORA_PKG="docker"
+FEDORA_PKG="podman"
+FEDORA_PKGS="podman-docker"
 
 FREEBSD_PKG="docker-machine"
 FREEBSD_PKGS="docker"
 
 OPENSUSE_PKG="docker"
 
-REDHAT_PKG="podman-docker"
+REDHAT_PKG="docker"
 
 UBUNTU_PKG="docker.io"
 
@@ -46,14 +47,24 @@ get_docker_packages() {
 	    (debian)
 		packages="${package:-$DEBIAN_PKG} ${DEBIAN_PKGS-}"
 		;;
+	    (fedora|centos)
+		packages="${package:-$FEDORA_PKG} ${FEDORA_PKGS-}"
+		;;
 	    (opensuse-leap)
 		packages="${package:-$OPENSUSE_PKG} ${OPENSUSE_LP_PKGS-}"
 		;;
 	    (opensuse-tumbleweed)
 		packages="${package:-$OPENSUSE_PKG} ${OPENSUSE_TW_PKGS-}"
 		;;
-	    (rhel|fedora)
-		packages="${package:-$REDHAT_PKG} ${REDHAT_PKGS-}"
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		    (8|8.[01])
+			packages="${package:-$REDHAT_PKG} ${REDHAT_PKGS-}"
+			;;
+		    (*)
+			break
+			;;
+		esac
 		;;
 	    (ubuntu)
 		packages="${package:-$UBUNTU_PKG} ${UBUNTU_PKGS-}"
