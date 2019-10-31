@@ -129,8 +129,6 @@ install_docker() {
     fi
 
     if [ -n "$packages" ]; then
-	printf "Removing $packages\n"
-
 	if ! "$script_dir/uninstall-packages" $packages; then
 	    return $?
 	fi
