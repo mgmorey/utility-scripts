@@ -200,127 +200,121 @@ validate_platform() {
 	    ;;
     esac
 
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian)
-		    case "$VERSION_ID" in
-			(10)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(ubuntu|neon)
-		    case "$VERSION_ID" in
-			(19.04)
-			    :
-			    ;;
-			(19.10)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(linuxmint)
-		    case "$VERSION_ID" in
-			(19.2)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(kali)
-		    case "$VERSION_ID" in
-			(2019.3)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(opensuse-leap)
-		    case "$VERSION_ID" in
-			(15.0|15.1)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(opensuse-tumbleweed)
-		    case "$VERSION_ID" in
-			(2019*)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(fedora)
-		    case "$VERSION_ID" in
-			(30)
-			    :
-			    ;;
-			(31)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(rhel|ol|centos)
-		    case "$VERSION_ID" in
-			(8|8.[01])
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(*)
-		    abort_not_supported Distro
-		    ;;
-	    esac
-	    ;;
-	(Darwin)
-	    case "$VERSION_ID" in
-		(10.14.*)
-		    :
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(FreeBSD)
-	    case "$VERSION_ID" in
-		(11.*)
-		    :
-		    ;;
-		(12.*)
-		    :
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(*)
-	    abort_not_supported "Operating system"
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		case "$VERSION_ID" in
+		    (10)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (19.04)
+			return
+			;;
+		    (19.10)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
+	    (linuxmint)
+		case "$VERSION_ID" in
+		    (19.2)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
+	    (kali)
+		case "$VERSION_ID" in
+		    (2019.3)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
+	    (opensuse-leap)
+		case "$VERSION_ID" in
+		    (15.0|15.1)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
+	    (opensuse-tumbleweed)
+		case "$VERSION_ID" in
+		    (2019*)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
+	    (fedora)
+		case "$VERSION_ID" in
+		    (30)
+			return
+			;;
+		    (31)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
+	    (rhel|ol|centos)
+		case "$VERSION_ID" in
+		    (8|8.[01])
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
+	    (macos)
+		case "$VERSION_ID" in
+		    (10.14.*)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
+	    (freebsd)
+		case "$VERSION_ID" in
+		    (11.*)
+			return
+			;;
+		    (12.*)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
+	esac
+    done
+
+    abort_not_supported "Operating system"
 }
 
 if [ $# -gt 0 ]; then

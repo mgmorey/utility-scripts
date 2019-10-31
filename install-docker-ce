@@ -310,84 +310,78 @@ validate_platform() {
 	    ;;
     esac
 
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian)
-		    case "$VERSION_ID" in
-			(10)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(ubuntu|neon)
-		    case "$VERSION_ID" in
-			(18.04)
-			    :
-			    ;;
-			(19.04)
-			    :
-			    ;;
-			(19.10)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(linuxmint)
-		    case "$VERSION_ID" in
-			(19.2)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(kali)
-		    case "$VERSION_ID" in
-			(2019.3)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(ol)
-		    case "$VERSION_ID" in
-			(7.*)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Distro
-			    ;;
-		    esac
-		    ;;
-		(centos)
-		    case "$VERSION_ID" in
-			(7)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Distro
-			    ;;
-		    esac
-		    ;;
-		(*)
-		    abort_not_supported Distro
-		    ;;
-	    esac
-	    ;;
-	(*)
-	    abort_not_supported "Operating system"
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
+	    (debian)
+		case "$VERSION_ID" in
+		    (10)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
+	    (kali)
+		case "$VERSION_ID" in
+		    (2019.3)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
+	    (linuxmint)
+		case "$VERSION_ID" in
+		    (19.2)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
+	    (ol)
+		case "$VERSION_ID" in
+		    (7.*)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.04)
+			return
+			;;
+		    (19.04)
+			return
+			;;
+		    (19.10)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
+	esac
+    done
+
+    abort_not_supported "Operating system"
 }
 
 if [ $# -gt 0 ]; then
