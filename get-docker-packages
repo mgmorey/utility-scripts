@@ -41,7 +41,7 @@ get_docker_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
-		packages=$debian_PKGS
+		packages=$DEBIAN_PKGS
 		;;
 	    (opensuse-leap)
 		packages=$OPENSUSE_PKGS
