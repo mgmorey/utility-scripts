@@ -66,19 +66,6 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-configure_platform() {
-    has_daemon=true
-
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (freebsd)
-		has_daemon=false
-		return
-		;;
-	esac
-    done
-}
-
 enable_additional_repositories() {
     case "$kernel_name" in
 	(Linux|GNU)
@@ -279,8 +266,6 @@ postinstall_docker() {
     esac
 
     if [ -z "${SUDO_USER-}" ] || [ "$(id -u)" -gt 0 ]; then
-	return 0
-    elif [ "$has_daemon" = false ]; then
 	return 0
     fi
 
