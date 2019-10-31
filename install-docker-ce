@@ -218,7 +218,7 @@ install_docker_ce() {
 	printf "Docker is not installed.\n"
     fi
 
-    selected_packages=$("$script_dir/get-docker-packages")
+    selected_packages=$("$script_dir/get-docker-ce-packages")
     packages=$(get_difference "$installed_packages" "$selected_packages")
 
     if [ -n "$packages" ]; then

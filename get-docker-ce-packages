@@ -16,7 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKGS="docker-ce"
+DEBIAN_PKGS="docker-ce docker-ce-cli containerd.io"
+
 REDHAT_PKGS="docker-ce docker-ce-cli containerd.io"
 
 abort() {
