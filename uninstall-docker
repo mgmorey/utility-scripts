@@ -102,7 +102,7 @@ uninstall_docker() {
 
     if [ -n "$packages" ]; then
 	if "$script_dir/uninstall-packages" $packages; then
-	    postuninstall_docker
+	    postuninstall_docker $packages
 	else
 	    return $?
 	fi
