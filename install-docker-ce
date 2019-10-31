@@ -283,8 +283,11 @@ postinstall_docker() {
     fi
 
     group=$("$script_dir/get-docker-group" "$@")
-    install_group $group
-    modify_user $group
+
+    if [ -n "$group" ]; then
+	install_group $group
+	modify_user $group
+    fi
 }
 
 remove_native_docker_packages() {
