@@ -17,8 +17,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 DOCKER_BASE_URL=https://download.docker.com
-DOCKER_GROUP_ID=docker
-
 ORACLE_LINUX_REPOS="ol7_addons ol7_optional_latest"
 
 abort() {
@@ -71,10 +69,10 @@ assert() {
 configure_platform() {
     case "$kernel_name" in
 	(FreeBSD)
-	    invoke_usermod=false
+	    is_docker_group=false
 	    ;;
 	(*)
-	    invoke_usermod=true
+	    is_docker_group=true
 	    ;;
     esac
 }
@@ -279,6 +277,8 @@ postinstall_docker() {
     esac
 
     if [ -z "${SUDO_USER-}" ] || [ "$(id -u)" -gt 0 ]; then
+	return 0
+    elif [ "$is_docker_group" = false ]; then
 	return 0
     fi
 

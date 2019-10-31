@@ -34,18 +34,18 @@ configure_platform() {
 	(Linux|GNU)
 	    case "$ID" in
 		(ol|rhel)
-		    install_group=false
+		    is_docker_group=false
 		    ;;
 		(*)
-		    install_group=true
+		    is_docker_group=true
 		    ;;
 	    esac
 	    ;;
 	(FreeBSD)
-	    install_group=false
+	    is_docker_group=false
 	    ;;
 	(*)
-	    install_group=true
+	    is_docker_group=true
 	    ;;
     esac
 }
@@ -180,7 +180,7 @@ modify_user() (
 postinstall_docker() {
     if [ -z "${SUDO_USER-}" ] || [ "$(id -u)" -gt 0 ]; then
 	return 0
-    elif [ "$install_group" = false ]; then
+    elif [ "$is_docker_group" = false ]; then
 	return 0
     fi
 
