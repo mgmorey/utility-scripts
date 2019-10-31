@@ -310,73 +310,21 @@ validate_platform() {
 	    ;;
     esac
 
+    # Refer to https://docs.docker.com/install/#supported-platforms
+
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (centos)
-		case "$VERSION_ID" in
-		    (7)
-			return
-			;;
-		    (*)
-			abort_not_supported Release
-			;;
-		esac
+		return
 		;;
 	    (debian)
-		case "$VERSION_ID" in
-		    (10)
-			return
-			;;
-		    (*)
-			abort_not_supported Release
-			;;
-		esac
+		return
 		;;
-	    (kali)
-		case "$VERSION_ID" in
-		    (2019.3)
-			return
-			;;
-		    (*)
-			abort_not_supported Release
-			;;
-		esac
-		;;
-	    (linuxmint)
-		case "$VERSION_ID" in
-		    (19.2)
-			return
-			;;
-		    (*)
-			abort_not_supported Release
-			;;
-		esac
-		;;
-	    (ol)
-		case "$VERSION_ID" in
-		    (7.*)
-			return
-			;;
-		    (*)
-			abort_not_supported Release
-			;;
-		esac
+	    (fedora)
+		return
 		;;
 	    (ubuntu)
-		case "$VERSION_ID" in
-		    (18.04)
-			return
-			;;
-		    (19.04)
-			return
-			;;
-		    (19.10)
-			return
-			;;
-		    (*)
-			abort_not_supported Release
-			;;
-		esac
+		return
 		;;
 	esac
     done
