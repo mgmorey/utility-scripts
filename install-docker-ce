@@ -229,7 +229,7 @@ install_docker_ce() {
 
     if [ -n "$selected_packages" ]; then
 	if "$script_dir/install-packages" $selected_packages; then
-	    postinstall_docker
+	    postinstall_docker $selected_packages
 	else
 	    return $?
 	fi
@@ -237,24 +237,28 @@ install_docker_ce() {
 }
 
 install_group() {
+    assert [ $# -eq 1 ]
+
     if [ "$install_group" = false ]; then
 	return 0
     fi
 
-    if ! getent group $DOCKER_GROUP_ID >/dev/null; then
-	groupadd $DOCKER_GROUP_ID
+    if ! getent group $1 >/dev/null; then
+	groupadd $1
     fi
 }
 
 modify_user() (
-    if ! getent group $DOCKER_GROUP_ID >/dev/null; then
+    assert [ $# -eq 1 ]
+
+    if ! getent group $1 >/dev/null; then
 	return 0
     fi
 
-    members="$(getent group $DOCKER_GROUP_ID | awk -F: '{print $4}')"
+    members="$(getent group $1 | awk -F: '{print $4}')"
 
     if ! printf "%s\n" "$members" | grep -q "\<$SUDO_USER\>"; then
-	usermod -a -G $DOCKER_GROUP_ID $SUDO_USER
+	usermod -a -G $1 $SUDO_USER
 	printf "Please restart the machine before using docker.\n"
     fi
 )
@@ -282,8 +286,9 @@ postinstall_docker() {
 	return 0
     fi
 
-    install_group
-    modify_user
+    group=$("$script_dir/get-docker-group" "$@")
+    install_group $group
+    modify_user $group
 }
 
 remove_native_docker_packages() {
