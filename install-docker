@@ -106,11 +106,21 @@ get_realpath() (
     fi
 )
 
+get_difference() (
+    assert [ $# -eq 2 ]
+
+    for item in $1; do
+	if ! printf "%s\n" $2 | grep -Eq '^'$item'$'; then
+	    printf "%s\n" "$item"
+	fi
+    done
+)
+
 install_docker() {
     validate_platform
     configure_platform
-    packages=$("$script_dir/get-installed-docker-packages")
-    origin=$(get_docker_origin $packages)
+    installed_packages=$("$script_dir/get-installed-docker-packages")
+    origin=$(get_docker_origin $installed_packages)
 
     if [ -n "$origin" ]; then
 	case "$origin" in
@@ -127,6 +137,9 @@ install_docker() {
     else
 	printf "Docker is not installed.\n"
     fi
+
+    selected_packages=$("$script_dir/get-docker-packages")
+    packages=$(get_difference "$installed_packages" "$selected_packages")
 
     if [ -n "$packages" ]; then
 	if ! "$script_dir/uninstall-packages" $packages; then
