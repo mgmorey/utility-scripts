@@ -157,10 +157,6 @@ install_docker() {
 install_group() {
     assert [ $# -eq 1 ]
 
-    if [ "$install_group" = false ]; then
-	return 0
-    fi
-
     if ! getent group $1 >/dev/null; then
 	groupadd $1
     fi
@@ -183,6 +179,8 @@ modify_user() (
 
 postinstall_docker() {
     if [ -z "${SUDO_USER-}" ] || [ "$(id -u)" -gt 0 ]; then
+	return 0
+    elif [ "$install_group" = false ]; then
 	return 0
     fi
 

@@ -239,10 +239,6 @@ install_docker_ce() {
 install_group() {
     assert [ $# -eq 1 ]
 
-    if [ "$install_group" = false ]; then
-	return 0
-    fi
-
     if ! getent group $1 >/dev/null; then
 	groupadd $1
     fi
