@@ -50,7 +50,4 @@ get_realpath() (
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-create_tmpfile
-"$script_dir/get-installed-packages" >$tmpfile
-"$script_dir/grep-docker-package" <$tmpfile || \
-    true
+"$script_dir/get-installed-packages" | "$script_dir/grep-docker-package"
