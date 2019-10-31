@@ -16,19 +16,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DARWIN_PKG="docker"
+DARWIN_PKGS="docker"
 
-DEBIAN_PKG="docker.io"
+DEBIAN_PKGS="docker.io"
 
-FREEBSD_PKG="docker-machine"
-FREEBSD_PKGS="docker"
+FREEBSD_PKG="docker docker-machine"
 
-OPENSUSE_PKG="docker"
+OPENSUSE_PKGS="docker"
 
-REDHAT_PKG="podman"
-REDHAT_PKGS="podman-docker"
+REDHAT_PKGS="podman podman-docker"
 
-UBUNTU_PKG="docker.io"
+UBUNTU_PKGS="docker.io"
 
 abort() {
     printf "$@" >&2
@@ -43,25 +41,25 @@ get_docker_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
-		packages="${package:-$DEBIAN_PKG} ${DEBIAN_PKGS-}"
+		packages=$debian_PKGS
 		;;
 	    (opensuse-leap)
-		packages="${package:-$OPENSUSE_PKG} ${OPENSUSE_LP_PKGS-}"
+		packages=$OPENSUSE_PKGS
 		;;
 	    (opensuse-tumbleweed)
-		packages="${package:-$OPENSUSE_PKG} ${OPENSUSE_TW_PKGS-}"
+		packages=$OPENSUSE_PKGS
 		;;
 	    (rhel|fedora)
-		packages="${package:-$REDHAT_PKG} ${REDHAT_PKGS-}"
+		packages=$REDHAT_PKGS
 		;;
 	    (ubuntu)
-		packages="${package:-$UBUNTU_PKG} ${UBUNTU_PKGS-}"
+		packages=$UBUNTU_PKGS
 		;;
 	    (macos)
-		packages="${package:-$DARWIN_PKG} ${DARWIN_PKGS-}"
+		packages=$DARWIN_PKGS
 		;;
 	    (freebsd)
-		packages="${package:-$FREEBSD_PKG} ${FREEBSD_PKGS-}"
+		packages=$FREEBSD_PKGS
 		;;
 	esac
 
