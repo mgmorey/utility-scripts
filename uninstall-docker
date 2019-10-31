@@ -29,6 +29,27 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_docker_origin() {
+    for package; do
+	case $package in
+	    (docker-ce|docker-ce-cli)
+		origin=docker.com
+		;;
+	    (docker|docker.io)
+		origin=native
+		;;
+	    (podman-docker)
+		origin=podman
+		;;
+	esac
+
+	if [ -n "${origin-}" ]; then
+	    printf "%s\n" "$origin"
+	    return
+	fi
+    done
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -46,28 +67,33 @@ get_realpath() (
     fi
 )
 
-grep_docker() {
-    grep -q '^\(docker\|docker.io\)$'
-}
-
-grep_docker_ce() {
-    grep -q '^\(docker-ce\|docker-ce-cli\)$'
-}
-
 uninstall_docker() {
     validate_platform
-    installed_packages=$("$script_dir/get-installed-docker-packages")
+    packages=$("$script_dir/get-installed-docker-packages")
+    origin=$(get_docker_origin $packages)
 
-    if printf "%s\n" $installed_packages | grep_docker; then
-	printf "Removing native Docker packages\n"
-    elif printf "%s\n" $installed_packages | grep_docker_ce; then
-	printf "Removing Docker CE packages\n"
+    if [ -n "$origin" ]; then
+	case "$origin" in
+	    (docker.com)
+		printf "Docker Community Edition is installed.\n"
+		;;
+	    (native)
+		printf "Native Docker is installed.\n"
+		;;
+	    (podman)
+		printf "Podman is installed.\n"
+		;;
+	esac
     else
-	printf "No Docker package installed\n"
+	printf "Docker is not installed.\n"
     fi
 
-    if [ -n "$installed_packages" ]; then
-	"$script_dir/uninstall-packages" $installed_packages
+    if [ -n "$packages" ]; then
+	printf "Removing $packages\n"
+
+	if ! "$script_dir/uninstall-packages" $packages; then
+	    return $?
+	fi
     fi
 }
 
