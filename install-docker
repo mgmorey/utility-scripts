@@ -68,6 +68,16 @@ get_architecture() {
     esac
 }
 
+get_difference() (
+    assert [ $# -eq 2 ]
+
+    for item in $1; do
+	if ! printf "%s\n" $2 | grep -Eq '^'$item'$'; then
+	    printf "%s\n" "$item"
+	fi
+    done
+)
+
 get_docker_origin() {
     for package; do
 	case $package in
@@ -104,16 +114,6 @@ get_realpath() (
 	    fi
 	done
     fi
-)
-
-get_difference() (
-    assert [ $# -eq 2 ]
-
-    for item in $1; do
-	if ! printf "%s\n" $2 | grep -Eq '^'$item'$'; then
-	    printf "%s\n" "$item"
-	fi
-    done
 )
 
 install_docker() {
