@@ -185,7 +185,6 @@ install_dependencies() {
 
 install_docker_ce() {
     validate_platform
-    configure_platform
     installed_packages=$("$script_dir/get-installed-docker-packages")
     origin=$(get_docker_origin $installed_packages)
 
