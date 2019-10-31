@@ -70,6 +70,60 @@ get_realpath() (
     fi
 )
 
+get_setpriv_command() (
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    version="$(setpriv --version 2>/dev/null)"
+
+    case "${version##* }" in
+	('')
+	    return 1
+	    ;;
+	([01].*)
+	    return 1
+	    ;;
+	(2.[0-9].*)
+	    return 1
+	    ;;
+	(2.[12][0-9].*)
+	    return 1
+	    ;;
+	(2.3[012].*)
+	    return 1
+	    ;;
+	(*)
+	    options="--init-groups --reset-env"
+	    ;;
+    esac
+
+    regid="$(id -u $1)"
+    reuid="$(id -g $1)"
+    printf "setpriv --reuid %s --regid %s %s\n" "$reuid" "$regid" "$options"
+)
+
+get_su_command() (
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "${kernel_name=$(uname -s)}" in
+	(GNU|Linux)
+	    if get_setpriv_command $1; then
+		return 0
+	    else
+		options=-l
+	    fi
+	    ;;
+	(Darwin|FreeBSD)
+	    options=-l
+	    ;;
+	(*)
+	    options=-
+	    ;;
+    esac
+
+    printf "su %s %s\n" "$options" "$1"
+)
+
 invoke_manager() (
     if [ "$1" = /usr/local/bin/brew ]; then
 	run_unpriv -c "$*"
@@ -81,6 +135,27 @@ invoke_manager() (
 parse_arguments() {
     packages="$@"
 }
+
+run_unpriv() (
+    assert [ $# -ge 1 ]
+
+    if [ "$1" = -c ]; then
+	sh_opts="$1"
+	shift
+    else
+	sh_opts=
+    fi
+
+    if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
+	su="$(get_su_command $SUDO_USER) $sh_opts"
+    elif [ -n "$sh_opts" ]; then
+	su="sh $sh_opts"
+    else
+	su=
+    fi
+
+    $su "$@"
+)
 
 uninstall_packages() {
     validate_platform
