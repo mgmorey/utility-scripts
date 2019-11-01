@@ -26,8 +26,6 @@ OPENSUSE_PKGS="docker"
 
 REDHAT_PKGS="podman podman-docker"
 
-UBUNTU_PKGS="docker.io"
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -51,9 +49,6 @@ get_docker_packages() {
 		;;
 	    (rhel|fedora)
 		packages=$REDHAT_PKGS
-		;;
-	    (ubuntu)
-		packages=$UBUNTU_PKGS
 		;;
 	    (macos)
 		packages=$DARWIN_PKGS
