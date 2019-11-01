@@ -32,15 +32,14 @@ add_gpg_key() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu)
-		    curl -fsSL $1/gpg | apt-key add - >/dev/null 2>&1
-		    ;;
-	    esac
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		curl -fsSL $1/gpg | apt-key add - >/dev/null 2>&1
+		break
+		;;
+	esac
+    done
 }
 
 add_repositories() {
@@ -48,18 +47,18 @@ add_repositories() {
     assert [ -n "$1" ]
     repo="$(get_docker_repo $1)"
 
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu)
-		    add-apt-repository "$repo"
-		    ;;
-		(rhel|ol|centos)
-		    yum-config-manager --add-repo "$repo" >/dev/null
-		    ;;
-	    esac
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		add-apt-repository "$repo"
+		break
+		;;
+	    (fedora)
+		yum-config-manager --add-repo "$repo" >/dev/null
+		break
+		;;
+	esac
+    done
 }
 
 assert() {
@@ -67,17 +66,13 @@ assert() {
 }
 
 enable_additional_repositories() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(ol)
-		    case "$VERSION_ID" in
-			(7.*)
-			    for repo in $ORACLE_LINUX_REPOS; do
-				yum-config-manager --enable $repo >/dev/null
-			    done
-			    ;;
-		    esac
+    case "$ID" in
+	(ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    for repo in $ORACLE_LINUX_REPOS; do
+			yum-config-manager --enable $repo >/dev/null
+		    done
 		    ;;
 	    esac
 	    ;;
@@ -140,18 +135,18 @@ get_docker_repo() {
     assert [ -n "$1" ]
     arch=$(get_architecture)
 
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu)
-		    printf "%s\n" "deb [arch=$arch] $1 $(get_codename) stable"
-		    ;;
-		(rhel|ol|centos)
-		    printf "%s\n" "$DOCKER_BASE_URL/linux/centos/docker-ce.repo"
-		    ;;
-	    esac
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		printf "%s\n" "deb [arch=$arch] $1 $(get_codename) stable"
+		break
+		;;
+	    (fedora)
+		printf "%s\n" "$DOCKER_BASE_URL/linux/centos/docker-ce.repo"
+		break
+		;;
+	esac
+    done
 }
 
 get_docker_url() {
