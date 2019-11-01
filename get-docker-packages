@@ -41,10 +41,7 @@ get_docker_packages() {
 	    (debian)
 		packages=$DEBIAN_PKGS
 		;;
-	    (opensuse-leap)
-		packages=$OPENSUSE_PKGS
-		;;
-	    (opensuse-tumbleweed)
+	    (opensuse)
 		packages=$OPENSUSE_PKGS
 		;;
 	    (rhel|fedora)
