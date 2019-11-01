@@ -46,6 +46,8 @@ libXmu-devel libXpm-devel libXrandr-devel libXt-devel libXtst-devel \
 libXv-devel libxml2-devel make m17n-lib-devel ncurses5-devel \
 zlib-devel webkit2gtk3-devel"
 
+SOLARIS_PKGS="library/gnutls"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -57,34 +59,42 @@ assert() {
 
 
 get_emacs_build_extras() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    packages=$DEBIAN_PKGS
-		    ;;
-		(opensuse-*)
-		    packages=$OPENSUSE_PKGS
-		    ;;
-		(fedora)
-		    packages=$FEDORA_PKGS
-	    	    ;;
-		(rhel|ol|centos)
-		    case "$VERSION_ID" in
-			(7|7.[78])
-			    packages=$REDHAT_7_PKGS
-			    ;;
-			(8|8.[01])
-			    packages=$REDHAT_8_PKGS
-			    ;;
-		    esac
-		    ;;
-	    esac
-	    ;;
-	(FreeBSD|SunOS|CYGWIN_NT-*)
-	    :
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (ms-windows)
+		break
+		;;
+	    (debian)
+		packages=$DEBIAN_PKGS
+		;;
+	    (fedora)
+		packages=$FEDORA_PKGS
+	    	;;
+	    (opensuse)
+		packages=$OPENSUSE_PKGS
+		;;
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		    (7|7.[78])
+			packages=$REDHAT_7_PKGS
+			;;
+		    (8|8.[01])
+			packages=$REDHAT_8_PKGS
+			;;
+		esac
+		;;
+	    (freebsd)
+		break
+		;;
+	    (solaris)
+		packages=$SOLARIS_PKGS
+		;;
+	esac
+
+	if [ -n "${packages-}" ]; then
+	    break
+	fi
+    done
 
     if [ -n "${packages-}" ]; then
 	printf "%s\n" $packages

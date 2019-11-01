@@ -89,19 +89,22 @@ configure_emacs() {
 }
 
 get_configure_options() {
-    case "$kernel_name" in
-        (Linux)
-            case "$ID" in
-                (rhel|ol|centos)
-		    case "$VERSION_ID" in
-			(8|8.[01])
-			    printf "%s\n" "--with-gif=no"
-			    ;;
-		    esac
-		    ;;
-            esac
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+            (rhel|fedora)
+		case "$VERSION_ID" in
+		    (8|8.[01])
+			printf "%s\n" "--with-gif=no"
+			return
+			;;
+		esac
+		;;
+            (solaris)
+		printf "%s\n" "--with-gif=no --with-gnutls=no"
+		return
+		;;
+	esac
+    done
 }
 
 get_realpath() (
@@ -183,27 +186,27 @@ usage() {
 }
 
 validate_platform() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    :
-	    	    ;;
-		(opensuse-*|fedora|rhel|ol|centos)
-		    :
-	    	    ;;
-		(*)
-		    abort_not_supported Distro
-		    ;;
-	    esac
-	    ;;
-	(FreeBSD|SunOS)
-	    :
-	    ;;
-	(*)
-	    abort_not_supported "Operating system"
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		return
+	    	;;
+	    (opensuse)
+		return
+	    	;;
+	    (rhel|fedora)
+		return
+	    	;;
+	    (freebsd)
+		return
+		;;
+	    (solaris)
+		return
+		;;
+	esac
+    done
+
+    abort_not_supported "Operating system"
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")

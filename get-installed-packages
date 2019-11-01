@@ -46,46 +46,57 @@ get_installed_packages() {
     manager1=$(printf "%s\n" $managers | awk 'NR == 1 {print $0}')
     manager2=$(printf "%s\n" $managers | awk 'NR == 2 {print $0}')
 
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    dpkg-query -Wf '${Status} ${Package}\n' | awk "$DEBIAN_AWK"
-		    ;;
-		(opensuse-*)
-		    $manager1 -q search -i -t package | awk 'NR > 3 {print $3}'
-		    ;;
-		(fedora)
-		    $manager1 list installed | awk '{print $1}' | awk -F. '{print $1}'
-		    ;;
-		(rhel|ol|centos)
-		    case "$VERSION_ID" in
-			(7|7.[78])
-			    $manager1 list installed | awk '{print $1}' | awk -F. '{print $1}'
-			    $manager2 list | awk '{print ":" $1}'
-			    ;;
-			(8|8.[01])
-			    $manager1 list installed | awk '{print $1}' | awk -F. '{print $1}'
-			    ;;
-		    esac
-		    ;;
-	    esac
-	    ;;
-	(Darwin)
-	    run_unpriv -c "$manager1 list -1"
-	    $manager2 list | awk '{print ":" $1}'
-	    ;;
-	(FreeBSD)
-	    $manager1 info | awk "$FREEBSD_AWK"
-	    ;;
-	(NetBSD)
-	    $manager1 list | awk '{print $1}'
-	    ;;
-	(SunOS)
-	    $manager1 list -s | awk '{print $1}'
-	    $manager2 list | awk '{print ":" $1}'
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		dpkg-query -Wf '${Status} ${Package}\n' | awk "$DEBIAN_AWK"
+		return
+		;;
+	    (opensuse)
+		$manager1 -q search -i -t package | awk 'NR > 3 {print $3}'
+		return
+		;;
+	    (fedora)
+		$manager1 list installed | awk '{print $1}' | awk -F. '{print $1}'
+		return
+		;;
+	    (rhel|ol|centos)
+		case "$VERSION_ID" in
+		    (7|7.[78])
+			$manager1 list installed | awk '{print $1}' | awk -F. '{print $1}'
+			$manager2 list | awk '{print ":" $1}'
+			return
+			;;
+		    (8|8.[01])
+			$manager1 list installed | awk '{print $1}' | awk -F. '{print $1}'
+			return
+			;;
+		esac
+		;;
+	    (macos)
+		run_unpriv -c "$manager1 list -1"
+		$manager2 list | awk '{print ":" $1}'
+		return
+		;;
+	    (freebsd)
+		$manager1 info | awk "$FREEBSD_AWK"
+		return
+		;;
+	    (netbsd)
+		$manager1 list | awk '{print $1}'
+		return
+		;;
+	    (illumos)
+		$manager1 list -s | awk '{print $1}'
+		$manager2 list | awk '{print ":" $1}'
+		return
+		;;
+	    (solaris)
+		$manager1 list -s | awk '{print $1}'
+		return
+		;;
+	esac
+    done
 }
 
 get_realpath() (

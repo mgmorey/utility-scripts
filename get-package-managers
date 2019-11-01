@@ -56,8 +56,11 @@ get_package_managers() {
 	    (netbsd)
 		managers="pkgin"
 		;;
-	    (solaris)
+	    (illumos)
 		managers="pkg pkgin"
+		;;
+	    (solaris)
+		managers="pkg"
 		;;
 	esac
 
