@@ -51,19 +51,19 @@ collect_data() {
 
     case "$kernel_name" in
 	(CYGWIN_NT-*)
-	    collect_data_for_cygwin
+	    collect_data_for_cygwin $kernel_data
 	    ;;
 	(Linux|GNU)
-	    collect_data_for_gnu
+	    collect_data_for_gnu $kernel_data
 	    ;;
 	(Darwin)
-	    collect_data_for_darwin
+	    collect_data_for_darwin $kernel_data
 	    ;;
 	(SunOS)
-	    collect_data_for_sunos
+	    collect_data_for_sunos $kernel_data
 	    ;;
 	(*)
-	    collect_data_for_unix
+	    collect_data_for_unix $kernel_data
 	    ;;
 
     esac
