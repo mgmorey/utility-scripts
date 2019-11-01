@@ -109,6 +109,13 @@ collect_data_for_sunos() {
     ID="$(uname -o | to_lower)"
 
     case "$ID" in
+	(illumos)
+	    os_data=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE_RELEASE)
+	    os_family=unix
+	    ID_LIKE="solaris sunos"
+	    NAME=${os_data%:*}
+	    VERSION=${os_data#*:}
+	    ;;
 	(solaris)
 	    os_data=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE_RELEASE)
 	    os_family=unix
