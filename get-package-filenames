@@ -44,7 +44,7 @@ get_package_filenames() {
 		pkg query %Fp "$1"
 		return
 		;;
-	    (openindiana)
+	    (solaris)
 		pkg contents $1 | awk 'NR > 1 {printf("/%s\n", $0)}'
 		return
 		;;

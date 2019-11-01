@@ -78,7 +78,7 @@ get_python_metadata() {
 	    (netbsd)
 		data="$NETBSD_DATA"
 		;;
-	    (openindiana)
+	    (solaris)
 		data="$SUNOS_DATA"
 		;;
 	esac
