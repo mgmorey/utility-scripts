@@ -34,6 +34,9 @@ readline sqlite3 wget"
 FREEBSD_12_PKGS="bash bzip2 curl gdbm gmake libffi llvm60 lzma ncurses \
 readline sqlite3 wget"
 
+ILLUMOS_PKGS="database/sqlite-3 developer/build/make developer/gcc \
+library/libffi library/ncurses library/readline shell/bash"
+
 NETBSD_PKGS="bash bzip2 curl gdbm gmake libffi lzma ncurses readline \
 sqlite3 wget"
 
@@ -48,7 +51,8 @@ REDHAT_8_PKGS="bash bzip2-devel curl gcc gdbm-devel libffi-devel \
 libuuid-devel make ncurses-devel openssl-devel python36-devel \
 readline-devel sqlite-devel wget xz-devel zlib-devel"
 
-SUNOS_PKGS="bash database/sqlite-3 gcc-6 libffi make ncurses readline"
+SOLARIS_PKGS="database/sqlite-3 developer/build/make developer/gcc \
+library/libffi library/ncurses library/readline shell/bash"
 
 abort() {
     printf "$@" >&2
@@ -60,81 +64,86 @@ assert() {
 }
 
 get_python_build_deps() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian)
-		    case "$VERSION_ID" in
-			(10)
-	    		    packages=$DEBIAN_10_PKGS
-			    ;;
-		    esac
-		    ;;
-		(ubuntu|neon)
-		    case "$VERSION_ID" in
-			(18.04)
-	    		    packages=$DEBIAN_10_PKGS
-			    ;;
-			(19.04)
-	    		    packages=$DEBIAN_10_PKGS
-			    ;;
-			(19.10)
-	    		    packages=$DEBIAN_10_PKGS
-			    ;;
-		    esac
-		    ;;
-		(linuxmint)
-		    case "$VERSION_ID" in
-			(19.2)
-	    		    packages=$DEBIAN_10_PKGS
-			    ;;
-		    esac
-		    ;;
-		(kali)
-		    case "$VERSION_ID" in
-			(2019.3)
-	    		    packages=$DEBIAN_10_PKGS
-			    ;;
-		    esac
-		    ;;
-		(opensuse-*)
-	    	    packages=$OPENSUSE_PKGS
-	    	    ;;
-		(fedora)
-	    	    packages=$FEDORA_PKGS
-	    	    ;;
-		(rhel|ol|centos)
-		    case "$VERSION_ID" in
-			(7|7.[78])
-			    packages=$REDHAT_7_PKGS
-			    ;;
-			(8|8.[01])
-			    packages=$REDHAT_8_PKGS
-			    ;;
-		    esac
-		    ;;
-	    esac
-	    ;;
-	(Darwin)
-	    packages=$DARWIN_PKGS
-	    ;;
-	(FreeBSD)
-	    case "$VERSION_ID" in
-		(11.*)
-		    packages=$FREEBSD_11_PKGS
-		    ;;
-		(12.*)
-		    packages=$FREEBSD_12_PKGS
-		    ;;
-	    esac
-	    ;;
-	(NetBSD)
-	    packages=$NETBSD_PKGS
-	    ;;
-	(SunOS)
-	    packages=$SUNOS_PKGS
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		case "$VERSION_ID" in
+		    (10)
+	    		packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (ubuntu|neon)
+		case "$VERSION_ID" in
+		    (18.04)
+	    		packages=$DEBIAN_10_PKGS
+			;;
+		    (19.04)
+	    		packages=$DEBIAN_10_PKGS
+			;;
+		    (19.10)
+	    		packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (linuxmint)
+		case "$VERSION_ID" in
+		    (19.2)
+	    		packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (kali)
+		case "$VERSION_ID" in
+		    (2019.3)
+	    		packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (opensuse-*)
+	    	packages=$OPENSUSE_PKGS
+	    	;;
+	    (fedora)
+	    	packages=$FEDORA_PKGS
+	    	;;
+	    (rhel|ol|centos)
+		case "$VERSION_ID" in
+		    (7|7.[78])
+			packages=$REDHAT_7_PKGS
+			;;
+		    (8|8.[01])
+			packages=$REDHAT_8_PKGS
+			;;
+		esac
+		;;
+	    (macos)
+		packages=$DARWIN_PKGS
+		;;
+	    (freebsd)
+		case "$VERSION_ID" in
+		    (11.*)
+			packages=$FREEBSD_11_PKGS
+			;;
+		    (12.*)
+			packages=$FREEBSD_12_PKGS
+			;;
+		esac
+		;;
+	    (netbsd)
+		packages=$NETBSD_PKGS
+		;;
+	    (illumos)
+		packages=$ILLUMOS_PKGS
+		;;
+	    (solaris)
+		packages=$SOLARIS_PKGS
+		;;
+	esac
+
+	if [ -n "${packages-}" ]; then
+	    break
+	fi
+    done
 
     if [ -n "${packages-}" ]; then
 	printf "%s\n" $packages
