@@ -95,7 +95,7 @@ configure_platform() {
 		;;
 	    (solaris)
 		case "$desktop_name" in
-		    (MATE|'')
+		    (GNOME|MATE|'')
 			helper=/usr/lib/ssh/ssh-askpass
 			;;
 		esac
