@@ -110,6 +110,8 @@ get_difference() (
 )
 
 get_docker_origin() {
+    origin=
+
     for package; do
 	case $package in
 	    (docker-ce|docker-ce-cli)
@@ -125,7 +127,7 @@ get_docker_origin() {
 
 	if [ -n "${origin-}" ]; then
 	    printf "%s\n" "$origin"
-	    return
+	    break
 	fi
     done
 }
@@ -134,18 +136,24 @@ get_docker_repo() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     arch=$(get_architecture)
+    repo=
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
-		printf "%s\n" "deb [arch=$arch] $1 $(get_codename) stable"
+		repo="deb [arch=$arch] $1 $(get_codename) stable"
 		break
 		;;
 	    (fedora)
-		printf "%s\n" "$DOCKER_BASE_URL/linux/centos/docker-ce.repo"
+		repo="$DOCKER_BASE_URL/linux/centos/docker-ce.repo"
 		break
 		;;
 	esac
+
+	if [ -n "${repo-}" ]; then
+	    printf "%s\n" "$repo"
+	    break
+	fi
     done
 }
 
@@ -249,13 +257,9 @@ preinstall_docker() {
 }
 
 postinstall_docker() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(ol)
-		    semanage permissive -a container_runtime_t
-		    ;;
-	    esac
+    case "$ID" in
+	(ol)
+	    semanage permissive -a container_runtime_t
 	    ;;
     esac
 

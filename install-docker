@@ -73,6 +73,8 @@ get_difference() (
 )
 
 get_docker_origin() {
+    origin=
+
     for package; do
 	case $package in
 	    (docker-ce|docker-ce-cli)
@@ -88,7 +90,7 @@ get_docker_origin() {
 
 	if [ -n "${origin-}" ]; then
 	    printf "%s\n" "$origin"
-	    return
+	    break
 	fi
     done
 }
