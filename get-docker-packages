@@ -20,7 +20,7 @@ DARWIN_PKGS="docker"
 
 DEBIAN_PKGS="docker.io"
 
-FREEBSD_PKG="docker docker-machine"
+FREEBSD_PKGS="docker docker-machine"
 
 OPENSUSE_PKGS="docker"
 
