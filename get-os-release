@@ -106,12 +106,24 @@ collect_data_for_gnu() {
 }
 
 collect_data_for_sunos() {
-    os_data=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE_RELEASE)
-    os_family=unix
-    NAME=${os_data%:*}
-    VERSION=${os_data#*:}
-    ID=$(printf "%s\n" "${NAME% *}" | to_lower)
-    ID_LIKE="illumos solaris sunos"
+    ID="$(uname -o | to_lower)"
+
+    case "$ID" in
+	(solaris)
+	    os_data=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE_RELEASE)
+	    os_family=unix
+	    ID_LIKE="sunos"
+	    NAME=${os_data%:*}
+	    VERSION=${os_data#*:}
+	    ;;
+	(*)
+	    os_data=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE_RELEASE)
+	    os_family=unix
+	    ID_LIKE="sunos"
+	    NAME=${os_data%:*}
+	    VERSION=${os_data#*:}
+	    ;;
+    esac
 }
 
 collect_data_for_unix() {
