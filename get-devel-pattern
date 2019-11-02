@@ -22,7 +22,7 @@ OPENSUSE_PATTERN="devel_basis"
 
 REDHAT_PATTERN="Development Tools"
 
-SUNOS_PATTERN="build-essential"
+ILLUMOS_PATTERN="build-essential"
 
 abort() {
     printf "$@" >&2
@@ -45,8 +45,8 @@ get_devel_pattern() {
 	    (rhel|fedora)
 		pattern=$REDHAT_PATTERN
 		;;
-	    (solaris)
-		pattern=$SUNOS_PATTERN
+	    (illumos)
+		pattern=$ILLUMOS_PATTERN
 		;;
 	esac
 
