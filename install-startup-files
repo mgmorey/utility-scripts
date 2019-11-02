@@ -35,7 +35,7 @@ get_diff_command() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (solaris)
-		diff=/usr/gnu/bin/diff
+		diff=gdiff
 		;;
 	esac
 
@@ -53,7 +53,7 @@ get_install_command() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (solaris)
-		install=/usr/gnu/bin/install
+		install=ginstall
 		;;
 	esac
 
