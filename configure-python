@@ -64,32 +64,14 @@ configure_python() {
     build_dir="$HOME/Documents/build/$basename"
     src_dir="$HOME/Documents/src/Python/$basename"
 
+    command=$(get_command $src_dir/configure)
     filename=$basename.tar.xz
 
     pathname=$archive_dir/$filename
-    url=$PYTHON_BASE_URL/python/$python_version/$filename
 
     mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
-
-    if [ ! -r "$pathname" ]; then
-	cd "$archive_dir"
-	wget $url
-    fi
-
-    if [ ! -r "$src_dir/configure" ]; then
-	cd "$(dirname "$src_dir")"
-	tar -xvf "$pathname"
-    fi
-
-    configure=$src_dir/configure
-
-    if [ "$is_optimizing" = true ]; then
-	options="--enable-optimizations"
-    else
-	options="--disable-optimizations"
-    fi
-
-    options="$options --enable-shared --prefix=$python_prefix"
+    download_archive
+    extract_files
 
     if [ "$is_forcing" = true ]; then
 	/bin/rm -f "$build_dir/config.status"
@@ -97,22 +79,75 @@ configure_python() {
 	exit 0
     fi
 
+    printf "%s\n" "$command"
     cd "$build_dir"
+    $command
+}
 
-    case "$kernel_name" in
-	(Linux|GNU)
-	    "$configure" $options LDFLAGS="-Wl,--rpath=$python_prefix/lib"
+download_archive() {
+    url=$PYTHON_BASE_URL/python/$python_version/$filename
+
+    if [ ! -r "$pathname" ]; then
+	cd "$archive_dir"
+	wget $url
+    fi
+
+}
+
+extract_files() {
+    if [ ! -r "$src_dir/configure" ]; then
+	cd "$(dirname "$src_dir")"
+	tar -xvf "$pathname"
+    fi
+}
+
+get_command() {
+    compiler=$(get_compiler)
+    ldflags=$(get_ldflags)
+    options=$(get_options)
+    printf "%s\n" "$1 $options CC=$compiler LDFLAGS=$ldflags"
+}
+
+get_compiler() {
+    compiler=
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (solaris)
+		compiler=cc
+		break
+		;;
+	esac
+    done
+
+    printf "%s\n" "${compiler:-gcc}"
+}
+
+get_ldflags() {
+    case "$os_family" in
+	(gnu-*)
+	    ldflags="-Wl,--rpath=$python_prefix/lib"
 	    ;;
-	(FreeBSD)
-	    "$configure" $options LDFLAGS="-R$python_prefix/lib"
-	    ;;
-	(SunOS)
-	    "$configure" $options LDFLAGS="-R$python_prefix/lib"
+	(unix)
+	    ldflags="-R$python_prefix/lib"
 	    ;;
 	(*)
-	    "$configure"
+	    ldflags=
 	    ;;
     esac
+
+    printf "%s\n" "$ldflags"
+}
+
+get_options() {
+    if [ "$is_optimizing" = true ]; then
+	options="--enable-optimizations"
+    else
+	options="--disable-optimizations"
+    fi
+
+    options="$options --enable-shared --prefix=$python_prefix"
+    printf "%s\n" "$options"
 }
 
 get_realpath() (
