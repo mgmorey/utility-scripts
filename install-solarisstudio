@@ -1,0 +1,3 @@
+#/bin/sh -eu
+
+pkg install --accept developerstudio-126
