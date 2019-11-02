@@ -24,6 +24,8 @@ FEDORA_DATA="python3 python3"
 
 FREEBSD_DATA="python3 py36"
 
+ILLUMOS_DATA=":python36 py36"
+
 NETBSD_DATA="python36 py36"
 
 OPENSUSE_DATA="python3 python3"
@@ -31,9 +33,7 @@ OPENSUSE_DATA="python3 python3"
 REDHAT_7_DATA=":python36 py36"
 REDHAT_8_DATA="python3 python3"
 
-SUNOS_DATA=":python36 py36"
-
-UBUNTU_DATA="python3 python3"
+SOLARIS_DATA="runtime/python-35 35"
 
 abort() {
     printf "$@" >&2
@@ -47,7 +47,7 @@ assert() {
 get_python_metadata() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (debian|raspbian|kali)
+	    (debian)
 		data="$DEBIAN_DATA"
 		;;
 	    (fedora)
@@ -66,10 +66,7 @@ get_python_metadata() {
 			;;
 		esac
 		;;
-	    (ubuntu|linuxmint|neon)
-		data="$UBUNTU_DATA"
-		;;
-	    (macos)
+	    (darwin)
 		data="$DARWIN_DATA"
 		;;
 	    (freebsd)
@@ -78,8 +75,11 @@ get_python_metadata() {
 	    (netbsd)
 		data="$NETBSD_DATA"
 		;;
+	    (illumos)
+		data="$ILLUMOS_DATA"
+		;;
 	    (solaris)
-		data="$SUNOS_DATA"
+		data="$SOLARIS_DATA"
 		;;
 	esac
 
