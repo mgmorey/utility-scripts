@@ -51,8 +51,10 @@ REDHAT_8_PKGS="bash bzip2-devel curl gcc gdbm-devel libffi-devel \
 libuuid-devel make ncurses-devel openssl-devel python36-devel \
 readline-devel sqlite-devel wget xz-devel zlib-devel"
 
-SOLARIS_PKGS="database/sqlite-3 developer/build/make developer/gcc \
-library/libffi library/ncurses library/readline shell/bash"
+SOLARIS_PKGS="database/sqlite-3 developer/build/autoconf \
+developer/build/automake developer/build/libtool developer/build/make \
+developer/build/pkg-config developer/gcc library/libffi library/ncurses \
+library/readline shell/bash"
 
 abort() {
     printf "$@" >&2
