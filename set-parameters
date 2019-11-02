@@ -73,9 +73,16 @@ include_common_directories() {
     fi
 
     # add common binary directories to PATH (if they exist)
-    for dir in $COMMON_BINDIRS; do
-	if is_to_be_included $dir "${PATH-}"; then
-	    PATH="$dir${PATH:+:$PATH}"
+    for dir in $(ls -d $COMMON_BINDIRS 2>/dev/null); do
+	if ! is_included $dir "${PATH-}"; then
+	    case "$dir" in
+		(/usr/gnu/bin)
+		    PATH="${PATH:+$PATH:}$dir"
+		    ;;
+		(*)
+		    PATH="$dir${PATH:+:$PATH}"
+		    ;;
+	    esac
 	fi
     done
 }
