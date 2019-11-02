@@ -18,7 +18,7 @@
 
 ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
 
-COMMON_BINDIRS="/usr/local/sbin /usr/lib/cups/bin /usr/gnu/bin"
+COMMON_BINDIRS="/usr/gnu/bin /usr/lib/cups/bin /usr/local/bin /usr/local/sbin"
 PKGSRC_PKGDIRS="/opt/local /opt/pkg /usr/pkg"
 
 PROFILE_BINDIRS="bin .cargo/bin .local/bin .pyenv/bin"
