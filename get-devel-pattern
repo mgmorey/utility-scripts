@@ -45,7 +45,7 @@ get_devel_pattern() {
 	    (rhel|fedora)
 		pattern=$REDHAT_PATTERN
 		;;
-	    (openindiana)
+	    (solaris)
 		pattern=$SUNOS_PATTERN
 		;;
 	esac

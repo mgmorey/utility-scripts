@@ -93,9 +93,9 @@ configure_platform() {
 	    (netbsd)
 		helper=/usr/X11R7/bin/ssh-askpass
 		;;
-	    (openindiana)
+	    (solaris)
 		case "$desktop_name" in
-		    (MATE|'')
+		    (GNOME|MATE|'')
 			helper=/usr/lib/ssh/ssh-askpass
 			;;
 		esac
