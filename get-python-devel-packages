@@ -41,7 +41,7 @@ REDHAT_7_PKGS=":%s-codestyle :%s-packaging :%s-pip :%s-pylint :%s-test \
 :%s-virtualenv"
 REDHAT_8_PKGS="%s-pip %s-pytest %s-virtualenv"
 
-SOLARIS_PKGS="library/python/pip-%s developer/python/pylint-%s \
+SOLARIS_PKGS="developer/python/pylint-%s library/python/pip-%s \
 library/python/pytest-%s library/python/virtualenv-%s"
 
 abort() {
