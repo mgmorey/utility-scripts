@@ -16,7 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKGS="libgnutls28-dev libgpm-dev libwebkit2gtk-4.0-dev"
+DEBIAN_PKGS="libgif-dev libgnutls28-dev libgpm-dev libjpeg-dev \
+libncurses5-dev libtiff5-dev libwebkit2gtk-4.0-dev libxpm-dev"
 
 FEDORA_PKGS="GConf2-devel giflib-devel gnutls-devel gpm-devel gtk3-devel \
 ImageMagick-devel lcms2-devel libacl-devel libICE-devel libjpeg-turbo-devel \
@@ -38,17 +39,20 @@ libXaw-devel libXext-devel libXi-devel libXmu-devel libXpm-devel \
 libXrandr-devel libXt-devel libXtst-devel libXv-devel libxml2-devel make \
 ncurses-devel zlib-devel"
 
-OPENSUSE_PKGS="gconf2-devel giflib-devel gpm-devel gtk3-devel \
+OPENSUSE_PKGS="gcc gconf2-devel giflib-devel gpm-devel gtk3-devel \
 ImageMagick-devel libacl-devel libgnutls-devel libjpeg62-devel \
-libICE-devel liblcms2-devel libpng16-devel libSM-devel \
-libtiff-devel libX11-devel libXaw3d-devel libXext-devel libXi-devel \
-libXmu-devel libXpm-devel libXrandr-devel libXt-devel libXtst-devel \
-libXv-devel libxml2-devel make m17n-lib-devel ncurses5-devel \
-zlib-devel webkit2gtk3-devel"
+libICE-devel liblcms2-devel libpng16-devel libSM-devel libtiff-devel \
+libX11-devel libXaw3d-devel libXext-devel libXi-devel libXmu-devel \
+libXpm-devel libXrandr-devel libXt-devel libXtst-devel libXv-devel \
+libxml2-devel make m17n-lib-devel ncurses5-devel zlib-devel \
+webkit2gtk3-devel"
 
 SOLARIS_PKGS="developer/build/make developer/build/pkg-config \
 image/library/libpng10 library/gnutls library/libjpeg \
 library/ncurses library/zlib"
+
+UBUNTU_PKGS="libgif-dev libgnutls28-dev libgpm-dev libjpeg-dev \
+libncurses5-dev libtiff5-dev libwebkit2gtk-4.0-dev libxpm-dev"
 
 abort() {
     printf "$@" >&2
@@ -90,6 +94,9 @@ get_emacs_build_extras() {
 		;;
 	    (solaris)
 		packages=$SOLARIS_PKGS
+		;;
+	    (ubuntu)
+		packages=$UBUNTU_PKGS
 		;;
 	esac
 
