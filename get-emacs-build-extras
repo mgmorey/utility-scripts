@@ -46,7 +46,9 @@ libXmu-devel libXpm-devel libXrandr-devel libXt-devel libXtst-devel \
 libXv-devel libxml2-devel make m17n-lib-devel ncurses5-devel \
 zlib-devel webkit2gtk3-devel"
 
-SOLARIS_PKGS="library/gnutls"
+SOLARIS_PKGS="developer/build/make developer/build/pkg-config \
+image/library/libpng10 library/gnutls library/libjpeg \
+library/ncurses library/zlib"
 
 abort() {
     printf "$@" >&2
