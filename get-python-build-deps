@@ -34,9 +34,6 @@ readline sqlite3 wget"
 FREEBSD_12_PKGS="bash bzip2 curl gdbm gmake libffi llvm60 lzma ncurses \
 readline sqlite3 wget"
 
-ILLUMOS_PKGS="database/sqlite-3 developer/build/make developer/gcc \
-library/libffi library/ncurses library/readline shell/bash"
-
 NETBSD_PKGS="bash bzip2 curl gdbm gmake libffi lzma ncurses readline \
 sqlite3 wget"
 
@@ -133,9 +130,6 @@ get_python_build_deps() {
 		;;
 	    (netbsd)
 		packages=$NETBSD_PKGS
-		;;
-	    (illumos)
-		packages=$ILLUMOS_PKGS
 		;;
 	    (solaris)
 		packages=$SOLARIS_PKGS
