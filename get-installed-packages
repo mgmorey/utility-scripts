@@ -86,11 +86,6 @@ get_installed_packages() {
 		$manager1 list | awk '{print $1}'
 		return
 		;;
-	    (illumos)
-		$manager1 list -s | awk '{print $1}'
-		$manager2 list | awk '{print ":" $1}'
-		return
-		;;
 	    (solaris)
 		$manager1 list -s | awk '{print $1}'
 		return
