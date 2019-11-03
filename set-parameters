@@ -19,9 +19,9 @@
 ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
 
 COMMON_BINDIRS="/usr/gnu/bin /usr/lib/cups/bin /usr/local/bin /usr/local/sbin"
-ORACLE_SOLARIS_BINDIRS="/opt/developerstudio*/bin"
-PKGSRC_PKGDIRS="/opt/local /opt/pkg /usr/pkg"
+SOLARIS_BINDIRS="/opt/developerstudio*/bin /opt/sunstudio*/bin"
 
+PKGSRC_PKGDIRS="/opt/local /opt/pkg /usr/pkg"
 PROFILE_BINDIRS="bin .cargo/bin .local/bin .pyenv/bin"
 
 abort() {
@@ -75,12 +75,12 @@ include_common_directories() {
 
     # add common binary directories to PATH (if they exist)
 
-    dirs="$COMMON_BINDIRS $ORACLE_SOLARIS_BINDIRS"
+    dirs="$COMMON_BINDIRS $SOLARIS_BINDIRS"
 
     for dir in $(ls -d $dirs 2>/dev/null); do
 	if ! is_included $dir "${PATH-}"; then
 	    case "$dir" in
-		(/opt/*|/usr/gnu/bin)
+		(/usr/gnu/bin)
 		    PATH="${PATH:+$PATH:}$dir"
 		    ;;
 		(*)
