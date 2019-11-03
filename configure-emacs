@@ -57,38 +57,71 @@ assert() {
 configure_emacs() {
     validate_platform
     parse_arguments "$@"
-
     basename=emacs-$EMACS_VERSION
 
     archive_dir="$HOME/Downloads/GNU"
     build_dir="$HOME/Documents/build/$basename"
     src_dir="$HOME/Documents/src/GNU/$basename"
 
+    command=$(get_command $src_dir/configure)
     filename=$basename.tar.xz
 
     pathname=$archive_dir/$filename
-    url=$GNU_BASE_URL/emacs/$filename
 
     mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
+    download_archive
+    extract_files
+
+    if [ "$is_forcing" = true ]; then
+	/bin/rm -f "$build_dir/config.status"
+    elif [ -r "$build_dir/config.status" ]; then
+	exit 0
+    fi
+
+    printf "%s\n" "$command"
+    cd "$build_dir"
+    $command
+}
+
+download_archive() {
+    url=$GNU_BASE_URL/emacs/$filename
 
     if [ ! -r "$pathname" ]; then
 	cd "$archive_dir"
 	wget $url
     fi
 
+}
+
+extract_files() {
     if [ ! -r "$src_dir/configure" ]; then
 	cd "$(dirname "$src_dir")"
 	tar -xvf "$pathname"
     fi
-
-    if [ ! -r "$build_dir/config.status" ]; then
-	cd "$build_dir"
-        options=$(get_configure_options)
-	"$src_dir/configure" ${options-} "$@"
-    fi
 }
 
-get_configure_options() {
+get_command() {
+    compiler=$(get_compiler)
+    options=$(get_options)
+    printf "%s\n" "$1 $options CC=$compiler"
+}
+
+get_compiler() {
+    compiler=
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (solaris)
+		compiler=cc
+		break
+		;;
+	esac
+    done
+
+    printf "%s\n" "${compiler:-gcc}"
+}
+
+get_options() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
             (rhel|fedora)
@@ -100,7 +133,7 @@ get_configure_options() {
 		esac
 		;;
             (solaris)
-		printf "%s\n" "--with-gif=no --with-gnutls=no"
+		printf "%s\n" "--with-gif=no"
 		return
 		;;
 	esac
