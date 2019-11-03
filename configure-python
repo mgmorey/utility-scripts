@@ -140,14 +140,19 @@ get_ldflags() {
 }
 
 get_options() {
+    options=
+
     if [ "$is_optimizing" = true ]; then
-	options="--enable-optimizations"
+	options="${options:+$options }--enable-optimizations"
     else
-	options="--disable-optimizations"
+	options="${options:+$options }--disable-optimizations"
     fi
 
-    options="$options --enable-shared --prefix=$python_prefix"
-    printf "%s\n" "$options"
+    options="${options:+$options }--enable-shared --prefix=$python_prefix"
+
+    if [ -n "${options:-}" ]; then
+	printf "%s\n" "$options"
+    fi
 }
 
 get_realpath() (
