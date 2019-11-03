@@ -75,19 +75,21 @@ include_common_directories() {
 
     # add common binary directories to PATH (if they exist)
 
-    dirs="$COMMON_BINDIRS $SOLARIS_BINDIRS"
+    dirs="$SOLARIS_BINDIRS $COMMON_BINDIRS"
 
     for dir in $(ls -d $dirs 2>/dev/null); do
-	if ! is_included $dir "${PATH-}"; then
-	    case "$dir" in
-		(/usr/gnu/bin)
-		    PATH="${PATH:+$PATH:}$dir"
-		    ;;
-		(*)
-		    PATH="$dir${PATH:+:$PATH}"
-		    ;;
-	    esac
-	fi
+	case "$dir" in
+	    (/usr/gnu/bin)
+		PATH="$(remove_directory_from_path $dir ${PATH-})"
+		;;
+	    (*)
+		if is_included $dir "${PATH-}"; then
+		    continue
+		fi
+		;;
+	esac
+
+	PATH="$dir${PATH:+:$PATH}"
     done
 }
 
@@ -207,6 +209,12 @@ print_parameters() {
 		;;
 	esac
     done
+}
+
+remove_directory_from_path() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    printf "%s\n" "$2" | sed -e 's,^'$1':,,' -e 's,:'$1':,:,' -e 's,:'$1'$,,'
 }
 
 set_askpass_parameters() {
