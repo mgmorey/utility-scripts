@@ -80,7 +80,7 @@ include_common_directories() {
     for dir in $(ls -d $dirs 2>/dev/null); do
 	case "$dir" in
 	    (/usr/gnu/bin)
-		PATH="$(remove_directory_from_path $dir ${PATH-})"
+		PATH="$(remove_directory $dir ${PATH-})"
 		;;
 	    (*)
 		if is_included $dir "${PATH-}"; then
@@ -211,7 +211,7 @@ print_parameters() {
     done
 }
 
-remove_directory_from_path() {
+remove_directory() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
     printf "%s\n" "$2" | sed -e 's,^'$1':,,' -e 's,:'$1':,:,' -e 's,:'$1'$,,'
