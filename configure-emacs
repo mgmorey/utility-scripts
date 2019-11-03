@@ -122,22 +122,30 @@ get_compiler() {
 }
 
 get_options() {
+    options=
+
     for id in $ID $ID_LIKE; do
 	case "$id" in
             (rhel|fedora)
 		case "$VERSION_ID" in
 		    (8|8.[01])
-			printf "%s\n" "--with-gif=no"
-			return
+			options="${options:+$options }--with-gif=no"
+			break
 			;;
 		esac
 		;;
             (solaris)
-		printf "%s\n" "--with-gif=no"
-		return
+		options="${options:+$options }--with-gif=no"
+		break
 		;;
 	esac
     done
+
+    options="${options:+$options }--with-gnutls=yes"
+
+    if [ -n "${options:-}" ]; then
+	printf "%s\n" "$options"
+    fi
 }
 
 get_realpath() (
