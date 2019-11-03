@@ -103,9 +103,6 @@ validate_platform() {
 		    (10)
 			return
 			;;
-		    (*)
-			abort_not_supported Release
-			;;
 		esac
 		;;
 	    (opensuse)
@@ -122,13 +119,7 @@ validate_platform() {
 		    (19.*)
 			return
 			;;
-		    (*)
-			abort_not_supported Release
-			;;
 		esac
-		;;
-	    (freebsd)
-		return
 		;;
 	    (solaris)
 		return
