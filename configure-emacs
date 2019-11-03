@@ -111,6 +111,10 @@ get_compiler() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (illumos)
+		compiler=gcc
+		break
+		;;
 	    (solaris)
 		compiler=cc
 		break
