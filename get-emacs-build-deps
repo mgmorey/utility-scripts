@@ -48,8 +48,7 @@ libxml2-devel make m17n-lib-devel ncurses5-devel zlib-devel \
 webkit2gtk3-devel"
 
 SOLARIS_PKGS="developer/build/make developer/build/pkg-config \
-image/library/libpng10 library/gnutls library/libjpeg \
-library/ncurses library/zlib"
+library/gnutls library/ncurses library/zlib"
 
 UBUNTU_PKGS="libgif-dev libgnutls28-dev libgpm-dev libjpeg-dev \
 libncurses5-dev libtiff5-dev libwebkit2gtk-4.0-dev libxpm-dev"
