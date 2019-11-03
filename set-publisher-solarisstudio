@@ -1,3 +1,3 @@
 #/bin/sh -eu
 
-pkg set-publisher -k ~/Desktop/pkg.oracle.com.key.pem -c ~/Desktop/pkg.oracle.com.certificate.pem -G "*" -g https://pkg.oracle.com/solarisstudio/release solarisstudio
+pkg set-publisher -k pkg.oracle.com.key.pem -c pkg.oracle.com.certificate.pem -G "*" -g https://pkg.oracle.com/solarisstudio/release solarisstudio
