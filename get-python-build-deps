@@ -34,6 +34,11 @@ readline sqlite3 wget"
 FREEBSD_12_PKGS="bash bzip2 curl gdbm gmake libffi llvm60 lzma ncurses \
 readline sqlite3 wget"
 
+ILLUMOS_PKGS="database/sqlite-3 developer/build/autoconf \
+developer/build/automake developer/build/gnu-make developer/build/libtool \
+developer/build/pkg-config developer/gcc library/libffi library/ncurses \
+library/readline shell/bash"
+
 NETBSD_PKGS="bash bzip2 curl gdbm gmake libffi lzma ncurses readline \
 sqlite3 wget"
 
@@ -49,9 +54,10 @@ libuuid-devel make ncurses-devel openssl-devel python36-devel \
 readline-devel sqlite-devel wget xz-devel zlib-devel"
 
 SOLARIS_PKGS="database/sqlite-3 developer/build/autoconf \
-developer/build/automake developer/build/libtool developer/build/make \
-developer/build/pkg-config developer/gcc library/libffi library/ncurses \
-library/readline shell/bash"
+developer/build/automake developer/build/gnu-make developer/build/libtool \
+developer/build/pkg-config developer/developerstudio-126/cc \
+developer/developerstudio-126/library/c-libs library/libffi \
+library/ncurses library/readline shell/bash"
 
 abort() {
     printf "$@" >&2
@@ -63,48 +69,50 @@ assert() {
 }
 
 get_python_build_deps() {
+    packages=
+
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
 		case "$VERSION_ID" in
 		    (10)
-	    		packages=$DEBIAN_10_PKGS
+			packages=$DEBIAN_10_PKGS
 			;;
 		esac
 		;;
 	    (ubuntu|neon)
 		case "$VERSION_ID" in
 		    (18.04)
-	    		packages=$DEBIAN_10_PKGS
+			packages=$DEBIAN_10_PKGS
 			;;
 		    (19.04)
-	    		packages=$DEBIAN_10_PKGS
+			packages=$DEBIAN_10_PKGS
 			;;
 		    (19.10)
-	    		packages=$DEBIAN_10_PKGS
+			packages=$DEBIAN_10_PKGS
 			;;
 		esac
 		;;
 	    (linuxmint)
 		case "$VERSION_ID" in
 		    (19.2)
-	    		packages=$DEBIAN_10_PKGS
+			packages=$DEBIAN_10_PKGS
 			;;
 		esac
 		;;
 	    (kali)
 		case "$VERSION_ID" in
 		    (2019.3)
-	    		packages=$DEBIAN_10_PKGS
+			packages=$DEBIAN_10_PKGS
 			;;
 		esac
 		;;
 	    (opensuse-*)
-	    	packages=$OPENSUSE_PKGS
-	    	;;
+		packages=$OPENSUSE_PKGS
+		;;
 	    (fedora)
-	    	packages=$FEDORA_PKGS
-	    	;;
+		packages=$FEDORA_PKGS
+		;;
 	    (rhel|ol|centos)
 		case "$VERSION_ID" in
 		    (7|7.[78])
@@ -127,6 +135,9 @@ get_python_build_deps() {
 			packages=$FREEBSD_12_PKGS
 			;;
 		esac
+		;;
+	    (illumos)
+		packages=$ILLUMOS_PKGS
 		;;
 	    (netbsd)
 		packages=$NETBSD_PKGS
@@ -151,7 +162,7 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
