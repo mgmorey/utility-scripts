@@ -26,6 +26,8 @@ assert() {
 }
 
 get_package_install_options() {
+    options=
+
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (centos)
@@ -46,6 +48,9 @@ get_package_install_options() {
 			;;
 		esac
 		;;
+	    (solaris)
+		options="--accept"
+		;;
 	esac
 
 	if [ -n "${options-}" ]; then
@@ -63,7 +68,7 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
