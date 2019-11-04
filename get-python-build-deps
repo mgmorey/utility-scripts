@@ -36,7 +36,8 @@ readline sqlite3 wget"
 
 ILLUMOS_PKGS="database/sqlite-3 developer/build/autoconf \
 developer/build/automake developer/build/gnu-make developer/build/libtool \
-developer/build/pkg-config developer/gcc library/libffi library/ncurses \
+developer/build/pkg-config developer/sunstudio12u1/backend \
+developer/sunstudio12u1/cc library/libffi library/ncurses \
 library/readline shell/bash"
 
 NETBSD_PKGS="bash bzip2 curl gdbm gmake libffi lzma ncurses readline \
