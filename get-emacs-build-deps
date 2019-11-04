@@ -26,6 +26,9 @@ libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
 libXt-devel libXtst-devel libXv-devel libxml2-devel make m17n-lib-devel \
 openjpeg-devel ncurses-devel zlib-devel webkit2gtk3-devel Xaw3d-devel"
 
+ILLUMOS_PKGS="developer/build/gnu-make developer/build/pkg-config \
+library/gnutls library/ncurses library/zlib"
+
 REDHAT_7_PKGS="GConf2-devel giflib-devel gnutls-devel gpm-devel gtk3-devel \
 ImageMagick-devel lcms2-devel libacl-devel libICE-devel libjpeg-turbo-devel \
 libpng-devel libSM-devel libtiff-devel libX11-devel libXaw-devel \
@@ -47,7 +50,9 @@ libXpm-devel libXrandr-devel libXt-devel libXtst-devel libXv-devel \
 libxml2-devel make m17n-lib-devel ncurses5-devel zlib-devel \
 webkit2gtk3-devel"
 
-SOLARIS_PKGS="developer/build/make developer/build/pkg-config \
+SOLARIS_PKGS="developer/build/autoconf developer/build/automake \
+developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
+developer/developerstudio-126/cc developer/developerstudio-126/library/c-libs \
 library/gnutls library/ncurses library/zlib"
 
 UBUNTU_PKGS="libgif-dev libgnutls28-dev libgpm-dev libjpeg-dev \
@@ -63,18 +68,17 @@ assert() {
 }
 
 
-get_emacs_build_extras() {
+get_emacs_build_deps() {
+    packages=
+
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (ms-windows)
-		break
-		;;
 	    (debian)
 		packages=$DEBIAN_PKGS
 		;;
 	    (fedora)
 		packages=$FEDORA_PKGS
-	    	;;
+		;;
 	    (opensuse)
 		packages=$OPENSUSE_PKGS
 		;;
@@ -88,14 +92,14 @@ get_emacs_build_extras() {
 			;;
 		esac
 		;;
-	    (freebsd)
-		break
+	    (ubuntu)
+		packages=$UBUNTU_PKGS
+		;;
+	    (illumos)
+		packages=$ILLUMOS_PKGS
 		;;
 	    (solaris)
 		packages=$SOLARIS_PKGS
-		;;
-	    (ubuntu)
-		packages=$UBUNTU_PKGS
 		;;
 	esac
 
@@ -114,7 +118,7 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
@@ -130,4 +134,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
 
-get_emacs_build_extras
+get_emacs_build_deps
