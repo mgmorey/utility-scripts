@@ -160,7 +160,7 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
@@ -259,10 +259,10 @@ validate_platform() {
 	    case "$ID" in
 		(debian|raspbian|ubuntu|linuxmint|neon|kali)
 		    :
-	    	    ;;
+		    ;;
 		(opensuse-*|fedora|rhel|ol|centos)
 		    :
-	    	    ;;
+		    ;;
 		(*)
 		    abort_not_supported Distro
 		    ;;
@@ -270,7 +270,7 @@ validate_platform() {
 	    ;;
 	(FreeBSD|SunOS|CYGWIN_NT-*)
 	    :
-    	    ;;
+	    ;;
 	(*)
 	    abort_not_supported "Operating system"
 	    ;;
