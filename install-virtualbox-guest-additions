@@ -22,9 +22,6 @@ FEDORA_PKGS="bzip2 dkms gcc kernel-headers kernel-devel make perl"
 
 REDHAT_PKGS="bzip2 dkms gcc kernel-headers kernel-devel make perl"
 
-VBOX_DIR=VBox_GAs_6.*
-VBOX_FILE=VBoxLinuxAdditions.run
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -41,6 +38,9 @@ assert() {
 configure_platform() {
     case "$kernel_name" in
 	(Linux|GNU)
+	    payload=VBoxLinuxAdditions.run
+	    vbox_dir=VBox_GAs_6.*
+
 	    case "$ID" in
 		(debian|raspbian|ubuntu|neon|linuxmint|kali)
 		    cdrom_dev=/dev/cdrom
@@ -49,18 +49,38 @@ configure_platform() {
 		    ;;
 		(fedora)
 		    cdrom_dev=/dev/cdrom
-		    mount_dir=/run/media/${SUDO_USER-USER}/$VBOX_DIR
+		    mount_dir=/run/media/${SUDO_USER-USER}/$vbox_dir
 		    packages=$FEDORA_PKGS
 		    ;;
 		(rhel|ol|centos)
 		    export KERN_DIR=/usr/src/kernels/`uname -r`
 		    cdrom_dev=/dev/cdrom
-		    mount_dir=/run/media/${SUDO_USER-USER}/$VBOX_DIR
+		    mount_dir=/run/media/${SUDO_USER-USER}/$vbox_dir
 		    packages=$REDHAT_PKGS
 		    ;;
 	    esac
 	    ;;
+	(SunOS)
+	    mount_dir=/cdrom/vboxadditions_6.*
+	    payload=VBoxSolarisAdditions.pkg
+	    ;;
     esac
+}
+
+get_awk_command() {
+    case "$kernel_name" in
+	(SunOS)
+	    printf "%s" /usr/gnu/bin/awk
+	    ;;
+	(*)
+	    printf "%s" /usr/bin/awk
+	    ;;
+    esac
+}
+
+get_hypervisor_vendor() {
+    awk="$(get_awk_command)"
+    lscpu 2>/dev/null || true | $awk -f "$script_dir/get-hypervisor-vendor"
 }
 
 get_package_directory() {
@@ -85,7 +105,9 @@ get_realpath() (
 )
 
 install_kernel_packages() {
-    "$script_dir/install-packages" $packages
+    if [ -n "${packages-}" ]; then
+	"$script_dir/install-packages" $packages
+    fi
 }
 
 install_prerequisites() {
@@ -105,29 +127,44 @@ install_virtualbox_guest() {
     configure_platform
     preinstall_virtualbox_guest
 
-    until mount_package_directory; do
-	printf "Insert VirtualBox Guest Additions CD-ROM and press Enter: "
-	read INPUT
-    done
+    if [ "$kernel_name" != SunOS ]; then
+	until mount_package_directory; do
+	    printf "Insert VirtualBox Guest Additions CD-ROM and press Enter: "
+	    read INPUT
+	done
+    else
+	package_dir=$(get_package_directory)
+    fi
 
     install_virtualbox_package
 }
 
 install_virtualbox_package() {
-    sh $VBOX_FILE
+    cd $package_dir
+
+    case "$kernel_name" in
+	(Linux|GNU)
+	    sh $payload
+	    ;;
+	(SunOS)
+	    pkgrm SUNWvboxguest
+	    pkgadd -G -d $payload
+	    ;;
+    esac
 }
 
 mount_package_directory() {
     package_dir=$(get_package_directory)
 
-    if [ ! -r $package_dir/$VBOX_FILE ]; then
-	if ! mount -r $cdrom_dev $package_dir 2>/dev/null; then
-	    return 1
-	fi
+    if [ -r $package_dir/$payload ]; then
+	return 0
+    elif [ -z "${cdrom_dev-}" ]; then
+	return 1
+    elif mount -r $cdrom_dev $package_dir 2>/dev/null; then
+	return 0
+    else
+	return 1
     fi
-
-    cd $package_dir
-    return 0
 }
 
 preinstall_virtualbox_guest() {
@@ -210,19 +247,22 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
+	(SunOS)
+	    :
+	    ;;
 	(*)
 	    abort_not_supported "Operating system"
 	    ;;
     esac
 
-    vendor=$(lscpu | "$script_dir/get-hypervisor-vendor")
+    vendor=$(get_hypervisor_vendor)
 
     case "$vendor" in
 	(KVM)
 	    :
 	    ;;
 	('')
-	    exit 0
+	    :
 	    ;;
 	(*)
 	    abort "%s: %s hypervisor not supported\n" "$0" "$vendor"
