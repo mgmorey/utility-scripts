@@ -39,7 +39,7 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
@@ -88,10 +88,14 @@ install_emacs_build_deps() {
     validate_platform
     configure_platform
 
-    if [ -n "${package:-}" ] && ! "$install_build_deps" $package; then
-	return $?
-    elif [ -n "${packages:-}" ] && ! "$install_packages" $packages; then
-	return $?
+    if [ -n "${package:-}" ]; then
+	"$install_build_deps" $package || true
+    fi
+
+    if [ -n "${packages:-}" ]; then
+	if ! "$install_packages" $packages; then
+	    return 1
+	fi
     fi
 }
 
