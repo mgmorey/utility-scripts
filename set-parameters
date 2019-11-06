@@ -57,7 +57,7 @@ include_common_directories() {
 
 	for dir in /usr/share/local/info /usr/local/info; do
 	    if [ -d $dir ]; then
-		INFOPATH=$dir:$INFOPATH
+		INFOPATH="$dir:$INFOPATH"
 	    fi
 	done
     fi
@@ -68,7 +68,7 @@ include_common_directories() {
 
 	for dir in /usr/share/local/man /usr/local/man; do
 	    if [ -d $dir ]; then
-		MANPATH=$dir:$MANPATH
+		MANPATH="$dir:$MANPATH"
 	    fi
 	done
     fi
@@ -80,7 +80,7 @@ include_common_directories() {
     for dir in $(ls -d $dirs 2>/dev/null); do
 	case "$dir" in
 	    (/usr/gnu/bin)
-		PATH="$(remove_directory $dir ${PATH-})"
+		PATH="$(remove_directory $dir "${PATH-}")"
 		;;
 	    (*)
 		if is_included $dir "${PATH-}"; then
@@ -214,7 +214,7 @@ print_parameters() {
 remove_directory() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
-    printf "%s\n" "$2" | sed -e 's,^'$1':,,' -e 's,:'$1':,:,' -e 's,:'$1'$,,'
+    printf "%s\n" "$2" | sed -e 's|^'"$1"':||g;s|:'"$1"':|:|g;s|:'"$1"'$||g'
 }
 
 set_askpass_parameters() {
