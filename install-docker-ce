@@ -306,7 +306,7 @@ validate_platform() {
 	    return
 	    ;;
 	(ubuntu)
-	    if [ "${VERSION_ID%.*}" -gt 18 ]; then
+	    if [ "${VERSION_ID%.*}" -ge 18 ]; then
 		return
 	    fi
 	    ;;

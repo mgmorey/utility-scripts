@@ -147,6 +147,10 @@ get_options() {
 
     options="${options:+$options }--with-gnutls=yes"
 
+    if [ "$is_x_toolkit" = false ]; then
+	options="${options:+$options }--with-x-toolkit=no"
+    fi
+
     if [ -n "${options:-}" ]; then
 	printf "%s\n" "$options"
     fi
@@ -171,13 +175,17 @@ get_realpath() (
 
 parse_arguments() {
     is_forcing=false
+    is_x_toolkit=true
     emacs_prefix=$EMACS_PREFIX
     emacs_version=$EMACS_VERSION
 
-    while getopts fp:v:h opt; do
+    while getopts fnp:v:h opt; do
 	case $opt in
 	    (f)
 		is_forcing=true
+		;;
+	    (n)
+		is_x_toolkit=false
 		;;
 	    (p)
 		case $OPTARG in
@@ -225,7 +233,7 @@ usage() {
     fi
 
     cat <<-EOF >&2
-	Usage: $0 [-f][-p PREFIX][-v VERSION]
+	Usage: $0 [-f][-n][-p PREFIX][-v VERSION]
 	       $0 -h
 	EOF
 }
