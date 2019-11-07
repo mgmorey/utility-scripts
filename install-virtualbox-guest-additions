@@ -80,7 +80,7 @@ get_awk_command() {
 
 get_hypervisor_vendor() {
     awk="$(get_awk_command)"
-    lscpu 2>/dev/null || true | $awk -f "$script_dir/get-hypervisor-vendor"
+    (lscpu 2>/dev/null | $awk -f "$script_dir/get-hypervisor-vendor") || true
 }
 
 get_package_directory() {
