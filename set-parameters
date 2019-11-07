@@ -17,12 +17,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
+PREFIXES="/usr/gnu /usr /usr/share /usr/pkg /opt/pkg /opt/local /usr/local /usr/local/share"
 
-COMMON_BINDIRS="/usr/gnu/bin /usr/lib/cups/bin /usr/local/bin /usr/local/sbin"
+COMMON_BINDIRS="/usr/lib/cups/bin"
+PROFILE_BINDIRS="bin .cargo/bin .local/bin .pyenv/bin"
 SOLARIS_BINDIRS="/opt/developerstudio*/bin /opt/sunstudio*/bin"
 
-PKGSRC_PKGDIRS="/opt/local /opt/pkg /usr/pkg"
-PROFILE_BINDIRS="bin .cargo/bin .local/bin .pyenv/bin"
 
 abort() {
     printf "$@" >&2
@@ -51,45 +51,38 @@ get_realpath() (
 )
 
 include_common_directories() {
-    # initialize INFOPATH parameter
-    if [ -z "${INFOPATH-}" ]; then
-	INFOPATH=/usr/share/info
-
-	for dir in /usr/share/local/info /usr/local/info; do
-	    if [ -d $dir ]; then
-		INFOPATH="$dir:$INFOPATH"
-	    fi
-	done
-    fi
-
-    # initialize MANPATH parameter
-    if [ -z "${MANPATH-}" ]; then
-	MANPATH=/usr/share/man
-
-	for dir in /usr/share/local/man /usr/local/man; do
-	    if [ -d $dir ]; then
-		MANPATH="$dir:$MANPATH"
-	    fi
-	done
-    fi
-
     # add common binary directories to PATH (if they exist)
+    for dir in $(ls -d $SOLARIS_BINDIRS 2>/dev/null) $COMMON_BINDIRS; do
+	if is_to_be_included "$dir" "$PATH"; then
+	    PATH="$dir${PATH:+:$PATH}"
+	fi
+    done
 
-    dirs="$SOLARIS_BINDIRS $COMMON_BINDIRS"
+    # add common prefix directories to paths (if they exist)
+    for dir in $PREFIXES; do
+	if [ -d $dir ]; then
+	    case "$dir" in
+		(/usr/gnu)
+		    INFOPATH="$(remove_directory "$dir/info" "${INFOPATH-}")"
+		    MANPATH="$(remove_directory "$dir/man" "${MANPATH-}")"
+		    PATH="$(remove_directory "$dir/sbin" "${PATH-}")"
+		    PATH="$(remove_directory "$dir/bin" "${PATH-}")"
+		    ;;
+	    esac
 
-    for dir in $(ls -d $dirs 2>/dev/null); do
-	case "$dir" in
-	    (/usr/gnu/bin)
-		PATH="$(remove_directory $dir "${PATH-}")"
-		;;
-	    (*)
-		if is_included $dir "${PATH-}"; then
-		    continue
-		fi
-		;;
-	esac
-
-	PATH="$dir${PATH:+:$PATH}"
+	    if is_to_be_included "$dir/info" "$INFOPATH"; then
+		INFOPATH="$dir/info${INFOPATH:+:$INFOPATH}"
+	    fi
+	    if is_to_be_included "$dir/man" "$MANPATH"; then
+		MANPATH="$dir/man${MANPATH:+:$MANPATH}"
+	    fi
+	    if is_to_be_included "$dir/sbin" "$PATH"; then
+		PATH="$dir/sbin${PATH:+:$PATH}"
+	    fi
+	    if is_to_be_included "$dir/bin" "$PATH"; then
+		PATH="$dir/bin${PATH:+:$PATH}"
+	    fi
+	fi
     done
 }
 
@@ -125,24 +118,6 @@ include_macos_directories() {
 	if [ -d "$HOME/Library/Python/$version/bin" ] ; then
 	    PATH="$HOME/Library/Python/$version/bin${PATH:+:$PATH}"
 	    break
-	fi
-    done
-}
-
-include_pkgsrc_directories() {
-    # add pkgsrc directory to INFOPATH, MANPATH and PATH (if it exists)
-    for dir in $(ls -d $PKGSRC_PKGDIRS 2>/dev/null || true); do
-	if is_to_be_included "$dir/info" "${PATH-}"; then
-	    INFOPATH="$dir/info${INFOPATH:+:$INFOPATH}"
-	fi
-	if is_to_be_included "$dir/man" "${PATH-}"; then
-	    MANPATH="$dir/man${MANPATH:+:$MANPATH}"
-	fi
-	if is_to_be_included "$dir/bin" "${PATH-}"; then
-	    PATH="$dir/bin${PATH:+:$PATH}"
-	fi
-	if is_to_be_included "$dir/sbin" "${PATH-}"; then
-	    PATH="$dir/sbin${PATH:+:$PATH}"
 	fi
     done
 }
@@ -224,7 +199,6 @@ set_askpass_parameters() {
 set_profile_parameters() {
     validate_parameters
     include_common_directories
-    include_pkgsrc_directories
     include_platform_directories
     include_profile_directories
     print_parameters $ALL_PARAMETERS
