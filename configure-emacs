@@ -129,20 +129,20 @@ get_options() {
     options=
 
     # for id in $ID $ID_LIKE; do
-    # 	case "$id" in
+    #	case "$id" in
     #         (rhel|fedora)
-    # 		case "$VERSION_ID" in
-    # 		    (8|8.[01])
-    # 			# options="${options:+$options }--with-gif=no"
-    # 			break
-    # 			;;
-    # 		esac
-    # 		;;
+    #		case "$VERSION_ID" in
+    #		    (8|8.[01])
+    #			# options="${options:+$options }--with-gif=no"
+    #			break
+    #			;;
+    #		esac
+    #		;;
     #         (solaris)
-    # 		# options="${options:+$options }--with-gif=no"
-    # 		break
-    # 		;;
-    # 	esac
+    #		# options="${options:+$options }--with-gif=no"
+    #		break
+    #		;;
+    #	esac
     # done
 
     options="${options:+$options }--with-gnutls=yes"
@@ -165,7 +165,7 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
@@ -251,13 +251,13 @@ validate_platform() {
 	case "$id" in
 	    (debian)
 		return
-	    	;;
+		;;
 	    (opensuse)
 		return
-	    	;;
+		;;
 	    (rhel|fedora)
 		return
-	    	;;
+		;;
 	    (freebsd)
 		return
 		;;
