@@ -63,7 +63,7 @@ include_common_directories() {
     for dir in $PREFIXES; do
 	if [ -d $dir ]; then
 	    case "$dir" in
-		(/usr/gnu)
+		(/usr/gnu|/usr/local)
 		    INFOPATH="$(remove_directory "$dir/info" "${INFOPATH-}")"
 		    MANPATH="$(remove_directory "$dir/man" "${MANPATH-}")"
 		    PATH="$(remove_directory "$dir/sbin" "${PATH-}")"
@@ -132,6 +132,14 @@ include_platform_directories() {
 }
 
 include_profile_directories() {
+    INFOPATH="$(remove_directory "$HOME/info" "${INFOPATH-}")"
+    MANPATH="$(remove_directory "$HOME/man" "${MANPATH-}")"
+    PATH="$(remove_directory "$HOME/sbin" "${PATH-}")"
+
+    for dir in $PROFILE_BINDIRS; do
+	PATH="$(remove_directory "$dir" "${PATH-}")"
+    done
+
     # add user info directory to INFOPATH (if it exists)
     if ! is_included "$HOME/info" "${PATH-}"; then
 	INFOPATH="$HOME/info${INFOPATH:+:$INFOPATH}"
