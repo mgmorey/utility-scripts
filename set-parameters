@@ -17,7 +17,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
-PREFIXES="/usr/gnu /usr /usr/share /usr/pkg /opt/pkg /opt/local /usr/local /usr/local/share"
+PREFIXES="/usr/gnu /usr /usr/share /usr/pkg /opt/pkg /opt/local \
+/usr/local /usr/local/share"
 
 COMMON_BINDIRS="/usr/lib/cups/bin"
 PROFILE_BINDIRS="bin .cargo/bin .local/bin .pyenv/bin"
