@@ -71,16 +71,16 @@ include_common_directories() {
 		    ;;
 	    esac
 
-	    if is_to_be_included "$dir/info" "$INFOPATH"; then
+	    if is_to_be_included "$dir/info" "${INFOPATH-}"; then
 		INFOPATH="$dir/info${INFOPATH:+:$INFOPATH}"
 	    fi
-	    if is_to_be_included "$dir/man" "$MANPATH"; then
+	    if is_to_be_included "$dir/man" "${MANPATH-}"; then
 		MANPATH="$dir/man${MANPATH:+:$MANPATH}"
 	    fi
-	    if is_to_be_included "$dir/sbin" "$PATH"; then
+	    if is_to_be_included "$dir/sbin" "${PATH-}"; then
 		PATH="$dir/sbin${PATH:+:$PATH}"
 	    fi
-	    if is_to_be_included "$dir/bin" "$PATH"; then
+	    if is_to_be_included "$dir/bin" "${PATH-}"; then
 		PATH="$dir/bin${PATH:+:$PATH}"
 	    fi
 	fi
