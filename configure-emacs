@@ -128,27 +128,31 @@ get_compiler() {
 get_options() {
     options=
 
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-            (rhel|fedora)
-		case "$VERSION_ID" in
-		    (8|8.[01])
-			options="${options:+$options }--with-gif=no"
-			break
-			;;
-		esac
-		;;
-            (solaris)
-		options="${options:+$options }--with-gif=no"
-		break
-		;;
-	esac
-    done
+    # for id in $ID $ID_LIKE; do
+    # 	case "$id" in
+    #         (rhel|fedora)
+    # 		case "$VERSION_ID" in
+    # 		    (8|8.[01])
+    # 			# options="${options:+$options }--with-gif=no"
+    # 			break
+    # 			;;
+    # 		esac
+    # 		;;
+    #         (solaris)
+    # 		# options="${options:+$options }--with-gif=no"
+    # 		break
+    # 		;;
+    # 	esac
+    # done
 
     options="${options:+$options }--with-gnutls=yes"
 
-    if [ "$is_x_toolkit" = false ]; then
+    if [ "$is_with_x_toolkit" = false ]; then
 	options="${options:+$options }--with-x-toolkit=no"
+    fi
+
+    if [ "$is_with_xwidgets" = true ]; then
+	options="${options:+$options }--with-xwidgets"
     fi
 
     if [ -n "${options:-}" ]; then
@@ -175,17 +179,18 @@ get_realpath() (
 
 parse_arguments() {
     is_forcing=false
-    is_x_toolkit=true
+    is_with_x_toolkit=true
+    is_with_xwidgets=false
     emacs_prefix=$EMACS_PREFIX
     emacs_version=$EMACS_VERSION
 
-    while getopts fnp:v:h opt; do
+    while getopts fnp:v:xh opt; do
 	case $opt in
 	    (f)
 		is_forcing=true
 		;;
 	    (n)
-		is_x_toolkit=false
+		is_with_x_toolkit=false
 		;;
 	    (p)
 		case $OPTARG in
@@ -210,6 +215,9 @@ parse_arguments() {
 			abort_invalid_version $OPTARG
 			;;
 		esac
+		;;
+	    (x)
+		is_with_xwidgets=true
 		;;
 	    (h)
 		usage
