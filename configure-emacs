@@ -148,11 +148,11 @@ get_command() {
     printf '%s %s' "$1" "$options"
 
     if [ -n "${cc-}" ]; then
-	printf ' CC=%s' "${cc-}"
+	printf ' CC=\"%s\"' "${cc-}"
     fi
 
     if [ -n "${cflags-}" ]; then
-	printf ' CFLAGS=%s' "${cflags-}"
+	printf ' CFLAGS=\"%s\"' "${cflags-}"
     fi
 
     if [ -n "${cppflags-}" ]; then
@@ -271,7 +271,7 @@ usage() {
     fi
 
     cat <<-EOF >&2
-	Usage: $0 [-f][-g][-n][-p PREFIX][-v VERSION][-x]
+	Usage: $0 [-c][-f][-g][-n][-p PREFIX][-v VERSION][-x]
 	       $0 -h
 	EOF
 }
@@ -279,6 +279,9 @@ usage() {
 validate_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (cygwin)
+		return
+		;;
 	    (debian)
 		return
 		;;
