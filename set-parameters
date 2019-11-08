@@ -53,6 +53,14 @@ get_realpath() (
     fi
 )
 
+include_binary_directories() {
+    for bindir; do
+	if is_to_be_included "$bindir" "${PATH-}"; then
+	    PATH="$bindir${PATH:+:$PATH}"
+	fi
+    done
+}
+
 include_common_directories() {
     # add common binary directories to PATH (if they exist)
     for dir in $COMMON_BINDIRS; do
@@ -75,6 +83,10 @@ include_common_directories() {
 		PATH="$(remove_directory "$dir/sbin" "${PATH-}")"
 		PATH="$(remove_directory "$dir/bin" "${PATH-}")"
 		;;
+	    (*)
+		if [ ! -d "$dir" ]; then
+		    continue
+		fi
 	esac
 
 	if is_to_be_included "$dir/info" "${INFOPATH-}"; then
@@ -89,16 +101,23 @@ include_common_directories() {
 	    MANPATH="$dir/share/man${MANPATH:+:$MANPATH}"
 	fi
 
-	if is_to_be_included "$dir/sbin" "${PATH-}"; then
-	    PATH="$dir/sbin${PATH:+:$PATH}"
-	fi
+	for id in $ID $ID_LIKE; do
+	    case $id in
+		(debian|opensuse)
+		    include_binary_directories "$dir/bin" "$dir/sbin"
+		    break
+		    ;;
+		(*)
+		    include_binary_directories "$dir/sbin" "$dir/bin"
+		    break
+		    ;;
+	    esac
+	done
 
-	if is_to_be_included "$dir/bin" "${PATH-}"; then
-	    PATH="$dir/bin${PATH:+:$PATH}"
-	fi
+	configdir=$dir/lib/pkgconfig
 
-	if is_to_be_included $dir/lib/pkgconfig "${PKG_CONFIG_PATH-}"; then
-	    PKG_CONFIG_PATH="$dir/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+	if is_to_be_included $configdir "${PKG_CONFIG_PATH-}"; then
+	    PKG_CONFIG_PATH="$dir/lib/configdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 	fi
     done
 }
@@ -130,8 +149,10 @@ include_macos_directories() {
 	    PATH="$prefix/$pkg/bin${PATH:+:$PATH}"
 	fi
 
-	if is_to_be_included $prefix/$pkg/lib/pkgconfig "${PKG_CONFIG_PATH-}"; then
-	    PKG_CONFIG_PATH="$prefix/$pkg/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+	configdir=$prefix/$pkg/lib/pkgconfig
+
+	if is_to_be_included $configdir "${PKG_CONFIG_PATH-}"; then
+	    PKG_CONFIG_PATH="$configdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 	fi
     done
 
