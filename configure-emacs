@@ -55,8 +55,19 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+clean_build() (
+    if [ -d $build_dir ]; then
+	cd $build_dir
+
+	if [ -r Makefile ]; then
+	    make clean
+	fi
+    fi
+)
+
 configure_emacs() {
     validate_platform
+    configure_platform
     parse_arguments "$@"
     basename=emacs-$EMACS_VERSION
 
@@ -75,13 +86,44 @@ configure_emacs() {
 
     if [ "$is_forcing" = true ]; then
 	/bin/rm -f "$build_dir/config.status"
-    elif [ -r "$build_dir/config.status" ]; then
+    elif [ ! -r "$build_dir/config.status" ]; then
+	:
+    elif [ "$is_cleaning" = true ]; then
+	clean_build
+    else
 	exit 0
     fi
 
     printf "%s\n" "$command"
     cd "$build_dir"
     eval $command
+}
+
+configure_platform() {
+    cc=
+    cflags=
+    cppflags=
+    ldflags=
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (solaris)
+		incdir=$OPENCSW_PREFIX/include
+		libdir=$OPENCSW_PREFIX/lib/amd64
+		libgif=$libdir/libgif.so
+		cc=cc
+		cflags=-m64
+    		cppflags="-I$incdir"
+    		ldflags="-L$libdir -R$libdir"
+
+		if [ -n "${libgif-}" -a ! -x $libgif ]; then
+		    abort "%s: %s: No such shared object\n" "$0" "$libgif"
+		else
+		    break
+		fi
+		;;
+	esac
+    done
 }
 
 download_archive() {
@@ -102,17 +144,15 @@ extract_files() {
 }
 
 get_command() {
-    if [ -z "${compiler-}" ]; then
-	compiler="$(get_compiler)"
-    fi
-
-    cppflags=$(get_cppflags)
-    ldflags=$(get_ldflags)
     options=$(get_options)
     printf '%s %s' "$1" "$options"
 
-    if [ -n "${compiler-}" ]; then
-	printf ' CC=\"%s\"' "${compiler-}"
+    if [ -n "${cc-}" ]; then
+	printf ' CC=%s' "${cc-}"
+    fi
+
+    if [ -n "${cflags-}" ]; then
+	printf ' CFLAGS=%s' "${cflags-}"
     fi
 
     if [ -n "${cppflags-}" ]; then
@@ -124,83 +164,6 @@ get_command() {
     fi
 
     printf '\n'
-}
-
-get_compiler() {
-    compiler=
-
-    for id in $ID $ID_LIKE; do
-    	case "$id" in
-    	    (illumos)
-    		break
-    		;;
-    	    (solaris)
-    		break
-    		;;
-    	esac
-    done
-
-    if [ -n "${compiler-}" ]; then
-	printf "%s\n" "compiler"
-    fi
-}
-
-get_cppflags() {
-    cppflags=
-
-    for id in $ID $ID_LIKE; do
-    	case "$id" in
-    	    (illumos)
-    		break
-    		;;
-    	    (solaris)
-		dir=$OPENCSW_PREFIX/include
-    		cppflags="-I$dir"
-    		break
-    		;;
-    	esac
-    done
-
-    printf "%s\n" "${cppflags:-}"
-}
-
-get_ldflags() {
-    ldflags=
-
-    for id in $ID $ID_LIKE; do
-    	case "$id" in
-    	    (illumos)
-    		break
-    		;;
-    	    (solaris)
-		dir=$OPENCSW_PREFIX/lib/amd64
-    		ldflags="-L$dir -R$dir"
-    		break
-    		;;
-    	esac
-    done
-
-    printf "%s\n" "${ldflags:-}"
-}
-
-get_libgif_file() {
-    file=
-
-    for id in $ID $ID_LIKE; do
-    	case "$id" in
-    	    (illumos)
-    		break
-    		;;
-    	    (solaris)
-		file=$OPENCSW_PREFIX/lib/amd64/libgif.so
-    		break
-    		;;
-    	esac
-    done
-
-    if [ -n "${file-}" ]; then
-	printf "%s\n" "$file"
-    fi
 }
 
 get_options() {
@@ -238,20 +201,23 @@ get_realpath() (
 )
 
 parse_arguments() {
-    compiler=
+    is_cleaning=false
     is_forcing=false
     is_using_x_toolkit=true
     is_using_xwidgets=false
     emacs_prefix=$EMACS_PREFIX
     emacs_version=$EMACS_VERSION
 
-    while getopts fgnp:v:xh opt; do
+    while getopts cfgnp:v:xh opt; do
 	case $opt in
+	    (c)
+		is_cleaning=true
+		;;
 	    (f)
 		is_forcing=true
 		;;
 	    (g)
-		compiler=gcc
+		cc=gcc
 		;;
 	    (n)
 		is_using_x_toolkit=false
@@ -326,13 +292,7 @@ validate_platform() {
 		return
 		;;
 	    (solaris)
-		libgif=$(get_libgif_file)
-
-		if [ -n "${libgif-}" -a ! -x $libgif ]; then
-		    abort "%s: %s: No such shared object\n" "$0" "$libgif"
-		else
-		    return 0
-		fi
+		return
 		;;
 	esac
     done
