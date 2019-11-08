@@ -64,7 +64,6 @@ get_realpath() (
 )
 
 install_pkgsrc() {
-    assert [ $# -eq 1 ]
     target="${1-/}"
 
     case "$kernel_name" in
@@ -107,7 +106,7 @@ install_pkgsrc() {
 	    ;;
 	(SunOS)
 	    case "$ID" in
-		(openindiana)
+		(illumos)
 		    key=ILLUMOS
 		    ;;
 		(*)
@@ -156,10 +155,6 @@ verify_signature() {
 	eval /bin/rm -f $boot_pgp.asc $boot_tar.asc
     fi
 }
-
-if [ $# -lt 1 ]; then
-    abort "%s: Not enough arguments\n" "$0"
-fi
 
 if [ $# -gt 1 ]; then
     abort "%s: Too many arguments\n" "$0"
