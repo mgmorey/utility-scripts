@@ -65,7 +65,7 @@ get_realpath() (
 
 install_pkgsrc() {
     assert [ $# -eq 1 ]
-    target="$1"
+    target="${1-/}"
 
     case "$kernel_name" in
 	(Linux)
@@ -106,7 +106,14 @@ install_pkgsrc() {
 	    esac
 	    ;;
 	(SunOS)
-	    key=ILLUMOS
+	    case "$ID" in
+		(openindiana)
+		    key=ILLUMOS
+		    ;;
+		(*)
+		    abort_not_supported Distro
+		    ;;
+	    esac
 	    ;;
 	(*)
 	    abort_not_supported "Operating system"
