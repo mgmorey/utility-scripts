@@ -112,7 +112,7 @@ include_common_directories() {
 	    esac
 	done
 
-	eval include_binary_directories ${bindirs-"\"$dir/sbin\" \"$dir/bin\""}
+	eval include_binary_directories ${bindirs:-\"$dir/sbin\" \"$dir/bin\"}
 	configdir=$dir/lib/pkgconfig
 
 	if is_to_be_included $configdir "${PKG_CONFIG_PATH-}"; then
