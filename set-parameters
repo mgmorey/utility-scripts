@@ -36,6 +36,23 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+configure_platform() {
+    bindirs=
+
+    for id in $ID $ID_LIKE; do
+	case $id in
+	    (debian|opensuse)
+		bindirs="bin sbin"
+		break
+		;;
+	esac
+    done
+
+    if [ -z "${bindirs-}" ]; then
+	bindirs="sbin bin"
+    fi
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -55,8 +72,8 @@ get_realpath() (
 
 include_binary_directories() {
     for bindir; do
-	if is_to_be_included "$bindir" "${PATH-}"; then
-	    PATH="$bindir${PATH:+:$PATH}"
+	if is_to_be_included "$dir/$bindir" "${PATH-}"; then
+	    PATH="$dir/$bindir${PATH:+:$PATH}"
 	fi
     done
 }
@@ -101,18 +118,7 @@ include_common_directories() {
 	    MANPATH="$dir/share/man${MANPATH:+:$MANPATH}"
 	fi
 
-	bindirs=
-
-	for id in $ID $ID_LIKE; do
-	    case $id in
-		(debian|opensuse)
-		    bindirs="\"$dir/bin\" \"$dir/sbin\""
-		    break
-		    ;;
-	    esac
-	done
-
-	eval include_binary_directories ${bindirs:-"\"$dir/sbin\" \"$dir/bin\""}
+	include_binary_directories $bindirs
 	configdir=$dir/lib/pkgconfig
 
 	if is_to_be_included $configdir "${PKG_CONFIG_PATH-}"; then
@@ -247,14 +253,15 @@ set_askpass_parameters() {
 }
 
 set_profile_parameters() {
-    validate_parameters
+    validate_platform
+    configure_platform
     include_common_directories
     include_platform_directories
     include_profile_directories
     print_parameters $ALL_PARAMETERS
 }
 
-validate_parameters() {
+validate_platform() {
     case ${SHELL##*/} in
 	(bash|fish|ksh|ksh93|rbash|zsh)
 	    :
