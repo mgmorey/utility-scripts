@@ -55,49 +55,50 @@ get_realpath() (
 
 include_common_directories() {
     # add common binary directories to PATH (if they exist)
-    for dir in $(ls -d $COMMON_BINDIRS 2>/dev/null); do
+    for dir in $COMMON_BINDIRS; do
 	if is_to_be_included "$dir" "$PATH"; then
 	    PATH="$dir${PATH:+:$PATH}"
 	fi
     done
 
     # add common prefix directories to paths (if they exist)
+
     dirs="$SYSTEM_DIRS $STUDIO_DIRS $PKGSRC_DIRS $LOCAL_DIRS"
 
     for dir in $dirs; do
-	if [ -d $dir ]; then
-	    case "$dir" in
-		(/usr/gnu|/usr/local)
-		    INFOPATH="$(remove_directory "$dir/info" "${INFOPATH-}")"
-		    MANPATH="$(remove_directory "$dir/man" "${MANPATH-}")"
-		    PATH="$(remove_directory "$dir/sbin" "${PATH-}")"
-		    PATH="$(remove_directory "$dir/bin" "${PATH-}")"
-		    ;;
-	    esac
+	case "$dir" in
+	    (/usr/gnu|/usr/local)
+		INFOPATH="$(remove_directory "$dir/share/info" "${INFOPATH-}")"
+		MANPATH="$(remove_directory "$dir/share/man" "${MANPATH-}")"
+		INFOPATH="$(remove_directory "$dir/info" "${INFOPATH-}")"
+		MANPATH="$(remove_directory "$dir/man" "${MANPATH-}")"
+		PATH="$(remove_directory "$dir/sbin" "${PATH-}")"
+		PATH="$(remove_directory "$dir/bin" "${PATH-}")"
+		;;
+	esac
 
-	    if is_to_be_included "$dir/info" "${INFOPATH-}"; then
-		INFOPATH="$dir/info${INFOPATH:+:$INFOPATH}"
-	    elif is_to_be_included "$dir/share/info" "${INFOPATH-}"; then
-		INFOPATH="$dir/share/info${INFOPATH:+:$INFOPATH}"
-	    fi
+	if is_to_be_included "$dir/info" "${INFOPATH-}"; then
+	    INFOPATH="$dir/info${INFOPATH:+:$INFOPATH}"
+	elif is_to_be_included "$dir/share/info" "${INFOPATH-}"; then
+	    INFOPATH="$dir/share/info${INFOPATH:+:$INFOPATH}"
+	fi
 
-	    if is_to_be_included "$dir/man" "${MANPATH-}"; then
-		MANPATH="$dir/man${MANPATH:+:$MANPATH}"
-	    elif is_to_be_included "$dir/share/man" "${MANPATH-}"; then
-		MANPATH="$dir/share/man${MANPATH:+:$MANPATH}"
-	    fi
+	if is_to_be_included "$dir/man" "${MANPATH-}"; then
+	    MANPATH="$dir/man${MANPATH:+:$MANPATH}"
+	elif is_to_be_included "$dir/share/man" "${MANPATH-}"; then
+	    MANPATH="$dir/share/man${MANPATH:+:$MANPATH}"
+	fi
 
-	    if is_to_be_included "$dir/sbin" "${PATH-}"; then
-		PATH="$dir/sbin${PATH:+:$PATH}"
-	    fi
+	if is_to_be_included "$dir/sbin" "${PATH-}"; then
+	    PATH="$dir/sbin${PATH:+:$PATH}"
+	fi
 
-	    if is_to_be_included "$dir/bin" "${PATH-}"; then
-		PATH="$dir/bin${PATH:+:$PATH}"
-	    fi
+	if is_to_be_included "$dir/bin" "${PATH-}"; then
+	    PATH="$dir/bin${PATH:+:$PATH}"
+	fi
 
-	    if is_to_be_included $dir/lib/pkgconfig "${PKG_CONFIG_PATH-}"; then
-		PKG_CONFIG_PATH="$dir/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-	    fi
+	if is_to_be_included $dir/lib/pkgconfig "${PKG_CONFIG_PATH-}"; then
+	    PKG_CONFIG_PATH="$dir/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 	fi
     done
 }
