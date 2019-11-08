@@ -17,12 +17,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
-PREFIXES="/usr/gnu /usr /usr/share /usr/pkg /opt/pkg /opt/local \
-/usr/local /usr/local/share"
+
+LOCAL_DIRS="/usr/local /usr/local/share"
+OPENCSW_DIRS="/opt/csw /opt/csw/share"
+PKGSRC_DIRS="/usr/pkg /opt/pkg /opt/local"
+SOLARIS_DIRS="$(ls -d /opt/*studio* /opt/*studio*/share)"
+SYSTEM_DIRS="/usr /usr/share /usr/gnu /usr/gnu/share"
 
 COMMON_BINDIRS="/usr/lib/cups/bin"
 PROFILE_BINDIRS="bin .cargo/bin .local/bin .pyenv/bin"
-SOLARIS_BINDIRS="/opt/developerstudio*/bin /opt/sunstudio*/bin"
 
 
 abort() {
@@ -53,17 +56,19 @@ get_realpath() (
 
 include_common_directories() {
     # add common binary directories to PATH (if they exist)
-    for dir in $(ls -d $SOLARIS_BINDIRS 2>/dev/null) $COMMON_BINDIRS; do
+    for dir in $(ls -d $COMMON_BINDIRS 2>/dev/null); do
 	if is_to_be_included "$dir" "$PATH"; then
 	    PATH="$dir${PATH:+:$PATH}"
 	fi
     done
 
     # add common prefix directories to paths (if they exist)
-    for dir in $PREFIXES; do
+    dirs="$SYSTEM_DIRS $SOLARIS_DIRS $OPENCSW_DIRS $PKGSRC_DIRS $LOCAL_DIRS"
+
+    for dir in $dirs; do
 	if [ -d $dir ]; then
 	    case "$dir" in
-		(/usr/gnu|/usr/local)
+		(/usr/gnu|/usr/local|/usr/local/share)
 		    INFOPATH="$(remove_directory "$dir/info" "${INFOPATH-}")"
 		    MANPATH="$(remove_directory "$dir/man" "${MANPATH-}")"
 		    PATH="$(remove_directory "$dir/sbin" "${PATH-}")"
