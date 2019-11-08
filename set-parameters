@@ -94,6 +94,10 @@ include_common_directories() {
 	    if is_to_be_included "$dir/bin" "${PATH-}"; then
 		PATH="$dir/bin${PATH:+:$PATH}"
 	    fi
+
+	    if is_to_be_included $dir/lib/pkgconfig "${PKG_CONFIG_PATH-}"; then
+		PKG_CONFIG_PATH="$dir/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+	    fi
 	fi
     done
 }
