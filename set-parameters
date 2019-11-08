@@ -101,23 +101,22 @@ include_common_directories() {
 	    MANPATH="$dir/share/man${MANPATH:+:$MANPATH}"
 	fi
 
+	bindirs=
+
 	for id in $ID $ID_LIKE; do
 	    case $id in
 		(debian|opensuse)
-		    include_binary_directories "$dir/bin" "$dir/sbin"
-		    break
-		    ;;
-		(*)
-		    include_binary_directories "$dir/sbin" "$dir/bin"
+		    bindirs="\"$dir/bin\" \"$dir/sbin\""
 		    break
 		    ;;
 	    esac
 	done
 
+	eval include_binary_directories ${bindirs-"\"$dir/sbin\" \"$dir/bin\""}
 	configdir=$dir/lib/pkgconfig
 
 	if is_to_be_included $configdir "${PKG_CONFIG_PATH-}"; then
-	    PKG_CONFIG_PATH="$dir/lib/configdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+	    PKG_CONFIG_PATH="$configdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 	fi
     done
 }
