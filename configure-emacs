@@ -17,6 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 GNU_BASE_URL=https://mirrors.ocf.berkeley.edu/gnu
+OPENCSW_PREFIX=/opt/csw
 
 if [ -z "${EMACS_PREFIX-}" ]; then
     EMACS_PREFIX=/usr/local
@@ -80,7 +81,7 @@ configure_emacs() {
 
     printf "%s\n" "$command"
     cd "$build_dir"
-    $command
+    eval $command
 }
 
 download_archive() {
@@ -102,49 +103,79 @@ extract_files() {
 
 get_command() {
     compiler=$(get_compiler)
+    cppflags=$(get_cppflags)
+    ldflags=$(get_ldflags)
     options=$(get_options)
-    printf "%s\n" "$1 $options CC=$compiler"
+    printf '%s %s CC=%s' "$1" "$options" "$compiler"
+
+    if [ -n "${cppflags-}" ]; then
+	printf ' CPPFLAGS=\"%s\"' "${cppflags-}"
+    fi
+
+    if [ -n "${cppflags-}" ]; then
+	printf ' LDFLAGS=\"%s\"' "${ldflags-}"
+    fi
+
+    printf '\n'
 }
 
 get_compiler() {
     compiler=
 
     for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (illumos)
-		compiler=gcc
-		break
-		;;
-	    (solaris)
-		compiler=cc
-		break
-		;;
-	esac
+    	case "$id" in
+    	    (illumos)
+    		break
+    		;;
+    	    (solaris)
+    		break
+    		;;
+    	esac
     done
 
     printf "%s\n" "${compiler:-gcc}"
 }
 
+get_cppflags() {
+    cppflags=
+
+    for id in $ID $ID_LIKE; do
+    	case "$id" in
+    	    (illumos)
+    		break
+    		;;
+    	    (solaris)
+		dir=$OPENCSW_PREFIX/include
+    		cppflags="-I$dir"
+    		break
+    		;;
+    	esac
+    done
+
+    printf "%s\n" "${cppflags:-}"
+}
+
+get_ldflags() {
+    ldflags=
+
+    for id in $ID $ID_LIKE; do
+    	case "$id" in
+    	    (illumos)
+    		break
+    		;;
+    	    (solaris)
+		dir=$OPENCSW_PREFIX/lib/amd64
+    		ldflags="-L$dir -R$dir"
+    		break
+    		;;
+    	esac
+    done
+
+    printf "%s\n" "${ldflags:-}"
+}
+
 get_options() {
     options=
-
-    # for id in $ID $ID_LIKE; do
-    #	case "$id" in
-    #         (rhel|fedora)
-    #		case "$VERSION_ID" in
-    #		    (8|8.[01])
-    #			# options="${options:+$options }--with-gif=no"
-    #			break
-    #			;;
-    #		esac
-    #		;;
-    #         (solaris)
-    #		# options="${options:+$options }--with-gif=no"
-    #		break
-    #		;;
-    #	esac
-    # done
-
     options="${options:+$options }--with-gnutls=yes"
 
     if [ "$is_with_x_toolkit" = false ]; then
