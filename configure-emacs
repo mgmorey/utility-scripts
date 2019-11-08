@@ -102,11 +102,18 @@ extract_files() {
 }
 
 get_command() {
-    compiler=$(get_compiler)
+    if [ -z "${compiler-}" ]; then
+	compiler="$(get_compiler)"
+    fi
+
     cppflags=$(get_cppflags)
     ldflags=$(get_ldflags)
     options=$(get_options)
-    printf '%s %s CC=%s' "$1" "$options" "$compiler"
+    printf '%s %s' "$1" "$options"
+
+    if [ -n "${compiler-}" ]; then
+	printf ' CC=\"%s\"' "${compiler-}"
+    fi
 
     if [ -n "${cppflags-}" ]; then
 	printf ' CPPFLAGS=\"%s\"' "${cppflags-}"
@@ -133,7 +140,9 @@ get_compiler() {
     	esac
     done
 
-    printf "%s\n" "${compiler:-gcc}"
+    if [ -n "${compiler-}" ]; then
+	printf "%s\n" "compiler"
+    fi
 }
 
 get_cppflags() {
@@ -175,18 +184,34 @@ get_ldflags() {
 }
 
 get_libgif_file() {
-    printf "%s\n" "$OPENCSW_PREFIX/lib/amd64/libgif.so"
+    file=
+
+    for id in $ID $ID_LIKE; do
+    	case "$id" in
+    	    (illumos)
+    		break
+    		;;
+    	    (solaris)
+		file=$OPENCSW_PREFIX/lib/amd64/libgif.so
+    		break
+    		;;
+    	esac
+    done
+
+    if [ -n "${file-}" ]; then
+	printf "%s\n" "$file"
+    fi
 }
 
 get_options() {
     options=
     options="${options:+$options }--with-gnutls=yes"
 
-    if [ "$is_with_x_toolkit" = false ]; then
+    if [ "$is_using_x_toolkit" = false ]; then
 	options="${options:+$options }--with-x-toolkit=no"
     fi
 
-    if [ "$is_with_xwidgets" = true ]; then
+    if [ "$is_using_xwidgets" = true ]; then
 	options="${options:+$options }--with-xwidgets"
     fi
 
@@ -213,19 +238,23 @@ get_realpath() (
 )
 
 parse_arguments() {
+    compiler=
     is_forcing=false
-    is_with_x_toolkit=true
-    is_with_xwidgets=false
+    is_using_x_toolkit=true
+    is_using_xwidgets=false
     emacs_prefix=$EMACS_PREFIX
     emacs_version=$EMACS_VERSION
 
-    while getopts fnp:v:xh opt; do
+    while getopts fgnp:v:xh opt; do
 	case $opt in
 	    (f)
 		is_forcing=true
 		;;
+	    (g)
+		compiler=gcc
+		;;
 	    (n)
-		is_with_x_toolkit=false
+		is_using_x_toolkit=false
 		;;
 	    (p)
 		case $OPTARG in
@@ -252,7 +281,7 @@ parse_arguments() {
 		esac
 		;;
 	    (x)
-		is_with_xwidgets=true
+		is_using_xwidgets=true
 		;;
 	    (h)
 		usage
@@ -276,7 +305,7 @@ usage() {
     fi
 
     cat <<-EOF >&2
-	Usage: $0 [-f][-n][-p PREFIX][-v VERSION]
+	Usage: $0 [-f][-g][-n][-p PREFIX][-v VERSION][-x]
 	       $0 -h
 	EOF
 }
@@ -299,10 +328,10 @@ validate_platform() {
 	    (solaris)
 		libgif=$(get_libgif_file)
 
-		if [ ! -x $libgif ]; then
+		if [ -n "${libgif-}" -a ! -x $libgif ]; then
 		    abort "%s: %s: No such shared object\n" "$0" "$libgif"
 		else
-		    return
+		    return 0
 		fi
 		;;
 	esac
