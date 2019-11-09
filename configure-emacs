@@ -97,7 +97,6 @@ configure_emacs() {
 
     if [ "$use_force" = true ]; then
 	clean_build
-	/bin/rm -f config.status
     elif [ ! -r config.status ]; then
 	:
     else
