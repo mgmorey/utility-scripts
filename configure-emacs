@@ -16,9 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-EMACS_PREFIX=/usr/local
 EMACS_VERSION=26.3
+
 GNU_BASE_URL=https://mirrors.ocf.berkeley.edu/gnu
+
+EMACS_PREFIX=/usr/local
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
 
@@ -123,7 +125,7 @@ configure_platform() {
 	esac
     done
 
-    if [ -n "${libgif-}" -a ! -x $libgif ]; then
+    if [ -n "${libgif-}" ] && [ ! -x $libgif ]; then
 	abort "%s: %s: No such shared object\n" "$0" "$libgif"
     else
 	break
