@@ -112,6 +112,10 @@ configure_emacs() {
 configure_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (rhel|ol)
+		configure_linux_redhat
+		break
+		;;
 	    (illumos)
 		configure_unix_illumos
 		configure_compiler_gcc
@@ -130,6 +134,12 @@ configure_platform() {
     else
 	break
     fi
+}
+
+configure_linux_redhat() {
+    incdir=$LOCAL_PREFIX/include
+    libdir=$LOCAL_PREFIX/lib
+    libgif=$libdir/libgif.so
 }
 
 configure_unix_illumos() {
