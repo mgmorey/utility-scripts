@@ -74,12 +74,30 @@ include_binary_directories() {
     for bindir; do
 	if is_to_be_included "$dir/$bindir" "${PATH-}"; then
 	    case "$dir" in
+		(/opt/local)
+		    PATH="${PATH:+$PATH:}$dir/$bindir"
+		    ;;
 		(*)
 		    PATH="$dir/$bindir${PATH:+:$PATH}"
 		    ;;
 	    esac
 	fi
     done
+}
+
+include_config_directories() {
+    pkgdir=$dir/lib/pkgconfig
+
+    if is_to_be_included $pkgdir "${PKG_CONFIG_PATH-}"; then
+	case "$dir" in
+	    (/opt/local)
+	    	PKG_CONFIG_PATH="${PKG_CONFIG_PATH:+$PKG_CONFIG_PATH:}$pkgdir"
+	    	;;
+	    (*)
+		PKG_CONFIG_PATH="$pkgdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+		;;
+	esac
+    fi
 }
 
 include_common_directories() {
@@ -123,11 +141,7 @@ include_common_directories() {
 	fi
 
 	include_binary_directories $bindirs
-	configdir=$dir/lib/pkgconfig
-
-	if is_to_be_included $configdir "${PKG_CONFIG_PATH-}"; then
-	    PKG_CONFIG_PATH="$configdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-	fi
+	include_config_directories
     done
 }
 
@@ -158,10 +172,10 @@ include_macos_directories() {
 	    PATH="$prefix/$pkg/bin${PATH:+:$PATH}"
 	fi
 
-	configdir=$prefix/$pkg/lib/pkgconfig
+	pkgdir=$prefix/$pkg/lib/pkgconfig
 
-	if is_to_be_included $configdir "${PKG_CONFIG_PATH-}"; then
-	    PKG_CONFIG_PATH="$configdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+	if is_to_be_included $pkgdir "${PKG_CONFIG_PATH-}"; then
+	    PKG_CONFIG_PATH="$pkgdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 	fi
     done
 
