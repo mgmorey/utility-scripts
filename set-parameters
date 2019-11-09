@@ -41,7 +41,7 @@ configure_platform() {
 
     for id in $ID $ID_LIKE; do
 	case $id in
-	    (debian|opensuse)
+	    (cygwin|debian|opensuse)
 		bindirs="bin sbin"
 		break
 		;;
