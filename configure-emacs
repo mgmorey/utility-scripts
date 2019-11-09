@@ -65,16 +65,15 @@ clean_build() {
 
 configure_compiler_cc() {
     cc=cc
-    cflags=-m64
+    cflags="${*-}"
     cppflags="-I$incdir"
-    ldflags="-L$libdir -R$libdir"
+    ldflags="$(get_ldflags)"
 }
 
 configure_compiler_gcc() {
     cc=gcc
-    cflags=-m64
-    cppflags="-I$incdir"
-    ldflags="-L$libdir -R$libdir"
+    cflags="${*-}"
+    ldflags="$(get_ldflags)"
 }
 
 configure_emacs() {
@@ -114,16 +113,17 @@ configure_platform() {
 	case "$id" in
 	    (rhel|ol)
 		configure_linux_redhat
+		configure_compiler_gcc
 		break
 		;;
 	    (illumos)
 		configure_unix_illumos
-		configure_compiler_gcc
+		configure_compiler_gcc -m64
 		break
 		;;
 	    (solaris)
 		configure_unix_solaris
-		configure_compiler_cc
+		configure_compiler_cc -m64
 		break
 		;;
 	esac
@@ -189,11 +189,27 @@ get_command() {
 	printf ' CPPFLAGS=\"%s\"' "${cppflags-}"
     fi
 
-    if [ -n "${cppflags-}" ]; then
+    if [ -n "${ldflags-}" ]; then
 	printf ' LDFLAGS=\"%s\"' "${ldflags-}"
     fi
 
     printf '\n'
+}
+
+get_ldflags() {
+    case "$os_family" in
+	(gnu-*)
+	    ldflags="-Wl,--rpath=$libdir"
+	    ;;
+	(unix)
+	    ldflags="-R$libdir"
+	    ;;
+	(*)
+	    ldflags=
+	    ;;
+    esac
+
+    printf "%s\n" "$ldflags"
 }
 
 get_options() {
