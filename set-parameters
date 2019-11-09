@@ -73,7 +73,11 @@ get_realpath() (
 include_binary_directories() {
     for bindir; do
 	if is_to_be_included "$dir/$bindir" "${PATH-}"; then
-	    PATH="$dir/$bindir${PATH:+:$PATH}"
+	    case "$dir" in
+		(*)
+		    PATH="$dir/$bindir${PATH:+:$PATH}"
+		    ;;
+	    esac
 	fi
     done
 }
