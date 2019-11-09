@@ -32,6 +32,7 @@ get_package_install_options() {
 	case "$id" in
 	    (centos)
 		break
+		;;
 	    (debian)
 		options="--no-install-recommends"
 		;;
@@ -43,7 +44,10 @@ get_package_install_options() {
 		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
-		    (8.*)
+		    (7|7.*)
+			break
+			;;
+		    (8|8.*)
 			options="--nobest"
 			;;
 		esac
