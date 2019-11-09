@@ -1,0 +1,3 @@
+#!/bin/sh -eu
+
+printenv | grep PATH= | sort
