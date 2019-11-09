@@ -16,16 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+EMACS_PREFIX=/usr/local
+EMACS_VERSION=26.3
 GNU_BASE_URL=https://mirrors.ocf.berkeley.edu/gnu
 OPENCSW_PREFIX=/opt/csw
-
-if [ -z "${EMACS_PREFIX-}" ]; then
-    EMACS_PREFIX=/usr/local
-fi
-
-if [ -z "${EMACS_VERSION-}" ]; then
-    EMACS_VERSION=26.3
-fi
 
 abort() {
     printf "$@" >&2
@@ -34,6 +28,11 @@ abort() {
 
 abort_invalid_prefix() {
     usage "%s: invalid prefix -- %s\n" "$0" "$*"
+    exit 2
+}
+
+abort_invalid_toolkit() {
+    usage "%s: invalid toolkit -- %s\n" "$0" "$*"
     exit 2
 }
 
@@ -55,15 +54,11 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-clean_build() (
-    if [ -d $build_dir ]; then
-	cd $build_dir
-
-	if [ -r Makefile ]; then
-	    make clean
-	fi
+clean_build() {
+    if [ -r Makefile ]; then
+	make distclean
     fi
-)
+}
 
 configure_emacs() {
     validate_platform
@@ -83,28 +78,22 @@ configure_emacs() {
     mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
     download_archive
     extract_files
+    cd "$build_dir"
 
-    if [ "$is_forcing" = true ]; then
-	/bin/rm -f "$build_dir/config.status"
-    elif [ ! -r "$build_dir/config.status" ]; then
-	:
-    elif [ "$is_cleaning" = true ]; then
+    if [ "$use_force" = true ]; then
 	clean_build
+	/bin/rm -f config.status
+    elif [ ! -r config.status ]; then
+	:
     else
 	exit 0
     fi
 
     printf "%s\n" "$command"
-    cd "$build_dir"
     eval $command
 }
 
 configure_platform() {
-    cc=
-    cflags=
-    cppflags=
-    ldflags=
-
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (solaris)
@@ -115,6 +104,8 @@ configure_platform() {
 		cflags=-m64
     		cppflags="-I$incdir"
     		ldflags="-L$libdir -R$libdir"
+		with_gsettings=no
+		with_x_toolkit=lucid
 
 		if [ -n "${libgif-}" -a ! -x $libgif ]; then
 		    abort "%s: %s: No such shared object\n" "$0" "$libgif"
@@ -167,15 +158,22 @@ get_command() {
 }
 
 get_options() {
-    options=
     options="${options:+$options }--with-gnutls=yes"
 
-    if [ "$is_using_x_toolkit" = false ]; then
-	options="${options:+$options }--with-x-toolkit=no"
+    if [ -n "${with_x_toolkit-}" ]; then
+	options="${options:+$options }--with-x-toolkit=$with_x_toolkit"
     fi
 
-    if [ "$is_using_xwidgets" = true ]; then
-	options="${options:+$options }--with-xwidgets"
+    if [ -n "${with_xwidgets-}" ]; then
+	options="${options:+$options }--with-xwidgets=$with_xwidgets"
+    fi
+
+    if [ "${with_conf-no}" = no ]; then
+	options="${options:+$options }--without-gconf"
+    fi
+
+    if [ "${with_gsettings-no}" = no ]; then
+	options="${options:+$options }--without-gsettings"
     fi
 
     if [ -n "${options:-}" ]; then
@@ -201,26 +199,23 @@ get_realpath() (
 )
 
 parse_arguments() {
-    is_cleaning=false
-    is_forcing=false
-    is_using_x_toolkit=true
-    is_using_xwidgets=false
     emacs_prefix=$EMACS_PREFIX
     emacs_version=$EMACS_VERSION
+    use_force=false
 
-    while getopts cfgnp:v:xh opt; do
+    while getopts fglnp:st:v:xh opt; do
 	case $opt in
-	    (c)
-		is_cleaning=true
-		;;
 	    (f)
-		is_forcing=true
+		use_force=true
 		;;
 	    (g)
 		cc=gcc
 		;;
+	    (l)
+		with_x_toolkit=lucid
+		;;
 	    (n)
-		is_using_x_toolkit=false
+		with_x_toolkit=no
 		;;
 	    (p)
 		case $OPTARG in
@@ -246,8 +241,20 @@ parse_arguments() {
 			;;
 		esac
 		;;
+	    (s)
+		with_gsettings=yes
+		;;
+	    (t)
+		case $OPTARG in
+		    (athena|lucid|gtk|gtk2|gtk3)
+			with_x_toolkit=$OPTARG
+			;;
+		    (*)
+			abort_invalid_toolkit $OPTARG
+		esac
+		;;
 	    (x)
-		is_using_xwidgets=true
+		with_xwidgets=yes
 		;;
 	    (h)
 		usage
@@ -271,7 +278,7 @@ usage() {
     fi
 
     cat <<-EOF >&2
-	Usage: $0 [-c][-f][-g][-n][-p PREFIX][-v VERSION][-x]
+	Usage: $0 [-f][-g][-l][-n][-p PREFIX][-s][-t TOOLKIT][-v VERSION][-x]
 	       $0 -h
 	EOF
 }
