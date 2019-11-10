@@ -40,7 +40,7 @@ get_package_managers() {
 	    (rhel|ol|centos)
 		case "$VERSION_ID" in
 		    (7|7.[78])
-			managers="yum /usr/pkg/bin/pkgin"
+			managers="/usr/bin/yum /usr/pkg/bin/pkgin"
 			;;
 		    (8|8.[01])
 			managers="dnf"
