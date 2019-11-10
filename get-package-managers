@@ -29,7 +29,7 @@ get_package_managers() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
-		managers="apt-get"
+		managers="/usr/bin/apt-get"
 		;;
 	    (fedora)
 		managers="dnf"
