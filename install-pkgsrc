@@ -23,10 +23,10 @@ DARWIN_BOOT_PGP=1F32A9AD
 DARWIN_BOOT_SHA=1c554a806fb41dcc382ef33e64841ace13988479
 DARWIN_BOOT_TAR=bootstrap-trunk-x86_64-20190524.tar.gz
 
-REDHAT7_BOOT_OS=Linux/el7
-REDHAT7_BOOT_PGP=56AAACAF
-REDHAT7_BOOT_SHA=eb0d6911489579ca893f67f8a528ecd02137d43a
-REDHAT7_BOOT_TAR=bootstrap-trunk-x86_64-20170127.tar.gz
+RHEL_7_BOOT_OS=Linux/el7
+RHEL_7_BOOT_PGP=56AAACAF
+RHEL_7_BOOT_SHA=eb0d6911489579ca893f67f8a528ecd02137d43a
+RHEL_7_BOOT_TAR=bootstrap-trunk-x86_64-20170127.tar.gz
 
 SMARTOS_BOOT_OS=SmartOS
 SMARTOS_BOOT_PGP=DE817B8E
@@ -72,7 +72,7 @@ install_pkgsrc() {
 		(ol)
 		    case "$VERSION_ID" in
 			(7.*)
-			    key=REDHAT7
+			    key=RHEL_7
 			    ;;
 			(*)
 			    abort_not_supported Release
@@ -82,7 +82,7 @@ install_pkgsrc() {
 		(centos)
 		    case "$VERSION_ID" in
 			(7)
-			    key=REDHAT7
+			    key=RHEL_7
 			    ;;
 			(*)
 			    abort_not_supported Release
