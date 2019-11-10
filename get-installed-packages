@@ -70,7 +70,7 @@ get_packages_using() {
 	(pkg|*/pkg)
 	    case "$ID" in
 		(freebsd)
-		    $1 info | awk "$FREEBSD_AWK"
+		    $1 info --all | awk "$FREEBSD_AWK"
 		    ;;
 		(*)
 		    $1 list -s | awk 'NR > 1 {print $1}'
