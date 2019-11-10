@@ -54,7 +54,7 @@ get_package_managers() {
 		managers="pkg"
 		;;
 	    (netbsd)
-		managers="pkgin"
+		managers="/usr/pkg/bin/pkgin"
 		;;
 	    (illumos)
 		managers="/usr/bin/pkg /opt/local/bin/pkgin"
