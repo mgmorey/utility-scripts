@@ -37,7 +37,7 @@ get_uninstall_command() {
 	    uninstall=remove
 	    ;;
 	(pkg|*/pkg)
-	    uninstall=remove
+	    uninstall=uninstall
 	    ;;
 	(pkgin|*/pkgin)
 	    uninstall=remove
