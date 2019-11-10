@@ -57,7 +57,7 @@ get_package_managers() {
 		managers="pkgin"
 		;;
 	    (solaris)
-		managers="pkg"
+		managers="pkg pkgutil"
 		;;
 	esac
 
