@@ -47,10 +47,16 @@ install_package_manager() {
     assert [ -n "$1" ]
 
     case "$1" in
+	(/usr/local/bin/brew)
+	    "$script_dir/install-homebrew"
+	    ;;
 	(/opt/csw/bin/pkgutil)
 	    "$script_dir/install-opencsw-pkgutil"
 	    ;;
 	(/opt/local/bin/pkgin)
+	    "$script_dir/install-pkgsrc"
+	    ;;
+	(/opt/pkg/bin/pkgin)
 	    "$script_dir/install-pkgsrc"
 	    ;;
     esac
