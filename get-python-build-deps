@@ -30,7 +30,7 @@ make ncurses-devel openssl-devel python3-devel readline-devel sqlite-devel \
 wget xz-devel zlib-devel"
 
 FREEBSD_11_PKGS="bash bzip2 curl gdbm gmake libffi lzma ncurses \
-openssl-devel readline sqlite3 wget"
+readline sqlite3 wget"
 FREEBSD_12_PKGS="bash bzip2 curl gdbm gmake libffi lzma ncurses \
 openssl-devel readline sqlite3 wget"
 
