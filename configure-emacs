@@ -329,10 +329,10 @@ usage() {
 	printf "%s\n" "" >&2
     fi
 
-    cat <<-EOF >&2
-	Usage: $0 [-f] [-g] [-l] [-n] [-p PREFIX] [-s] [-t TOOLKIT] [-v VERSION] [-x]
-	       $0 -h
-	EOF
+    cat <<EOF >&2
+Usage: $0 [-f] [-g] [-l] [-n] [-p PREFIX] [-s] [-t TOOLKIT] [-v VERSION] [-x]
+       $0 -h
+EOF
 }
 
 validate_platform() {
