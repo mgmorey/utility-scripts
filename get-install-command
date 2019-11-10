@@ -43,7 +43,7 @@ get_install_command() {
 	    install=install
 	    ;;
 	(pkgutil|*/pkgutil)
-	    install=install
+	    install=--install
 	    ;;
 	(yum|*/yum)
 	    install=install
