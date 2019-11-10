@@ -163,6 +163,7 @@ install_packages() {
     fi
 
     parse_arguments "$@"
+    "$script_dir/install-package-managers" $managers
 
     if [ "$IS_PATTERN_SUPPORTED" = true ]; then
 	install_pattern_from_args
