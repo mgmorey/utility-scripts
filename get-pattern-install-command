@@ -25,12 +25,31 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_pattern_install_command() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "$(basename $1)" in
+	(dnf|yum)
+	    install="groupinstall"
+	    ;;
+	(zypper)
+	    install="install -t pattern"
+	    ;;
+	(*)
+	    install="install"
+	    ;;
+    esac
+
+    printf "%s\n" "$install"
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
@@ -42,25 +61,4 @@ get_realpath() (
     fi
 )
 
-script_dir=$(get_realpath "$(dirname "$0")")
-
-eval $("$script_dir/get-os-release" -x)
-
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (opensuse-*)
-		printf "%s\n" "install -t pattern"
-		;;
-	    (fedora|rhel|ol|centos)
-		printf "%s\n" "groupinstall"
-		;;
-	    (*)
-		printf "%s\n" "install"
-		;;
-	esac
-	;;
-    (*)
-	printf "%s\n" "install"
-	;;
-esac
+get_pattern_install_command "$@"
