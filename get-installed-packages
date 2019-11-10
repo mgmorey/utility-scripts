@@ -44,11 +44,14 @@ assert() {
 }
 
 get_installed_packages() {
-    managers=$("$script_dir/get-package-managers")
     prefix=
 
-    for manager in $managers; do
-	get_packages_using $manager | awk -v prefix=$prefix "$PREFIX_AWK"
+    for manager; do
+	if ! which $manager >/dev/null 2>&1; then
+	    continue
+	fi
+
+	(get_packages_using $manager || true) | prefix_lines "$prefix"
 	prefix=:
     done
 }
@@ -163,6 +166,11 @@ get_su_command() (
     printf "su %s %s\n" "$options" "$1"
 )
 
+prefix_lines() {
+    assert [ $# -eq 1 ]
+    awk -v prefix=$1 "$PREFIX_AWK"
+}
+
 run_unpriv() (
     assert [ $# -ge 1 ]
 
@@ -188,4 +196,5 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
 
-get_installed_packages
+managers=$("$script_dir/get-package-managers")
+get_installed_packages $managers
