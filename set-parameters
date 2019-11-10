@@ -20,7 +20,7 @@ ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
 
 LOCAL_DIRS="/usr/local"
 PKGSRC_DIRS="$(ls -d /usr/pkg /opt/pkg /opt/local 2>/dev/null || true)"
-STUDIO_DIRS="$(ls -d /opt/csw /opt/*studio* 2>/dev/null || true)"
+SOLARIS_DIRS="$(ls -d /opt/csw /opt/*studio* 2>/dev/null || true)"
 SYSTEM_DIRS="/usr /usr/gnu"
 
 COMMON_BINDIRS="/usr/lib/cups/bin"
@@ -74,7 +74,7 @@ include_binary_directories() {
     for bindir; do
 	if is_to_be_included "$dir/$bindir" "${PATH-}"; then
 	    case "$dir" in
-		(/opt/local)
+		(/opt/csw|/opt/local)
 		    PATH="${PATH:+$PATH:}$dir/$bindir"
 		    ;;
 		(*)
@@ -90,7 +90,7 @@ include_config_directories() {
 
     if is_to_be_included $pkgdir "${PKG_CONFIG_PATH-}"; then
 	case "$dir" in
-	    (/opt/local)
+	    (/opt/csw|/opt/local)
 	    	PKG_CONFIG_PATH="${PKG_CONFIG_PATH:+$PKG_CONFIG_PATH:}$pkgdir"
 	    	;;
 	    (*)
@@ -110,7 +110,7 @@ include_common_directories() {
 
     # add common prefix directories to paths (if they exist)
 
-    dirs="$SYSTEM_DIRS $STUDIO_DIRS $PKGSRC_DIRS $LOCAL_DIRS"
+    dirs="$SYSTEM_DIRS $SOLARIS_DIRS $PKGSRC_DIRS $LOCAL_DIRS"
 
     for dir in $dirs; do
 	case "$dir" in
