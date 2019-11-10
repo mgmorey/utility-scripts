@@ -50,17 +50,14 @@ install_package_manager() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    case "$1" in
-	(/usr/local/bin/brew)
+    case "$(basename $1)" in
+	(brew)
 	    "$script_dir/$INSTALL_BREW"
 	    ;;
-	(/opt/*/bin/pkgin)
+	(pkgin)
 	    "$script_dir/$INSTALL_PKGIN"
 	    ;;
-	(/usr/pkg/bin/pkgin)
-	    "$script_dir/$INSTALL_PKGIN"
-	    ;;
-	(/opt/csw/bin/pkgutil)
+	(pkgutil)
 	    "$script_dir/$INSTALL_PKGUTIL"
 	    ;;
     esac
