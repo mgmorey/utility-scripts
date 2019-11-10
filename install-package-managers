@@ -25,23 +25,26 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+install_package_manager() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "$1" in
+	(/opt/csw/bin/pkgutil)
+	    "$script_dir/install-opencsw-pkgutil"
+	    ;;
+	(/opt/local/bin/pkgin)
+	    "$script_dir/install-pkgsrc"
+	    ;;
+    esac
+}
+
 install_package_managers() {
     for manager; do
 	if [ ! -x $(which $manager) ]; then
 	    install_package_manager $manager
 	fi
     done
-}
-
-install_package_manager() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-
-    case "$1" in
-	(/opt/local/bin/pkgin)
-	    "$script_dir/install-pkgsrc"
-	    ;;
-    esac
 }
 
 get_realpath() (
