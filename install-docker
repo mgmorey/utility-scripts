@@ -31,16 +31,21 @@ assert() {
 
 configure_platform() {
     has_daemon=true
+    has_getent=true
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (rhel|fedora)
 		has_daemon=false
-		return
+		break
+		;;
+	    (darwin)
+		has_getent=false
+		break
 		;;
 	    (freebsd)
 		has_daemon=false
-		return
+		break
 		;;
 	esac
     done
@@ -179,6 +184,8 @@ postinstall_docker() {
     if [ -z "${SUDO_USER-}" ] || [ "$(id -u)" -gt 0 ]; then
 	return 0
     elif [ "$has_daemon" = false ]; then
+	return 0
+    elif [ "$has_getent" = false ]; then
 	return 0
     fi
 
