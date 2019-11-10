@@ -208,7 +208,7 @@ install_using() (
     options=$2
     shift 2
 
-    install=$("$script_dir/get-install-command" $1)
+    install=$("$script_dir/get-install-command" $manager)
 
     case "$manager" in
 	(brew|*/brew)
