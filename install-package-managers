@@ -54,10 +54,7 @@ install_package_manager() {
 	(/usr/local/bin/brew)
 	    "$script_dir/$INSTALL_BREW"
 	    ;;
-	(/opt/local/bin/pkgin)
-	    "$script_dir/$INSTALL_PKGIN"
-	    ;;
-	(/opt/pkg/bin/pkgin)
+	(/opt/*/bin/pkgin)
 	    "$script_dir/$INSTALL_PKGIN"
 	    ;;
 	(/usr/pkg/bin/pkgin)
