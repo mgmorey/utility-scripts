@@ -195,7 +195,7 @@ uninstall_using() (
     manager=$1
     shift 1
 
-    uninstall=$("$script_dir/get-uninstall-command" $1)
+    uninstall=$("$script_dir/get-uninstall-command" $manager)
 
     case "$manager" in
 	(brew|*/brew)
