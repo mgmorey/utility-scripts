@@ -1,0 +1,143 @@
+#!/bin/sh -eu
+
+# install-package-managers: install non-native package managers
+# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+install_package_managers() {
+    for manager; do
+	if [ ! -x $(which $manager) ]; then
+	    install_package_manager $manager
+	fi
+    done
+}
+
+install_package_manager() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "$1" in
+	(/opt/local/bin/pkgin)
+	    "$script_dir/install-pkgsrc"
+	    ;;
+    esac
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+    	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+get_setpriv_command() (
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    version="$(setpriv --version 2>/dev/null)"
+
+    case "${version##* }" in
+	('')
+	    return 1
+	    ;;
+	([01].*)
+	    return 1
+	    ;;
+	(2.[0-9].*)
+	    return 1
+	    ;;
+	(2.[12][0-9].*)
+	    return 1
+	    ;;
+	(2.3[012].*)
+	    return 1
+	    ;;
+	(*)
+	    options="--init-groups --reset-env"
+	    ;;
+    esac
+
+    regid="$(id -u $1)"
+    reuid="$(id -g $1)"
+    printf "setpriv --reuid %s --regid %s %s\n" "$reuid" "$regid" "$options"
+)
+
+get_su_command() (
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "${kernel_name=$(uname -s)}" in
+	(GNU|Linux)
+	    if get_setpriv_command $1; then
+		return 0
+	    else
+		options=-l
+	    fi
+	    ;;
+	(Darwin|FreeBSD)
+	    options=-l
+	    ;;
+	(*)
+	    options=-
+	    ;;
+    esac
+
+    printf "su %s %s\n" "$options" "$1"
+)
+
+run_unpriv() (
+    assert [ $# -ge 1 ]
+
+    if [ "$1" = -c ]; then
+	sh_opts="$1"
+	shift
+    else
+	sh_opts=
+    fi
+
+    if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
+	su="$(get_su_command $SUDO_USER) $sh_opts"
+    elif [ -n "$sh_opts" ]; then
+	su="sh $sh_opts"
+    else
+	su=
+    fi
+
+    $su "$@"
+)
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -x)
+
+install_package_managers "$@"
