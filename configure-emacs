@@ -78,8 +78,6 @@ configure_compiler_gcc() {
 }
 
 configure_emacs() {
-    validate_platform
-    configure_platform
     basename=emacs-$EMACS_VERSION
 
     archive_dir="$HOME/Downloads/GNU"
@@ -349,5 +347,7 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
 
+validate_platform
+configure_platform
 parse_arguments "$@"
 configure_emacs
