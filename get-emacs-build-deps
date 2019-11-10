@@ -53,7 +53,7 @@ webkit2gtk3-devel"
 SOLARIS_PKGS="developer/build/autoconf developer/build/automake \
 developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
 developer/developerstudio-126/cc developer/developerstudio-126/library/c-libs \
-library/gnutls library/ncurses library/zlib"
+library/gnome/dconf library/gnutls library/ncurses library/zlib"
 
 UBUNTU_PKGS="libgif-dev libgnutls28-dev libgpm-dev libjpeg-dev \
 libncurses5-dev libtiff5-dev libwebkit2gtk-4.0-dev libxpm-dev"
