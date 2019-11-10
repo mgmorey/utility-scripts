@@ -32,7 +32,7 @@ get_package_managers() {
 		managers="/usr/bin/apt-get"
 		;;
 	    (fedora)
-		managers="dnf"
+		managers="/usr/bin/dnf"
 		;;
 	    (opensuse)
 		managers="zypper"
