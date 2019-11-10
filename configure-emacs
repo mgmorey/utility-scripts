@@ -330,7 +330,7 @@ usage() {
     fi
 
     cat <<-EOF >&2
-	Usage: $0 [-f][-g][-l][-n][-p PREFIX][-s][-t TOOLKIT][-v VERSION][-x]
+	Usage: $0 [-f] [-g] [-l] [-n] [-p PREFIX] [-s] [-t TOOLKIT] [-v VERSION] [-x]
 	       $0 -h
 	EOF
 }
