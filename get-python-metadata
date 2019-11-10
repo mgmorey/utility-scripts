@@ -56,7 +56,7 @@ get_python_metadata() {
 	    (opensuse)
 		data="$OPENSUSE_DATA"
 		;;
-	    (rhel|centos)
+	    (rhel|ol|centos)
 		case "$VERSION_ID" in
 		    (7|7.*)
 			data="$REDHAT_7_DATA"
