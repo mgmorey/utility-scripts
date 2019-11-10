@@ -32,6 +32,8 @@ for(i = 1; i < n; i++) {
 printf("\n")
 }'
 
+PREFIX_AWK='{printf("%s%s\n", prefix, $0)}'
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -43,56 +45,51 @@ assert() {
 
 get_installed_packages() {
     managers=$("$script_dir/get-package-managers")
-    manager1=$(printf "%s\n" $managers | awk 'NR == 1 {print $0}')
-    manager2=$(printf "%s\n" $managers | awk 'NR == 2 {print $0}')
+    prefix=
 
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (debian)
-		dpkg-query -Wf '${Status} ${Package}\n' | awk "$DEBIAN_AWK"
-		return
-		;;
-	    (opensuse)
-		$manager1 -q search -i -t package | awk 'NR > 3 {print $3}'
-		return
-		;;
-	    (fedora)
-		$manager1 list installed | awk '{print $1}' | awk -F. '{print $1}'
-		return
-		;;
-	    (rhel|ol|centos)
-		case "$VERSION_ID" in
-		    (7|7.[78])
-			$manager1 list installed | awk '{print $1}' | awk -F. '{print $1}'
-			$manager2 list | awk '{print ":" $1}'
-			return
-			;;
-		    (8|8.[01])
-			$manager1 list installed | awk '{print $1}' | awk -F. '{print $1}'
-			return
-			;;
-		esac
-		;;
-	    (macos)
-		run_unpriv -c "$manager1 list -1"
-		$manager2 list | awk '{print ":" $1}'
-		return
-		;;
-	    (freebsd)
-		$manager1 info | awk "$FREEBSD_AWK"
-		return
-		;;
-	    (netbsd)
-		$manager1 list | awk '{print $1}'
-		return
-		;;
-	    (solaris)
-		$manager1 list -s | awk 'NR > 1 {print $1}'
-		$manager2 -l | awk '{print ":" $1}'
-		return
-		;;
-	esac
+    for manager in $managers; do
+	get_packages_using $manager | awk -v prefix=$prefix "$PREFIX_AWK"
+	prefix=:
     done
+}
+
+get_packages_using() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "$1" in
+	(apt-get|*/apt-get)
+	    dpkg-query -Wf '${Status} ${Package}\n' | awk "$DEBIAN_AWK"
+	    ;;
+	(dnf|*/dnf)
+	    $1 list installed | awk '{print $1}' | awk -F. '{print $1}'
+	    ;;
+	(brew|*/brew)
+	    run_unpriv -c "$1 list -1"
+	    ;;
+	(pkg|*/pkg)
+	    case "$ID" in
+		(freebsd)
+		    $1 info | awk "$FREEBSD_AWK"
+		    ;;
+		(*)
+		    $1 list -s | awk 'NR > 1 {print $1}'
+		    ;;
+	    esac
+	    ;;
+	(pkgin|*/pkgin)
+	    $1 list | awk '{print $1}'
+	    ;;
+	(pkgutil)
+	    $1 --list | awk '{print $1}'
+	    ;;
+	(yum|*/yum)
+	    $1 list installed | awk '{print $1}' | awk -F. '{print $1}'
+	    ;;
+	(zypper|*/zypper)
+	    $1 -q search -i -t package | awk 'NR > 3 {print $3}'
+	    ;;
+    esac
 }
 
 get_realpath() (
