@@ -48,11 +48,6 @@ abort_not_supported() {
     abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
 }
 
-abort_too_many_arguments() {
-    usage "%s: too many arguments -- %s\n" "$0" "$*"
-    exit 2
-}
-
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
@@ -63,18 +58,15 @@ clean_build() {
     fi
 }
 
-configure_compiler_cc() {
-    cc=cc
-    cflags="${*-}"
-    cppflags="-I$incdir"
-    ldflags="$(get_ldflags)"
-}
-
-configure_compiler_gcc() {
-    cc=gcc
-    cflags="${*-}"
-    cppflags="-I$incdir"
-    ldflags="$(get_ldflags)"
+configure_compiler() {
+    assert [ $# -eq 3 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    assert [ -n "$3" ]
+    cc="$(get_compiler $1)"
+    cflags="$(get_compiler_flags $1)"
+    cppflags="$(get_include_flags $2)"
+    ldflags="$(get_linker_flags $3)"
 }
 
 configure_emacs() {
@@ -84,7 +76,7 @@ configure_emacs() {
     build_dir="$HOME/Documents/build/$basename"
     src_dir="$HOME/Documents/src/GNU/$basename"
 
-    command=$(get_command $src_dir/configure)
+    command=$(get_configure_command $src_dir)
     filename=$basename.tar.xz
 
     pathname=$archive_dir/$filename
@@ -106,22 +98,31 @@ configure_emacs() {
     eval $command
 }
 
+configure_library_gif() {
+    assert [ $# -ge 1 -a $# -le 2 ]
+    assert [ -n "$1" ]
+    incdir="$1/include"
+    libdir="$1/lib${2+/$2}"
+    libgif="$libdir/libgif.so"
+}
+
 configure_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (rhel|ol)
-		configure_linux_redhat
-		configure_compiler_gcc
+		configure_library_gif $LOCAL_PREFIX
+		configure_compiler gcc $incdir $libdir
 		break
 		;;
 	    (illumos)
-		configure_unix_illumos
-		configure_compiler_gcc -m64
+		configure_library_gif $LOCAL_PREFIX
+		configure_compiler "gcc -m64" $incdir $libdir
 		break
 		;;
 	    (solaris)
-		configure_unix_solaris
-		configure_compiler_gcc -m64
+		configure_library_gif $OPENCSW_PREFIX amd64
+		configure_compiler "gcc -m64" $incdir $libdir
+		with_x_toolkit=lucid
 		break
 		;;
 	esac
@@ -132,25 +133,6 @@ configure_platform() {
     else
 	break
     fi
-}
-
-configure_linux_redhat() {
-    incdir=$LOCAL_PREFIX/include
-    libdir=$LOCAL_PREFIX/lib
-    libgif=$libdir/libgif.so
-}
-
-configure_unix_illumos() {
-    incdir=$LOCAL_PREFIX/include
-    libdir=$LOCAL_PREFIX/lib
-    libgif=$libdir/libgif.so
-}
-
-configure_unix_solaris() {
-    incdir=$OPENCSW_PREFIX/include
-    libdir=$OPENCSW_PREFIX/lib/amd64
-    libgif=$libdir/libgif.so
-    with_x_toolkit=lucid
 }
 
 download_archive() {
@@ -170,9 +152,18 @@ extract_files() {
     fi
 }
 
-get_command() {
-    options=$(get_options)
-    printf '%s %s' "$1" "$options"
+get_compiler() {
+    printf "%s\n" "$1"
+}
+
+get_compiler_flags() {
+    shift
+    printf "%s\n" "$*"
+}
+
+get_configure_command() {
+    options=$(get_configure_options)
+    printf '%s %s' "$1/configure" "$options"
 
     if [ -n "${cc-}" ]; then
 	printf ' CC=\"%s\"' "${cc-}"
@@ -193,7 +184,30 @@ get_command() {
     printf '\n'
 }
 
-get_ldflags() {
+get_configure_options() {
+    options="${options:+$options }--with-gnutls=yes"
+
+    if [ -n "${with_x_toolkit-}" ]; then
+	options="${options:+$options }--with-x-toolkit=$with_x_toolkit"
+    fi
+
+    if [ -n "${with_xwidgets-}" ]; then
+	options="${options:+$options }--with-xwidgets=$with_xwidgets"
+    fi
+
+    if [ -n "${options:-}" ]; then
+	printf "%s\n" "$options"
+    fi
+}
+
+get_include_flags() {
+    assert [ $# -ge 1 ]
+    printf -- "-I%s\n" "$@"
+}
+
+get_linker_flags() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
     ldflags=
 
     case "$os_family" in
@@ -207,22 +221,6 @@ get_ldflags() {
 
     if [ "${ldflags-}" ]; then
 	printf "%s\n" "$ldflags"
-    fi
-}
-
-get_options() {
-    options="${options:+$options }--with-gnutls=yes"
-
-    if [ -n "${with_x_toolkit-}" ]; then
-	options="${options:+$options }--with-x-toolkit=$with_x_toolkit"
-    fi
-
-    if [ -n "${with_xwidgets-}" ]; then
-	options="${options:+$options }--with-xwidgets=$with_xwidgets"
-    fi
-
-    if [ -n "${options:-}" ]; then
-	printf "%s\n" "$options"
     fi
 }
 
@@ -248,7 +246,7 @@ parse_arguments() {
     emacs_version=$EMACS_VERSION
     use_force=false
 
-    while getopts fp:t:v:xh opt; do
+    while getopts fp:t:v:wh opt; do
 	case $opt in
 	    (f)
 		use_force=true
@@ -286,7 +284,7 @@ parse_arguments() {
 			;;
 		esac
 		;;
-	    (x)
+	    (w)
 		with_xwidgets=yes
 		;;
 	    (h)
@@ -311,7 +309,7 @@ usage() {
     fi
 
     cat <<-EOF >&2
-	Usage: $0 [-f] [-p PREFIX] [-t TOOLKIT] [-v VERSION] [-x]
+	Usage: $0 [-f] [-p PREFIX] [-t TOOLKIT] [-v VERSION] [-w]
 	       $0 -h
 	EOF
 }
