@@ -35,7 +35,7 @@ get_package_managers() {
 		managers="/usr/bin/dnf"
 		;;
 	    (opensuse)
-		managers="zypper"
+		managers="/usr/bin/zypper"
 		;;
 	    (rhel|ol|centos)
 		case "$VERSION_ID" in
