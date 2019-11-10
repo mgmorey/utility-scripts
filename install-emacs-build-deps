@@ -71,7 +71,16 @@ configure_platform() {
 			;;
 		esac
 		;;
-	    (rhel|fedora)
+	    (fedora)
+		package=$REDHAT_PKG
+		;;
+	    (rhel|ol|centos)
+		case "$VERSION_ID" in
+		    (7|7.*)
+			"$script_dir/install-epel"
+			;;
+		esac
+
 		package=$REDHAT_PKG
 		;;
 	esac
