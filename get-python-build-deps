@@ -29,10 +29,10 @@ FEDORA_PKGS="bash bzip2-devel curl gcc gdbm-devel libffi-devel libuuid-devel \
 make ncurses-devel openssl-devel python3-devel readline-devel sqlite-devel \
 wget xz-devel zlib-devel"
 
-FREEBSD_11_PKGS="bash bzip2 curl gdbm gmake libffi llvm50 lzma ncurses \
-readline sqlite3 wget"
-FREEBSD_12_PKGS="bash bzip2 curl gdbm gmake libffi llvm60 lzma ncurses \
-readline sqlite3 wget"
+FREEBSD_11_PKGS="bash bzip2 curl gdbm gmake libffi lzma ncurses \
+openssl-devel readline sqlite3 wget"
+FREEBSD_12_PKGS="bash bzip2 curl gdbm gmake libffi lzma ncurses \
+openssl-devel readline sqlite3 wget"
 
 ILLUMOS_PKGS="database/sqlite-3 developer/build/autoconf \
 developer/build/automake developer/build/gnu-make developer/build/libtool \
