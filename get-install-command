@@ -26,30 +26,12 @@ assert() {
 }
 
 get_install_command() {
-    case "$1" in
-	(apt-get|*/apt-get)
-	    install=install
-	    ;;
-	(brew|*/brew)
-	    install=install
-	    ;;
-	(dnf|*/dnf)
-	    install=install
-	    ;;
-	(pkg|*/pkg)
-	    install=install
-	    ;;
-	(pkgin|*/pkgin)
-	    install=install
-	    ;;
-	(pkgutil|*/pkgutil)
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "$(basename $1)" in
+	(pkgutil)
 	    install=--install
-	    ;;
-	(yum|*/yum)
-	    install=install
-	    ;;
-	(zypper|*/zypper)
-	    install=install
 	    ;;
 	(*)
 	    install=install

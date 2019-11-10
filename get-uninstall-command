@@ -26,30 +26,15 @@ assert() {
 }
 
 get_uninstall_command() {
-    case "$1" in
-	(apt-get|*/apt-get)
-	    uninstall=remove
-	    ;;
-	(brew|*/brew)
-	    uninstall=remove
-	    ;;
-	(dnf|*/dnf)
-	    uninstall=remove
-	    ;;
-	(pkg|*/pkg)
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "$(basename $1)" in
+	(pkg)
 	    uninstall=uninstall
 	    ;;
-	(pkgin|*/pkgin)
-	    uninstall=remove
-	    ;;
-	(pkgutil|*/pkgutil)
+	(pkgutil)
 	    uninstall=--remove
-	    ;;
-	(yum|*/yum)
-	    uninstall=remove
-	    ;;
-	(zypper|*/zypper)
-	    uninstall=remove
 	    ;;
 	(*)
 	    uninstall=remove
