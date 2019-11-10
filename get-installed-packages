@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_AWK='$1 = "install" && $2 == "ok" && $3 == "installed" {print $4}'
+DPKG_AWK='$1 = "install" && $2 == "ok" && $3 == "installed" {print $4}'
 
 FREEBSD_AWK='{
 n = split($1, a, "-");
@@ -59,13 +59,13 @@ get_packages_using() {
 
     case "$1" in
 	(apt-get|*/apt-get)
-	    dpkg-query -Wf '${Status} ${Package}\n' | awk "$DEBIAN_AWK"
-	    ;;
-	(dnf|*/dnf)
-	    $1 list installed | awk '{print $1}' | awk -F. '{print $1}'
+	    dpkg-query -Wf '${Status} ${Package}\n' | awk "$DPKG_AWK"
 	    ;;
 	(brew|*/brew)
 	    run_unpriv -c "$1 list -1"
+	    ;;
+	(dnf|*/dnf)
+	    $1 list installed | awk 'NF == 3 {print $1}' | awk -F. '{print $1}'
 	    ;;
 	(pkg|*/pkg)
 	    case "$ID" in
@@ -84,7 +84,7 @@ get_packages_using() {
 	    $1 --list | awk '{print $1}'
 	    ;;
 	(yum|*/yum)
-	    $1 list installed | awk '{print $1}' | awk -F. '{print $1}'
+	    $1 list installed | awk 'NF == 3 {print $1}' | awk -F. '{print $1}'
 	    ;;
 	(zypper|*/zypper)
 	    $1 -q search -i -t package | awk 'NR > 3 {print $3}'
