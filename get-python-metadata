@@ -58,10 +58,10 @@ get_python_metadata() {
 		;;
 	    (rhel|centos)
 		case "$VERSION_ID" in
-		    (7|7.[78])
+		    (7|7.*)
 			data="$REDHAT_7_DATA"
 			;;
-		    (8|8.[01])
+		    (8|8.*)
 			data="$REDHAT_8_DATA"
 			;;
 		esac
