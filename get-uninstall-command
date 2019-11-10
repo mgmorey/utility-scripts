@@ -43,7 +43,7 @@ get_uninstall_command() {
 	    uninstall=remove
 	    ;;
 	(pkgutil|*/pkgutil)
-	    uninstall=remove
+	    uninstall=--remove
 	    ;;
 	(yum|*/yum)
 	    uninstall=remove
