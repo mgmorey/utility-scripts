@@ -60,7 +60,7 @@ get_package_managers() {
 		managers="/usr/bin/pkg /opt/local/bin/pkgin"
 		;;
 	    (solaris)
-		managers="pkg pkgutil"
+		managers="/usr/bin/pkg /opt/csw/bin/pkgutil"
 		;;
 	esac
 
