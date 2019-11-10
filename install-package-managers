@@ -16,6 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+INSTALL_BREW=install-homebrew
+INSTALL_PKGIN=install-pkgsrc
+INSTALL_PKGUTIL=install-opencsw
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -47,20 +51,20 @@ install_package_manager() {
     assert [ -n "$1" ]
 
     case "$1" in
-	(/opt/csw/bin/pkgutil)
-	    "$script_dir/install-opencsw-pkgutil"
+	(/usr/local/bin/brew)
+	    "$script_dir/$INSTALL_BREW"
 	    ;;
 	(/opt/local/bin/pkgin)
-	    "$script_dir/install-pkgsrc"
+	    "$script_dir/$INSTALL_PKGIN"
 	    ;;
 	(/opt/pkg/bin/pkgin)
-	    "$script_dir/install-pkgsrc"
-	    ;;
-	(/usr/local/bin/brew)
-	    "$script_dir/install-homebrew"
+	    "$script_dir/$INSTALL_PKGIN"
 	    ;;
 	(/usr/pkg/bin/pkgin)
-	    "$script_dir/install-pkgsrc"
+	    "$script_dir/$INSTALL_PKGIN"
+	    ;;
+	(/opt/csw/bin/pkgutil)
+	    "$script_dir/$INSTALL_PKGUTIL"
 	    ;;
     esac
 }

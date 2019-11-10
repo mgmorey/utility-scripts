@@ -1,6 +1,6 @@
 #!/bin/sh -u
 
-# install-homebrew: install HomeBrew (for Darwin platform)
+# install-homebrew: install the HomeBrew package manager brew
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
