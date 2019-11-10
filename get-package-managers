@@ -57,7 +57,7 @@ get_package_managers() {
 		managers="pkgin"
 		;;
 	    (illumos)
-		managers="pkg pkgin"
+		managers="/usr/bin/pkg /opt/local/bin/pkgin"
 		;;
 	    (solaris)
 		managers="pkg pkgutil"
