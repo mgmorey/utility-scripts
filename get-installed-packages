@@ -73,7 +73,7 @@ get_packages_using() {
 		    $1 info | awk "$FREEBSD_AWK"
 		    ;;
 		(*)
-		    $1 list -s | awk 'NR > 1 {print $1}'
+		    $1 list | awk 'NR > 1 {print $1}'
 		    ;;
 	    esac
 	    ;;
