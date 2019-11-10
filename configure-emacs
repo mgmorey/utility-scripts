@@ -73,13 +73,13 @@ configure_compiler_cc() {
 configure_compiler_gcc() {
     cc=gcc
     cflags="${*-}"
+    cppflags="-I$incdir"
     ldflags="$(get_ldflags)"
 }
 
 configure_emacs() {
     validate_platform
     configure_platform
-    parse_arguments "$@"
     basename=emacs-$EMACS_VERSION
 
     archive_dir="$HOME/Downloads/GNU"
@@ -123,7 +123,7 @@ configure_platform() {
 		;;
 	    (solaris)
 		configure_unix_solaris
-		configure_compiler_cc -m64
+		configure_compiler_gcc -m64
 		break
 		;;
 	esac
@@ -152,7 +152,6 @@ configure_unix_solaris() {
     incdir=$OPENCSW_PREFIX/include
     libdir=$OPENCSW_PREFIX/lib/amd64
     libgif=$libdir/libgif.so
-    with_gsettings=no
     with_x_toolkit=lucid
 }
 
@@ -197,28 +196,24 @@ get_command() {
 }
 
 get_ldflags() {
+    ldflags=
+
     case "$os_family" in
 	(gnu-*)
 	    ldflags="-Wl,--rpath=$libdir"
 	    ;;
 	(unix)
-	    ldflags="-R$libdir"
-	    ;;
-	(*)
-	    ldflags=
+	    ldflags="-L$libdir -R$libdir"
 	    ;;
     esac
 
-    printf "%s\n" "$ldflags"
+    if [ "${ldflags-}" ]; then
+	printf "%s\n" "$ldflags"
+    fi
 }
 
 get_options() {
     options="${options:+$options }--with-gnutls=yes"
-
-    if [ "${with_gsettings-yes}" = no ]; then
-	options="${options:+$options }--without-gconf"
-	options="${options:+$options }--without-gsettings"
-    fi
 
     if [ -n "${with_x_toolkit-}" ]; then
 	options="${options:+$options }--with-x-toolkit=$with_x_toolkit"
@@ -255,19 +250,10 @@ parse_arguments() {
     emacs_version=$EMACS_VERSION
     use_force=false
 
-    while getopts fglnp:st:v:xh opt; do
+    while getopts fp:t:v:xh opt; do
 	case $opt in
 	    (f)
 		use_force=true
-		;;
-	    (g)
-		cc=gcc
-		;;
-	    (l)
-		with_x_toolkit=lucid
-		;;
-	    (n)
-		with_x_toolkit=no
 		;;
 	    (p)
 		case $OPTARG in
@@ -283,6 +269,15 @@ parse_arguments() {
 			;;
 		esac
 		;;
+	    (t)
+		case $OPTARG in
+		    (athena|gtk|gtk2|gtk3|lucid|no)
+			with_x_toolkit=$OPTARG
+			;;
+		    (*)
+			abort_invalid_toolkit $OPTARG
+		esac
+		;;
 	    (v)
 		case $OPTARG in
 		    (2[6789].[0-9]|2[6789].[1-9][0-9])
@@ -291,18 +286,6 @@ parse_arguments() {
 		    (*)
 			abort_invalid_version $OPTARG
 			;;
-		esac
-		;;
-	    (s)
-		with_gsettings=yes
-		;;
-	    (t)
-		case $OPTARG in
-		    (athena|lucid|gtk|gtk2|gtk3)
-			with_x_toolkit=$OPTARG
-			;;
-		    (*)
-			abort_invalid_toolkit $OPTARG
 		esac
 		;;
 	    (x)
@@ -329,10 +312,10 @@ usage() {
 	printf "%s\n" "" >&2
     fi
 
-    cat <<EOF >&2
-Usage: $0 [-f] [-g] [-l] [-n] [-p PREFIX] [-s] [-t TOOLKIT] [-v VERSION] [-x]
-       $0 -h
-EOF
+    cat <<-EOF >&2
+	Usage: $0 [-f] [-p PREFIX] [-t TOOLKIT] [-v VERSION] [-x]
+	       $0 -h
+	EOF
 }
 
 validate_platform() {
@@ -366,4 +349,5 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
 
-configure_emacs "$@"
+parse_arguments "$@"
+configure_emacs
