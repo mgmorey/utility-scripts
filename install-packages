@@ -179,7 +179,7 @@ install_packages_from_args() (
     index=1
 
     while [ $index -le 2 ]; do
-	install_using "$(get_manager $index)" install \
+	install_using "$(get_manager $index)" \
 		      "$(get_options $index)" \
 		      $(get_packages $index)
 	index=$((index + 1))
@@ -196,24 +196,28 @@ install_pattern_from_args() (
 )
 
 install_using() (
-    assert [ $# -ge 3 ]
+    assert [ $# -ge 2 ]
 
-    if [ $# -eq 3 ]; then
+    if [ $# -eq 2 ]; then
 	return 0
     elif [ -z "$1" ]; then
 	return 0
     fi
 
-    installer=$1
-    installer_command=$2
-    installer_options=$3
-    shift 3
+    manager=$1
+    options=$2
+    shift 2
 
-    if [ "$installer" = /usr/local/bin/brew ]; then
-	run_unpriv -c "$installer $installer_command $installer_options $*"
-    else
-	$installer $installer_command $installer_options "$@"
-    fi
+    install=$("$script_dir/get-install-command" $1)
+
+    case "$manager" in
+	(brew|*/brew)
+	    run_unpriv -c "$manager $install $options $*"
+	    ;;
+	(*)
+	    $manager $install $options $*
+	    ;;
+    esac
 )
 
 parse_arguments() {
