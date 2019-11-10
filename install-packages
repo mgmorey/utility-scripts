@@ -211,8 +211,8 @@ install_using() (
 
     install=$("$script_dir/get-install-command" $manager)
 
-    case "$manager" in
-	(brew|*/brew)
+    case "$(basename $manager)" in
+	(brew)
 	    run_unpriv -c "$manager $install $options $*"
 	    ;;
 	(*)
