@@ -47,7 +47,7 @@ get_package_managers() {
 			;;
 		esac
 		;;
-	    (macos)
+	    (darwin)
 		managers="/usr/local/bin/brew /opt/pkg/bin/pkgin"
 		;;
 	    (freebsd)
