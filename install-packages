@@ -30,24 +30,20 @@ assert() {
 }
 
 configure_platform() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    IS_PATTERN_SUPPORTED=true
-		    ;;
-		(opensuse-*|fedora|rhel|ol|centos)
-		    IS_PATTERN_SUPPORTED=true
-		    ;;
-		(*)
-		    IS_PATTERN_SUPPORTED=false
-		    ;;
-	    esac
-	    ;;
-	(*)
-	    IS_PATTERN_SUPPORTED=false
-	    ;;
-    esac
+    is_pattern_supported=false
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		is_pattern_supported=true
+		break
+		;;
+	    (opensuse|fedora|rhel)
+		is_pattern_supported=true
+		break
+		;;
+	esac
+    done
 }
 
 get_manager() {
@@ -165,7 +161,7 @@ install_packages() {
     parse_arguments "$@"
     "$script_dir/install-package-managers" $managers
 
-    if [ "$IS_PATTERN_SUPPORTED" = true ]; then
+    if [ "$is_pattern_supported" = true ]; then
 	install_pattern_from_args
     fi
 
@@ -304,36 +300,46 @@ usage() {
 }
 
 validate_platform() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    :
-		    ;;
-		(opensuse-*|fedora|rhel|ol|centos)
-		    :
-		    ;;
-		(*)
-		    abort_not_supported Distro
-		    ;;
-	    esac
-	    ;;
-	(Darwin)
-	    :
-	    ;;
-	(FreeBSD)
-	    :
-	    ;;
-	(NetBSD)
-	    :
-	    ;;
-	(SunOS)
-	    :
-	    ;;
-	(*)
-	    abort_not_supported "Operating system"
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		return
+		;;
+	    (fedora)
+		return
+		;;
+	    (opensuse)
+		return
+		;;
+	    (rhel|ol|centos)
+		case "$VERSION_ID" in
+		    (7|7.*)
+			return
+			;;
+		    (8|8.*)
+			return
+			;;
+		esac
+		;;
+	    (darwin)
+		return
+		;;
+	    (freebsd)
+		return
+		;;
+	    (netbsd)
+		return
+		;;
+	    (illumos)
+		return
+		;;
+	    (solaris)
+		return
+		;;
+	esac
+    done
+
+    abort_not_supported "Operating system"
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
