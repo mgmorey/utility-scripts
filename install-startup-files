@@ -87,10 +87,6 @@ install_startup_files() {
 	abort "Please change from source directory before running this script\n"
     fi
 
-    if ! "$script_dir/install-git"; then
-	abort "%s: Unable to install git\n" "$0"
-    fi
-
     cd
 
     if [ ! -d Documents/git ]; then
