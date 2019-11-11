@@ -74,7 +74,7 @@ include_binary_directories() {
     for bindir; do
 	if is_to_be_included "$dir/$bindir" "${PATH-}"; then
 	    case "$dir" in
-		(/opt/csw|/opt/local)
+		(/opt/csw|/opt/local|/usr/pkg)
 		    PATH="${PATH:+$PATH:}$dir/$bindir"
 		    ;;
 		(*)
