@@ -18,6 +18,9 @@
 
 HOMEBREW_URL=https://raw.githubusercontent.com/Homebrew/install/master/install
 
+PKG_DIR=/Library/Developer/CommandLineTools/Packages/
+PKG_NAME=macOS_SDK_headers_for_macOS_10.14.pkg
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -55,6 +58,7 @@ install_homebrew() {
 	brew update
 	brew upgrade
     else
+	installer -allowUntrusted -pkg $PKG_DIR/$PKG_NAME -target /
 	/usr/bin/ruby -e "$(curl -fsSL $HOMEBREW_URL)"
     fi
 }
