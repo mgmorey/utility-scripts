@@ -109,11 +109,6 @@ configure_library_gif() {
 configure_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (rhel|ol)
-		configure_library_gif $LOCAL_PREFIX
-		configure_compiler gcc $incdir $libdir
-		break
-		;;
 	    (illumos)
 		configure_library_gif $LOCAL_PREFIX
 		configure_compiler "gcc -m64" $incdir $libdir
