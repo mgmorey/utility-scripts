@@ -58,7 +58,8 @@ SOLARIS_PKGS="database/sqlite-3 developer/build/autoconf \
 developer/build/automake developer/build/gnu-make developer/build/libtool \
 developer/build/pkg-config developer/developerstudio-126/cc \
 developer/developerstudio-126/library/c-libs library/libffi \
-library/ncurses library/readline shell/bash"
+library/ncurses library/pcre library/readline shell/bash \
+system/header"
 
 abort() {
     printf "$@" >&2
