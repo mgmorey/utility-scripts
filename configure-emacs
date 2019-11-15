@@ -86,7 +86,7 @@ configure_emacs() {
     extract_files
     cd "$build_dir"
 
-    if [ "$use_force" = true ]; then
+    if [ "$force" = true ]; then
 	clean_build
     elif [ ! -r config.status ]; then
 	:
@@ -107,6 +107,14 @@ configure_library_gif() {
 }
 
 configure_platform() {
+    emacs_prefix=$EMACS_PREFIX
+    emacs_version=$EMACS_VERSION
+    force=false
+    with_cairo=false
+    with_gnutls=true
+    with_toolkit=false
+    with_widgets=false
+
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (illumos)
@@ -117,7 +125,7 @@ configure_platform() {
 	    (solaris)
 		configure_library_gif $OPENCSW_PREFIX amd64
 		configure_compiler "gcc -m64" $incdir $libdir
-		with_x_toolkit=lucid
+		toolkit=lucid
 		break
 		;;
 	esac
@@ -180,14 +188,20 @@ get_configure_command() {
 }
 
 get_configure_options() {
-    options="${options:+$options }--with-gnutls=yes"
-
-    if [ -n "${with_x_toolkit-}" ]; then
-	options="${options:+$options }--with-x-toolkit=$with_x_toolkit"
+    if [ "${with_cairo-false}" = true ]; then
+	options="${options:+$options }--with-cairo${cairo:+=$cairo}"
     fi
 
-    if [ -n "${with_xwidgets-}" ]; then
-	options="${options:+$options }--with-xwidgets=$with_xwidgets"
+    if [ "${with_gnutls-false}" = true ]; then
+	options="${options:+$options }--with-gnutls${gnutls:+=$gnutls}"
+    fi
+
+    if [ "${with_toolkit-false}" = true ]; then
+	options="${options:+$options }--with-x-toolkit${toolkit:+=$toolkit}"
+    fi
+
+    if [ "${with_widgets-false}" = true ]; then
+	options="${options:+$options }--with-xwidgets${widgets:+=$widgets}"
     fi
 
     if [ -n "${options:-}" ]; then
@@ -237,14 +251,13 @@ get_realpath() (
 )
 
 parse_arguments() {
-    emacs_prefix=$EMACS_PREFIX
-    emacs_version=$EMACS_VERSION
-    use_force=false
-
-    while getopts fp:t:v:wh opt; do
+    while getopts cfp:t:v:wh opt; do
 	case $opt in
+	    (c)
+		with_cairo=true
+		;;
 	    (f)
-		use_force=true
+		force=true
 		;;
 	    (p)
 		case $OPTARG in
@@ -263,7 +276,8 @@ parse_arguments() {
 	    (t)
 		case $OPTARG in
 		    (athena|gtk|gtk2|gtk3|lucid|no)
-			with_x_toolkit=$OPTARG
+			toolkit=$OPTARG
+			with_toolkit=true
 			;;
 		    (*)
 			abort_invalid_toolkit $OPTARG
@@ -280,7 +294,7 @@ parse_arguments() {
 		esac
 		;;
 	    (w)
-		with_xwidgets=yes
+		with_widgets=true
 		;;
 	    (h)
 		usage
