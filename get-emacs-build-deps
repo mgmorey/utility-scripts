@@ -56,8 +56,9 @@ developer/developerstudio-126/cc developer/developerstudio-126/library/c-libs \
 library/gnome/dconf library/gnutls library/ncurses library/zlib system/header \
 :CSWlibgif-dev"
 
-UBUNTU_PKGS="libgif-dev libgnutls28-dev libgpm-dev libjpeg-dev \
-libncurses5-dev libtiff5-dev libwebkit2gtk-4.0-dev libxpm-dev"
+UBUNTU_PKGS="libdbus-1-dev libgif-dev libgnutls28-dev libgpm-dev libjpeg-dev \
+liblcms2-dev libm17n-dev libncurses5-dev libotf-dev librsvg2-dev libtiff5-dev \
+libwebkit2gtk-4.0-dev libxml2-dev libxpm-dev"
 
 abort() {
     printf "$@" >&2
