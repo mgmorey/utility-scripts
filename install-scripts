@@ -22,11 +22,11 @@ abort() {
 }
 
 if [ -h $0 ]; then
-    abort "Please change to source directory before running this script\n"
+    abort "This script must be run as %s.\n" "$(realpath $0)"
 fi
 
-dir=$PWD
-cd "$HOME"
+script_dir=$(pwd)
+cd
 
 if [ ! -d Documents/bin ]; then
     mkdir -m go-w -p Documents
@@ -49,9 +49,8 @@ for file in bin/*; do
     fi
 done
 
-for file in $dir/*; do
+for file in $script_dir/*; do
     if [ ! -e bin/$(basename $file) -a -x $file ]; then
 	ln -s $file bin
     fi
 done
-
