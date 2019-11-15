@@ -45,7 +45,7 @@ fi
 for file in bin/*; do
     if [ -h $file -a ! -e $file ]; then
 	printf "Removing broken link: %s\n" "$file"
-	/bin/rm -f $file
+	/bin/rm -f "$file"
     fi
 done
 
