@@ -114,7 +114,13 @@ install_startup_files() {
     for file in $STARTUP_FILES; do
 	if is_to_be_installed $file; then
 	    printf "Installing %s\n" $file
-	    $install -bm 644 $HOME/git/startup-files/$file $file
+
+	    if [ -r /etc/skel/$file ]; then
+		$install -bm 644 /etc/skel/$file $file
+		cat $HOME/git/startup-files/$file >>$file
+	    else
+		$install -bm 644 $HOME/git/startup-files/$file $file
+	    fi
 	fi
     done
 
