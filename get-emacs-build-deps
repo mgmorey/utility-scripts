@@ -37,8 +37,8 @@ libXt-devel libXtst-devel libXv-devel libxml2-devel make m17n-lib-devel \
 openjpeg-devel ncurses-devel zlib-devel Xaw3d-devel"
 
 REDHAT_8_PKGS="gnutls-devel gpm-devel gtk3-devel libacl-devel libICE-devel \
-libjpeg-turbo-devel libpng-devel libSM-devel libtiff-devel libX11-devel \
-libXaw-devel libXext-devel libXi-devel libXmu-devel libXpm-devel \
+libjpeg-turbo-devel libpng-devel librsvg2-devel libSM-devel libtiff-devel \
+libX11-devel libXaw-devel libXext-devel libXi-devel libXmu-devel libXpm-devel \
 libXrandr-devel libXt-devel libXtst-devel libXv-devel libxml2-devel make \
 ncurses-devel zlib-devel"
 
