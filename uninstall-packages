@@ -96,8 +96,8 @@ get_setpriv_command() (
 	    ;;
     esac
 
-    regid="$(id -u $1)"
-    reuid="$(id -g $1)"
+    regid="$(id -g $1)"
+    reuid="$(id -u $1)"
     printf "setpriv --reuid %s --regid %s %s\n" "$reuid" "$regid" "$options"
 )
 
@@ -122,14 +122,6 @@ get_su_command() (
     esac
 
     printf "su %s %s\n" "$options" "$1"
-)
-
-invoke_manager() (
-    if [ "$1" = /usr/local/bin/brew ]; then
-	run_unpriv -c "$*"
-    else
-	"$@"
-    fi
 )
 
 parse_arguments() {
@@ -199,7 +191,7 @@ uninstall_using() (
 
     case "$manager" in
 	(brew|*/brew)
-	    run_unpriv -c "$manager $uninstall $*"
+	    run_unpriv sh -c "$manager $uninstall $*"
 	    ;;
 	(*)
 	    $manager $uninstall $*
