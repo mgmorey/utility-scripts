@@ -20,6 +20,8 @@ DEBIAN_PKGS="build-essential dkms linux-headers-$(uname -r)"
 
 FEDORA_PKGS="bzip2 dkms gcc kernel-headers kernel-devel make perl"
 
+OPENSUSE_PKGS="bzip2 dkms gcc kernel-devel make perl"
+
 REDHAT_PKGS="bzip2 dkms gcc kernel-headers kernel-devel make perl"
 
 abort() {
@@ -46,6 +48,11 @@ configure_platform() {
 		    cdrom_dev=/dev/cdrom
 		    mount_dir=/media/cdrom0
 		    packages=$DEBIAN_PKGS
+		    ;;
+		(opensuse-*)
+		    cdrom_dev=/dev/cdrom
+		    mount_dir=/run/media/${SUDO_USER-USER}/$vbox_dir
+		    packages=$OPENSUSE_PKGS
 		    ;;
 		(fedora)
 		    cdrom_dev=/dev/cdrom
@@ -201,6 +208,9 @@ validate_platform() {
 	(Linux)
 	    case "$ID" in
 		(debian|raspbian|ubuntu|neon|linuxmint|kali)
+		    :
+		    ;;
+		(opensuse-*)
 		    :
 		    ;;
 		(ol)
