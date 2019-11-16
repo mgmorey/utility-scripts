@@ -65,7 +65,7 @@ get_packages_using() {
 	    dpkg-query -Wf '${Status} ${Package}\n' | awk "$DPKG_AWK"
 	    ;;
 	(brew)
-	    run_unpriv -c "$1 list -1"
+	    run_unpriv sh -c "$1 list -1"
 	    ;;
 	(dnf)
 	    $1 list installed | awk 'NF == 3 {print $1}' | awk -F. '{print $1}'
@@ -138,8 +138,8 @@ get_setpriv_command() (
 	    ;;
     esac
 
-    regid="$(id -u $1)"
-    reuid="$(id -g $1)"
+    regid="$(id -g $1)"
+    reuid="$(id -u $1)"
     printf "setpriv --reuid %s --regid %s %s\n" "$reuid" "$regid" "$options"
 )
 
