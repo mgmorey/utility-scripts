@@ -27,8 +27,10 @@ libXmu-devel libXpm-devel libXrandr-devel libXt-devel libXtst-devel \
 libXv-devel libxml2-devel make m17n-lib-devel openjpeg-devel ncurses-devel \
 webkit2gtk3-devel Xaw3d-devel zlib-devel"
 
-ILLUMOS_PKGS="developer/build/gnu-make developer/build/pkg-config \
-developer/illumos-gcc library/gnutls library/ncurses library/zlib"
+ILLUMOS_PKGS="developer/build/autoconf developer/build/automake \
+developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
+developer/illumos-gcc image/library/librsvg library/desktop/cairo
+library/gnutls library/ncurses library/zlib system/header"
 
 REDHAT_7_PKGS="GConf2-devel giflib-devel gnutls-devel gpm-devel gtk3-devel \
 ImageMagick-devel lcms2-devel libacl-devel libICE-devel libjpeg-turbo-devel \
