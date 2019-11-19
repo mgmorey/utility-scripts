@@ -32,20 +32,6 @@ developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
 developer/illumos-gcc image/library/librsvg library/desktop/cairo
 library/gnutls library/ncurses library/zlib system/header"
 
-REDHAT_7_PKGS="GConf2-devel giflib-devel gnutls-devel gpm-devel gtk3-devel \
-ImageMagick-devel lcms2-devel libacl-devel libICE-devel libjpeg-turbo-devel \
-libotf-devel libpng-devel librsvg2-devel libSM-devel libtiff-devel
-libX11-devel libXaw-devel libXext-devel libXi-devel libxml2-devel
-libXmu-devel libXpm-devel libXrandr-devel libXt-devel libXtst-devel \
-libXv-devel make m17n-lib-devel openjpeg-devel ncurses-devel \
-webkitgtk4-devel Xaw3d-devel zlib-devel"
-
-REDHAT_8_PKGS="cairo-devel gnutls-devel gpm-devel gtk3-devel libacl-devel \
-libICE-devel libjpeg-turbo-devel libpng-devel librsvg2-devel libSM-devel \
-libtiff-devel libX11-devel libXaw-devel libXext-devel libXi-devel \
-libxml2-devel libXmu-devel libXpm-devel libXrandr-devel libXt-devel \
-libXtst-devel libXv-devel make ncurses-devel webkit2gtk3-devel zlib-devel"
-
 OPENSUSE_PKGS="gcc gconf2-devel giflib-devel gpm-devel gtk3-devel \
 ImageMagick-devel libacl-devel libgnutls-devel libjpeg62-devel \
 libICE-devel liblcms2-devel libpng16-devel libSM-devel libtiff-devel \
@@ -53,6 +39,20 @@ libX11-devel libXaw3d-devel libXext-devel libXi-devel libXmu-devel \
 libXpm-devel libXrandr-devel libXt-devel libXtst-devel libXv-devel \
 libxml2-devel make m17n-lib-devel ncurses5-devel \
 webkit2gtk3-devel zlib-devel"
+
+REDHAT_7_PKGS="autoconf automake cairo-devel GConf2-devel giflib-devel \
+gnutls-devel gpm-devel gtk3-devel ImageMagick-devel lcms2-devel libacl-devel \
+libICE-devel libjpeg-turbo-devel libotf-devel libpng-devel librsvg2-devel \
+libSM-devel libtiff-devel libtool libX11-devel libXaw-devel libXext-devel \
+libXi-devel libxml2-devel libXmu-devel libXpm-devel libXrandr-devel \
+libXt-devel libXtst-devel libXv-devel make m17n-lib-devel ncurses-devel \
+openjpeg-devel pkgconfig webkitgtk4-devel Xaw3d-devel zlib-devel"
+
+REDHAT_8_PKGS="cairo-devel gnutls-devel gpm-devel gtk3-devel libacl-devel \
+libICE-devel libjpeg-turbo-devel libpng-devel librsvg2-devel libSM-devel \
+libtiff-devel libX11-devel libXaw-devel libXext-devel libXi-devel \
+libxml2-devel libXmu-devel libXpm-devel libXrandr-devel libXt-devel \
+libXtst-devel libXv-devel make ncurses-devel webkit2gtk3-devel zlib-devel"
 
 SOLARIS_PKGS="developer/build/autoconf developer/build/automake \
 developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
