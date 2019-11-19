@@ -19,20 +19,20 @@
 DEBIAN_PKGS="libgif-dev libgnutls28-dev libgpm-dev libjpeg-dev \
 libncurses5-dev libtiff5-dev libwebkit2gtk-4.0-dev libxpm-dev"
 
-FEDORA_PKGS="cairo-devel GConf2-devel giflib-devel gnutls-devel gpm-devel \
-gtk3-devel ImageMagick-devel lcms2-devel libacl-devel libICE-devel \
-libjpeg-turbo-devel libpng-devel librsvg2-devel libSM-devel libtiff-devel \
-libX11-devel libXaw-devel libXext-devel libXi-devel libxml2-devel \
-libXmu-devel libXpm-devel libXrandr-devel libXt-devel libXtst-devel \
-libXv-devel libxml2-devel make m17n-lib-devel openjpeg-devel ncurses-devel \
-webkit2gtk3-devel Xaw3d-devel zlib-devel"
+FEDORA_PKGS="autoconf automake cairo-devel gcc GConf2-devel giflib-devel \
+gnutls-devel gpm-devel gtk3-devel ImageMagick-devel lcms2-devel libacl-devel \
+libICE-devel libjpeg-turbo-devel libpng-devel librsvg2-devel libSM-devel \
+libtiff-devel libtool libX11-devel libXaw-devel libXext-devel libXi-devel \
+libxml2-devel libXmu-devel libXpm-devel libXrandr-devel libXt-devel \
+libXtst-devel libXv-devel libxml2-devel make m17n-lib-devel openjpeg-devel \
+ncurses-devel webkit2gtk3-devel Xaw3d-devel zlib-devel"
 
 ILLUMOS_PKGS="developer/build/autoconf developer/build/automake \
 developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
 developer/illumos-gcc image/library/librsvg library/desktop/cairo
 library/gnutls library/ncurses library/zlib system/header"
 
-OPENSUSE_PKGS="autoconf automake gcc cairo-devel gconf2-devel giflib-devel \
+OPENSUSE_PKGS="autoconf automake cairo-devel gcc gconf2-devel giflib-devel \
 gpm-devel gtk3-devel ImageMagick-devel libacl-devel libgnutls-devel \
 libjpeg62-devel libICE-devel liblcms2-devel libpng16-devel librsvg-devel \
 libSM-devel libtiff-devel libtool libX11-devel libXaw3d-devel libXext-devel \
