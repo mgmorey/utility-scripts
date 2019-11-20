@@ -19,7 +19,7 @@
 DEBIAN_PKGS="libgif-dev libjpeg-dev libtiff5-dev libxpm-dev"
 
 FEDORA_PKGS="giflib-devel ImageMagick-devel libjpeg-turbo-devel libpng-devel \
-libtiff-devel openjpeg-devel"
+libtiff-devel libXpm-devel openjpeg-devel"
 
 OPENSUSE_PKGS="giflib-devel ImageMagick-devel libjpeg8-devel libpng16-devel \
 libtiff-devel libXpm-devel"
