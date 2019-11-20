@@ -1,0 +1,106 @@
+#!/bin/sh -eu
+
+# get-webkitgtk-packages: get list of WebKitGTK packages
+# Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+DEBIAN_PKGS="libwebkit2gtk-4.0-dev"
+
+FEDORA_PKGS="webkit2gtk3-devel"
+
+OPENSUSE_PKGS="webkit2gtk3-devel"
+
+REDHAT_7_PKGS="webkitgtk4-devel"
+
+REDHAT_8_PKGS="webkit2gtk3-devel"
+
+SOLARIS_PKGS="library/desktop/webkitgtk4"
+
+UBUNTU_PKGS="libwebkit2gtk-4.0-dev"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+
+get_emacs_build_deps() {
+    packages=
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		packages=$DEBIAN_PKGS
+		;;
+	    (fedora)
+		packages=$FEDORA_PKGS
+		;;
+	    (opensuse)
+		packages=$OPENSUSE_PKGS
+		;;
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		    (7|7.[78])
+			packages=$REDHAT_7_PKGS
+			;;
+		    (8|8.[01])
+			packages=$REDHAT_8_PKGS
+			;;
+		esac
+		;;
+	    (ubuntu)
+		packages=$UBUNTU_PKGS
+		;;
+	    (solaris)
+		packages=$SOLARIS_PKGS
+		;;
+	esac
+
+	if [ -n "${packages-}" ]; then
+	    break
+	fi
+    done
+
+    if [ -n "${packages-}" ]; then
+	printf "%s\n" $packages
+    fi
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -x)
+
+get_emacs_build_deps
