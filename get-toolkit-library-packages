@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-FEDORA_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
-libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
+FEDORA_PKGS="GConf2-devel gtk3-devel libICE-devel libSM-devel libX11-devel \
+libXaw-devel libXext-devel libXi-devel libXmu-devel libXrandr-devel \
 libXt-devel libXtst-devel libXv-devel Xaw3d-devel"
 
 OPENSUSE_PKGS="gconf2-devel gtk3-devel libICE-devel libSM-devel libX11-devel \
