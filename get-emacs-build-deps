@@ -18,9 +18,6 @@
 
 CATEGORIES="development image-library toolkit-library utility-library"
 
-DEBIAN_PKGS="libgif-dev libgnutls28-dev libgpm-dev libjpeg-dev \
-libncurses5-dev libtiff5-dev libwebkit2gtk-4.0-dev libxpm-dev"
-
 ILLUMOS_PKGS="developer/build/autoconf developer/build/automake \
 developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
 developer/illumos-gcc image/library/librsvg library/desktop/cairo
