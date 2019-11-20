@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+CATEGORIES="development image-library toolkit-library utility-library"
+
 DEBIAN_PKGS="libgif-dev libgnutls28-dev libgpm-dev libjpeg-dev \
 libncurses5-dev libtiff5-dev libwebkit2gtk-4.0-dev libxpm-dev"
 
@@ -75,50 +77,14 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-
 get_emacs_build_deps() {
-    packages=
+    get_packages_in $CATEGORIES | sort -u
+}
 
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (debian)
-		packages=$DEBIAN_PKGS
-		;;
-	    (fedora)
-		packages=$FEDORA_PKGS
-		;;
-	    (opensuse)
-		packages=$OPENSUSE_PKGS
-		;;
-	    (rhel|ol)
-		case "$VERSION_ID" in
-		    (7|7.[78])
-			packages=$REDHAT_7_PKGS
-			;;
-		    (8|8.[01])
-			packages=$REDHAT_8_PKGS
-			;;
-		esac
-		;;
-	    (ubuntu)
-		packages=$UBUNTU_PKGS
-		;;
-	    (illumos)
-		packages=$ILLUMOS_PKGS
-		;;
-	    (solaris)
-		packages=$SOLARIS_PKGS
-		;;
-	esac
-
-	if [ -n "${packages-}" ]; then
-	    break
-	fi
+get_packages_in() {
+    for category; do
+	"$script_dir/get-$category-packages"
     done
-
-    if [ -n "${packages-}" ]; then
-	printf "%s\n" $packages
-    fi
 }
 
 get_realpath() (
