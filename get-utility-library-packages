@@ -24,7 +24,8 @@ libxml2-devel m17n-lib-devel ncurses-devel webkit2gtk3-devel zlib-devel"
 ILLUMOS_PKGS="library/desktop/cairo library/gnutls library/ncurses library/zlib"
 
 OPENSUSE_PKGS="cairo-devel gpm-devel libacl-devel libgnutls-devel \
-liblcms2-devel librsvg-devel m17n-lib-devel ncurses5-devel webkit2gtk3-devel"
+liblcms2-devel librsvg-devel libxml2-devel m17n-lib-devel ncurses5-devel \
+webkit2gtk3-devel zlib-devel"
 
 REDHAT_7_PKGS="cairo-devel gnutls-devel gpm-devel lcms2-devel \
 libacl-devel libotf-devel librsvg2-devel libxml2-devel m17n-lib-devel \
