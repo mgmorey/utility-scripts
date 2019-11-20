@@ -35,8 +35,8 @@ ncurses-devel webkitgtk4-devel zlib-devel"
 REDHAT_8_PKGS="cairo-devel gnutls-devel gpm-devel libacl-devel librsvg2-devel \
 libxml2-devel ncurses-devel webkit2gtk3-devel zlib-devel"
 
-SOLARIS_PKGS="library/desktop/cairo library/desktop/webkitgtk4 \
-library/gnutls library/ncurses library/zlib system/header"
+SOLARIS_PKGS="image/library/librsvg library/desktop/cairo \
+library/desktop/webkitgtk4 library/gnutls library/ncurses library/zlib"
 
 UBUNTU_PKGS="libdbus-1-dev libgnutls28-dev libgpm-dev liblcms2-dev libm17n-dev \
 libncurses5-dev libotf-dev librsvg2-dev libwebkit2gtk-4.0-dev libxml2-dev"
