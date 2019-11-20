@@ -22,7 +22,7 @@ ILLUMOS_PKGS="developer/build/autoconf developer/build/automake \
 developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
 developer/illumos-gcc system/header"
 
-OPENSUSE_PKGS="autoconf automake gcc libtool make"
+OPENSUSE_PKGS="autoconf automake gcc libtool make pkgconf"
 
 REDHAT_7_PKGS="autoconf automake gcc libtool make pkgconfig"
 
