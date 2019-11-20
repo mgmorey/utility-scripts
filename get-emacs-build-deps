@@ -40,7 +40,7 @@ libXi-devel libXmu-devel libXpm-devel libXrandr-devel libXt-devel \
 libXtst-devel libXv-devel libxml2-devel make m17n-lib-devel \
 ncurses5-devel webkit2gtk3-devel zlib-devel"
 
-REDHAT_7_PKGS="autoconf automake cairo-devel GConf2-devel giflib-devel \
+REDHAT_7_PKGS="autoconf automake cairo-devel gcc GConf2-devel giflib-devel \
 gnutls-devel gpm-devel gtk3-devel ImageMagick-devel lcms2-devel libacl-devel \
 libICE-devel libjpeg-turbo-devel libotf-devel libpng-devel librsvg2-devel \
 libSM-devel libtiff-devel libtool libX11-devel libXaw-devel libXext-devel \
