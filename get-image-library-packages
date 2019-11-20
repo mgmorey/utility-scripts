@@ -29,6 +29,8 @@ libtiff-devel libtool libXpm-devel openjpeg-devel"
 
 REDHAT_8_PKGS="libjpeg-turbo-devel libpng-devel libtiff-devel libXpm-devel"
 
+SOLARIS_PKGS=":CSWlibgif-dev"
+
 UBUNTU_PKGS="libgif-dev libjpeg-dev libtiff5-dev libxpm-dev"
 
 abort() {
@@ -64,6 +66,9 @@ get_emacs_build_deps() {
 			packages=$REDHAT_8_PKGS
 			;;
 		esac
+		;;
+	    (solaris)
+		packages=$SOLARIS_PKGS
 		;;
 	    (ubuntu)
 		packages=$UBUNTU_PKGS
