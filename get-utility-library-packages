@@ -24,7 +24,7 @@ ncurses-devel zlib-devel"
 ILLUMOS_PKGS="library/gnutls library/ncurses library/zlib"
 
 OPENSUSE_PKGS="gpm-devel libacl-devel libgnutls-devel liblcms2-devel \
-m17n-lib-devel ncurses5-devel zlib-devel"
+libotf-devel m17n-lib-devel ncurses5-devel zlib-devel"
 
 REDHAT_7_PKGS="gnutls-devel gpm-devel lcms2-devel libacl-devel libotf-devel \
 m17n-lib-devel ncurses-devel zlib-devel"
