@@ -26,13 +26,6 @@ developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
 developer/illumos-gcc image/library/librsvg library/desktop/cairo
 library/gnutls library/ncurses library/zlib system/header"
 
-SOLARIS_PKGS="developer/build/autoconf developer/build/automake \
-developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
-developer/developerstudio-126/cc developer/developerstudio-126/library/c-libs \
-image/library/librsvg library/desktop/cairo library/desktop/webkitgtk4 \
-library/gnome/dconf library/gnutls library/ncurses library/zlib system/header \
-:CSWlibgif-dev"
-
 UBUNTU_PKGS="libdbus-1-dev libgif-dev libgnutls28-dev libgpm-dev libjpeg-dev \
 liblcms2-dev libm17n-dev libncurses5-dev libotf-dev librsvg2-dev libtiff5-dev \
 libwebkit2gtk-4.0-dev libxml2-dev libxpm-dev"
