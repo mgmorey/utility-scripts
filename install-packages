@@ -38,9 +38,18 @@ configure_platform() {
 		is_pattern_supported=true
 		break
 		;;
-	    (opensuse|fedora|rhel)
+	    (fedora)
 		is_pattern_supported=true
 		break
+		;;
+	    (rhel|ol|centos)
+		case "$VERSION_ID" in
+		    (7|7.*)
+			"$script_dir/install-epel"
+			;;
+		esac
+
+		is_pattern_supported=true
 		;;
 	esac
     done
