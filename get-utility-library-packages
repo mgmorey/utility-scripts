@@ -18,8 +18,9 @@
 
 DEBIAN_PKGS="libgnutls28-dev libgpm-dev libncurses5-dev libwebkit2gtk-4.0-dev"
 
-FEDORA_PKGS="gnutls-devel gpm-devel lcms2-devel libacl-devel librsvg2-devel \
-libxml2-devel m17n-lib-devel ncurses-devel webkit2gtk3-devel zlib-devel"
+FEDORA_PKGS="cairo-devel gnutls-devel gpm-devel lcms2-devel libacl-devel \
+librsvg2-devel libxml2-devel m17n-lib-devel ncurses-devel webkit2gtk3-devel \
+zlib-devel"
 
 ILLUMOS_PKGS="library/desktop/cairo library/gnutls library/ncurses library/zlib"
 
