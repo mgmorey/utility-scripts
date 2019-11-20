@@ -34,13 +34,6 @@ developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
 developer/illumos-gcc image/library/librsvg library/desktop/cairo
 library/gnutls library/ncurses library/zlib system/header"
 
-REDHAT_8_PKGS="autoconf automake cairo-devel gcc gnutls-devel gpm-devel \
-gtk3-devel libacl-devel libICE-devel libjpeg-turbo-devel libpng-devel \
-librsvg2-devel libSM-devel libtiff-devel libtool libX11-devel libXaw-devel \
-libXext-devel libXi-devel libxml2-devel libXmu-devel libXpm-devel \
-libXrandr-devel libXt-devel libXtst-devel libXv-devel make ncurses-devel \
-webkit2gtk3-devel zlib-devel"
-
 SOLARIS_PKGS="developer/build/autoconf developer/build/automake \
 developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
 developer/developerstudio-126/cc developer/developerstudio-126/library/c-libs \
