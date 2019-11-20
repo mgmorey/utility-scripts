@@ -24,8 +24,8 @@ gnutls-devel gpm-devel gtk3-devel ImageMagick-devel lcms2-devel libacl-devel \
 libICE-devel libjpeg-turbo-devel libpng-devel librsvg2-devel libSM-devel \
 libtiff-devel libtool libX11-devel libXaw-devel libXext-devel libXi-devel \
 libxml2-devel libXmu-devel libXpm-devel libXrandr-devel libXt-devel \
-libXtst-devel libXv-devel libxml2-devel make m17n-lib-devel openjpeg-devel \
-ncurses-devel webkit2gtk3-devel Xaw3d-devel zlib-devel"
+libXtst-devel libXv-devel libxml2-devel make m17n-lib-devel ncurses-devel \
+openjpeg-devel pkgconf webkit2gtk3-devel Xaw3d-devel zlib-devel"
 
 ILLUMOS_PKGS="developer/build/autoconf developer/build/automake \
 developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
