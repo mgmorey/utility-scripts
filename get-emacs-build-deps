@@ -16,7 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CATEGORIES="development image-library toolkit-library utility-library"
+CATEGORIES="development image-library render-library toolkit-library \
+utility-library webkitgtk"
 
 ILLUMOS_PKGS="developer/build/autoconf developer/build/automake \
 developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
