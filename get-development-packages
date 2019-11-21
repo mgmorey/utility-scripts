@@ -28,7 +28,7 @@ OPENSUSE_PKGS="autoconf automake gcc libtool make pkgconf"
 
 REDHAT_7_PKGS="autoconf automake gcc libtool make pkgconfig"
 
-REDHAT_8_PKGS="autoconf automake gcc libtool make"
+REDHAT_8_PKGS="autoconf automake gcc libtool make pkgconf"
 
 SOLARIS_PKGS="developer/build/autoconf developer/build/automake \
 developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
