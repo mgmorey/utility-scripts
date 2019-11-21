@@ -16,21 +16,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+DEBIAN_PKGS="libgtk-3-dev libice-dev libsm-dev libx11-dev libxaw7-dev \
+libxext-dev libxi-dev libxmu-dev libxrandr-dev libxt-dev libxtst-dev"
+
 FEDORA_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
 libXext-devel libXi-devel libXmu-devel libXrandr-devel libXt-devel \
-libXtst-devel libXv-devel"
+libXtst-devel"
 
 OPENSUSE_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw3d-devel \
 libXext-devel libXi-devel libXmu-devel libXrandr-devel libXt-devel \
-libXtst-devel libXv-devel"
+libXtst-devel"
 
 REDHAT_7_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
 libXext-devel libXi-devel libXmu-devel libXrandr-devel libXt-devel \
-libXtst-devel libXv-devel"
+libXtst-devel"
 
 REDHAT_8_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
 libXext-devel libXi-devel libXmu-devel libXrandr-devel libXt-devel \
-libXtst-devel libXv-devel"
+libXtst-devel"
 
 SOLARIS_PKGS="x11/library/libice x11/library/libsm x11/library/libx11 \
 x11/library/libxext x11/library/libxi x11/library/libxmu x11/library/libxrandr \
@@ -52,6 +55,9 @@ get_emacs_build_deps() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (debian)
+		packages=$DEBIAN_PKGS
+		;;
 	    (fedora)
 		packages=$FEDORA_PKGS
 		;;
