@@ -25,7 +25,7 @@ OPENSUSE_PKGS="giflib-devel ImageMagick-devel libjpeg8-devel libpng16-devel \
 libtiff-devel libXpm-devel"
 
 REDHAT_7_PKGS="giflib-devel ImageMagick-devel libjpeg-turbo-devel libpng-devel \
-libtiff-devel libtool libXpm-devel openjpeg-devel"
+libtiff-devel libXpm-devel openjpeg2-devel"
 
 REDHAT_8_PKGS="libjpeg-turbo-devel libpng-devel libtiff-devel libXpm-devel"
 
