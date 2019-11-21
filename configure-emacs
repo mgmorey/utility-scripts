@@ -123,9 +123,10 @@ configure_platform() {
 		break
 		;;
 	    (solaris)
+		toolkit=lucid
+		with_toolkit=true
 		configure_library_gif $OPENCSW_PREFIX amd64
 		configure_compiler "gcc -m64" $incdir $libdir
-		toolkit=lucid
 		break
 		;;
 	esac
