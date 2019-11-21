@@ -18,8 +18,8 @@
 
 DEBIAN_PKGS="libgnutls28-dev libgpm-dev libncurses5-dev"
 
-FEDORA_PKGS="gnutls-devel gpm-devel lcms2-devel libacl-devel m17n-lib-devel \
-ncurses-devel zlib-devel"
+FEDORA_PKGS="gnutls-devel gpm-devel lcms2-devel libacl-devel libotf-devel \
+m17n-lib-devel ncurses-devel zlib-devel"
 
 ILLUMOS_PKGS="library/gnutls library/ncurses library/zlib"
 
