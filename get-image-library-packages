@@ -17,21 +17,21 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 DEBIAN_PKGS="libgif-dev libjpeg-dev libmagickcore-6-headers libopenjp2-7-dev \
-libpng-dev libtiff5-dev libxpm-dev"
+libpng-dev libtiff5-dev"
 
 FEDORA_PKGS="giflib-devel ImageMagick-devel libjpeg-turbo-devel libpng-devel \
-libtiff-devel libXpm-devel openjpeg-devel"
+libtiff-devel openjpeg-devel"
 
 OPENSUSE_PKGS="giflib-devel ImageMagick-devel libjpeg8-devel libpng16-devel \
-libtiff-devel libXpm-devel openjpeg2-devel"
+libtiff-devel openjpeg2-devel"
 
 REDHAT_7_PKGS="giflib-devel ImageMagick-devel libjpeg-turbo-devel libpng-devel \
-libtiff-devel libXpm-devel openjpeg2-devel"
+libtiff-devel openjpeg2-devel"
 
-REDHAT_8_PKGS="libjpeg-turbo-devel libpng-devel libtiff-devel libXpm-devel"
+REDHAT_8_PKGS="libjpeg-turbo-devel libpng-devel libtiff-devel"
 
 SOLARIS_PKGS="image/imagemagick image/library/libjpeg image/library/libpng14 \
-image/library/libtiff image/library/openjpeg2 x11/library/libxpm :CSWlibgif-dev"
+image/library/libtiff image/library/openjpeg2 :CSWlibgif-dev"
 
 abort() {
     printf "$@" >&2
