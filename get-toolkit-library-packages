@@ -16,23 +16,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-FEDORA_PKGS="GConf2-devel gtk3-devel libICE-devel libSM-devel libX11-devel \
-libXaw-devel libXext-devel libXi-devel libXmu-devel libXrandr-devel \
-libXt-devel libXtst-devel libXv-devel Xaw3d-devel"
+FEDORA_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
+libXext-devel libXi-devel libXmu-devel libXrandr-devel libXt-devel \
+libXtst-devel libXv-devel"
 
-OPENSUSE_PKGS="gconf2-devel gtk3-devel libICE-devel libSM-devel libX11-devel \
-libXaw3d-devel libXext-devel libXi-devel libXmu-devel libXrandr-devel \
-libXt-devel libXtst-devel libXv-devel"
+OPENSUSE_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw3d-devel \
+libXext-devel libXi-devel libXmu-devel libXrandr-devel libXt-devel \
+libXtst-devel libXv-devel"
 
-REDHAT_7_PKGS="GConf2-devel gtk3-devel libICE-devel libSM-devel libX11-devel \
-libXaw-devel libXext-devel libXi-devel libXmu-devel libXrandr-devel \
-libXt-devel libXtst-devel libXv-devel Xaw3d-devel"
+REDHAT_7_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
+libXext-devel libXi-devel libXmu-devel libXrandr-devel libXt-devel \
+libXtst-devel libXv-devel"
 
 REDHAT_8_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
-libXext-devel libXi-devel libxml2-devel libXmu-devel libXpm-devel \
-libXrandr-devel libXt-devel libXtst-devel libXv-devel"
-
-SOLARIS_PKGS="library/gnome/dconf"
+libXext-devel libXi-devel libXmu-devel libXrandr-devel libXt-devel \
+libXtst-devel libXv-devel"
 
 abort() {
     printf "$@" >&2
@@ -64,9 +62,6 @@ get_emacs_build_deps() {
 			packages=$REDHAT_8_PKGS
 			;;
 		esac
-		;;
-	    (solaris)
-		packages=$SOLARIS_PKGS
 		;;
 	esac
 
