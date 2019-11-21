@@ -38,8 +38,8 @@ libXt-devel libXtst-devel"
 
 SOLARIS_PKGS="x11/library/libice x11/library/libsm x11/library/libx11 \
 x11/library/libxext x11/library/libxi x11/library/libxmu x11/library/libxpm \
-x11/library/libxrandr x11/library/libxt x11/library/libxtst \
-x11/library/toolkit/libxaw7 x11/library/toolkit/libxt"
+x11/library/libxrandr x11/library/libxtst x11/library/toolkit/libxaw7 \
+x11/library/toolkit/libxt"
 
 abort() {
     printf "$@" >&2
