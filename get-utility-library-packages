@@ -22,8 +22,6 @@ libm17n-dev libncurses5-dev libotf-dev zlib1g-dev"
 FEDORA_PKGS="gnutls-devel gpm-devel lcms2-devel libacl-devel libotf-devel \
 m17n-lib-devel ncurses-devel zlib-devel"
 
-ILLUMOS_PKGS="library/gnutls library/ncurses library/zlib"
-
 OPENSUSE_PKGS="gpm-devel libacl-devel libgnutls-devel liblcms2-devel \
 libotf-devel m17n-lib-devel ncurses5-devel zlib-devel"
 
@@ -67,9 +65,6 @@ get_emacs_build_deps() {
 			packages=$REDHAT_8_PKGS
 			;;
 		esac
-		;;
-	    (illumos)
-		packages=$ILLUMOS_PKGS
 		;;
 	    (solaris)
 		packages=$SOLARIS_PKGS
