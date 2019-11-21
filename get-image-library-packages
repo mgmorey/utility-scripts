@@ -16,7 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKGS="libgif-dev libjpeg-dev libtiff5-dev libxpm-dev"
+DEBIAN_PKGS="libgif-dev libjpeg-dev libmagickcore-6-headers libopenjp2-7-dev \
+libpng-dev libtiff5-dev libxpm-dev"
 
 FEDORA_PKGS="giflib-devel ImageMagick-devel libjpeg-turbo-devel libpng-devel \
 libtiff-devel libXpm-devel openjpeg-devel"
