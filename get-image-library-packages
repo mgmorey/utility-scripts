@@ -16,25 +16,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKGS="libgif-dev libjpeg-dev libmagickcore-6-headers libopenjp2-7-dev \
-libpng-dev libtiff5-dev"
+DEBIAN_PKGS="libgif-dev libjpeg-dev libmagickcore-6-headers libpng-dev \
+libtiff5-dev" # libopenjp2-7-dev
 
 FEDORA_PKGS="giflib-devel ImageMagick-devel libjpeg-turbo-devel libpng-devel \
-libtiff-devel openjpeg-devel"
+libtiff-devel" # openjpeg-devel
 
 ILLUMOS_PKGS="image/imagemagick image/library/libjpeg image/library/libpng14 \
-image/library/libtiff image/library/openjpeg library/giflib"
+image/library/libtiff library/giflib" # image/library/openjpeg
 
 OPENSUSE_PKGS="giflib-devel ImageMagick-devel libjpeg8-devel libpng16-devel \
-libtiff-devel openjpeg2-devel"
+libtiff-devel" # openjpeg2-devel
 
 REDHAT_7_PKGS="giflib-devel ImageMagick-devel libjpeg-turbo-devel libpng-devel \
-libtiff-devel openjpeg2-devel"
+libtiff-devel" # openjpeg2-devel
 
 REDHAT_8_PKGS="libjpeg-turbo-devel libpng-devel libtiff-devel"
 
 SOLARIS_PKGS="image/imagemagick image/library/libjpeg image/library/libpng14 \
-image/library/libtiff image/library/openjpeg2 :CSWlibgif-dev"
+image/library/libtiff :CSWlibgif-dev" # image/library/openjpeg2
 
 abort() {
     printf "$@" >&2
