@@ -24,7 +24,7 @@ FEDORA_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
 libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
 libXt-devel libXtst-devel"
 
-OPENSUSE_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw3d-devel \
+OPENSUSE_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
 libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
 libXt-devel libXtst-devel"
 
