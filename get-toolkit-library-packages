@@ -20,19 +20,11 @@ DEBIAN_PKGS="libgtk-3-dev libice-dev libsm-dev libx11-dev libxaw7-dev \
 libxext-dev libxi-dev libxmu-dev libxpm-dev libxrandr-dev \
 libxt-dev libxtst-dev"
 
-FEDORA_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
-libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
-libXt-devel libXtst-devel"
-
 OPENSUSE_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
 libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
 libXt-devel libXtst-devel"
 
-REDHAT_7_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
-libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
-libXt-devel libXtst-devel"
-
-REDHAT_8_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
+REDHAT_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
 libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
 libXt-devel libXtst-devel"
 
@@ -65,15 +57,8 @@ get_emacs_build_deps() {
 	    (opensuse)
 		packages=$OPENSUSE_PKGS
 		;;
-	    (rhel|ol)
-		case "$VERSION_ID" in
-		    (7|7.[78])
-			packages=$REDHAT_7_PKGS
-			;;
-		    (8|8.[01])
-			packages=$REDHAT_8_PKGS
-			;;
-		esac
+	    (rhel|ol|fedora)
+		packages=$REDHAT_PKGS
 		;;
 	    (solaris)
 		packages=$SOLARIS_PKGS
