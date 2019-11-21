@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+DEBIAN_PKGS="libcairo2-dev librsvg2-dev libxml2-dev"
+
 FEDORA_PKGS="cairo-devel librsvg2-devel libxml2-devel"
 
 ILLUMOS_PKGS="library/desktop/cairo"
@@ -45,6 +47,9 @@ get_emacs_build_deps() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (debian)
+		packages=$DEBIAN_PKGS
+		;;
 	    (fedora)
 		packages=$FEDORA_PKGS
 		;;
