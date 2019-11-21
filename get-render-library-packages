@@ -20,8 +20,6 @@ DEBIAN_PKGS="libcairo2-dev librsvg2-dev libxml2-dev"
 
 FEDORA_PKGS="cairo-devel librsvg2-devel libxml2-devel"
 
-ILLUMOS_PKGS="library/desktop/cairo"
-
 OPENSUSE_PKGS="cairo-devel librsvg-devel libxml2-devel"
 
 REDHAT_7_PKGS="cairo-devel librsvg2-devel libxml2-devel"
@@ -63,9 +61,6 @@ get_emacs_build_deps() {
 			packages=$REDHAT_8_PKGS
 			;;
 		esac
-		;;
-	    (illumos)
-		packages=$ILLUMOS_PKGS
 		;;
 	    (solaris)
 		packages=$SOLARIS_PKGS
