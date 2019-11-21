@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+DEBIAN_PKGS="autoconf automake gcc libtool make pkgconf"
+
 FEDORA_PKGS="autoconf automake gcc libtool make pkgconf"
 
 ILLUMOS_PKGS="developer/build/autoconf developer/build/automake \
@@ -48,6 +50,9 @@ get_emacs_build_deps() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (debian)
+		packages=$DEBIAN_PKGS
+		;;
 	    (fedora)
 		packages=$FEDORA_PKGS
 		;;
