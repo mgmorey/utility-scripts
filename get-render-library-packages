@@ -18,13 +18,9 @@
 
 DEBIAN_PKGS="libcairo2-dev librsvg2-dev libxml2-dev"
 
-FEDORA_PKGS="cairo-devel librsvg2-devel libxml2-devel"
-
 OPENSUSE_PKGS="cairo-devel librsvg-devel libxml2-devel"
 
-REDHAT_7_PKGS="cairo-devel librsvg2-devel libxml2-devel"
-
-REDHAT_8_PKGS="cairo-devel librsvg2-devel libxml2-devel"
+REDHAT_PKGS="cairo-devel librsvg2-devel libxml2-devel"
 
 SOLARIS_PKGS="image/library/librsvg library/desktop/cairo library/libxml2"
 
@@ -46,21 +42,11 @@ get_emacs_build_deps() {
 	    (debian)
 		packages=$DEBIAN_PKGS
 		;;
-	    (fedora)
-		packages=$FEDORA_PKGS
-		;;
 	    (opensuse)
 		packages=$OPENSUSE_PKGS
 		;;
-	    (rhel|ol)
-		case "$VERSION_ID" in
-		    (7|7.[78])
-			packages=$REDHAT_7_PKGS
-			;;
-		    (8|8.[01])
-			packages=$REDHAT_8_PKGS
-			;;
-		esac
+	    (rhel|ol|fedora)
+		packages=$REDHAT_PKGS
 		;;
 	    (solaris)
 		packages=$SOLARIS_PKGS
