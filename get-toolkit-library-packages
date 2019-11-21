@@ -32,6 +32,11 @@ REDHAT_8_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
 libXext-devel libXi-devel libXmu-devel libXrandr-devel libXt-devel \
 libXtst-devel libXv-devel"
 
+SOLARIS_PKGS="x11/library/libice x11/library/libsm x11/library/libx11 \
+x11/library/libxext x11/library/libxi x11/library/libxmu x11/library/libxrandr \
+x11/library/libxtst x11/library/libxv x11/library/toolkit/libxaw7 \
+x11/library/toolkit/libxt"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -62,6 +67,9 @@ get_emacs_build_deps() {
 			packages=$REDHAT_8_PKGS
 			;;
 		esac
+		;;
+	    (solaris)
+		packages=$SOLARIS_PKGS
 		;;
 	esac
 

@@ -26,7 +26,7 @@ REDHAT_7_PKGS="cairo-devel librsvg2-devel libxml2-devel"
 
 REDHAT_8_PKGS="cairo-devel librsvg2-devel libxml2-devel"
 
-SOLARIS_PKGS="image/library/librsvg library/desktop/cairo"
+SOLARIS_PKGS="image/library/librsvg library/desktop/cairo library/libxml2"
 
 UBUNTU_PKGS="librsvg2-dev libxml2-dev"
 
