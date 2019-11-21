@@ -33,8 +33,6 @@ REDHAT_8_PKGS="libjpeg-turbo-devel libpng-devel libtiff-devel libXpm-devel"
 SOLARIS_PKGS="image/imagemagick image/library/libjpeg image/library/libpng14 \
 image/library/libtiff image/library/openjpeg2 x11/library/libxpm :CSWlibgif-dev"
 
-UBUNTU_PKGS="libgif-dev libjpeg-dev libtiff5-dev libxpm-dev"
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -71,9 +69,6 @@ get_emacs_build_deps() {
 		;;
 	    (solaris)
 		packages=$SOLARIS_PKGS
-		;;
-	    (ubuntu)
-		packages=$UBUNTU_PKGS
 		;;
 	esac
 

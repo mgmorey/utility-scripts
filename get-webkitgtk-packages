@@ -28,8 +28,6 @@ REDHAT_8_PKGS="webkit2gtk3-devel"
 
 SOLARIS_PKGS="library/desktop/webkitgtk4"
 
-UBUNTU_PKGS="libwebkit2gtk-4.0-dev"
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -63,9 +61,6 @@ get_emacs_build_deps() {
 			packages=$REDHAT_8_PKGS
 			;;
 		esac
-		;;
-	    (ubuntu)
-		packages=$UBUNTU_PKGS
 		;;
 	    (solaris)
 		packages=$SOLARIS_PKGS

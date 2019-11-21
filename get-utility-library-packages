@@ -34,9 +34,6 @@ REDHAT_8_PKGS="gnutls-devel gpm-devel libacl-devel ncurses-devel zlib-devel"
 
 SOLARIS_PKGS="library/gnutls library/lcms2 library/ncurses library/zlib"
 
-UBUNTU_PKGS="libdbus-1-dev libgnutls28-dev libgpm-dev liblcms2-dev libm17n-dev \
-libncurses5-dev libotf-dev"
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -70,9 +67,6 @@ get_emacs_build_deps() {
 			packages=$REDHAT_8_PKGS
 			;;
 		esac
-		;;
-	    (ubuntu)
-		packages=$UBUNTU_PKGS
 		;;
 	    (illumos)
 		packages=$ILLUMOS_PKGS
