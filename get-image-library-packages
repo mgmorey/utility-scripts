@@ -22,9 +22,6 @@ libtiff5-dev" # libopenjp2-7-dev
 FEDORA_PKGS="giflib-devel ImageMagick-devel libjpeg-turbo-devel libpng-devel \
 libtiff-devel" # openjpeg-devel
 
-ILLUMOS_PKGS="image/imagemagick image/library/libjpeg image/library/libpng14 \
-image/library/libtiff library/giflib" # image/library/openjpeg
-
 OPENSUSE_PKGS="giflib-devel ImageMagick-devel libjpeg8-devel libpng16-devel \
 libtiff-devel" # openjpeg2-devel
 
@@ -34,7 +31,7 @@ libtiff-devel" # openjpeg2-devel
 REDHAT_8_PKGS="libjpeg-turbo-devel libpng-devel libtiff-devel"
 
 SOLARIS_PKGS="image/imagemagick image/library/libjpeg image/library/libpng14 \
-image/library/libtiff :CSWlibgif-dev" # image/library/openjpeg2
+image/library/libtiff" # image/library/openjpeg2
 
 abort() {
     printf "$@" >&2
@@ -71,10 +68,10 @@ get_emacs_build_deps() {
 		esac
 		;;
 	    (illumos)
-		packages=$ILLUMOS_PKGS
+		packages="$SOLARIS_PKGS library/giflib"
 		;;
 	    (solaris)
-		packages=$SOLARIS_PKGS
+		packages="$SOLARIS_PKGS :CSWlibgif-dev"
 		;;
 	esac
 
