@@ -44,7 +44,6 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-
 get_emacs_build_deps() {
     packages=
 
