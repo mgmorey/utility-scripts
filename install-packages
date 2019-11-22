@@ -50,6 +50,11 @@ configure_platform() {
 		esac
 
 		is_pattern_supported=true
+		break
+		;;
+	    (illumos)
+		"$script_dir/set-publisher-sfe-on-openindiana"
+		break
 		;;
 	esac
     done
