@@ -66,8 +66,9 @@ configure_compiler() {
     assert [ -n "$3" ]
     cc="$(get_compiler $1)"
     cflags="$(get_compiler_flags $1)"
-    cppflags="$(get_include_flags $2)"
-    ldflags="$(get_linker_flags $3)"
+    cppflags="$(get_include_flags "$2")"
+    ldflags="$(get_linker_flags "$3")"
+    pkg_config_path="$(get_pkg_config_path)"
 }
 
 configure_emacs() {
@@ -99,14 +100,16 @@ configure_emacs() {
     eval $command
 }
 
-configure_compiler_paths() {
+include_prefix() {
     assert [ $# -ge 1 -a $# -le 2 ]
     assert [ -n "$1" ]
     incdir="$1/include"
     libdir="$1/lib${2+/$2}"
+    incdirs="${incdirs+$incdirs }$incdir"
+    libdirs="${libdirs+$libdirs }$libdir"
 
     if [ -d "$libdir/pkgconfig" ]; then
-	pkg_config_path="${pkg_config_path+:$pkg_config_path}$libdir/pkgconfig"
+	pkgdirs="${pkgdirs+$pkgdirs }$libdir/pkgconfig"
     fi
 }
 
@@ -120,10 +123,6 @@ configure_platform() {
     with_gnutls=true
     with_toolkit=false
     with_widgets=false
-
-    if [ -d $PKG_PREFIX/lib/pkgconfig ]; then
-	pkg_config_path=$pkg_prefix/lib/pkgconfig
-    fi
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -148,14 +147,14 @@ configure_platform() {
 }
 
 configure_unix_illumos() {
-    configure_compiler_paths $LOCAL_PREFIX
-    configure_compiler "$gcc_prefix/bin/gcc -m64" $incdir $libdir
+    include_prefix $LOCAL_PREFIX
+    configure_compiler "$gcc_prefix/bin/gcc -m64" "$incdirs" "$libdirs"
     libgif="$libdir/libgif.so"
 }
 
 configure_unix_solaris() {
-    configure_compiler_paths $OPENCSW_PREFIX amd64
-    configure_compiler "$gcc_prefix/bin/gcc -m64" $incdir $libdir
+    include_prefix $OPENCSW_PREFIX amd64
+    configure_compiler "$gcc_prefix/bin/gcc -m64" "$incdirs" "$libdirs"
     libgif="$libdir/libgif.so"
 }
 
@@ -244,17 +243,29 @@ get_linker_flags() {
     assert [ -n "$1" ]
     ldflags=
 
-    case "$os_family" in
-	(gnu-*)
-	    ldflags="-Wl,--rpath=$libdir"
-	    ;;
-	(unix)
-	    ldflags="-L$libdir -R$libdir"
-	    ;;
-    esac
+    for libdir; do
+	case "$os_family" in
+	    (gnu-*)
+		ldflags="-Wl,--rpath=$libdir"
+		;;
+	    (unix)
+		ldflags="-L$libdir -R$libdir"
+		;;
+	esac
+    done
 
     if [ "${ldflags-}" ]; then
 	printf "%s\n" "$ldflags"
+    fi
+}
+
+get_pkg_config_path() {
+    for pkgdir in ${pkgdirs-}; do
+	pkg_config_path=${pkg_config_path+$pkg_config_path:}$pkgdir
+    done
+
+    if [ "${pkg_config_path-}" ]; then
+	printf "%s\n" "$pkg_config_path"
     fi
 }
 
