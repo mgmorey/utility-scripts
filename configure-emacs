@@ -99,12 +99,15 @@ configure_emacs() {
     eval $command
 }
 
-configure_library_gif() {
+configure_compiler_paths() {
     assert [ $# -ge 1 -a $# -le 2 ]
     assert [ -n "$1" ]
     incdir="$1/include"
     libdir="$1/lib${2+/$2}"
-    libgif="$libdir/libgif.so"
+
+    if [ -d "$libdir/pkgconfig" ]; then
+	pkg_config_path="${pkg_config_path+:$pkg_config_path}$libdir/pkgconfig"
+    fi
 }
 
 configure_platform() {
@@ -118,18 +121,20 @@ configure_platform() {
     with_toolkit=false
     with_widgets=false
 
+    if [ -d $PKG_PREFIX/lib/pkgconfig ]; then
+	pkg_config_path=$pkg_prefix/lib/pkgconfig
+    fi
+
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (illumos)
-		configure_library_gif $LOCAL_PREFIX
-		configure_compiler "$gcc_prefix/bin/gcc -m64" $incdir $libdir
+		configure_unix_solaris
 		break
 		;;
 	    (solaris)
 		toolkit=lucid
 		with_toolkit=true
-		configure_library_gif $LOCAL_PREFIX
-		configure_compiler "$gcc_prefix/bin/gcc -m64" $incdir $libdir
+		configure_unix_solaris
 		break
 		;;
 	esac
@@ -140,6 +145,12 @@ configure_platform() {
     else
 	break
     fi
+}
+
+configure_unix_solaris() {
+    configure_compiler_paths $LOCAL_PREFIX
+    configure_compiler "$gcc_prefix/bin/gcc -m64" $incdir $libdir
+    libgif="$libdir/libgif.so"
 }
 
 download_archive() {
@@ -188,7 +199,11 @@ get_configure_command() {
 	printf ' LDFLAGS=\"%s\"' "${ldflags-}"
     fi
 
-    printf ' PKG_CONFIG_PATH=%s\n' "$pkg_prefix/lib/pkgconfig"
+    if [ -n "${pkg_config_path-}" ]; then
+	printf ' PKG_CONFIG_PATH=\"%s\"' "${pkg_config_path-}"
+    fi
+
+    printf '\n'
 }
 
 get_configure_options() {
