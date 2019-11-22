@@ -45,7 +45,7 @@ get_emacs_build_deps() {
 	    (opensuse)
 		packages=$OPENSUSE_PKGS
 		;;
-	    (rhel|ol|fedora)
+	    (rhel|fedora)
 		packages=$REDHAT_PKGS
 		;;
 	    (solaris)
