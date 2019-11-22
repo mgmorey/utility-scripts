@@ -128,7 +128,7 @@ configure_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (illumos)
-		configure_unix_solaris
+		configure_unix_illumos
 		break
 		;;
 	    (solaris)
@@ -147,8 +147,14 @@ configure_platform() {
     fi
 }
 
-configure_unix_solaris() {
+configure_unix_illumos() {
     configure_compiler_paths $LOCAL_PREFIX
+    configure_compiler "$gcc_prefix/bin/gcc -m64" $incdir $libdir
+    libgif="$libdir/libgif.so"
+}
+
+configure_unix_solaris() {
+    configure_compiler_paths $OPENCSW_PREFIX amd64
     configure_compiler "$gcc_prefix/bin/gcc -m64" $incdir $libdir
     libgif="$libdir/libgif.so"
 }
