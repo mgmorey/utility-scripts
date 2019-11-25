@@ -142,11 +142,9 @@ get_docker_repo() {
 	case "$id" in
 	    (debian)
 		repo="deb [arch=$arch] $1 $(get_codename) stable"
-		break
 		;;
 	    (fedora)
 		repo="$DOCKER_BASE_URL/linux/centos/docker-ce.repo"
-		break
 		;;
 	esac
 
@@ -188,6 +186,7 @@ install_dependencies() {
 
 install_docker_ce() {
     validate_platform
+    preinstall_docker
     installed_packages=$("$script_dir/get-installed-docker-packages")
     origin=$(get_docker_origin $installed_packages)
 
