@@ -120,7 +120,7 @@ get_docker_origin() {
 	    (docker|docker.io)
 		origin=native
 		;;
-	    (podman-docker)
+	    (podman|podman-docker)
 		origin=podman
 		;;
 	esac
