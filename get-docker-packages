@@ -16,6 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+CENTOS_PKGS="container-selinux containerd containernetworking-plugins \
+containers-common podman"
+
 DARWIN_PKGS="docker"
 
 DEBIAN_PKGS="docker.io runc tini"
@@ -39,6 +42,9 @@ assert() {
 get_docker_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (centos)
+		packages=$CENTOS_PKGS
+		;;
 	    (debian)
 		packages=$DEBIAN_PKGS
 		;;
