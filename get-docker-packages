@@ -18,7 +18,7 @@
 
 DARWIN_PKGS="docker"
 
-DEBIAN_PKGS="docker.io"
+DEBIAN_PKGS="docker.io runc tini"
 
 FREEBSD_PKGS="docker docker-machine"
 
