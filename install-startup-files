@@ -16,11 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+BASE_URL=https://github.com/mgmorey
 PROJECT=startup-files
+
 STARTUP_FILES=".bashrc .editorconfig .profile"
 STARTUP_FILES_LEGACY=".bash_profile .emacs"
 
-STARTUP_FILES_URL=https://github.com/mgmorey/$PROJECT.git
+STARTUP_FILES_URL=$BASE_URL/$PROJECT.git
 
 abort() {
     printf "$@" >&2
