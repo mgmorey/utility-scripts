@@ -30,6 +30,8 @@ OPENSUSE_PKGS="catatonit containerd docker docker-libnetwork docker-runc"
 REDHAT_PKGS="container-selinux containernetworking-plugins containers-common \
 podman podman-docker runc"
 
+UBUNTU_PKGS="containerd docker.io runc tini"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -53,6 +55,9 @@ get_docker_packages() {
 		;;
 	    (rhel|fedora)
 		packages=$REDHAT_PKGS
+		;;
+	    (ubuntu)
+		packages=$UBUNTU_PKGS
 		;;
 	    (darwin)
 		packages=$DARWIN_PKGS
