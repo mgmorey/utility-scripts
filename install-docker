@@ -307,7 +307,7 @@ validate_platform() {
 			;;
 		esac
 		;;
-	    (macos)
+	    (darwin)
 		case "$VERSION_ID" in
 		    (10.14.*)
 			return
