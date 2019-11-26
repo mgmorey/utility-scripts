@@ -16,9 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-LEGACY_FILES=".bash_profile .emacs"
+PROJECT=startup-files
 STARTUP_FILES=".bashrc .editorconfig .profile"
-STARTUP_FILES_URL=https://mgmorey@github.com/mgmorey/startup-files.git
+STARTUP_FILES_LEGACY=".bash_profile .emacs"
+
+STARTUP_FILES_URL=https://github.com/mgmorey/$PROJECT.git
 
 abort() {
     printf "$@" >&2
@@ -27,6 +29,24 @@ abort() {
 
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+create_git_directory() {
+    cd
+
+    if [ ! -d Documents/git ]; then
+	mkdir -p Documents
+
+	if [ -d git ]; then
+	    /bin/mv git Documents/git
+	else
+	    mkdir Documents/git
+	fi
+    fi
+
+    if [ ! -e git ]; then
+	/bin/ln -s Documents/git git
+    fi
 }
 
 get_diff_command() {
@@ -87,25 +107,10 @@ install_startup_files() {
 	abort "Please change from source directory before running this script\n"
     fi
 
-    cd
-
-    if [ ! -d Documents/git ]; then
-	mkdir -p Documents
-
-	if [ -d git ]; then
-	    /bin/mv git Documents/git
-	else
-	    mkdir Documents/git
-	fi
-    fi
-
-    if [ ! -e git ]; then
-	/bin/ln -s Documents/git git
-    fi
-
+    create_git_directory
     cd git
 
-    if [ ! -d startup-files ]; then
+    if [ ! -d $PROJECT ]; then
 	git clone $STARTUP_FILES_URL
     fi
 
@@ -117,9 +122,9 @@ install_startup_files() {
 
 	    if [ -r /etc/skel/$file ]; then
 		$install -bm 644 /etc/skel/$file $file
-		cat $HOME/git/startup-files/$file >>$file
+		cat $HOME/git/$PROJECT/$file >>$file
 	    else
-		$install -bm 644 $HOME/git/startup-files/$file $file
+		$install -bm 644 $HOME/git/$PROJECT/$file $file
 	    fi
 	fi
     done
@@ -134,13 +139,13 @@ install_startup_files() {
 
 	if [ ! -e init.el ]; then
 	    printf "Installing %s\n" .emacs.d/init.el
-	    $install -bm 644 $HOME/git/startup-files/.emacs.d/init.el init.el
+	    $install -bm 644 $HOME/git/$PROJECT/.emacs.d/init.el init.el
 	fi
     fi
 
     cd
 
-    for file in $LEGACY_FILES; do
+    for file in $STARTUP_FILES_LEGACY; do
 	if [ -e $file ]; then
 	    printf "Renaming %s to %s\n" $file $file.orig
 	    /bin/mv -f $file $file.orig
