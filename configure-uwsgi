@@ -96,5 +96,5 @@ fi
 
 if [ ! -r "$src_dir/INSTALL" ]; then
     cd $(dirname "$src_dir")
-    tar -xvf "$pathname"
+    tar -zxvf "$pathname"
 fi
