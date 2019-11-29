@@ -28,7 +28,7 @@ FREEBSD_PKGS="pylint-%s %s-packaging %s-pip %s-pycodestyle %s-pytest \
 FEDORA_PKGS="%s-packaging %s-pip %s-pycodestyle %s-pylint %s-pytest \
 %s-virtualenv"
 
-ILLUMOS_PKGS=":%s-codestyle :%s-packaging :%s-pip :%s-pylint :%s-test \
+ILLUMOS_PKGS=":%s-codestyle :%s-packaging :%s-pip :%s-test \
 :%s-virtualenv"
 
 NETBSD_PKGS="%s-codestyle %s-packaging %s-pip %s-pylint %s-test \
