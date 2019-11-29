@@ -49,15 +49,14 @@ get_realpath() (
 )
 
 configure_platform() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    package=$DEBIAN_PKG
-		    ;;
-	    esac
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		package=$DEBIAN_PKG
+		break
+		;;
+	esac
+    done
 }
 
 install_python_development_tools() {
@@ -95,43 +94,57 @@ preinstall_python_development_tools() {
 }
 
 validate_platform() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    :
-	    	    ;;
-		(opensuse-*)
-		    :
-	    	    ;;
-		(fedora)
-		    :
-	    	    ;;
-		(rhel|ol|centos)
-                    case "$VERSION_ID" in
-			(7|7.[78])
-			    :
-                            ;;
-			(8|8.[01])
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Distro
-			    ;;
-                    esac
-		    ;;
-		(*)
-		    abort_not_supported Distro
-		    ;;
-	    esac
-	    ;;
-	(Darwin|FreeBSD|SunOS|CYGWIN_NT-*)
-	    :
-    	    ;;
-	(*)
-	    abort_not_supported "Operating system"
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+                case "$VERSION_ID" in
+		    (10)
+			return
+                        ;;
+                esac
+	    	;;
+	    (fedora)
+		return
+	    	;;
+	    (opensuse)
+		return
+	    	;;
+	    (rhel|ol|centos)
+                case "$VERSION_ID" in
+		    (7|7.*)
+			return
+                        ;;
+		    (8|8.*)
+			return
+			;;
+                esac
+		;;
+	    (ubuntu)
+                case "$VERSION_ID" in
+		    (18.*)
+			return
+                        ;;
+		    (19.*)
+			return
+			;;
+                esac
+	    	;;
+	    (darwin)
+		return
+    		;;
+	    (freebsd)
+		return
+    		;;
+	    (netbsd)
+		return
+		;;
+	    (solaris)
+		return
+    		;;
+	esac
+    done
+
+    abort_not_supported "Operating system"
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")

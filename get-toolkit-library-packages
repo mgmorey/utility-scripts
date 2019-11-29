@@ -28,6 +28,8 @@ REDHAT_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
 libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
 libXt-devel libXtst-devel"
 
+NETBSD_PKGS="libX11"
+
 SOLARIS_PKGS="x11/library/libice x11/library/libsm x11/library/libx11 \
 x11/library/libxext x11/library/libxi x11/library/libxmu x11/library/libxpm \
 x11/library/libxrandr x11/library/libxtst x11/library/toolkit/libxaw7 \

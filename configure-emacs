@@ -19,10 +19,8 @@
 BASE_URL=https://mirrors.ocf.berkeley.edu/gnu
 EMACS_VERSION=26.3
 
-GCC_PREFIX=/usr
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
-PKG_PREFIX=/usr
 PREFIX=/usr/local
 
 abort() {
@@ -55,19 +53,24 @@ assert() {
 
 clean_build() {
     if [ -r Makefile ]; then
-	make distclean
+	$make distclean
     fi
 }
 
 configure_compiler() {
-    assert [ $# -eq 3 ]
-    assert [ -n "$1" ]
-    assert [ -n "$2" ]
-    assert [ -n "$3" ]
-    cc="$(get_compiler $1)"
-    cflags="$(get_compiler_flags $1)"
-    cppflags="$(get_include_flags "$2")"
-    ldflags="$(get_linker_flags "$3")"
+    if [ -n "${1-}" ]; then
+	cc="$(get_compiler $1)"
+	cflags="$(get_compiler_flags $1)"
+    fi
+
+    if [ -n "${2-}" ]; then
+	cppflags="$(get_include_flags "$2")"
+    fi
+
+    if [ -n "${3-}" ]; then
+	ldflags="$(get_linker_flags "$3")"
+    fi
+
     pkg_config_path="$(get_pkg_config_path)"
 }
 
@@ -116,13 +119,12 @@ include_prefix() {
 configure_platform() {
     emacs_version=$EMACS_VERSION
     force=false
-    gcc_prefix=$GCC_PREFIX
-    pkg_prefix=$PKG_PREFIX
+    make=make
     prefix=$PREFIX
-    with_cairo=false
-    with_gnutls=true
-    with_toolkit=false
-    with_widgets=false
+    with_cairo=
+    with_gnutls=
+    with_toolkit=
+    with_widgets=
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -130,9 +132,11 @@ configure_platform() {
 		configure_unix_illumos
 		break
 		;;
+	    (netbsd)
+	    	configure_unix_netbsd
+	    	break
+	    	;;
 	    (solaris)
-		toolkit=lucid
-		with_toolkit=true
 		configure_unix_solaris
 		break
 		;;
@@ -148,13 +152,23 @@ configure_platform() {
 
 configure_unix_illumos() {
     include_prefix $LOCAL_PREFIX
-    configure_compiler "$gcc_prefix/bin/gcc -m64" "$incdirs" "$libdirs"
+    configure_compiler "/usr/bin/gcc -m64" "$incdirs" "$libdirs"
+    libgif="$libdir/libgif.so"
+}
+
+configure_unix_netbsd() {
+    make=gmake
+    with_gnutls=false
+    include_prefix /usr/pkg
+    configure_compiler "/usr/bin/gcc" "$incdirs" "$libdirs"
     libgif="$libdir/libgif.so"
 }
 
 configure_unix_solaris() {
+    toolkit=lucid
+    with_toolkit=true
     include_prefix $OPENCSW_PREFIX amd64
-    configure_compiler "$gcc_prefix/bin/gcc -m64" "$incdirs" "$libdirs"
+    configure_compiler "/usr/bin/gcc -m64" "$incdirs" "$libdirs"
     libgif="$libdir/libgif.so"
 }
 
@@ -171,7 +185,7 @@ download_archive() {
 extract_files() {
     if [ ! -r "$src_dir/configure" ]; then
 	cd "$(dirname "$src_dir")"
-	tar -xvf "$pathname"
+	tar -zxvf "$pathname"
     fi
 }
 
@@ -212,20 +226,26 @@ get_configure_command() {
 }
 
 get_configure_options() {
-    if [ "${with_cairo-false}" = true ]; then
+    if [ "${with_cairo-}" = true ]; then
 	options="${options:+$options }--with-cairo${cairo:+=$cairo}"
+    elif [ "${with_cairo-}" = false ]; then
+	options="${options:+$options }--without-cairo${cairo:+=$cairo}"
     fi
 
-    if [ "${with_gnutls-false}" = true ]; then
+    if [ "${with_gnutls-}" = true ]; then
 	options="${options:+$options }--with-gnutls${gnutls:+=$gnutls}"
+    elif [ "${with_gnutls-}" = false ]; then
+	options="${options:+$options }--without-gnutls${gnutls:+=$gnutls}"
     fi
 
-    if [ "${with_toolkit-false}" = true ]; then
+    if [ "${with_toolkit-}" = true ]; then
 	options="${options:+$options }--with-x-toolkit${toolkit:+=$toolkit}"
     fi
 
-    if [ "${with_widgets-false}" = true ]; then
+    if [ "${with_widgets-}" = true ]; then
 	options="${options:+$options }--with-xwidgets${widgets:+=$widgets}"
+    elif [ "${with_widgets-}" = false ]; then
+	options="${options:+$options }--without-xwidgets${widgets:+=$widgets}"
     fi
 
     if [ -n "${options:-}" ]; then
@@ -372,6 +392,9 @@ validate_platform() {
 		return
 		;;
 	    (rhel|fedora)
+		return
+		;;
+	    (netbsd)
 		return
 		;;
 	    (freebsd)

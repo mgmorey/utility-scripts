@@ -95,7 +95,7 @@ fi
 
 if [ ! -r "$src_dir/Makefile" ]; then
     cd $(dirname "$src_dir")
-    tar -xvf "$pathname"
+    tar -zxvf "$pathname"
 fi
 
 if [ ! -r "$build_dir/config.status" ]; then
