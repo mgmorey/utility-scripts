@@ -19,11 +19,6 @@
 CATEGORIES="development image-library render-library toolkit-library \
 utility-library webkitgtk"
 
-ILLUMOS_PKGS="developer/build/autoconf developer/build/automake \
-developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
-developer/illumos-gcc image/library/librsvg library/desktop/cairo
-library/gnutls library/ncurses library/zlib system/header"
-
 abort() {
     printf "$@" >&2
     exit 1
