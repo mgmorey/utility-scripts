@@ -122,7 +122,7 @@ install_startup_files() {
 	if is_to_be_installed $file; then
 	    printf "Installing %s\n" $file
 
-	    if [ -r /etc/skel/$file ]; then
+	    if [ -r /etc/skel/$file -a "$file" = .profile ]; then
 		$install -bm 644 /etc/skel/$file $file
 		cat $HOME/git/$PROJECT/$file >>$file
 	    else
