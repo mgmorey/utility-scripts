@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# software-properties: invoke software properties dialog
+# edit-software-properties: invoke software properties dialog
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -69,14 +69,11 @@ case "$kernel_name" in
 	case "$ID" in
 	    (debian|raspbian|ubuntu|linuxmint|neon|kali)
 		case "$desktop_name" in
-		    (GNOME*|*:GNOME)
+		    (GNOME*|*:GNOME|MATE)
 			software-properties-gtk
 			;;
 		    (KDE*)
 			software-properties-kde
-			;;
-		    (MATE)
-			software-properties-gtk
 			;;
 		    (*)
 			abort_desktop_not_supported
