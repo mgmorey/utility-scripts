@@ -83,35 +83,25 @@ validate_platform() {
     case "$kernel_name" in
 	(Linux)
 	    case "$ID" in
-		(rhel)
-		    case "$VERSION_ID" in
-			(7|7.[78])
-			    :
-			    ;;
-			(8|8.[01])
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(ol)
-		    case "$VERSION_ID" in
-			(7|7.[78])
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
 		(centos)
 		    case "$VERSION_ID" in
-			(7|7.[78])
+			(7)
 			    :
 			    ;;
-			(8|8.[01])
+			(8)
+			    :
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(rhel|ol)
+		    case "$VERSION_ID" in
+			(7.[78])
+			    :
+			    ;;
+			(8.[01])
 			    :
 			    ;;
 			(*)
