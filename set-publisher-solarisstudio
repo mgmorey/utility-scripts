@@ -57,6 +57,7 @@ get_realpath() (
 )
 
 set_publisher_solarisstudio() {
+    validate_platform
     data=$(pkg publisher | get_publisher_data solarisstudio)
 
     if [ -z "$data" ]; then
