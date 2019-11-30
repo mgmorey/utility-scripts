@@ -236,6 +236,8 @@ get_configure_options() {
 
     if [ "${with_toolkit-}" = true ]; then
 	options="${options:+$options }--with-x-toolkit${toolkit:+=$toolkit}"
+    elif [ "${with_toolkit-}" = false ]; then
+	options="${options:+$options }--with-x-toolkit=no"
     fi
 
     if [ "${with_widgets-}" = true ]; then
