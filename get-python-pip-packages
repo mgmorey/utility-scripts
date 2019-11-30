@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-python-devel-packages: get list of Python development packages
+# get-python-devel-packages: get list of Python PIP packages
 # Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,33 +16,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DARWIN_PKGS=":%s-codestyle :%s-packaging :%s-pip :%s-pylint :%s-test \
-:%s-virtualenv"
+DARWIN_PKGS=":%s-packaging :%s-pip"
 
-DEBIAN_PKGS="%s-openssl %s-packaging %s-pip %s-pycodestyle \
-%s-pytest %s-venv %s-virtualenv virtualenv"
+DEBIAN_PKGS="%s-packaging %s-pip"
 
-FREEBSD_PKGS="pylint-%s %s-packaging %s-pip %s-pycodestyle %s-pytest \
-%s-virtualenv"
+FREEBSD_PKGS="%s-packaging %s-pip"
 
-FEDORA_PKGS="%s-packaging %s-pip %s-pycodestyle %s-pylint %s-pytest \
-%s-virtualenv"
+FEDORA_PKGS="%s-packaging %s-pip"
 
-ILLUMOS_PKGS=":%s-codestyle :%s-packaging :%s-pip :%s-test \
-:%s-virtualenv"
+ILLUMOS_PKGS=":%s-packaging :%s-pip"
 
-NETBSD_PKGS="%s-codestyle %s-packaging %s-pip %s-pylint %s-test \
-%s-virtualenv"
+NETBSD_PKGS="%s-packaging %s-pip"
 
-OPENSUSE_PKGS="%s-packaging %s-pip %s-pycodestyle %s-pylint %s-pytest \
-%s-virtualenv"
+OPENSUSE_PKGS="%s-packaging %s-pip"
 
-REDHAT_7_PKGS=":%s-codestyle :%s-packaging :%s-pip :%s-pylint :%s-test \
-:%s-virtualenv"
-REDHAT_8_PKGS="%s-pip %s-pytest %s-virtualenv"
+REDHAT_7_PKGS=":%s-packaging :%s-pip"
+REDHAT_8_PKGS="%s-pip"
 
-SOLARIS_PKGS="developer/python/pylint-%s library/python/pip-%s \
-library/python/pytest-%s library/python/virtualenv-%s"
+SOLARIS_PKGS="library/python/pip-%s"
 
 abort() {
     printf "$@" >&2
