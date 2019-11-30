@@ -135,10 +135,12 @@ configure_platform() {
 	esac
     done
 
+    if [ -n "${cc-}" ] && [ ! -x $cc ]; then
+	abort "%s: %s: No such compiler\n" "$0" "$cc"
+    fi
+
     if [ -n "${libgif-}" ] && [ ! -x $libgif ]; then
 	abort "%s: %s: No such shared object\n" "$0" "$libgif"
-    else
-	break
     fi
 }
 
