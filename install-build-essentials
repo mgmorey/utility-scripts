@@ -50,7 +50,7 @@ install_build_essentials() {
     command=$("$script_dir/get-pattern-install-command")
     manager=$("$script_dir/get-package-managers" | awk 'NR == 1 {print $0}')
     options=$("$script_dir/get-package-install-options")
-    pattern=$("$script_dir/get-devel-pattern")
+    pattern=$("$script_dir/get-development-pattern")
 
     case "$kernel_name" in
 	(Linux)

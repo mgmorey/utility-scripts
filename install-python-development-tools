@@ -62,10 +62,8 @@ configure_platform() {
 install_python_development_tools() {
     validate_platform
     configure_platform
-    preinstall_python_development_tools
-
-    packages=$("$script_dir/get-python-devel-packages")
-    pattern=$("$script_dir/get-devel-pattern")
+    packages=$("$script_dir/get-python-development-packages")
+    pattern=$("$script_dir/get-development-pattern")
 
     if [ -n "$packages" ]; then
 	"$script_dir/install-packages" ${pattern:+-p "$pattern" }$packages
