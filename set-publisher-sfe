@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-URL=http://pkg.openindiana.org/sfe
+BASE_URL=http://sfe.opencsw.org
 
 abort() {
     printf "$@" >&2
@@ -29,6 +29,21 @@ abort_not_supported() {
 
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+configure_platform() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (illumos)
+		publisher=localhostoih
+		break
+    		;;
+	    (solaris)
+		publisher=localhosts12
+		break
+    		;;
+	esac
+    done
 }
 
 get_publisher_data() {
@@ -56,10 +71,11 @@ get_realpath() (
 
 set_publisher_sfe() {
     validate_platform
-    data=$(pkg publisher | get_publisher_data sfe)
+    configure_platform
+    data=$(pkg publisher | get_publisher_data $publisher)
 
     if [ -z "$data" ]; then
-	pkg set-publisher -p $URL
+	pkg set-publisher -G '*' -g $BASE_URL/$publisher $publisher
     fi
 }
 
