@@ -56,8 +56,6 @@ assert() {
 
 
 configure_python() {
-    validate_platform
-    parse_arguments "$@"
     basename=Python-$python_version
 
     archive_dir="$HOME/Downloads/Python"
@@ -254,31 +252,39 @@ usage() {
 }
 
 validate_platform() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    :
-		    ;;
-		(opensuse-*|fedora|rhel|ol|centos)
-		    :
-		    ;;
-		(*)
-		    abort_not_supported Distro
-		    ;;
-	    esac
-	    ;;
-	(FreeBSD|SunOS|CYGWIN_NT-*)
-	    :
-	    ;;
-	(*)
-	    abort_not_supported "Operating system"
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (cygwin)
+		return
+		;;
+	    (debian)
+		return
+		;;
+	    (opensuse)
+		return
+		;;
+	    (rhel|fedora)
+		return
+		;;
+	    (freebsd)
+		return
+		;;
+	    (netbsd)
+		return
+		;;
+	    (solaris)
+		return
+		;;
+	esac
+    done
+
+    abort_not_supported "Operating system"
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
 
-configure_python "$@"
+validate_platform
+parse_arguments "$@"
+configure_python
