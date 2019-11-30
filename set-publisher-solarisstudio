@@ -25,6 +25,10 @@ abort() {
     exit 1
 }
 
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
+
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
@@ -35,6 +39,23 @@ get_publisher_data() {
     awk -v publisher=$1 'NR > 1 && $1 == publisher && $2 == "origin" {print $0}'
 }
 
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+    	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
 set_publisher_solarisstudio() {
     data=$(pkg publisher | get_publisher_data solarisstudio)
 
@@ -42,5 +63,21 @@ set_publisher_solarisstudio() {
 	pkg set-publisher -k $KEY -c $CERT -G "*" -g $URL solarisstudio
     fi
 }
+
+validate_platform() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (solaris)
+		return
+    		;;
+	esac
+    done
+
+    abort_not_supported "Operating system"
+}
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -x)
 
 set_publisher_solarisstudio

@@ -53,7 +53,7 @@ configure_platform() {
 		break
 		;;
 	    (illumos)
-		"$script_dir/set-publisher-sfe-on-openindiana"
+		"$script_dir/set-publisher-sfe"
 		break
 		;;
 	esac
