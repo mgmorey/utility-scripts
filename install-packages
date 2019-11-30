@@ -34,6 +34,19 @@ configure_platform() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (centos)
+		is_pattern_supported=true
+
+		case "$VERSION_ID" in
+		    (7)
+			"$script_dir/install-epel"
+			;;
+		    (8)
+			"$script_dir/install-epel"
+			;;
+		esac
+		break
+		;;
 	    (debian)
 		is_pattern_supported=true
 		break
@@ -42,17 +55,20 @@ configure_platform() {
 		is_pattern_supported=true
 		break
 		;;
-	    (rhel|ol|centos)
+	    (rhel|ol)
+		is_pattern_supported=true
+
 		case "$VERSION_ID" in
-		    (7|7.*)
+		    (7.*)
+			"$script_dir/install-epel"
+			;;
+		    (8.*)
 			"$script_dir/install-epel"
 			;;
 		esac
-
-		is_pattern_supported=true
 		break
 		;;
-	    (illumos)
+	    (solaris)
 		"$script_dir/set-publisher-sfe"
 		break
 		;;
