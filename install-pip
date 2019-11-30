@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKG=python3-defaults
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -48,31 +46,12 @@ get_realpath() (
     fi
 )
 
-configure_platform() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (debian)
-		package=$DEBIAN_PKG
-		break
-		;;
-	esac
-    done
-}
-
-install_python_development_tools() {
+install_pip() {
     validate_platform
-    configure_platform
-    preinstall_python_development_tools
-
-    packages=$("$script_dir/get-python-devel-packages")
-    pattern=$("$script_dir/get-devel-pattern")
+    packages=$("$script_dir/get-python-pip-packages")
 
     if [ -n "$packages" ]; then
-	"$script_dir/install-packages" ${pattern:+-p "$pattern" }$packages
-    fi
-
-    if [ -n "${package:-}" ]; then
-	"$script_dir/install-build-deps" "$@" $package
+	"$script_dir/install-packages" $packages
     fi
 }
 
@@ -134,4 +113,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
 
-install_python_development_tools "$@"
+install_pip "$@"
