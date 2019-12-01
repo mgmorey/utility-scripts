@@ -49,7 +49,7 @@ get_emacs_build_deps() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (rhel|ol)
+	    (centos)
 		case "$VERSION_ID" in
 		    (7)
 			packages=$CENTOS_7_PKGS

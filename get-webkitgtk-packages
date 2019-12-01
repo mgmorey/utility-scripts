@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+CENTOS_7_PKGS="webkitgtk4-devel"
+
 DEBIAN_PKGS="libwebkit2gtk-4.0-dev"
 
 FEDORA_PKGS="webkit2gtk3-devel"
@@ -45,6 +47,13 @@ get_emacs_build_deps() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			packages=$CENTOS_7_PKGS
+			;;
+		esac
+		;;
 	    (debian)
 		packages=$DEBIAN_PKGS
 		;;
