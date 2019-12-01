@@ -185,7 +185,7 @@ get_realpath() (
 get_repository_data() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    awk -v repo=$1 'NR > 1 && $1 == repo {print $0}'
+    awk -v repo_id=$1 'NR > 1 && $1 == repo_id {print $0}'
 }
 
 install_dependencies() {
