@@ -31,7 +31,7 @@ get_python_packages() {
     package_name=$(printf "%s" "$data" | awk '{print $1}')
     package_modifier=$(printf "%s" "$data" | awk '{print $2}')
 
-    # printf "%s\n" $package_name
+    printf "%s\n" $package_name
 
     for package in "$@"; do
 	case $package in
