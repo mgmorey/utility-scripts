@@ -30,7 +30,7 @@ NETBSD_DATA="python36 py36"
 
 OPENSUSE_DATA="python3 python3"
 
-REDHAT_7_DATA=":python36 py36"
+REDHAT_7_DATA=":python37 py37"
 REDHAT_8_DATA="python3 python3"
 
 SOLARIS_DATA="runtime/python-35 35"
