@@ -87,7 +87,7 @@ configure_emacs() {
     src_dir="$HOME/Documents/src/GNU/$basename"
 
     command=$(get_configure_command $src_dir)
-    filename=$basename.tar.xz
+    filename=$basename.tar.gz
 
     pathname=$archive_dir/$filename
 
