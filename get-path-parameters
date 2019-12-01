@@ -16,4 +16,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-printenv | grep PATH= | sort
+printenv | egrep '^(|INFO|MAN|PKG_CONFIG)PATH=' | sort
