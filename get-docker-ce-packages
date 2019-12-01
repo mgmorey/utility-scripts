@@ -16,9 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKGS="docker-ce docker-ce-cli containerd.io"
+DEBIAN_PKGS="containerd.io docker-ce docker-ce-cli"
 
-REDHAT_PKGS="docker-ce docker-ce-cli containerd.io"
+FEDORA_PKGS="containerd.io docker-ce docker-ce-cli"
+
+REDHAT_7_PKGS="container-selinux containerd docker-ce docker-ce-cli"
 
 abort() {
     printf "$@" >&2
@@ -35,8 +37,15 @@ get_docker_ce_packages() {
 	    (debian)
 		packages=$DEBIAN_PKGS
 		;;
-	    (rhel|fedora)
-		packages=$REDHAT_PKGS
+	    (fedora)
+		packages=$FEDORA_PKGS
+		;;
+	    (rhel|ol|centos)
+		case "$VERSION_ID" in
+		    (7|7.*)
+			packages=$REDHAT_7_PKGS
+			;;
+		esac
 		;;
 	esac
 

@@ -53,8 +53,14 @@ add_repositories() {
 		add-apt-repository "$repo"
 		break
 		;;
-	    (fedora)
-		yum-config-manager --add-repo "$repo" >/dev/null
+	    (fedora|rhel|ol|centos)
+		repo_id=docker-ce-stable/$(uname -m)
+		data=$(yum repolist | get_repository_data $repo_id)
+
+		if [ -z "$data" ]; then
+		    yum-config-manager --add-repo "$repo" >/dev/null
+		fi
+
 		break
 		;;
 	esac
@@ -143,7 +149,7 @@ get_docker_repo() {
 	    (debian)
 		repo="deb [arch=$arch] $1 $(get_codename) stable"
 		;;
-	    (fedora)
+	    (fedora|rhel|ol|centos)
 		repo="$DOCKER_BASE_URL/linux/centos/docker-ce.repo"
 		;;
 	esac
@@ -175,6 +181,12 @@ get_realpath() (
 	done
     fi
 )
+
+get_repository_data() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    awk -v repo=$1 'NR > 1 && $1 == repo {print $0}'
+}
 
 install_dependencies() {
     dependencies=$("$script_dir/get-docker-ce-dependencies")
@@ -303,6 +315,11 @@ validate_platform() {
 	    ;;
 	(fedora)
 	    return
+	    ;;
+	(redhat|ol|centos)
+	    if [ "${VERSION_ID%.*}" -eq 7 ]; then
+		return
+	    fi
 	    ;;
 	(ubuntu)
 	    if [ "${VERSION_ID%.*}" -ge 18 ]; then
