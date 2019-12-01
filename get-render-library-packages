@@ -16,11 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+CENTOS_7_PKGS="cairo-devel librsvg2-devel libxml2-devel"
+
 DEBIAN_PKGS="libcairo2-dev librsvg2-dev libxml2-dev"
 
 OPENSUSE_PKGS="cairo-devel librsvg-devel libxml2-devel"
 
-REDHAT_PKGS="cairo-devel librsvg2-devel libxml2-devel"
+REDHAT_7_PKGS="cairo-devel librsvg2-devel libxml2-devel"
+REDHAT_8_PKGS="cairo-devel librsvg2-devel libxml2-devel"
 
 SOLARIS_PKGS="image/library/librsvg library/desktop/cairo library/libxml2"
 
@@ -39,6 +42,13 @@ get_emacs_build_deps() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			packages=$CENTOS_7_PKGS
+			;;
+		esac
+		;;
 	    (debian)
 		packages=$DEBIAN_PKGS
 		;;
@@ -46,7 +56,14 @@ get_emacs_build_deps() {
 		packages=$OPENSUSE_PKGS
 		;;
 	    (rhel|fedora)
-		packages=$REDHAT_PKGS
+		case "$VERSION_ID" in
+		    (7.*)
+			packages=$REDHAT_7_PKGS
+			;;
+		    (8.*)
+			packages=$REDHAT_8_PKGS
+			;;
+		esac
 		;;
 	    (solaris)
 		packages=$SOLARIS_PKGS

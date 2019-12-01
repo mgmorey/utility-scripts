@@ -16,6 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+CENTOS_7_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
+libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
+libXt-devel libXtst-devel"
+
 DEBIAN_PKGS="libgtk-3-dev libice-dev libsm-dev libx11-dev libxaw7-dev \
 libxext-dev libxi-dev libxmu-dev libxpm-dev libxrandr-dev \
 libxt-dev libxtst-dev"
@@ -24,7 +28,10 @@ OPENSUSE_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
 libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
 libXt-devel libXtst-devel"
 
-REDHAT_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
+REDHAT_7_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
+libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
+libXt-devel libXtst-devel"
+REDHAT_8_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
 libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
 libXt-devel libXtst-devel"
 
@@ -50,6 +57,13 @@ get_emacs_build_deps() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			packages=$CENTOS_7_PKGS
+			;;
+		esac
+		;;
 	    (debian)
 		packages=$DEBIAN_PKGS
 		;;
@@ -57,7 +71,14 @@ get_emacs_build_deps() {
 		packages=$OPENSUSE_PKGS
 		;;
 	    (rhel|fedora)
-		packages=$REDHAT_PKGS
+		case "$VERSION_ID" in
+		    (7.*)
+			packages=$REDHAT_7_PKGS
+			;;
+		    (8.*)
+			packages=$REDHAT_8_PKGS
+			;;
+		esac
 		;;
 	    (solaris)
 		packages=$SOLARIS_PKGS
