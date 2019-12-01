@@ -111,6 +111,13 @@ install_emacs_build_deps() {
 validate_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			return
+			;;
+		esac
+		;;
 	    (debian)
 		case "$VERSION_ID" in
 		    (10)
@@ -118,11 +125,21 @@ validate_platform() {
 			;;
 		esac
 		;;
+	    (fedora)
+		return
+		;;
 	    (opensuse)
 		return
 		;;
-	    (rhel|fedora)
-		return
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		    (7.*)
+			return
+			;;
+		    (8.*)
+			return
+			;;
+		esac
 		;;
 	    (ubuntu)
 		case "$VERSION_ID" in
