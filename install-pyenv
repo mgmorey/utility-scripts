@@ -196,7 +196,7 @@ install_pyenv() {
     create_tmpfile
     chmod a+r $tmpfile
     curl -BL $url >$tmpfile
-    run_unpriv /bin/sh -c "bash $tmpfile"
+    run_unpriv $tmpfile
 }
 
 get_setpriv_command() (
