@@ -187,10 +187,7 @@ install_pyenv() {
 	"$script_dir/install-packages" ${pattern:+-p "$pattern" }$packages
     fi
 
-    create_tmpfile
-    chmod a+r $tmpfile
-    curl -BL $url >$tmpfile
-    run_unpriv $tmpfile
+    run_unpriv -c "curl -BL $url | bash"
 }
 
 get_setpriv_command() (
