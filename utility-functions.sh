@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 create_tmpfile() {
-    tmpfile=$(mktemp -p /tmp)
+    tmpfile=$(mktemp)
     tmpfiles="${tmpfiles+$tmpfiles }$tmpfile"
     trap "/bin/rm -f $tmpfiles" EXIT INT QUIT TERM
 }
@@ -70,18 +70,15 @@ get_su_command() (
 	    ;;
     esac
 
-    printf "su %s %s\n" "$options" "$1${2+ $2}"
+    printf "su %s %s\n" "$options" "$1"
 )
 
 run_unpriv() (
     if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
 	su="$(get_su_command $SUDO_USER)"
     else
-	su=/bin/sh
+	su=
     fi
 
-    create_tmpfile
-    printf "%s\n" "$@" >$tmpfile
-    chmod a+rx $tmpfile
-    $su $tmpfile
+    ${su+$su }"$@"
 )

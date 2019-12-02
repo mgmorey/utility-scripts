@@ -116,7 +116,7 @@ uninstall_using() (
 
     case "$manager" in
 	(brew|*/brew)
-	    run_unpriv "$manager $uninstall $*"
+	    run_unpriv sh -c "$manager $uninstall $*"
 	    ;;
 	(*)
 	    $manager $uninstall $*
