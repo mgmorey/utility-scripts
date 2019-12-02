@@ -65,7 +65,7 @@ get_packages_using() {
 	    dpkg-query -Wf '${Status} ${Package}\n' | awk "$DPKG_AWK"
 	    ;;
 	(brew)
-	    run_unpriv sh -c "$1 list -1"
+	    run_unpriv /bin/sh -c "$1 list -1"
 	    ;;
 	(dnf)
 	    $1 list installed | awk 'NF == 3 {print $1}' | awk -F. '{print $1}'
