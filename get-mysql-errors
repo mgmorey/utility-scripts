@@ -36,6 +36,10 @@ configure_platform() {
 		log_dir=/var/log/mariadb
 		log_file=mariadb.log
 		;;
+	    (fedora)
+		log_dir=/var/log/mariadb
+		log_file=mariadb.log
+		;;
 	    (illumos)
 		log_dir=/var/mariadb/*/data
 		log_file=$(hostname).err
@@ -87,7 +91,7 @@ validate_platform() {
 		break
 		;;
 	    (fedora)
-		break
+		return
 		;;
 	    (opensuse)
 		break
