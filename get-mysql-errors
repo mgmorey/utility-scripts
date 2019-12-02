@@ -32,10 +32,6 @@ assert() {
 configure_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (centos)
-		log_dir=/var/log/mariadb
-		log_file=mariadb.log
-		;;
 	    (debian)
 		log_dir=/var/log/mysql
 		log_file=error.log
@@ -96,9 +92,6 @@ get_realpath() (
 validate_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (centos)
-		return
-		;;
 	    (debian)
 		return
 		;;
