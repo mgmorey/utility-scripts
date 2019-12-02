@@ -32,6 +32,9 @@ assert() {
 configure_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (illumos)
+		data_dir=/var/mariadb/*/data
+		;;
 	    (solaris)
 		data_dir=/var/mysql/*/data
 		;;
@@ -88,9 +91,6 @@ validate_platform() {
 		break
 		;;
 	    (freebsd)
-		break
-		;;
-	    (illumos)
 		break
 		;;
 	    (netbsd)
