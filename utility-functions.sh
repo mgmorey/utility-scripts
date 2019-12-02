@@ -14,10 +14,41 @@
 # GNU General Public License for more details.
 
 create_tmpfile() {
-    tmpfile=$(mktemp)
+    tmpfile=$(mktemp -p /tmp)
     tmpfiles="${tmpfiles+$tmpfiles }$tmpfile"
     trap "/bin/rm -f $tmpfiles" EXIT INT QUIT TERM
 }
+
+get_setpriv_command() (
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    version="$(setpriv --version 2>/dev/null)"
+
+    case "${version##* }" in
+	('')
+	    return 1
+	    ;;
+	([01].*)
+	    return 1
+	    ;;
+	(2.[0-9].*)
+	    return 1
+	    ;;
+	(2.[12][0-9].*)
+	    return 1
+	    ;;
+	(2.3[012].*)
+	    return 1
+	    ;;
+	(*)
+	    options="--init-groups --reset-env"
+	    ;;
+    esac
+
+    regid="$(id -g $1)"
+    reuid="$(id -u $1)"
+    printf "setpriv --reuid %s --regid %s %s\n" "$reuid" "$regid" "$options"
+)
 
 get_su_command() (
     assert [ $# -eq 1 ]
@@ -39,26 +70,18 @@ get_su_command() (
 	    ;;
     esac
 
-    printf "su %s %s\n" "$options" "$1"
+    printf "su %s %s\n" "$options" "$1${2+ $2}"
 )
 
 run_unpriv() (
-    assert [ $# -ge 1 ]
-
-    if [ "$1" = -c ]; then
-	sh_opts="$1"
-	shift
-    else
-	sh_opts=
-    fi
-
     if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
-	su="$(get_su_command $SUDO_USER) $sh_opts"
-    elif [ -n "$sh_opts" ]; then
-	su="sh $sh_opts"
+	su="$(get_su_command $SUDO_USER)"
     else
-	su=
+	su=/bin/sh
     fi
 
-    $su "$@"
+    create_tmpfile
+    printf "%s\n" "$@" >$tmpfile
+    chmod a+rx $tmpfile
+    $su $tmpfile
 )
