@@ -18,6 +18,10 @@
 
 # Wiki page: https://github.com/pyenv/pyenv/wiki
 
+CENTOS_7_PKGS="bash bzip2-devel curl gcc gdbm-devel libffi-devel \
+libuuid-devel make ncurses-devel openssl-devel python3-devel \
+readline-devel sqlite-devel wget xz-devel zlib-devel"
+
 DARWIN_PKGS="bash curl gdbm libffi openssl readline sqlite xz zlib"
 
 DEBIAN_10_PKGS="bash curl gcc libbz2-dev libffi-dev libgdbm-dev \
@@ -75,10 +79,47 @@ get_python_build_deps() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			packages=$CENTOS_7_PKGS
+			;;
+		esac
+		;;
 	    (debian)
 		case "$VERSION_ID" in
 		    (10)
 			packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (fedora)
+		packages=$FEDORA_PKGS
+		;;
+	    (kali)
+		case "$VERSION_ID" in
+		    (2019.3)
+			packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (linuxmint)
+		case "$VERSION_ID" in
+		    (19.2)
+			packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (opensuse-*)
+		packages=$OPENSUSE_PKGS
+		;;
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		    (7.*)
+			packages=$REDHAT_7_PKGS
+			;;
+		    (8.*)
+			packages=$REDHAT_8_PKGS
 			;;
 		esac
 		;;
@@ -95,37 +136,7 @@ get_python_build_deps() {
 			;;
 		esac
 		;;
-	    (linuxmint)
-		case "$VERSION_ID" in
-		    (19.2)
-			packages=$DEBIAN_10_PKGS
-			;;
-		esac
-		;;
-	    (kali)
-		case "$VERSION_ID" in
-		    (2019.3)
-			packages=$DEBIAN_10_PKGS
-			;;
-		esac
-		;;
-	    (opensuse-*)
-		packages=$OPENSUSE_PKGS
-		;;
-	    (fedora)
-		packages=$FEDORA_PKGS
-		;;
-	    (rhel|ol|centos)
-		case "$VERSION_ID" in
-		    (7|7.[78])
-			packages=$REDHAT_7_PKGS
-			;;
-		    (8|8.[01])
-			packages=$REDHAT_8_PKGS
-			;;
-		esac
-		;;
-	    (macos)
+	    (darwin)
 		packages=$DARWIN_PKGS
 		;;
 	    (freebsd)
