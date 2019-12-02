@@ -89,13 +89,12 @@ configure_platform() {
 	    break
 	fi
     done
-
-    packages=$("$script_dir/get-emacs-build-deps")
 }
 
 install_emacs_build_deps() {
     validate_platform
     configure_platform
+    packages=$("$script_dir/get-emacs-build-packages")
 
     if [ -n "${package:-}" ]; then
 	"$install_build_deps" $package || true
