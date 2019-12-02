@@ -32,15 +32,23 @@ assert() {
 configure_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (centos)
+		log_dir=/var/log/mariadb
+		log_file=mariadb.log
+		;;
 	    (illumos)
-		data_dir=/var/mariadb/*/data
+		log_dir=/var/mariadb/*/data
+		log_file=$(hostname).err
 		;;
 	    (solaris)
-		data_dir=/var/mysql/*/data
+		log_dir=/var/mysql/*/data
+		log_file=$(hostname).err
 		;;
 	esac
 
-	if [ -n "${data_dir-}" ]; then
+	if [ -n "${log_dir-}" ]; then
+	    break
+	elif [ -n "${log_file-}" ]; then
 	    break
 	fi
     done
@@ -49,7 +57,7 @@ configure_platform() {
 get_mysql_errors() {
     validate_platform
     configure_platform
-    cat $data_dir/$(hostname).err
+    cat "$log_dir/$log_file"
 }
 
 get_realpath() (
@@ -73,7 +81,7 @@ validate_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (centos)
-		break
+		return
 		;;
 	    (debian)
 		break
