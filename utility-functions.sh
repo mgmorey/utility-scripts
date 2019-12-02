@@ -83,7 +83,7 @@ run_unpriv() (
     fi
 
     if expr "$su" : 'su ' >/dev/null; then
-	if [ "${1-}" = /bin/sh -a "${2-}" = -c ]; then
+	if [ "${1-}${2+ $2}" = "/bin/sh -c" ]; then
 	    shift
 	else
 	    su="$su -c"
