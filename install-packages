@@ -332,6 +332,16 @@ usage() {
 validate_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			return
+			;;
+		    (8)
+			return
+			;;
+		esac
+		;;
 	    (debian)
 		return
 		;;
@@ -341,12 +351,12 @@ validate_platform() {
 	    (opensuse)
 		return
 		;;
-	    (rhel|ol|centos)
+	    (rhel|ol)
 		case "$VERSION_ID" in
-		    (7|7.*)
+		    (7.*)
 			return
 			;;
-		    (8|8.*)
+		    (8.*)
 			return
 			;;
 		esac
@@ -358,9 +368,6 @@ validate_platform() {
 		return
 		;;
 	    (netbsd)
-		return
-		;;
-	    (illumos)
 		return
 		;;
 	    (solaris)
