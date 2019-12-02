@@ -187,7 +187,7 @@ install_pyenv() {
 	"$script_dir/install-packages" ${pattern:+-p "$pattern" }$packages
     fi
 
-    run_unpriv /bin/sh -c "curl -BL $url | bash"
+    run_unpriv /bin/sh -c "curl -L $url | bash"
 }
 
 get_setpriv_command() (
