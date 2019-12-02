@@ -194,6 +194,7 @@ install_pyenv() {
     fi
 
     create_tmpfile
+    chmod a+r $tmpfile
     curl -BL $url >$tmpfile
     run_unpriv /usr/bin/bash $tmpfile
 }
