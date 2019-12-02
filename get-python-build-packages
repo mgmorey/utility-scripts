@@ -18,52 +18,37 @@
 
 # Wiki page: https://github.com/pyenv/pyenv/wiki
 
-CENTOS_7_PKGS="bash bzip2-devel curl gcc gdbm-devel libffi-devel \
-libuuid-devel make ncurses-devel openssl-devel python3-devel \
-readline-devel sqlite-devel wget xz-devel zlib-devel"
+CENTOS_7_PKGS="bzip2-devel gdbm-devel libffi-devel libuuid-devel ncurses-devel \
+openssl-devel python3-devel readline-devel sqlite-devel xz-devel zlib-devel"
 
-DARWIN_PKGS="bash curl gdbm libffi openssl readline sqlite xz zlib"
+DARWIN_PKGS="gdbm libffi openssl readline sqlite xz zlib"
 
-DEBIAN_10_PKGS="bash curl gcc libbz2-dev libffi-dev libgdbm-dev \
-libncurses5-dev libncursesw5-dev libpython3-dev libreadline-dev \
-libsqlite3-dev libssl-dev libxml2-dev libxmlsec1-dev liblzma-dev \
-make uuid-dev wget xz-utils zlib1g-dev"
+DEBIAN_10_PKGS="libbz2-dev libffi-dev libgdbm-dev libncurses5-dev \
+libncursesw5-dev libpython3-dev libreadline-dev libsqlite3-dev \
+libssl-dev libxml2-dev libxmlsec1-dev liblzma-dev uuid-dev \
+xz-utils zlib1g-dev"
 
-FEDORA_PKGS="bash bzip2-devel curl gcc gdbm-devel libffi-devel libuuid-devel \
-make ncurses-devel openssl-devel python3-devel readline-devel sqlite-devel \
-wget xz-devel zlib-devel"
+FEDORA_PKGS="bzip2-devel gdbm-devel libffi-devel libuuid-devel ncurses-devel \
+openssl-devel python3-devel readline-devel sqlite-devel xz-devel zlib-devel"
 
-FREEBSD_11_PKGS="bash bzip2 curl gdbm gmake libffi lzma ncurses \
-readline sqlite3 wget"
-FREEBSD_12_PKGS="bash bzip2 curl gdbm gmake libffi lzma ncurses \
-openssl111 readline sqlite3 wget"
+FREEBSD_11_PKGS="bzip2 gdbm libffi lzma ncurses readline sqlite3"
+FREEBSD_12_PKGS="bzip2 gdbm libffi lzma ncurses openssl111 readline sqlite3"
 
-ILLUMOS_PKGS="database/sqlite-3 developer/build/autoconf \
-developer/build/automake developer/build/gnu-make developer/build/libtool \
-developer/build/pkg-config developer/sunstudio12u1/backend \
-developer/sunstudio12u1/cc library/libffi library/ncurses \
-library/readline shell/bash"
+ILLUMOS_PKGS="database/sqlite-3 library/libffi library/ncurses library/readline"
 
-NETBSD_PKGS="bash bzip2 curl gdbm gmake libffi lzma ncurses readline \
-sqlite3 wget"
+NETBSD_PKGS="bzip2 gdbm libffi lzma ncurses readline sqlite3"
 
-OPENSUSE_PKGS="bash curl gcc gdbm-devel libbz2-devel libffi-devel \
-libopenssl-devel lzma-sdk-devel make ncurses-devel python3-devel \
-readline-devel sqlite3-devel uuid-devel wget zlib-devel"
+OPENSUSE_PKGS="gdbm-devel libbz2-devel libffi-devel libopenssl-devel \
+lzma-sdk-devel ncurses-devel python3-devel readline-devel sqlite3-devel \
+uuid-devel zlib-devel"
 
-REDHAT_7_PKGS="bash bzip2-devel curl gcc gdbm-devel libffi-devel \
-libuuid-devel make ncurses-devel openssl-devel python3-devel \
-readline-devel sqlite-devel wget xz-devel zlib-devel"
-REDHAT_8_PKGS="bash bzip2-devel curl gcc gdbm-devel libffi-devel \
-libuuid-devel make ncurses-devel openssl-devel python36-devel \
-readline-devel sqlite-devel wget xz-devel zlib-devel"
+REDHAT_7_PKGS="bzip2-devel gdbm-devel libffi-devel libuuid-devel ncurses-devel \
+openssl-devel python3-devel readline-devel sqlite-devel xz-devel zlib-devel"
+REDHAT_8_PKGS="bzip2-devel gdbm-devel libffi-devel libuuid-devel ncurses-devel \
+openssl-devel python36-devel readline-devel sqlite-devel xz-devel zlib-devel"
 
-SOLARIS_PKGS="database/sqlite-3 developer/build/autoconf \
-developer/build/automake developer/build/gnu-make developer/build/libtool \
-developer/build/pkg-config developer/developerstudio-126/cc \
-developer/developerstudio-126/library/c-libs library/libffi \
-library/ncurses library/pcre library/readline shell/bash \
-system/header"
+SOLARIS_PKGS="database/sqlite-3 library/libffi library/ncurses library/pcre \
+library/readline system/header"
 
 abort() {
     printf "$@" >&2
@@ -126,9 +111,6 @@ get_python_build_deps() {
 	    (ubuntu|neon)
 		case "$VERSION_ID" in
 		    (18.04)
-			packages=$DEBIAN_10_PKGS
-			;;
-		    (19.04)
 			packages=$DEBIAN_10_PKGS
 			;;
 		    (19.10)
