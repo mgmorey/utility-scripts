@@ -80,21 +80,13 @@ run_unpriv() (
 	su=
     fi
 
-    case "${kernel_name=$(uname -s)}" in
-	(SunOS)
-	    if expr "$su" : 'su ' >/dev/null; then
-		case "$(basename $1)" in
-		    (sh)
-			case "$2" in
-			    (-c)
-				shift
-				;;
-			esac
-			;;
-		esac
-	    fi
-	    ;;
-    esac
+    if expr "$su" : 'su ' >/dev/null; then
+	if [ "${1-}" = /bin/sh -a "${2-}" = -c ]; then
+	    shift
+	else
+	    su="$su -c"
+	fi
+    fi
 
     ${su+$su }"$@"
 )
