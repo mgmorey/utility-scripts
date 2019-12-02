@@ -74,6 +74,8 @@ get_su_command() (
 )
 
 run_unpriv() (
+    assert [ $# -ge 1 ]
+
     if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
 	su="$(get_su_command $SUDO_USER)"
     else
