@@ -46,7 +46,7 @@ configure_platform() {
 get_mysql_errors() {
     validate_platform
     configure_platform
-    cat $data_dir/*.err
+    cat $data_dir/$(hostname).err
 }
 
 get_realpath() (
