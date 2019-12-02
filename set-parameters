@@ -77,9 +77,6 @@ include_binary_directories() {
 		(/opt/csw|/opt/local)
 		    PATH="${PATH:+$PATH:}$dir/$bindir"
 		    ;;
-		(/usr/pkg)
-		    PATH="$dir/$bindir${PATH:+:$PATH}"
-		    ;;
 		(*)
 		    PATH="$dir/$bindir${PATH:+:$PATH}"
 		    ;;
@@ -94,7 +91,7 @@ include_config_directories() {
     if is_to_be_included $pkgdir "${PKG_CONFIG_PATH-}"; then
 	case "$dir" in
 	    (/opt/csw)
-	    	:
+	    	true
 	    	;;
 	    (/opt/local)
 	    	PKG_CONFIG_PATH="${PKG_CONFIG_PATH:+$PKG_CONFIG_PATH:}$pkgdir"
@@ -120,7 +117,7 @@ include_common_directories() {
 
     for dir in $dirs; do
 	case "$dir" in
-	    (/usr/gnu|/usr/local)
+	    (/usr/gnu|/usr/local|/usr/pkg)
 		INFOPATH="$(remove_directory "$dir/share/info" "${INFOPATH-}")"
 		MANPATH="$(remove_directory "$dir/share/man" "${MANPATH-}")"
 		INFOPATH="$(remove_directory "$dir/info" "${INFOPATH-}")"
