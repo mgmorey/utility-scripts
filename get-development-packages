@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+CENTOS_7_PKGS="autoconf automake gcc libtool make pkgconfig"
+
 DEBIAN_PKGS="autoconf automake gcc libtool make pkgconf"
 
 FEDORA_PKGS="autoconf automake gcc libtool make pkgconf"
@@ -49,6 +51,13 @@ get_emacs_build_deps() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			packages=$CENTOS_7_PKGS
+			;;
+		esac
+		;;
 	    (debian)
 		packages=$DEBIAN_PKGS
 		;;
@@ -60,10 +69,10 @@ get_emacs_build_deps() {
 		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
-		    (7|7.[78])
+		    (7.*)
 			packages=$REDHAT_7_PKGS
 			;;
-		    (8|8.[01])
+		    (8.*)
 			packages=$REDHAT_8_PKGS
 			;;
 		esac
