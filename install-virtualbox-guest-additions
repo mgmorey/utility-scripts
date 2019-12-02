@@ -184,7 +184,13 @@ update_kernel_packages() {
     case "$kernel_name" in
 	(Linux)
 	    case "$ID" in
-		(rhel|ol|centos)
+		(centos)
+		    update_redhat_kernel_packages
+		    ;;
+		(fedora)
+		    update_redhat_kernel_packages
+		    ;;
+		(rhel|ol)
 		    update_redhat_kernel_packages
 		    ;;
 	    esac
@@ -207,45 +213,45 @@ validate_platform() {
     case "$kernel_name" in
 	(Linux)
 	    case "$ID" in
-		(debian|raspbian|ubuntu|neon|linuxmint|kali)
-		    :
-		    ;;
-		(opensuse-*)
-		    :
-		    ;;
-		(ol)
+		(centos)
 		    case "$VERSION_ID" in
-			(7.*)
-			    :
+			(7)
+			    true
 			    ;;
-			(8.*)
-			    :
+			(8)
+			    true
 			    ;;
 			(*)
 			    abort_not_supported Release
 			    ;;
 		    esac
+		    ;;
+		(debian|raspbian|ubuntu|neon|linuxmint|kali)
+		    true
 		    ;;
 		(fedora)
 		    case "$VERSION_ID" in
 			(30)
-			    :
+			    true
 			    ;;
 			(31)
-			    :
+			    true
 			    ;;
 			(*)
 			    abort_not_supported Release
 			    ;;
 		    esac
 		    ;;
-		(rhel|ol|centos)
+		(opensuse-*)
+		    true
+		    ;;
+		(rhel|ol)
 		    case "$VERSION_ID" in
-			(7|7.[78])
-			    :
+			(7.*)
+			    true
 			    ;;
-			(8|8.[01])
-			    :
+			(8.*)
+			    true
 			    ;;
 			(*)
 			    abort_not_supported Release
@@ -258,7 +264,7 @@ validate_platform() {
 	    esac
 	    ;;
 	(SunOS)
-	    :
+	    true
 	    ;;
 	(*)
 	    abort_not_supported "Operating system"
@@ -269,10 +275,10 @@ validate_platform() {
 
     case "$vendor" in
 	(KVM)
-	    :
+	    true
 	    ;;
 	('')
-	    :
+	    true
 	    ;;
 	(*)
 	    abort "%s: %s hypervisor not supported\n" "$0" "$vendor"
