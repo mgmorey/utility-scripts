@@ -36,6 +36,10 @@ configure_platform() {
 		log_dir=/var/log/mariadb
 		log_file=mariadb.log
 		;;
+	    (debian)
+		log_dir=/var/log/mysql
+		log_file=error.log
+		;;
 	    (fedora)
 		log_dir=/var/log/mariadb
 		log_file=mariadb.log
@@ -43,6 +47,10 @@ configure_platform() {
 	    (opensuse)
 		log_dir=/var/log/mysql
 		log_file=mysqld.log
+		;;
+	    (rhel)
+		log_dir=/var/log/mariadb
+		log_file=mariadb.log
 		;;
 	    (illumos)
 		log_dir=/var/mariadb/*/data
@@ -92,7 +100,7 @@ validate_platform() {
 		return
 		;;
 	    (debian)
-		break
+		return
 		;;
 	    (fedora)
 		return
@@ -101,7 +109,7 @@ validate_platform() {
 		return
 		;;
 	    (rhel)
-		break
+		return
 		;;
 	    (darwin)
 		break
