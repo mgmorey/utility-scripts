@@ -17,14 +17,148 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 BASE_URL=https://github.com/pyenv
+DEBIAN_PKG=python3-defaults
+
+CENTOS_7_PKGS="bash curl gcc make"
+
+DARWIN_PKGS="bash curl"
+
+DEBIAN_10_PKGS="bash curl gcc make wget"
+
+FEDORA_PKGS="bash curl gcc make wget"
+
+FREEBSD_11_PKGS="bash curl gmake wget"
+FREEBSD_12_PKGS="bash curl gmake wget"
+
+ILLUMOS_PKGS="developer/build/gnu-make developer/sunstudio12u1/backend \
+developer/sunstudio12u1/cc shell/bash"
+
+NETBSD_PKGS="bash curl gmake wget"
+
+OPENSUSE_PKGS="bash curl gcc make wget"
+
+REDHAT_7_PKGS="bash curl gcc make wget"
+REDHAT_8_PKGS="bash curl gcc make wget"
+
+SOLARIS_PKGS="developer/build/gnu-make developer/developerstudio-126/cc \
+developer/developerstudio-126/library/c-libs shell/bash \
+system/header"
 
 abort() {
     printf "$@" >&2
     exit 1
 }
 
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
+
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+configure_platform() {
+    package=
+    packages=
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			packages=$CENTOS_7_PKGS
+			;;
+		esac
+		;;
+	    (debian)
+		case "$VERSION_ID" in
+		    (10)
+			package=$DEBIAN_PKG
+			packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (fedora)
+		packages=$FEDORA_PKGS
+		;;
+	    (kali)
+		case "$VERSION_ID" in
+		    (2019.3)
+			packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (linuxmint)
+		case "$VERSION_ID" in
+		    (19.2)
+			packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (opensuse)
+		packages=$OPENSUSE_PKGS
+		;;
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		    (7.*)
+			packages=$REDHAT_7_PKGS
+			;;
+		    (8.*)
+			packages=$REDHAT_8_PKGS
+			;;
+		esac
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.04)
+			packages=$DEBIAN_10_PKGS
+			;;
+		    (19.10)
+			packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (darwin)
+		packages=$DARWIN_PKGS
+		;;
+	    (freebsd)
+		case "$VERSION_ID" in
+		    (11.*)
+			packages=$FREEBSD_11_PKGS
+			;;
+		    (12.*)
+			packages=$FREEBSD_12_PKGS
+			;;
+		esac
+		;;
+	    (illumos)
+		packages=$ILLUMOS_PKGS
+		;;
+	    (netbsd)
+		packages=$NETBSD_PKGS
+		;;
+	    (solaris)
+		packages=$SOLARIS_PKGS
+		;;
+	esac
+
+	if [ -n "${package-}" ]; then
+	    break
+	elif [ -n "${packages-}" ]; then
+	    break
+	fi
+    done
+}
+
+get_packages() {
+    printf "%s\n" $packages
+    "$script_dir/get-python-build-packages"
+}
+
+create_tmpfile() {
+    tmpfile=$(mktemp)
+    tmpfiles="${tmpfiles+$tmpfiles }$tmpfile"
+    trap "/bin/rm -f $tmpfiles" EXIT INT QUIT TERM
 }
 
 get_realpath() (
@@ -45,9 +179,23 @@ get_realpath() (
 )
 
 install_pyenv() {
+    validate_platform
+    configure_platform
+    packages=$(get_packages | sort -u)
+    pattern=$("$script_dir/get-development-pattern")
     url=$BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer
-    "$script_dir/install-python-build-deps"
-    run_unpriv sh -c "curl -L $url | bash"
+
+    if [ -n "${package-}" ]; then
+	"$script_dir/install-build-deps" "$@" $package || true
+    fi
+
+    if [ -n "${packages-}" ]; then
+	"$script_dir/install-packages" ${pattern:+-p "$pattern" }$packages
+    fi
+
+    create_tmpfile
+    curl -BL $url >$tmpfile
+    run_unpriv /usr/bin/bash $tmpfile
 }
 
 get_setpriv_command() (
@@ -125,6 +273,109 @@ run_unpriv() (
     $su "$@"
 )
 
+validate_platform() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			return
+			;;
+		esac
+		;;
+	    (debian)
+		case "$VERSION_ID" in
+		    (10)
+			return
+			;;
+		esac
+		;;
+	    (fedora)
+		return
+		;;
+	    (kali)
+		case "$VERSION_ID" in
+		    (2019.3)
+			return
+			;;
+		esac
+		;;
+	    (linuxmint)
+		case "$VERSION_ID" in
+		    (19.2)
+			return
+			;;
+		esac
+		;;
+	    (opensuse)
+		return
+		;;
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		    (7.*)
+			return
+			;;
+		    (8.*)
+			return
+			;;
+		esac
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.04)
+			return
+			;;
+		    (19.10)
+			return
+			;;
+		esac
+		;;
+	    (darwin)
+		return
+		;;
+	    (freebsd)
+		case "$VERSION_ID" in
+		    (11.*)
+			return
+			;;
+		    (12.*)
+			return
+			;;
+		esac
+		;;
+	    (illumos)
+		case "$VERSION_ID" in
+		    (2019.*)
+			return
+			;;
+		esac
+		;;
+	    (netbsd)
+		case "$VERSION_ID" in
+		    (8.1)
+			return
+			;;
+		esac
+		;;
+	    (solaris)
+		case "$VERSION_ID" in
+		    (11.4)
+			return
+			;;
+		esac
+		;;
+	esac
+
+	if [ -n "${packages-}" ]; then
+	    break
+	fi
+    done
+
+    abort_not_supported "Operating system"
+}
+
 script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -x)
 
 install_pyenv "$@"
