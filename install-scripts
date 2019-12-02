@@ -57,6 +57,11 @@ for file in "$working_dir"/*; do
 	(LICENSE|README*)
 	    :
 	    ;;
+	(*.sh)
+	    if [ ! -e "bin/$(basename "$file")" ]; then
+		ln -s "$file" bin
+	    fi
+	    ;;
 	(*)
 	    if [ ! -e "bin/$(basename "$file")" -a -x "$file" ]; then
 		ln -s "$file" bin
