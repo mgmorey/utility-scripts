@@ -25,13 +25,6 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-create_tmpfile() {
-    tmpfile=$(mktemp)
-    assert [ -n "${tmpfile}" ]
-    tmpfiles="${tmpfiles+$tmpfiles }$tmpfile"
-    trap "/bin/rm -f $tmpfiles" EXIT INT QUIT TERM
-}
-
 get_grep_command() {
     grep=
 
@@ -85,6 +78,8 @@ grep_package() {
 script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
+
+. "$script_dir/utility-functions.sh"
 
 grep=$(get_grep_command)
 get_uninstalled_packages "$@"
