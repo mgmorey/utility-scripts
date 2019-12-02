@@ -211,6 +211,16 @@ validate_platform() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
+			;;
+		esac
+		;;
 	    (debian)
 		case "$VERSION_ID" in
 		    (10)
@@ -221,12 +231,12 @@ validate_platform() {
 			;;
 		esac
 		;;
-	    (ubuntu)
+	    (fedora)
 		case "$VERSION_ID" in
-		    (19.04)
+		    (30)
 			return
 			;;
-		    (19.10)
+		    (31)
 			return
 			;;
 		    (*)
@@ -274,22 +284,9 @@ validate_platform() {
 			;;
 		esac
 		;;
-	    (fedora)
-		case "$VERSION_ID" in
-		    (30)
-			return
-			;;
-		    (31)
-			return
-			;;
-		    (*)
-			abort_not_supported Release
-			;;
-		esac
-		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
-		    (8|8.[01])
+		    (8.[01])
 			return
 			;;
 		    (*)
@@ -297,9 +294,12 @@ validate_platform() {
 			;;
 		esac
 		;;
-	    (centos)
+	    (ubuntu)
 		case "$VERSION_ID" in
-		    (7)
+		    (19.04)
+			return
+			;;
+		    (19.10)
 			return
 			;;
 		    (*)
