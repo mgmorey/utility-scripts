@@ -20,8 +20,6 @@ create_tmpfile() {
 }
 
 get_setpriv_command() (
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
     version="$(setpriv --version 2>/dev/null)"
 
     case "${version##* }" in
@@ -40,55 +38,73 @@ get_setpriv_command() (
 	(2.3[012].*)
 	    return 1
 	    ;;
-	(*)
-	    options="--init-groups --reset-env"
-	    ;;
     esac
 
+    printf "%s\n" setpriv
+)
+
+get_setpriv_options() (
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
     regid="$(id -g $1)"
     reuid="$(id -u $1)"
-    printf "setpriv --reuid %s --regid %s %s\n" "$reuid" "$regid" "$options"
+    printf -- "%s\n" "--init-groups --reset-env --reuid $reuid --regid $regid"
 )
 
 get_su_command() (
+    case "${kernel_name=$(uname -s)}" in
+	(GNU|Linux)
+	    if get_setpriv_command; then
+		return
+	    fi
+	    ;;
+    esac
+
+    printf "%s\n" su
+)
+
+get_su_options() (
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
     case "${kernel_name=$(uname -s)}" in
 	(GNU|Linux)
-	    if get_setpriv_command $1; then
-		return 0
-	    else
-		options=-l
-	    fi
+	    options="-l $1"
 	    ;;
 	(Darwin|FreeBSD)
-	    options=-l
+	    options="-l $1"
 	    ;;
 	(*)
-	    options=-
+	    options="- $1"
 	    ;;
     esac
 
-    printf "su %s %s\n" "$options" "$1"
+    printf -- "%s\n" "$options"
 )
 
 run_unpriv() (
     assert [ $# -ge 1 ]
 
     if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
-	su="$(get_su_command $SUDO_USER)"
+	command="$(get_su_command $SUDO_USER)"
     else
-	su=
+	command=
     fi
 
-    if expr "$su" : 'su ' >/dev/null; then
-	if [ "${1-}${2+ $2}" = "/bin/sh -c" ]; then
-	    shift
-	else
-	    su="$su -c"
-	fi
-    fi
+    case "$command" in
+	(setpriv)
+	    command="$command $(get_setpriv_options $SUDO_USER)"
+	    ;;
+	(su)
+	    command="$command $(get_su_options $SUDO_USER)"
 
-    ${su+$su }"$@"
+	    if [ "${1-}${2+ $2}" = "/bin/sh -c" ]; then
+		shift
+	    else
+		command="$command -c"
+	    fi
+	    ;;
+    esac
+
+    ${command+$command }"$@"
 )
