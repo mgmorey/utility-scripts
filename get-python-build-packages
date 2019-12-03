@@ -47,8 +47,8 @@ openssl-devel python3-devel readline-devel sqlite-devel xz-devel zlib-devel"
 REDHAT_8_PKGS="bzip2-devel gdbm-devel libffi-devel libuuid-devel ncurses-devel \
 openssl-devel python36-devel readline-devel sqlite-devel xz-devel zlib-devel"
 
-SOLARIS_PKGS="database/sqlite-3 library/libffi library/ncurses library/pcre \
-library/readline system/header"
+SOLARIS_PKGS="compress/xz database/sqlite-3 library/libffi library/ncurses \
+library/pcre library/readline system/header"
 
 abort() {
     printf "$@" >&2
