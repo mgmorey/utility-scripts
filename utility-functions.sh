@@ -87,24 +87,24 @@ run_unpriv() (
 
     if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
 	command="$(get_su_command $SUDO_USER)"
+
+	case "$command" in
+	    (setpriv)
+		command="$command $(get_setpriv_options $SUDO_USER)"
+		;;
+	    (su)
+		command="$command $(get_su_options $SUDO_USER)"
+
+		if [ "${1-}${2+ $2}" = "/bin/sh -c" ]; then
+		    shift
+		else
+		    command="$command -c"
+		fi
+		;;
+	esac
     else
 	command=
     fi
-
-    case "$command" in
-	(setpriv)
-	    command="$command $(get_setpriv_options $SUDO_USER)"
-	    ;;
-	(su)
-	    command="$command $(get_su_options $SUDO_USER)"
-
-	    if [ "${1-}${2+ $2}" = "/bin/sh -c" ]; then
-		shift
-	    else
-		command="$command -c"
-	    fi
-	    ;;
-    esac
 
     ${command+$command }"$@"
 )
