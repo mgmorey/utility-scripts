@@ -95,7 +95,7 @@ download_archive() {
 extract_files() {
     if [ ! -r "$src_dir/configure" ]; then
 	cd "$(dirname "$src_dir")"
-	tar -zxvf "$pathname"
+	xz -dc "$pathname" | tar -xvf -
     fi
 }
 
