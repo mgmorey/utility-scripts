@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 BASE_URL=https://projects.unbit.it/downloads
-VERSION=2.0.17.1
+UWSGI_VERSION=2.0.17.1
 
 abort() {
     printf "$@" >&2
@@ -30,6 +30,47 @@ abort_not_supported() {
 
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+configure_uwsgi() {
+    validate_platform
+    basename=uwsgi-$UWSGI_VERSION
+
+    archive_dir="$HOME/Downloads/uWSGI"
+    src_dir="$HOME/Documents/src/uWSGI/$basename"
+
+    filename=$basename.tar.gz
+
+    pathname=$archive_dir/$filename
+
+    mkdir -p "$(dirname "$src_dir")" "$archive_dir"
+    download_archive
+    extract_files
+}
+
+download_archive() {
+    url=$BASE_URL/$filename
+
+    if [ ! -r "$pathname" ]; then
+	cd "$archive_dir"
+	wget $url
+    fi
+
+}
+
+extract_files() {
+    if [ ! -r "$src_dir/configure" ]; then
+	cd "$(dirname "$src_dir")"
+
+	case "$pathname" in
+	    (*.tar.gz)
+		gzip -dc "$pathname" | tar -xvf -
+		;;
+	    (*.tar.xz)
+		xz -dc "$pathname" | tar -xvf -
+		;;
+	esac
+    fi
 }
 
 get_realpath() (
@@ -49,52 +90,32 @@ get_realpath() (
     fi
 )
 
-basename=uwsgi-$VERSION
-
-archive_dir="$HOME/Downloads/uWSGI"
-src_dir="$HOME/Documents/src/uWSGI/$basename"
-
-filename=$basename.tar.gz
-
-pathname=$archive_dir/$filename
-url=$BASE_URL/$filename
+validate_platform() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu|linuxmint|neon|kali)
+		    :
+	    	    ;;
+		(opensuse-*|fedora|rhel|ol|centos)
+		    :
+	    	    ;;
+		(*)
+		    abort_not_supported Distro
+		    ;;
+	    esac
+	    ;;
+	(FreeBSD|SunOS|CYGWIN_NT-*)
+	    :
+    	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
 
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (debian|raspbian|ubuntu|linuxmint|neon|kali)
-		:
-	    	;;
-	    (opensuse-*|fedora|rhel|ol|centos)
-		:
-	    	;;
-	    (*)
-		abort_not_supported Distro
-		;;
-	esac
-	;;
-    (FreeBSD|SunOS|CYGWIN_NT-*)
-	:
-    	;;
-    (*)
-	abort_not_supported "Operating system"
-	;;
-esac
-
-install-python-build-deps
-
-mkdir -p "$(dirname "$src_dir")" "$archive_dir"
-
-if [ ! -r "$pathname" ]; then
-    cd "$archive_dir"
-    wget $url || exit $?
-fi
-
-if [ ! -r "$src_dir/INSTALL" ]; then
-    cd $(dirname "$src_dir")
-    tar -zxvf "$pathname"
-fi
+configure_uwsgi

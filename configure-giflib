@@ -71,7 +71,15 @@ configure_giflib() {
 extract_files() {
     if [ ! -r "$src_dir/configure" ]; then
 	cd "$(dirname "$src_dir")"
-	tar -zxvf "$pathname"
+
+	case "$pathname" in
+	    (*.tar.gz)
+		gzip -dc "$pathname" | tar -xvf -
+		;;
+	    (*.tar.xz)
+		xz -dc "$pathname" | tar -xvf -
+		;;
+	esac
     fi
 }
 

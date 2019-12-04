@@ -54,7 +54,6 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-
 configure_python() {
     basename=Python-$python_version
 
@@ -95,7 +94,15 @@ download_archive() {
 extract_files() {
     if [ ! -r "$src_dir/configure" ]; then
 	cd "$(dirname "$src_dir")"
-	xz -dc "$pathname" | tar -xvf -
+
+	case "$pathname" in
+	    (*.tar.gz)
+		gzip -dc "$pathname" | tar -xvf -
+		;;
+	    (*.tar.xz)
+		xz -dc "$pathname" | tar -xvf -
+		;;
+	esac
     fi
 }
 

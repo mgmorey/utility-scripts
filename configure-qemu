@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 BASE_URL=https://download.qemu.org
-VERSION=3.0.0
+QEMU_VERSION=3.0.0
 
 abort() {
     printf "$@" >&2
@@ -30,6 +30,53 @@ abort_not_supported() {
 
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+configure_qemu() {
+    validate_platform
+    basename=qemu-$QEMU_VERSION
+
+    archive_dir="$HOME/Downloads/QEMU"
+    build_dir="$HOME/Documents/build/$basename"
+    src_dir="$HOME/Documents/src/QEMU/$basename"
+
+    filename=$basename.tar.xz
+
+    pathname=$archive_dir/$filename
+
+    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
+    download_archive
+    extract_files
+
+    if [ ! -r "$build_dir/config.status" ]; then
+	cd "$build_dir"
+	"$src_dir/configure" "$@"
+    fi
+}
+
+download_archive() {
+    url=$BASE_URL/$filename
+
+    if [ ! -r "$pathname" ]; then
+	cd "$archive_dir"
+	wget $url
+    fi
+
+}
+
+extract_files() {
+    if [ ! -r "$src_dir/configure" ]; then
+	cd "$(dirname "$src_dir")"
+
+	case "$pathname" in
+	    (*.tar.gz)
+		gzip -dc "$pathname" | tar -xvf -
+		;;
+	    (*.tar.xz)
+		xz -dc "$pathname" | tar -xvf -
+		;;
+	esac
+    fi
 }
 
 get_realpath() (
@@ -49,56 +96,32 @@ get_realpath() (
     fi
 )
 
-basename=qemu-$VERSION
-
-archive_dir="$HOME/Downloads/QEMU"
-build_dir="$HOME/Documents/build/$basename"
-src_dir="$HOME/Documents/src/QEMU/$basename"
-
-filename=$basename.tar.xz
-
-pathname=$archive_dir/$filename
-url=$BASE_URL/$filename
+validate_platform() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu|linuxmint|neon|kali)
+		    :
+	    	    ;;
+		(opensuse-*|fedora|rhel|ol|centos)
+		    :
+	    	    ;;
+		(*)
+		    abort_not_supported Distro
+		    ;;
+	    esac
+	    ;;
+	(FreeBSD|SunOS|CYGWIN_NT-*)
+	    :
+    	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
 
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (debian|raspbian|ubuntu|linuxmint|neon|kali)
-		:
-	    	;;
-	    (opensuse-*|fedora|rhel|ol|centos)
-		:
-	    	;;
-	    (*)
-		abort_not_supported Distro
-		;;
-	esac
-	;;
-    (FreeBSD|SunOS|CYGWIN_NT-*)
-	:
-    	;;
-    (*)
-	abort_not_supported "Operating system"
-	;;
-esac
-
-mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
-
-if [ ! -r "$pathname" ]; then
-    cd "$archive_dir"
-    wget $url || exit $?
-fi
-
-if [ ! -r "$src_dir/Makefile" ]; then
-    cd $(dirname "$src_dir")
-    tar -zxvf "$pathname"
-fi
-
-if [ ! -r "$build_dir/config.status" ]; then
-    cd "$build_dir"
-    "$src_dir/configure" "$@"
-fi
+configure_qemu
