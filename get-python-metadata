@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DARWIN_DATA=":python36 py36"
+DARWIN_DATA=":python37 py37"
 
 DEBIAN_DATA="python3 python3"
 
@@ -24,9 +24,9 @@ FEDORA_DATA="python3 python3"
 
 FREEBSD_DATA="python3 py36"
 
-ILLUMOS_DATA=":python36 py36"
+ILLUMOS_DATA=":python37 py37"
 
-NETBSD_DATA="python36 py36"
+NETBSD_DATA="python37 py37"
 
 OPENSUSE_DATA="python3 python3"
 
