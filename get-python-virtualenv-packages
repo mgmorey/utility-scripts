@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DARWIN_PKGS=":%s-virtualenv"
-
 DEBIAN_PKGS="%s-venv %s-virtualenv virtualenv"
 
 FREEBSD_PKGS="%s-virtualenv"
@@ -25,6 +23,8 @@ FREEBSD_PKGS="%s-virtualenv"
 FEDORA_PKGS="%s-virtualenv"
 
 ILLUMOS_PKGS=":%s-virtualenv"
+
+MACOS_PKGS=":%s-virtualenv"
 
 NETBSD_PKGS="%s-virtualenv"
 
@@ -93,14 +93,14 @@ get_python_devel_packages() {
 			;;
 		esac
 		;;
-	    (darwin)
-		packages=$DARWIN_PKGS
-		;;
 	    (freebsd)
 		packages=$FREEBSD_PKGS
 		;;
 	    (illumos)
 		packages=$ILLUMOS_PKGS
+		;;
+	    (macos)
+		packages=$MACOS_PKGS
 		;;
 	    (netbsd)
 		packages=$NETBSD_PKGS

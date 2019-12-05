@@ -104,10 +104,10 @@ validate_platform() {
 	    (rhel)
 		return
 		;;
-	    (darwin)
+	    (freebsd)
 		break
 		;;
-	    (freebsd)
+	    (macos)
 		break
 		;;
 	    (netbsd)

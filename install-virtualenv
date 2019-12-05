@@ -91,10 +91,10 @@ validate_platform() {
 			;;
                 esac
 	    	;;
-	    (darwin)
+	    (freebsd)
 		return
     		;;
-	    (freebsd)
+	    (macos)
 		return
     		;;
 	    (netbsd)

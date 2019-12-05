@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DARWIN_PKGS=":%s-packaging :%s-pip"
-
 DEBIAN_PKGS="%s-packaging %s-pip"
 
 FREEBSD_PKGS="%s-packaging %s-pip"
@@ -25,6 +23,8 @@ FREEBSD_PKGS="%s-packaging %s-pip"
 FEDORA_PKGS="%s-packaging %s-pip"
 
 ILLUMOS_PKGS=":%s-packaging :%s-pip"
+
+MACOS_PKGS=":%s-packaging :%s-pip"
 
 NETBSD_PKGS="%s-packaging %s-pip"
 
@@ -93,14 +93,14 @@ get_python_devel_packages() {
 			;;
 		esac
 		;;
-	    (darwin)
-		packages=$DARWIN_PKGS
-		;;
 	    (freebsd)
 		packages=$FREEBSD_PKGS
 		;;
 	    (illumos)
 		packages=$ILLUMOS_PKGS
+		;;
+	    (macos)
+		packages=$MACOS_PKGS
 		;;
 	    (netbsd)
 		packages=$NETBSD_PKGS

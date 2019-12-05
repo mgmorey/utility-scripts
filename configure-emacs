@@ -405,9 +405,6 @@ usage() {
 validate_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (cygwin)
-		return
-		;;
 	    (debian)
 		return
 		;;
@@ -424,6 +421,9 @@ validate_platform() {
 		return
 		;;
 	    (solaris)
+		return
+		;;
+	    (windows)
 		return
 		;;
 	esac

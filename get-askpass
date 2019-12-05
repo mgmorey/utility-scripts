@@ -40,13 +40,6 @@ configure_platform() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (ms-windows)
-		case "$desktop_name" in
-		    (MATE|X-Cygwin|'')
-			helper=/usr/libexec/gnome-ssh-askpass
-			;;
-		esac
-		;;
 	    (debian)
 		case "$desktop_name" in
 		    (GNOME|GNOME*|*:GNOME|LXDE|X-Cinnamon|'')
@@ -77,9 +70,6 @@ configure_platform() {
 			;;
 		esac
 		;;
-	    (macos)
-		break
-		;;
 	    (freebsd)
 		case "$desktop_name" in
 		    (GNOME|GNOME*|MATE|'')
@@ -90,6 +80,9 @@ configure_platform() {
 			;;
 		esac
 		;;
+	    (macos)
+		break
+		;;
 	    (netbsd)
 		helper=/usr/X11R7/bin/ssh-askpass
 		;;
@@ -97,6 +90,13 @@ configure_platform() {
 		case "$desktop_name" in
 		    (GNOME|MATE|'')
 			helper=/usr/lib/ssh/ssh-askpass
+			;;
+		esac
+		;;
+	    (windows)
+		case "$desktop_name" in
+		    (MATE|X-Cygwin|'')
+			helper=/usr/libexec/gnome-ssh-askpass
 			;;
 		esac
 		;;

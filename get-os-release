@@ -35,7 +35,7 @@ assert() {
 }
 
 abort_conflicting_option() {
-    usage "%s: conflicting option -- %s\n" "$0" "$1"
+    usage "%s: Conflicting option -- %s\n" "$0" "$1"
     exit 2
 }
 
@@ -76,8 +76,7 @@ collect_data_for_cygwin() {
     os_family=gnu-cygwin
     NAME="Microsoft Windows"
     VERSION=${kernel_name#*-}
-    ID=ms-windows
-    ID_LIKE="cygwin"
+    ID=windows
 }
 
 collect_data_for_darwin() {
@@ -85,7 +84,6 @@ collect_data_for_darwin() {
     NAME=$(sw_vers -productName)
     VERSION=$(sw_vers -productVersion)
     ID=macos
-    ID_LIKE="darwin"
 }
 
 collect_data_for_gnu() {
@@ -174,7 +172,7 @@ get_os_version_id() {
 		    printf "%s\n" "$VERSION" | awk '{print $1}'
 		    ;;
 		(fedora|rhel|ol|centos)
-		    "$script_dir/get-redhat-version" /etc/redhat-release
+		    "$script_dir/get-redhat-version.awk" /etc/redhat-release
 		    ;;
 	    esac
 	    ;;

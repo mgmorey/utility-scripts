@@ -39,12 +39,12 @@ configure_platform() {
 		has_daemon=false
 		break
 		;;
-	    (darwin)
-		has_getent=false
-		break
-		;;
 	    (freebsd)
 		has_daemon=false
+		break
+		;;
+	    (macos)
+		has_getent=false
 		break
 		;;
 	esac
@@ -304,9 +304,12 @@ validate_platform() {
 			;;
 		esac
 		;;
-	    (darwin)
+	    (freebsd)
 		case "$VERSION_ID" in
-		    (10.14.*)
+		    (11.*)
+			return
+			;;
+		    (12.*)
 			return
 			;;
 		    (*)
@@ -314,12 +317,9 @@ validate_platform() {
 			;;
 		esac
 		;;
-	    (freebsd)
+	    (macos)
 		case "$VERSION_ID" in
-		    (11.*)
-			return
-			;;
-		    (12.*)
+		    (10.14.*)
 			return
 			;;
 		    (*)

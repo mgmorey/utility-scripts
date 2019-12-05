@@ -21,8 +21,6 @@ DEBIAN_PKG=python3-defaults
 
 CENTOS_7_PKGS="bash curl gcc make"
 
-DARWIN_PKGS="bash curl"
-
 DEBIAN_10_PKGS="bash curl gcc make wget"
 
 FEDORA_PKGS="bash curl gcc make wget"
@@ -32,6 +30,8 @@ FREEBSD_12_PKGS="bash curl gmake wget"
 
 ILLUMOS_PKGS="developer/build/gnu-make developer/sunstudio12u1/backend \
 developer/sunstudio12u1/cc shell/bash"
+
+MACOS_PKGS="bash curl"
 
 NETBSD_PKGS="bash curl gmake wget"
 
@@ -118,9 +118,6 @@ configure_platform() {
 			;;
 		esac
 		;;
-	    (darwin)
-		packages=$DARWIN_PKGS
-		;;
 	    (freebsd)
 		case "$VERSION_ID" in
 		    (11.*)
@@ -133,6 +130,9 @@ configure_platform() {
 		;;
 	    (illumos)
 		packages=$ILLUMOS_PKGS
+		;;
+	    (macos)
+		packages=$MACOS_PKGS
 		;;
 	    (netbsd)
 		packages=$NETBSD_PKGS
@@ -278,9 +278,6 @@ validate_platform() {
 			;;
 		esac
 		;;
-	    (darwin)
-		return
-		;;
 	    (freebsd)
 		case "$VERSION_ID" in
 		    (11.*)
@@ -297,6 +294,9 @@ validate_platform() {
 			return
 			;;
 		esac
+		;;
+	    (macos)
+		return
 		;;
 	    (netbsd)
 		case "$VERSION_ID" in

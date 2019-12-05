@@ -47,17 +47,17 @@ get_package_managers() {
 			;;
 		esac
 		;;
-	    (darwin)
-		managers="/usr/local/bin/brew /opt/pkg/bin/pkgin"
-		;;
 	    (freebsd)
 		managers="/usr/local/sbin/pkg"
 		;;
-	    (netbsd)
-		managers="/usr/pkg/bin/pkgin"
-		;;
 	    (illumos)
 		managers="/usr/bin/pkg /opt/local/bin/pkgin"
+		;;
+	    (macos)
+		managers="/usr/local/bin/brew /opt/pkg/bin/pkgin"
+		;;
+	    (netbsd)
+		managers="/usr/pkg/bin/pkgin"
 		;;
 	    (solaris)
 		managers="/usr/bin/pkg /opt/csw/bin/pkgutil"
@@ -79,7 +79,7 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then

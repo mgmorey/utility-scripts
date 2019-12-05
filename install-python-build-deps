@@ -111,9 +111,6 @@ validate_platform() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (cygwin)
-		return
-		;;
 	    (centos)
 		case "$VERSION_ID" in
 		    (7)
@@ -175,9 +172,6 @@ validate_platform() {
 			;;
 		esac
 		;;
-	    (darwin)
-		return
-    		;;
 	    (freebsd)
 		case "$VERSION_ID" in
 		    (11.*)
@@ -195,6 +189,9 @@ validate_platform() {
 			;;
 		esac
 		;;
+	    (macos)
+		return
+    		;;
 	    (netbsd)
 		case "$VERSION_ID" in
 		    (8.1)
@@ -208,6 +205,9 @@ validate_platform() {
 			return
 			;;
 		esac
+		;;
+	    (windows)
+		return
 		;;
 	esac
     done

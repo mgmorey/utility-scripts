@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-python-build-deps: get list of Python 3 build dependencies
+# get-python-build-packages: get list of Python build packages
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -21,8 +21,6 @@
 CENTOS_7_PKGS="bzip2-devel gdbm-devel libffi-devel libuuid-devel ncurses-devel \
 openssl-devel python3-devel readline-devel sqlite-devel xz-devel zlib-devel"
 
-DARWIN_PKGS="gdbm libffi openssl readline sqlite xz zlib"
-
 DEBIAN_10_PKGS="libbz2-dev libffi-dev libgdbm-dev libncurses5-dev \
 libncursesw5-dev libpython3-dev libreadline-dev libsqlite3-dev \
 libssl-dev libxml2-dev libxmlsec1-dev liblzma-dev uuid-dev \
@@ -36,6 +34,8 @@ FREEBSD_12_PKGS="bzip2 gdbm libffi lzma ncurses openssl111 readline sqlite3"
 
 ILLUMOS_PKGS="database/sqlite-3 library/libffi library/ncurses library/readline"
 
+MACOS_PKGS="gdbm libffi openssl readline sqlite xz zlib"
+
 NETBSD_PKGS="bzip2 gdbm libffi lzma ncurses readline sqlite3"
 
 OPENSUSE_PKGS="gdbm-devel libbz2-devel libffi-devel libopenssl-devel \
@@ -47,8 +47,8 @@ openssl-devel python3-devel readline-devel sqlite-devel xz-devel zlib-devel"
 REDHAT_8_PKGS="bzip2-devel gdbm-devel libffi-devel libuuid-devel ncurses-devel \
 openssl-devel python36-devel readline-devel sqlite-devel xz-devel zlib-devel"
 
-SOLARIS_PKGS="compress/xz database/sqlite-3 library/libffi library/ncurses \
-library/pcre library/readline system/header"
+SOLARIS_PKGS="database/sqlite-3 library/libffi library/ncurses library/pcre \
+library/readline system/header"
 
 abort() {
     printf "$@" >&2
@@ -113,13 +113,13 @@ get_python_build_deps() {
 		    (18.04)
 			packages=$DEBIAN_10_PKGS
 			;;
+		    (19.04)
+			packages=$DEBIAN_10_PKGS
+			;;
 		    (19.10)
 			packages=$DEBIAN_10_PKGS
 			;;
 		esac
-		;;
-	    (darwin)
-		packages=$DARWIN_PKGS
 		;;
 	    (freebsd)
 		case "$VERSION_ID" in
@@ -133,6 +133,9 @@ get_python_build_deps() {
 		;;
 	    (illumos)
 		packages=$ILLUMOS_PKGS
+		;;
+	    (macos)
+		packages=$MACOS_PKGS
 		;;
 	    (netbsd)
 		packages=$NETBSD_PKGS
