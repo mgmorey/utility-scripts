@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# runsql: invoke SQL DBMS command line client
+# run-sql: invoke SQL DBMS command line client
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -125,17 +125,28 @@ run_sql() {
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-source_dir=$script_dir/..
+env_dir=$(pwd)
 
-sql_dir=$source_dir/sql
+until [ "$env_dir" = / -o -r "$env_dir/.env" ]; do
+    env_dir="$(dirname $env_dir)"
+done
 
-if [ -r .env ]; then
-    . ./.env
-elif [ -r "$source_dir/.env" ]; then
-    . "$source_dir/.env"
+if [ -r "$env_dir/.env" ]; then
+    env_file="$env_dir/.env"
 elif [ -r "$HOME/.env" ]; then
-    . "$HOME/.env"
+    env_file="$HOME/.env"
+else
+    env_file=
 fi
 
+if [ -n "$env_file" ]; then
+    if [ "${VENV_VERBOSE-false}" = true ]; then
+	printf "%s\n" "Loading .env environment variables" >&2
+    fi
+
+    . "$env_file"
+fi
+
+sql_dir=$env_dir/sql
 parse_arguments "$@"
 run_sql
