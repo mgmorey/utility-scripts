@@ -91,7 +91,7 @@ configure_platform() {
 		break
 		;;
 	    (netbsd)
-	    	configure_platform_bsd_netbsd
+	    	configure_platform_unix_netbsd
 	    	break
 	    	;;
 	    (solaris)
@@ -106,11 +106,11 @@ configure_platform() {
     fi
 }
 
-configure_platform_bsd_netbsd() {
+configure_platform_unix_netbsd() {
     make=gmake
     with_gnutls=false
     include_prefix /usr/pkg
-    configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
+    configure_compiler /usr/bin/gcc "${incdirs-}" "${libdirs-}"
 }
 
 configure_platform_unix_illumos() {
@@ -119,7 +119,7 @@ configure_platform_unix_illumos() {
 }
 
 configure_platform_unix_macos() {
-    configure_compiler "/usr/local/opt/gcc/bin/gcc-9" "${incdirs-}" "${libdirs-}"
+    configure_compiler /usr/bin/clang "${incdirs-}" "${libdirs-}"
 }
 
 configure_platform_unix_solaris() {
