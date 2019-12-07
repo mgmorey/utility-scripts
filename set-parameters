@@ -117,7 +117,7 @@ include_common_directories() {
 
     for dir in $dirs; do
 	case "$dir" in
-	    (/usr/gnu|/usr/local|/usr/pkg)
+	    (/opt/local|/opt/pkg|/usr/gnu|/usr/local|/usr/pkg)
 		INFOPATH="$(remove_directory "$dir/share/info" "${INFOPATH-}")"
 		MANPATH="$(remove_directory "$dir/share/man" "${MANPATH-}")"
 		INFOPATH="$(remove_directory "$dir/info" "${INFOPATH-}")"
