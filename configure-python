@@ -16,15 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-PYTHON_BASE_URL=https://www.python.org/ftp
+BASE_URL=https://www.python.org/ftp
+PYTHON_VERSION=3.6.9
 
-if [ -z "${PYTHON_PREFIX-}" ]; then
-    PYTHON_PREFIX=/usr/local
-fi
-
-if [ -z "${PYTHON_VERSION-}" ]; then
-    PYTHON_VERSION=3.6.9
-fi
+LOCAL_PREFIX=/usr/local
+OPENCSW_PREFIX=/opt/csw
+PREFIX=/usr/local
 
 abort() {
     printf "$@" >&2
@@ -54,6 +51,82 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+clean_build() {
+    if [ -r Makefile ]; then
+	$make distclean
+    fi
+}
+
+configure_compiler() {
+    if [ -n "${1-}" ]; then
+	cc="$(get_compiler $1)"
+	cflags="$(get_compiler_flags $1)"
+    fi
+
+    if [ -n "${2-}" ]; then
+	cppflags="$(get_include_flags "$2")"
+    fi
+
+    if [ -n "${3-}" ]; then
+	ldflags="$(get_linker_flags "$3")"
+    fi
+
+    pkg_config_path="$(get_pkg_config_path)"
+}
+
+configure_platform() {
+    python_version=$PYTHON_VERSION
+    force=false
+    make=make
+    prefix=$PREFIX
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (illumos)
+		configure_platform_unix_illumos
+		break
+		;;
+	    (macos)
+		configure_platform_unix_macos
+		break
+		;;
+	    (netbsd)
+	    	configure_platform_bsd_netbsd
+	    	break
+	    	;;
+	    (solaris)
+		configure_platform_unix_solaris
+		break
+		;;
+	esac
+    done
+
+    if [ -n "${cc-}" ] && [ ! -x $cc ]; then
+	abort "%s: %s: No such compiler\n" "$0" "$cc"
+    fi
+}
+
+configure_platform_bsd_netbsd() {
+    make=gmake
+    with_gnutls=false
+    include_prefix /usr/pkg
+    configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
+}
+
+configure_platform_unix_illumos() {
+    include_prefix $LOCAL_PREFIX
+    configure_compiler "/usr/bin/gcc -m64" "${incdirs-}" "${libdirs-}"
+}
+
+configure_platform_unix_macos() {
+    configure_compiler "/usr/local/opt/gcc/bin/gcc-9" "${incdirs-}" "${libdirs-}"
+}
+
+configure_platform_unix_solaris() {
+    include_prefix $OPENCSW_PREFIX amd64
+    configure_compiler "/opt/developerstudio12.6/bin/cc -m64" "${incdirs-}" "${libdirs-}"
+}
+
 configure_python() {
     basename=Python-$python_version
 
@@ -61,7 +134,7 @@ configure_python() {
     build_dir="$HOME/Documents/build/$basename"
     src_dir="$HOME/Documents/src/Python/$basename"
 
-    command=$(get_command $src_dir/configure)
+    command=$(get_configure_command $src_dir)
     filename=$basename.tar.xz
 
     pathname=$archive_dir/$filename
@@ -69,20 +142,22 @@ configure_python() {
     mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
     download_archive
     extract_files
+    cd "$build_dir"
 
-    if [ "$is_forcing" = true ]; then
-	/bin/rm -f "$build_dir/config.status"
-    elif [ -r "$build_dir/config.status" ]; then
+    if [ "$force" = true ]; then
+	clean_build
+    elif [ ! -r config.status ]; then
+	:
+    else
 	exit 0
     fi
 
     printf "%s\n" "$command"
-    cd "$build_dir"
-    $command
+    eval $command
 }
 
 download_archive() {
-    url=$PYTHON_BASE_URL/python/$python_version/$filename
+    url=$BASE_URL/python/$python_version/$filename
 
     if [ ! -r "$pathname" ]; then
 	cd "$archive_dir"
@@ -106,57 +181,109 @@ extract_files() {
     fi
 }
 
-get_command() {
-    compiler=$(get_compiler)
-    ldflags=$(get_ldflags)
-    options=$(get_options)
-    printf "%s\n" "$1 $options CC=$compiler LDFLAGS=$ldflags"
+get_compiler() {
+    printf "%s\n" "$1"
 }
 
-get_compiler() {
-    compiler=
+get_compiler_flags() {
+    shift
+    printf "%s\n" "$*"
+}
 
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (solaris)
-		compiler=cc
-		break
+get_configure_command() {
+    options=$(get_configure_options)
+    printf '%s' "$1/configure"
+
+    if [ -n "${options-}" ]; then
+	printf ' %s' "$options"
+    fi
+
+    if [ -n "${cc-}" ]; then
+	printf ' CC=\"%s\"' "${cc-}"
+    fi
+
+    if [ -n "${cflags-}" ]; then
+	printf ' CFLAGS=\"%s\"' "${cflags-}"
+    fi
+
+    if [ -n "${cppflags-}" ]; then
+	printf ' CPPFLAGS=\"%s\"' "${cppflags-}"
+    fi
+
+    if [ -n "${ldflags-}" ]; then
+	printf ' LDFLAGS=\"%s\"' "${ldflags-}"
+    fi
+
+    if [ -n "${pkg_config_path-}" ]; then
+	printf ' PKG_CONFIG_PATH=\"%s\"' "${pkg_config_path-}"
+    fi
+
+    printf '\n'
+}
+
+get_configure_options() {
+    if [ "${with_cairo-}" = true ]; then
+	options="${options:+$options }--with-cairo${cairo:+=$cairo}"
+    elif [ "${with_cairo-}" = false ]; then
+	options="${options:+$options }--without-cairo${cairo:+=$cairo}"
+    fi
+
+    if [ "${with_gnutls-}" = true ]; then
+	options="${options:+$options }--with-gnutls${gnutls:+=$gnutls}"
+    elif [ "${with_gnutls-}" = false ]; then
+	options="${options:+$options }--without-gnutls${gnutls:+=$gnutls}"
+    fi
+
+    if [ "${with_toolkit-}" = true ]; then
+	options="${options:+$options }--with-x-toolkit${toolkit:+=$toolkit}"
+    elif [ "${with_toolkit-}" = false ]; then
+	options="${options:+$options }--with-x-toolkit=no"
+    fi
+
+    if [ "${with_widgets-}" = true ]; then
+	options="${options:+$options }--with-xwidgets${widgets:+=$widgets}"
+    elif [ "${with_widgets-}" = false ]; then
+	options="${options:+$options }--without-xwidgets${widgets:+=$widgets}"
+    fi
+
+    if [ -n "${options:-}" ]; then
+	printf "%s\n" "$options"
+    fi
+}
+
+get_include_flags() {
+    assert [ $# -ge 1 ]
+    printf -- "-I%s\n" "$@"
+}
+
+get_linker_flags() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    ldflags=
+
+    for libdir; do
+	case "$os_family" in
+	    (gnu-*)
+		ldflags="-Wl,--rpath=$libdir"
+		;;
+	    (unix)
+		ldflags="-L$libdir -R$libdir"
 		;;
 	esac
     done
 
-    printf "%s\n" "${compiler:-gcc}"
-}
-
-get_ldflags() {
-    case "$os_family" in
-	(gnu-*)
-	    ldflags="-Wl,--rpath=$python_prefix/lib"
-	    ;;
-	(unix)
-	    ldflags="-R$python_prefix/lib"
-	    ;;
-	(*)
-	    ldflags=
-	    ;;
-    esac
-
-    printf "%s\n" "$ldflags"
-}
-
-get_options() {
-    options=
-
-    if [ "$is_optimizing" = true ]; then
-	options="${options:+$options }--enable-optimizations"
-    else
-	options="${options:+$options }--disable-optimizations"
+    if [ "${ldflags-}" ]; then
+	printf "%s\n" "$ldflags"
     fi
+}
 
-    options="${options:+$options }--enable-shared --prefix=$python_prefix"
+get_pkg_config_path() {
+    for pkgdir in ${pkgdirs-}; do
+	pkg_config_path=${pkg_config_path+$pkg_config_path:}$pkgdir
+    done
 
-    if [ -n "${options:-}" ]; then
-	printf "%s\n" "$options"
+    if [ "${pkg_config_path-}" ]; then
+	printf "%s\n" "$pkg_config_path"
     fi
 }
 
@@ -177,28 +304,36 @@ get_realpath() (
     fi
 )
 
-parse_arguments() {
-    is_forcing=false
-    is_optimizing=false
-    python_prefix=$PYTHON_PREFIX
-    python_version=$PYTHON_VERSION
+include_prefix() {
+    assert [ $# -ge 1 -a $# -le 2 ]
+    assert [ -n "$1" ]
+    incdir="$1/include"
+    libdir="$1/lib${2+/$2}"
+    incdirs="${incdirs+$incdirs }$incdir"
+    libdirs="${libdirs+$libdirs }$libdir"
 
+    if [ -d "$libdir/pkgconfig" ]; then
+	pkgdirs="${pkgdirs+$pkgdirs }$libdir/pkgconfig"
+    fi
+}
+
+parse_arguments() {
     while getopts defp:v:h opt; do
 	case $opt in
 	    (d)
-		is_optimizing=false
+		optimize=false
 		;;
 	    (e)
-		is_optimizing=true
+		optimize=true
 		;;
 	    (f)
-		is_forcing=true
+		force=true
 		;;
 	    (p)
 		case $OPTARG in
 		    ($HOME|/opt/*|/usr|/usr/local)
 			if [ -d $OPTARG ]; then
-			    python_prefix=$OPTARG
+			    prefix=$OPTARG
 			else
 			    abort_invalid_prefix $OPTARG
 			fi
@@ -273,6 +408,9 @@ validate_platform() {
 	    (freebsd)
 		return
 		;;
+	    (macos)
+		return
+		;;
 	    (netbsd)
 		return
 		;;
@@ -293,5 +431,6 @@ script_dir=$(get_realpath "$(dirname "$0")")
 eval $("$script_dir/get-os-release" -x)
 
 validate_platform
+configure_platform
 parse_arguments "$@"
 configure_python

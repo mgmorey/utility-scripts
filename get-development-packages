@@ -26,6 +26,8 @@ ILLUMOS_PKGS="developer/build/autoconf developer/build/automake \
 developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
 developer/illumos-gcc system/header"
 
+MACOS_PKGS="autoconf automake gcc libtool make pkg-config"
+
 OPENSUSE_PKGS="autoconf automake gcc libtool make pkgconf"
 
 REDHAT_7_PKGS="autoconf automake gcc libtool make pkgconfig"
@@ -79,6 +81,9 @@ get_emacs_build_deps() {
 		;;
 	    (illumos)
 		packages=$ILLUMOS_PKGS
+		;;
+	    (macos)
+		packages=$MACOS_PKGS
 		;;
 	    (solaris)
 		packages=$SOLARIS_PKGS
