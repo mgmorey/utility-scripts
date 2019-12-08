@@ -152,8 +152,9 @@ include_macos_directories() {
     # configure environment for Homebrew packages
 
     if [ -x /usr/bin/xcrun ]; then
-	CPPFLAGS="-I$(/usr/bin/xcrun --show-sdk-path)/usr/include"
-	LDFLAGS="-L$(/usr/bin/xcrun --show-sdk-path)/usr/lib"
+	dir=$(/usr/bin/xcrun --show-sdk-path)
+	CPPFLAGS="-I$dir/usr/include"
+	LDFLAGS="-L$dir/usr/lib -R$dir/usr/lib"
     fi
 
     MANPATH=${MANPATH:-$(manpath)}
@@ -166,7 +167,7 @@ include_macos_directories() {
 	fi
 
 	if [ -d $prefix/$pkg/lib ]; then
-	    LDFLAGS="-L$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
+	    LDFLAGS="-L$prefix/$pkg/lib -R$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
 	fi
 
 	if is_to_be_included $prefix/$pkg/lib/$pkg/man "${MANPATH-}"; then
