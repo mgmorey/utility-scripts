@@ -150,6 +150,12 @@ include_common_directories() {
 
 include_macos_directories() {
     # configure environment for Homebrew packages
+
+    if [ -x /usr/bin/xcrun ]; then
+	CPPFLAGS="-I$(/usr/bin/xcrun --show-sdk-path)/usr/include"
+	LDFLAGS="-L$(/usr/bin/xcrun --show-sdk-path)/usr/lib"
+    fi
+
     MANPATH=${MANPATH:-$(manpath)}
 
     prefix=/usr/local/opt
