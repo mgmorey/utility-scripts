@@ -54,7 +54,14 @@ get_realpath() (
 install_macos_sdk_headers() {
     case "$kernel_name" in
 	(Darwin)
-	    sudo installer -pkg $DARWIN_PKG_DIR/$DARWIN_PKG_NAME -target /
+	    case "$VERSION_ID" in
+		(10.14.*)
+		    installer -pkg $DARWIN_PKG_DIR/$DARWIN_PKG_NAME -target /
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
 	    ;;
 	(*)
 	    abort_not_supported "Operating system"
