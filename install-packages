@@ -138,7 +138,7 @@ install_packages() {
     "$script_dir/install-package-managers" $managers
 
     if [ "$is_pattern_supported" = true ]; then
-	install_pattern_from_args
+	install_pattern_from_args || true
     fi
 
     install_packages_from_args
