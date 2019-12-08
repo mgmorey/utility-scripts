@@ -36,7 +36,7 @@ assert() {
 }
 
 configure_platform() {
-    desktop_name=$(get-desktop-name)
+    desktop_name=$("$script_dir/get-desktop-name")
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -149,6 +149,8 @@ get_realpath() (
     fi
 )
 
-eval $(get-os-release -x)
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -x)
 
 get_askpass

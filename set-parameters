@@ -277,7 +277,7 @@ remove_directory() {
 }
 
 set_askpass_parameters() {
-    set-askpass || true
+    "$script_dir/set-askpass" || true
 }
 
 set_profile_parameters() {
@@ -306,7 +306,9 @@ validate_platform() {
     esac
 }
 
-eval $(get-os-release -x)
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -x)
 
 set_askpass_parameters
 set_profile_parameters

@@ -91,10 +91,12 @@ usage() {
 	EOF
 }
 
+script_dir=$(get_realpath "$(dirname "$0")")
+
 parse_arguments "$@"
 
 if [ $is_query = true ]; then
-    get-askpass
+    "$script_dir/get-askpass"
 else
-    set-askpass ${commands-}
+    "$script_dir/set-askpass" ${commands-}
 fi

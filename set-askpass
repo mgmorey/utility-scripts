@@ -60,7 +60,7 @@ parse_arguments() {
 
 set_askpass() {
     validate_parameters
-    askpass_helper=$(get-askpass | awk '! /^#/')
+    askpass_helper=$("$script_dir/get-askpass" | awk '! /^#/')
 
     if [ -z "$askpass_helper" ]; then
 	exit 0
@@ -112,6 +112,8 @@ validate_parameters() {
 	    ;;
     esac
 }
+
+script_dir=$(get_realpath "$(dirname "$0")")
 
 parse_arguments "$@"
 set_askpass
