@@ -148,19 +148,19 @@ configure_platform_bsd_netbsd() {
     make=gmake
     with_gnutls=false
     include_prefix /usr/pkg
-    configure_compiler "/usr/bin/gcc" "$incdirs" "$libdirs"
+    configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
     libgif="$libdir/libgif.so"
 }
 
 configure_platform_unix_illumos() {
     include_prefix $LOCAL_PREFIX
-    configure_compiler "/usr/bin/gcc -m64" "$incdirs" "$libdirs"
+    configure_compiler "/usr/bin/gcc -m64" "${incdirs-}" "${libdirs-}"
     libgif="$libdir/libgif.so"
 }
 
 configure_platform_unix_solaris() {
     include_prefix $OPENCSW_PREFIX amd64
-    configure_compiler "/opt/developerstudio12.6/bin/cc -m64" "$incdirs" "$libdirs"
+    configure_compiler "/opt/developerstudio12.6/bin/cc -m64" "${incdirs-}" "${libdirs-}"
     libgif="$libdir/libgif.so"
 }
 
