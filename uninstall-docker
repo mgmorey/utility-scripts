@@ -72,7 +72,7 @@ postuninstall_docker() {
 	return 0
     fi
 
-    group=$("$script_dir/get-docker-group" "$@")
+    group=$(get-docker-group "$@")
 
     if [ -n "$group" ]; then
 	uninstall_group $group
@@ -81,7 +81,7 @@ postuninstall_docker() {
 
 uninstall_docker() {
     validate_platform
-    packages=$("$script_dir/get-installed-docker-packages")
+    packages=$(get-installed-docker-packages)
     origin=$(get_docker_origin $packages)
 
     if [ -n "$origin" ]; then
@@ -101,7 +101,7 @@ uninstall_docker() {
     fi
 
     if [ -n "$packages" ]; then
-	if "$script_dir/uninstall-packages" $packages; then
+	if uninstall-packages $packages; then
 	    postuninstall_docker $packages
 	else
 	    return $?
@@ -150,8 +150,6 @@ validate_platform() {
     esac
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
-
-eval $("$script_dir/get-os-release" -x)
+eval $(get-os-release -x)
 
 uninstall_docker "$@"

@@ -76,7 +76,7 @@ parse_arguments() {
 
 uninstall_packages() {
     validate_platform
-    managers=$("$script_dir/get-package-managers")
+    managers=$(get-package-managers)
 
     if [ $# -eq 0 ]; then
 	return 0
@@ -112,7 +112,7 @@ uninstall_using() (
     manager=$1
     shift 1
 
-    uninstall=$("$script_dir/get-uninstall-command" $manager)
+    uninstall=$(get-uninstall-command $manager)
 
     case "$manager" in
 	(brew|*/brew)
@@ -160,10 +160,8 @@ validate_platform() {
     abort_not_supported "Operating system"
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
+eval $(get-os-release -x)
 
-eval $("$script_dir/get-os-release" -x)
-
-. "$script_dir/utility-functions.sh"
+. utility-functions.sh
 
 uninstall_packages "$@"

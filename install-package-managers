@@ -52,13 +52,13 @@ install_package_manager() {
 
     case "$(basename $1)" in
 	(brew)
-	    "$script_dir/$INSTALL_BREW"
+	    $INSTALL_BREW
 	    ;;
 	(pkgin)
-	    "$script_dir/$INSTALL_PKGIN"
+	    $INSTALL_PKGIN
 	    ;;
 	(pkgutil)
-	    "$script_dir/$INSTALL_PKGUTIL"
+	    $INSTALL_PKGUTIL
 	    ;;
     esac
 }
@@ -71,8 +71,6 @@ install_package_managers() {
     done
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
-
-eval $("$script_dir/get-os-release" -x)
+eval $(get-os-release -x)
 
 install_package_managers "$@"

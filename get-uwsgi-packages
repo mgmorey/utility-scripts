@@ -113,11 +113,9 @@ get_uwsgi_packages() {
 	fi
     done
 
-    "$script_dir/get-python-packages" ${packages-}
+    get-python-packages ${packages-}
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
-
-eval $("$script_dir/get-os-release" -X)
+eval $(get-os-release -X)
 
 get_uwsgi_packages

@@ -172,7 +172,7 @@ get_os_version_id() {
 		    printf "%s\n" "$VERSION" | awk '{print $1}'
 		    ;;
 		(fedora|rhel|ol|centos)
-		    "$script_dir/get-redhat-version.awk" /etc/redhat-release
+		    get-redhat-version.awk /etc/redhat-release
 		    ;;
 	    esac
 	    ;;
@@ -299,8 +299,6 @@ usage() {
 	       $0: -h
 	EOF
 }
-
-script_dir=$(get_realpath "$(dirname "$0")")
 
 parse_arguments "$@"
 collect_data

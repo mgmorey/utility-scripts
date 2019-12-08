@@ -54,11 +54,9 @@ if [ -z "${DISPLAY:-}" ]; then
     abort "%s: No DISPLAY variable set\n" "$0"
 fi
 
-script_dir=$(get_realpath "$(dirname "$0")")
+eval $(get-os-release -x)
 
-eval $("$script_dir/get-os-release" -x)
-
-desktop_name=$("$script_dir/get-desktop-name")
+desktop_name=$(get-desktop-name)
 
 if [ -z "${desktop_name:-}" ]; then
     abort "%s: Desktop not specified\n" "$0"

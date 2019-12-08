@@ -43,7 +43,7 @@ get_realpath() (
 )
 
 install_pipenv() {
-    pip=$("$script_dir/get-python-command" pip)
+    pip=$(get-python-command pip)
 
     if [ "$pip" != false ]; then
 	$pip install --upgrade --user pip pipenv
@@ -55,7 +55,5 @@ install_pipenv() {
 if [ $(id -u) -eq 0 ]; then
     abort "%s\n" "$0: Must be run as a non-privileged user"
 fi
-
-script_dir=$(get_realpath "$(dirname "$0")")
 
 install_pipenv "$@"

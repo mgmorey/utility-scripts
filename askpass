@@ -93,10 +93,8 @@ usage() {
 
 parse_arguments "$@"
 
-script_dir=$(get_realpath "$(dirname "$0")")
-
 if [ $is_query = true ]; then
-    "$script_dir/get-askpass"
+    get-askpass
 else
-    "$script_dir/set-askpass" ${commands-}
+    set-askpass ${commands-}
 fi

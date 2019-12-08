@@ -117,11 +117,9 @@ prefix_lines() {
     awk -v prefix=$1 "$PREFIX_AWK"
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
+eval $(get-os-release -x)
 
-eval $("$script_dir/get-os-release" -x)
+. utility-functions.sh
 
-. "$script_dir/utility-functions.sh"
-
-managers=$("$script_dir/get-package-managers")
+managers=$(get-package-managers)
 get_installed_packages $managers

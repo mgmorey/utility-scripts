@@ -87,8 +87,6 @@ parse_argument() {
 	script="$1"
     elif [ -e "$sql_dir/$file" ]; then
 	script="$sql_dir/$file"
-    elif [ -e "$script_dir/$file" ]; then
-	script="$script_dir/$file"
     else
 	abort "%s: No such script file\n" "$file"
     fi
@@ -122,8 +120,6 @@ run_sql() {
 	exec_sql_cli exec
     fi
 }
-
-script_dir=$(get_realpath "$(dirname "$0")")
 
 env_dir=$(pwd)
 

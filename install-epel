@@ -75,7 +75,7 @@ install_epel() {
 	return 0
     fi
 
-    manager=$("$script_dir/get-package-managers" | awk 'NR == 1 {print $0}')
+    manager=$(get-package-managers | awk 'NR == 1 {print $0}')
     $manager install $(get_url)
 }
 
@@ -124,8 +124,6 @@ if [ $# -gt 0 ]; then
     abort "%s: Too many arguments\n" "$0"
 fi
 
-script_dir=$(get_realpath "$(dirname "$0")")
-
-eval $("$script_dir/get-os-release" -x)
+eval $(get-os-release -x)
 
 install_epel

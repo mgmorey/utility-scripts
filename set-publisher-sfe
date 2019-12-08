@@ -91,8 +91,6 @@ validate_platform() {
     abort_not_supported "Operating system"
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
-
-eval $("$script_dir/get-os-release" -x)
+eval $(get-os-release -x)
 
 set_publisher_sfe

@@ -87,7 +87,7 @@ get_awk_command() {
 
 get_hypervisor_vendor() {
     awk="$(get_awk_command)"
-    (lscpu 2>/dev/null | $awk -f "$script_dir/get-hypervisor-vendor") || true
+    (lscpu 2>/dev/null | $awk -f get-hypervisor-vendor) || true
 }
 
 get_package_directory() {
@@ -113,7 +113,7 @@ get_realpath() (
 
 install_kernel_packages() {
     if [ -n "${packages-}" ]; then
-	"$script_dir/install-packages" $packages
+	install-packages $packages
     fi
 }
 
@@ -122,7 +122,7 @@ install_prerequisites() {
 	(Linux|GNU)
 	    case "$ID" in
 		(rhel|ol|centos)
-		    "$script_dir/install-epel"
+		    install-epel
 		    ;;
 	    esac
 	    ;;
@@ -199,7 +199,7 @@ update_kernel_packages() {
 }
 
 update_redhat_kernel_packages() {
-    manager=$("$script_dir/get-package-managers" | awk 'NR == 1 {print $0}')
+    manager=$(get-package-managers | awk 'NR == 1 {print $0}')
 
     if ! $manager update 'kernel*'; then
 	exit $?
@@ -290,8 +290,6 @@ if [ $# -gt 0 ]; then
     abort "%s: Too many arguments\n" "$0"
 fi
 
-script_dir=$(get_realpath "$(dirname "$0")")
-
-eval $("$script_dir/get-os-release" -x)
+eval $(get-os-release -x)
 
 install_virtualbox_guest

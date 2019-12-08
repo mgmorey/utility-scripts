@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 if [ $# -gt 0 ]; then
-    value="$(printf "%s\n" "$PATH" | sed "s|$1||")"
+    value="$(printf "%s\n" "$PATH" | sed -e 's|^'"$1"':||g;s|:'"$1"':|:|g;s|:'"$1"'$||g')"
 
     case ${SHELL##*/} in
 	(bash|fish|ksh|ksh93|rbash|zsh)

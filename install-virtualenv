@@ -48,10 +48,10 @@ get_realpath() (
 
 install_pip() {
     validate_platform
-    packages=$("$script_dir/get-python-virtualenv-packages")
+    packages=$(get-python-virtualenv-packages)
 
     if [ -n "$packages" ]; then
-	"$script_dir/install-packages" $packages
+	install-packages $packages
     fi
 }
 
@@ -109,8 +109,6 @@ validate_platform() {
     abort_not_supported "Operating system"
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
-
-eval $("$script_dir/get-os-release" -x)
+eval $(get-os-release -x)
 
 install_pip "$@"

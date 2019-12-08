@@ -120,7 +120,7 @@ get_realpath() (
 install_docker() {
     validate_platform
     configure_platform
-    installed_packages=$("$script_dir/get-installed-docker-packages")
+    installed_packages=$(get-installed-docker-packages)
     origin=$(get_docker_origin $installed_packages)
 
     if [ -n "$origin" ]; then
@@ -139,17 +139,17 @@ install_docker() {
 	printf "Docker is not installed.\n"
     fi
 
-    selected_packages=$("$script_dir/get-docker-packages")
+    selected_packages=$(get-docker-packages)
     packages=$(get_difference "$installed_packages" "$selected_packages")
 
     if [ -n "$packages" ]; then
-	if ! "$script_dir/uninstall-packages" $packages; then
+	if ! uninstall-packages $packages; then
 	    return $?
 	fi
     fi
 
     if [ -n "$selected_packages" ]; then
-	if "$script_dir/install-packages" $selected_packages; then
+	if install-packages $selected_packages; then
 	    postinstall_docker $selected_packages
 	else
 	    return $?
@@ -189,7 +189,7 @@ postinstall_docker() {
 	return 0
     fi
 
-    group=$("$script_dir/get-docker-group" "$@")
+    group=$(get-docker-group "$@")
 
     if [ -n "$group" ]; then
 	install_group $group
@@ -337,8 +337,6 @@ if [ $# -gt 0 ]; then
     abort "%s: Too many arguments\n" "$0"
 fi
 
-script_dir=$(get_realpath "$(dirname "$0")")
-
-eval $("$script_dir/get-os-release" -x)
+eval $(get-os-release -x)
 
 install_docker

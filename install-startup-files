@@ -167,9 +167,7 @@ is_to_be_installed() {
     fi
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
-
-eval $("$script_dir/get-os-release" -x)
+eval $(get-os-release -x)
 
 diff="$(get_diff_command)"
 install="$(get_install_command)"

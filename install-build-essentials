@@ -47,10 +47,10 @@ get_realpath() (
 )
 
 install_build_essentials() {
-    command=$("$script_dir/get-pattern-install-command")
-    manager=$("$script_dir/get-package-managers" | awk 'NR == 1 {print $0}')
-    options=$("$script_dir/get-package-install-options")
-    pattern=$("$script_dir/get-development-pattern")
+    command=$(get-pattern-install-command)
+    manager=$(get-package-managers | awk 'NR == 1 {print $0}')
+    options=$(get-package-install-options)
+    pattern=$(get-development-pattern)
 
     case "$kernel_name" in
 	(Linux)
@@ -75,8 +75,6 @@ install_build_essentials() {
     esac
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
-
-eval $("$script_dir/get-os-release" -x)
+eval $(get-os-release -x)
 
 install_build_essentials
