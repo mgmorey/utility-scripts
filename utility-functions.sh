@@ -405,25 +405,6 @@ get_sort_command() {
     esac
 }
 
-get_su_options() (
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-
-    case "${kernel_name=$(uname -s)}" in
-	(GNU|Linux)
-	    options="-l $1"
-	    ;;
-	(Darwin|FreeBSD)
-	    options="-l $1"
-	    ;;
-	(*)
-	    options="- $1"
-	    ;;
-    esac
-
-    printf -- "%s\n" "$options"
-)
-
 get_user_name() {
     printf "%s\n" "${SUDO_USER-${USER-${LOGNAME}}}"
 }
@@ -610,7 +591,7 @@ run_unpriv() (
 		command="$command $(get_setpriv_options $SUDO_USER)"
 		;;
 	    (su)
-		command="$command $(get_su_options $SUDO_USER)"
+		command="$command $SUDO_USER"
 
 		if [ "${1-}${2+ $2}" = "/bin/sh -c" ]; then
 		    shift
