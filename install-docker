@@ -100,23 +100,6 @@ get_docker_origin() {
     done
 }
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath)
-
-    if [ -n "$realpath" ]; then
-	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 install_docker() {
     validate_platform
     configure_platform

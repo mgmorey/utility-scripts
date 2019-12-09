@@ -165,23 +165,6 @@ get_docker_url() {
     printf "%s\n" "$DOCKER_BASE_URL/linux/$ID"
 }
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath)
-
-    if [ -n "$realpath" ]; then
-	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 get_repository_data() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
