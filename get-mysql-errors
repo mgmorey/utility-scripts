@@ -72,6 +72,23 @@ get_mysql_errors() {
     cat "$log_dir/$log_file"
 }
 
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
 validate_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in

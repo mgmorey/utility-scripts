@@ -87,6 +87,23 @@ get_install_command() {
     printf "%s\n" "${install:-install}"
 }
 
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
 install_startup_files() {
     if [ ! -h $0 ]; then
 	abort "Please change from source directory before running this script\n"
