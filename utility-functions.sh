@@ -36,7 +36,7 @@ check_python() {
     assert [ -n "$2" ]
     printf "Python %s interpreter found: %s\n" "$2" "$1" >&2
 
-    if ! "$1" "$(which test-python-version.py)" $2 >&2; then
+    if ! "$1" "$(which test-python-version)" $2 >&2; then
 	return 1
     fi
 
@@ -156,7 +156,7 @@ find_system_pythons() (
 
 find_user_python() (
     assert [ $# -eq 1 ]
-    python_versions=$($1 "$(which test-python-version.py)")
+    python_versions=$($1 "$(which test-python-version)")
 
     if pyenv --version >/dev/null 2>&1; then
 	pyenv_root="$(pyenv root)"
@@ -416,7 +416,7 @@ get_versions_all() {
 
 get_versions_passed() (
     python=$(find_system_python | awk '{print $1}')
-    python_versions=$($python "$(which test-python-version.py)" --delim '\.')
+    python_versions=$($python "$(which test-python-version)" --delim '\.')
 
     for python_version in ${python_versions-$PYTHON_VERSIONS}; do
 	if get_versions_all $python_version; then
