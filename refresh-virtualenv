@@ -1,0 +1,179 @@
+#!/bin/sh -eu
+
+# refresh-virtualenv: install virtual environment dependencies
+# Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+: ${LANG:=en_US.UTF-8}
+: ${LC_ALL:=en_US.UTF-8}
+export LANG LC_ALL
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+generate_requirements() (
+    assert [ $# -ge 1 ]
+    assert [ -n "$1" ]
+    pipenv=$1
+    shift
+    create_tmpfile
+
+    for file; do
+	if [ "$file" = "$PIP_DEV_REQUIREMENTS" ]; then
+		pipenv_opts=-dr
+	else
+		pipenv_opts=-r
+	fi
+
+	printf "Generating %s\n" $file
+
+	if $pipenv lock $pipenv_opts >$tmpfile; then
+	    /bin/mv -f $tmpfile $file
+	else
+	    abort "%s: Unable to update %s\n" "$0" "$file"
+	fi
+    done
+
+    chgrp $(id -g) "$@"
+    chmod a+r "$@"
+)
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+parse_arguments() {
+    while getopts p:v:h opt; do
+	case $opt in
+	    (p)
+		pypi_utilities=$OPTARG
+		;;
+	    (v)
+		venv_utilities=$OPTARG
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+}
+
+refresh_via_pipenv() {
+    assert [ $# -ge 1 ]
+    assert [ -n "$1" ]
+
+    if ! $1 --venv >/dev/null 2>&1; then
+	if upgrade_via_pip pip pipenv; then
+	    if [ -n "${BASH:-}" -o -n "${ZSH_VERSION:-}" ] ; then
+		hash -r
+	    fi
+	fi
+
+	if pyenv --version >/dev/null 2>&1; then
+	    $1 --python "$(find_python)"
+	else
+	    $1 --three
+	fi
+    fi
+
+    # Lock dependencies (including development dependencies) and
+    # generate Pipfile.lock
+    $1 lock -d
+}
+
+refresh_virtualenv() (
+    for utility in ${pypi_utilities-$PYPI_UTILITIES}; do
+	case "$utility" in
+	    (pipenv)
+		pipenv=$(get_command pipenv || true)
+
+		if [ -z "$pipenv" ]; then
+		    continue
+		fi
+
+		if refresh_via_pipenv $pipenv; then
+		    if generate_requirements $pipenv $PIP_ALL_REQUIREMENTS; then
+			if $pipenv sync -d; then
+			    return 0
+			fi
+		    fi
+		fi
+		;;
+	    (pip)
+		pip_requirements=$PIP_ALL_REQUIREMENTS
+		venv_force_sync=true
+
+		if refresh_via_pip ${VENV_DIRECTORY-venv}; then
+		    return 0
+		fi
+		;;
+	esac
+    done
+)
+
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
+    fi
+
+    cat <<-EOF >&2
+	Usage: $0: [-d <DIR>] [-p <PYPI>] [-v <VENV>]
+	       $0: -h
+	EOF
+}
+
+if [ "$(id -u)" -eq 0 ]; then
+    abort "%s: Must be run as a non-privileged user\n" "$0"
+fi
+
+if [ -n "${VIRTUAL_ENV:-}" ]; then
+    abort "%s: Must not be run within a virtual environment\n" "$0"
+fi
+
+eval $(get-app-configuration --input app.ini)
+. utility-functions.sh
+
+eval $(get-os-release -x)
+
+parse_arguments "$@"
+refresh_virtualenv
