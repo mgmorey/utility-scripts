@@ -1,0 +1,128 @@
+#!/bin/sh -eu
+
+# build-uwsgi: download and build uWSGI from GitHub source
+# Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+build_binary() (
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+
+    if [ -x $2 ]; then
+	return 0
+    fi
+
+    case $2 in
+	(uwsgi)
+	    CC=gcc $1 uwsgiconfig.py --build $UWSGI_BUILDCONF
+	    ;;
+	(*)
+	    CC=gcc $1 uwsgiconfig.py $(get_options) ${2%_*}
+	    ;;
+    esac
+)
+
+build_uwsgi() (
+    assert [ $# -ge 3 -a $# -le 4 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    python=$1
+    python_version=$2
+    shift 2
+    fetch_uwsgi_source
+
+    if ! cd "$HOME/git/$UWSGI_BRANCH"; then
+	return 1
+    fi
+
+    for binary; do
+	build_binary $python $binary
+    done
+)
+
+fetch_uwsgi_source() {
+    if [ -d "$HOME/git/$UWSGI_BRANCH" ]; then
+	return 0
+    fi
+
+    cd
+    mkdir -p git
+    cd git
+    git clone -b $UWSGI_BRANCH $UWSGI_URL $UWSGI_BRANCH
+}
+
+get_options() {
+    case "$UWSGI_BUILDCONF" in
+	(core)
+	    options="--plugin plugins/python $UWSGI_BUILDCONF"
+	    ;;
+	(*)
+	    options=
+	    ;;
+    esac
+
+    printf "%s\n" "$options"
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+if [ $# -lt 2 ]; then
+    abort "%s: Not enough arguments\n" "$0"
+elif [ $# -gt 2 ]; then
+    abort "%s: Too many arguments\n" "$0"
+fi
+
+if [ "$(id -u)" -eq 0 ]; then
+    abort "%s: Must be run as a non-privileged user\n" "$0"
+fi
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $(get-app-configuration --input app.ini)
+. utility-functions.sh
+. restapi-parameters.sh
+. restapi-functions.sh
+
+SYSTEM_PYTHON=$1
+SYSTEM_PYTHON_VERSION=$2
+
+configure_all
+build_uwsgi $SYSTEM_PYTHON $SYSTEM_PYTHON_VERSION \
+	    $UWSGI_BINARY_NAME $UWSGI_PLUGIN_NAME
