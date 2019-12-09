@@ -400,7 +400,7 @@ print_table() {
 	abort "No suitable awk command found\n"
     fi
 
-    $awk -f "$script_dir/print-table.awk" \
+    $awk -f "$(which print-table)" \
 	 -v border="${1-1}" \
 	 -v header="${2-}" \
 	 -v width="${COLUMNS-80}"
