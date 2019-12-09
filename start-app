@@ -1,0 +1,176 @@
+#!/bin/sh -eu
+
+# start-app.sh: start or run application
+# Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+control_app_enable() {
+    control_app enable
+}
+
+control_app_start() {
+    control_service restart uwsgi
+
+    if [ $dryrun = true ]; then
+	return 0
+    fi
+
+    printf "Waiting for service %s to start\n" "$APP_NAME"
+    elapsed=$((elapsed + $(wait_for_service $((WAIT_RESTART - elapsed)))))
+
+    if [ $elapsed -lt $WAIT_DEFAULT ]; then
+	elapsed=$((elapsed + $(wait_for_timeout $((WAIT_DEFAULT - elapsed)))))
+    fi
+}
+
+create_symlink() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$2" ]
+
+    if [ $dryrun = true ]; then
+	check_permissions_single "$2"
+    else
+	assert [ -n "$1" ]
+	assert [ -r $1 ]
+
+	if [ $1 != $2 -a ! -e $2 ]; then
+	    printf "Creating link %s\n" "$2"
+	    mkdir -p $(dirname $2)
+	    /bin/ln -s $1 $2
+	fi
+    fi
+}
+
+create_symlinks() (
+    assert [ $# -ge 1 ]
+    assert [ -n "$1" ]
+    file=$1
+    shift
+
+    if [ -z "${UWSGI_ETCDIR-}" ]; then
+	return 0
+    fi
+
+    for dir in "$@"; do
+	create_symlink $file $UWSGI_ETCDIR/$dir/$APP_NAME.ini
+    done
+)
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+print_status() (
+    status=$1
+
+    case $1 in
+	(running)
+	    if [ $start_requested = true ]; then
+		print_app_log_file 1
+		print_app_processes 0
+	    fi
+
+	    print_elapsed_time started
+
+	    if [ $start_requested = false ]; then
+		status="already $status"
+	    fi
+	    ;;
+	(*)
+	    exec >&2
+	    ;;
+    esac
+
+    printf "Service %s is %s\n" "$APP_NAME" "$status"
+)
+
+run_service() {
+    configure_defaults
+    validate_parameters_preinstallation
+    validate_parameters_postinstallation
+    command=$(get_uwsgi_binary_path)
+
+    if [ -d "${UWSGI_PLUGIN_DIR-}" ]; then
+	command="$command --plugin-dir $UWSGI_PLUGIN_DIR"
+    fi
+
+    $command --ini $APP_CONFIG
+}
+
+start_app() {
+    start_requested=false
+    elapsed=0
+
+    if ! is_app_installed; then
+	return 0
+    elif is_app_running; then
+	return 0
+    fi
+
+    if [ "$(is_uwsgi_service)" = true ]; then
+	for dryrun in true false; do
+	    control_app_enable
+	    control_app_start
+
+	    if [ $dryrun = false ]; then
+		start_requested=true
+	    fi
+	done
+    else
+	run_service
+    fi
+}
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-app-configuration" --input app.ini)
+. "$script_dir/utility-functions.sh"
+. "$script_dir/restapi-parameters.sh"
+. "$script_dir/restapi-functions.sh"
+
+set_unpriv_environment
+configure_baseline
+start_app
+
+status=$(get_app_status)
+print_status $status
+
+case $status in
+    (running)
+	exit 0
+	;;
+    (*)
+	exit 1
+	;;
+esac

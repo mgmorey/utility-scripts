@@ -1,0 +1,132 @@
+#!/bin/sh -eu
+
+# uninstall-app.sh: uninstall uWSGI application
+# Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_extra_arguments() {
+    usage "%s: extra arguments -- %s\n" "$0" "$*"
+    exit 2
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+parse_arguments() {
+    all=false
+
+    while getopts ah opt; do
+	case $opt in
+	    (a)
+		all=true
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	abort_extra_arguments "$@"
+    fi
+}
+
+remove_service() {
+    files="$APP_ETCDIR $APP_DIR"
+
+    if [ $all = true ]; then
+	files="$files $APP_VARDIR"
+
+	if [ $APP_RUNDIR != /run -a $APP_RUNDIR != /var/run ]; then
+	    files="$files $APP_RUNDIR"
+	fi
+    fi
+
+    if [ "$(is_uwsgi_packaged)" = false ]; then
+	binary=$(get_uwsgi_binary_path)
+	plugin=$(get_uwsgi_plugin_path)
+
+	if [ -n "${UWSGI_ETCDIR-}" ]; then
+	    files="$files $UWSGI_ETCDIR"
+	fi
+
+	files="$files $binary ${plugin-}"
+    fi
+
+    remove_files $(get_symlinks) $files
+}
+
+uninstall_app() {
+    for dryrun in true false; do
+	if [ $dryrun = false ] && is_app_running; then
+	    control_app stop
+	fi
+
+	remove_service
+    done
+
+    printf "Service %s uninstalled successfully\n" $APP_NAME
+}
+
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
+    fi
+
+    cat <<-EOF >&2
+	Usage: $0: [-h] [-p]
+	EOF
+}
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-app-configuration" --input app.ini)
+. "$script_dir/utility-functions.sh"
+. "$script_dir/restapi-parameters.sh"
+. "$script_dir/restapi-functions.sh"
+
+set_unpriv_environment
+parse_arguments "$@"
+configure_baseline
+uninstall_app
