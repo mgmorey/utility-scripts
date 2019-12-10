@@ -39,10 +39,10 @@ configure_platform() {
 
 		case "$VERSION_ID" in
 		    (7)
-			install-epel
+			install_epel
 			;;
 		    (8)
-			install-epel
+			install_epel
 			;;
 		esac
 		break
@@ -60,10 +60,10 @@ configure_platform() {
 
 		case "$VERSION_ID" in
 		    (7.*)
-			install-epel
+			install_epel
 			;;
 		    (8.*)
-			install-epel
+			install_epel
 			;;
 		esac
 		break
@@ -123,6 +123,10 @@ get_realpath() (
 	done
     fi
 )
+
+install_epel() {
+    "$script_dir/install-epel"
+}
 
 install_packages() {
     validate_platform
