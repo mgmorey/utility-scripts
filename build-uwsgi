@@ -113,7 +113,6 @@ if [ "$(id -u)" -eq 0 ]; then
     abort "%s: Must be run as a non-privileged user\n" "$0"
 fi
 
-eval $(get-app-configuration --input app.ini)
 . utility-functions.sh
 . restapi-parameters.sh
 . restapi-functions.sh

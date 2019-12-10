@@ -61,7 +61,6 @@ print_status() (
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-eval $("$script_dir/get-app-configuration" --input app.ini)
 . "$script_dir/utility-functions.sh"
 . "$script_dir/restapi-parameters.sh"
 . "$script_dir/restapi-functions.sh"

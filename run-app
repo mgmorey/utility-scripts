@@ -92,9 +92,11 @@ run_in_virtualenv() {
     done
 
     shift $(($OPTIND - 1))
+
+    . "$script_dir/utility-functions.sh"
+
     eval $("$script_dir/get-os-release" -x)
     eval $("$script_dir/get-app-configuration" --input app.ini)
-    . "$script_dir/utility-functions.sh"
 
     pipenv=$(get_command pipenv || true)
 
