@@ -271,8 +271,12 @@ preinstall_app() {
     home="$(get_home_directory "$(get_user_name)")"
     path="$(get_profile_path "$home")"
     script="\"$script_dir/run-app\" -d \"$(pwd)\" -h \"$home\" -p \"$path\""
-    run_unpriv /bin/sh -c "$script pylint app"
-    run_unpriv /bin/sh -c "$script pytest tests"
+
+    for command in "${PYTHON_COMMAND_LINT-}" "${PYTHON_COMMAND_TEST-}"; do
+	if [ -n "$command" ]; then
+	    run_unpriv /bin/sh -c "$script $command"
+	fi
+    done
 }
 
 print_status() {
@@ -312,10 +316,11 @@ usage() {
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-eval $("$script_dir/get-app-configuration" --input app.ini)
 . "$script_dir/utility-functions.sh"
 . "$script_dir/restapi-parameters.sh"
 . "$script_dir/restapi-functions.sh"
+
+eval $("$script_dir/get-app-configuration" --input app.ini)
 
 set_unpriv_environment
 parse_arguments "$@"
