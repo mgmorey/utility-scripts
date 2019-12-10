@@ -21,51 +21,81 @@ abort() {
     exit 1
 }
 
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+install_scripts() {
+    working_dir=$(pwd)
+    cd
+
+    if [ ! -d Documents/bin ]; then
+	mkdir -m go-w -p Documents
+
+	if [ -d bin ]; then
+	    /bin/mv bin Documents/bin
+	else
+	    mkdir -m go-w Documents/bin
+	fi
+    fi
+
+    if [ ! -e bin ]; then
+	/bin/ln -s Documents/bin bin
+    fi
+
+    for file in bin/*; do
+	if [ -h $file -a ! -e $file ]; then
+	    printf "Removing broken link: %s\n" "$file"
+	    /bin/rm -f "$file"
+	fi
+    done
+
+    for file in "$working_dir"/*; do
+	case "$(basename "$file")" in
+	    ("$(basename "$0")")
+		:
+		;;
+	    (LICENSE|README*)
+		:
+		;;
+	    (*.sh)
+		if [ ! -e "bin/$(basename "$file")" ]; then
+		    ln -s "$file" bin
+		fi
+		;;
+	    (*)
+		if [ ! -e "bin/$(basename "$file")" -a -x "$file" ]; then
+		    ln -s "$file" bin
+		fi
+		;;
+	esac
+    done
+}
+
 if [ -h $0 ]; then
     abort "This script must be run as %s.\n" "$(realpath $0)"
 fi
 
-working_dir=$(pwd)
-cd
+script_dir=$(get_realpath "$(dirname "$0")")
 
-if [ ! -d Documents/bin ]; then
-    mkdir -m go-w -p Documents
+. "$script_dir/utility-functions.sh"
 
-    if [ -d bin ]; then
-	/bin/mv bin Documents/bin
-    else
-	mkdir -m go-w Documents/bin
-    fi
-fi
-
-if [ ! -e bin ]; then
-    /bin/ln -s Documents/bin bin
-fi
-
-for file in bin/*; do
-    if [ -h $file -a ! -e $file ]; then
-	printf "Removing broken link: %s\n" "$file"
-	/bin/rm -f "$file"
-    fi
-done
-
-for file in "$working_dir"/*; do
-    case "$(basename "$file")" in
-	("$(basename "$0")")
-	    :
-	    ;;
-	(LICENSE|README*)
-	    :
-	    ;;
-	(*.sh)
-	    if [ ! -e "bin/$(basename "$file")" ]; then
-		ln -s "$file" bin
-	    fi
-	    ;;
-	(*)
-	    if [ ! -e "bin/$(basename "$file")" -a -x "$file" ]; then
-		ln -s "$file" bin
-	    fi
-	    ;;
-    esac
-done
+set_user_profile
+install_scripts

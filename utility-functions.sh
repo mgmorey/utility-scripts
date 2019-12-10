@@ -649,7 +649,7 @@ set_path() {
     done
 }
 
-set_unpriv_environment() {
+set_user_profile() {
     home="$(get_home_directory $(get_user_name))"
     path="$(get_profile_path "$home")"
 

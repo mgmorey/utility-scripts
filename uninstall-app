@@ -127,7 +127,7 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-app-configuration" --input app.ini)
 
-set_unpriv_environment
+set_user_profile
 parse_arguments "$@"
 configure_baseline
 uninstall_app
