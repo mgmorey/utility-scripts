@@ -51,15 +51,6 @@ change_owner() (
     fi
 )
 
-create_database() (
-    if [ $dryrun = true ]; then
-	check_permissions $APP_VARDIR
-    else
-	cd $APP_DIR
-	${VENV_DIRECTORY-venv}/bin/python3 -m app init-db
-    fi
-)
-
 create_dirs() (
     assert [ $# -ge 1 ]
     dirs=$(printf "%s\n" "$@" | sort -u)
@@ -140,6 +131,13 @@ get_realpath() (
     fi
 )
 
+initialize_app() (
+    if [ $dryrun = false -a $# -gt 0 ]; then
+	cd $APP_DIR
+	${VENV_DIRECTORY-venv}/bin/python3 -m app "$@"
+    fi
+)
+
 install_app() {
     configure_baseline
 
@@ -172,7 +170,7 @@ install_app() {
 	install_virtualenv $APP_DIR/${VENV_DIRECTORY-venv}
 	generate_service_ini $APP_CONFIG "$APP_VARS"
 	create_dirs $APP_VARDIR $APP_LOGDIR $APP_RUNDIR
-	create_database
+	initialize_app $APP_INSTALL_INITIALIZE
 	change_owner $APP_ETCDIR $APP_DIR $APP_VARDIR
     done
 
