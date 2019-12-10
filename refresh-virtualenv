@@ -37,7 +37,7 @@ generate_requirements() (
     create_tmpfile
 
     for file; do
-	if [ "$file" = "$PIP_DEV_REQUIREMENTS" ]; then
+	if [ "$file" = "$PIP_INSTALL_DEV" ]; then
 		pipenv_opts=-dr
 	else
 		pipenv_opts=-r
@@ -131,7 +131,7 @@ refresh_virtualenv() (
 		fi
 
 		if refresh_via_pipenv $pipenv; then
-		    if generate_requirements $pipenv $PIP_ALL_REQUIREMENTS; then
+		    if generate_requirements $pipenv $PIP_INSTALL_ALL; then
 			if $pipenv sync -d; then
 			    return 0
 			fi
@@ -139,7 +139,7 @@ refresh_virtualenv() (
 		fi
 		;;
 	    (pip)
-		pip_requirements=$PIP_ALL_REQUIREMENTS
+		pip_install_files=$PIP_INSTALL_ALL
 		venv_force_sync=true
 
 		if refresh_via_pip ${VENV_DIRECTORY-venv}; then
