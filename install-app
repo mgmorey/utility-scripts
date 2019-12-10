@@ -131,13 +131,6 @@ get_realpath() (
     fi
 )
 
-initialize_app() (
-    if [ $dryrun = false -a $# -gt 0 ]; then
-	cd $APP_DIR
-	${VENV_DIRECTORY-venv}/bin/python3 -m app "$@"
-    fi
-)
-
 install_app() {
     configure_baseline
 
@@ -170,7 +163,7 @@ install_app() {
 	install_virtualenv $APP_DIR/${VENV_DIRECTORY-venv}
 	generate_service_ini $APP_CONFIG "$APP_VARS"
 	create_dirs $APP_VARDIR $APP_LOGDIR $APP_RUNDIR
-	initialize_app $APP_INSTALL_INITIALIZE
+	run_in_virtualenv $APP_SET_UP
 	change_owner $APP_ETCDIR $APP_DIR $APP_VARDIR
     done
 
@@ -297,6 +290,13 @@ print_status() {
 	    ;;
     esac
 }
+
+run_in_virtualenv() (
+    if [ $dryrun = false -a $# -gt 0 ]; then
+	cd $APP_DIR
+	${VENV_DIRECTORY-venv}/bin/python3 -m app "$@"
+    fi
+)
 
 usage() {
     if [ $# -gt 0 ]; then
