@@ -192,7 +192,7 @@ install_dependencies() {
     dependencies=$("$script_dir/get-docker-ce-dependencies")
 
     if [ -n "$dependencies" ]; then
-	install-packages $dependencies
+	"$script_dir/install-packages" $dependencies
     fi
 }
 
