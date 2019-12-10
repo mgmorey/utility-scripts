@@ -113,7 +113,7 @@ get_uwsgi_packages() {
 	fi
     done
 
-    get-python-packages ${packages-}
+    "$script_dir/get-python-packages" ${packages-}
 }
 
 eval $(get-os-release -X)

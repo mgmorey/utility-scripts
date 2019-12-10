@@ -29,6 +29,25 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_package_manager() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "$(basename $1)" in
+	(brew)
+	    manager=$INSTALL_BREW
+	    ;;
+	(pkgin)
+	    manager=$INSTALL_PKGIN
+	    ;;
+	(pkgutil)
+	    manager=$INSTALL_PKGUTIL
+	    ;;
+    esac
+
+    printf "%s\n" "$manager"
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -47,20 +66,11 @@ get_realpath() (
 )
 
 install_package_manager() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
+    package_manager="$(get_package_manager)"
 
-    case "$(basename $1)" in
-	(brew)
-	    $INSTALL_BREW
-	    ;;
-	(pkgin)
-	    $INSTALL_PKGIN
-	    ;;
-	(pkgutil)
-	    $INSTALL_PKGUTIL
-	    ;;
-    esac
+    if [ -n "$package_manager" ]; then
+	"$script_dir/$package_manager"
+    fi
 }
 
 install_package_managers() {
@@ -71,6 +81,8 @@ install_package_managers() {
     done
 }
 
-eval $(get-os-release -x)
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -x)
 
 install_package_managers "$@"

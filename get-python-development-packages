@@ -33,7 +33,7 @@ get_python_devel_packages() {
 
 get_packages_in() {
     for category; do
-	get-python-$category-packages
+	"$script_dir/get-python-$category-packages"
     done
 }
 
@@ -54,6 +54,8 @@ get_realpath() (
     fi
 )
 
-eval $(get-os-release -x)
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -x)
 
 get_python_devel_packages

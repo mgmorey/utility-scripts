@@ -89,7 +89,7 @@ get_tk_build_deps() {
 	    ;;
     esac
 
-    get-python-packages ${packages-}
+    "$script_dir/get-python-packages" ${packages-}
 }
 
 eval $(get-os-release -x)

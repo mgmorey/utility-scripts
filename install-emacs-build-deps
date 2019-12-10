@@ -52,8 +52,8 @@ get_realpath() (
 )
 
 configure_platform() {
-    install_build_deps=install-build-deps
-    install_packages=install-packages
+    install_build_deps="$script_dir/install-build-deps"
+    install_packages="$script_dir/install-packages"
     package=
 
     for id in $ID $ID_LIKE; do
@@ -77,7 +77,7 @@ configure_platform() {
 	    (rhel|ol|centos)
 		case "$VERSION_ID" in
 		    (7|7.*)
-			install-epel
+			"$script_dir/install-epel"
 			;;
 		esac
 
@@ -94,7 +94,7 @@ configure_platform() {
 install_emacs_build_deps() {
     validate_platform
     configure_platform
-    packages=$(get-emacs-build-packages)
+    packages=$("$script_dir/get-emacs-build-packages")
 
     if [ -n "${package:-}" ]; then
 	"$install_build_deps" $package || true
@@ -159,6 +159,8 @@ validate_platform() {
     abort_not_supported "Operating system"
 }
 
-eval $(get-os-release -x)
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -x)
 
 install_emacs_build_deps

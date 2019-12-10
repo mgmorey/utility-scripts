@@ -152,7 +152,7 @@ configure_platform() {
 
 get_packages() {
     printf "%s\n" $packages
-    get-python-build-packages
+    "$script_dir/get-python-build-packages"
 }
 
 get_realpath() (
@@ -176,7 +176,7 @@ install_pyenv() {
     validate_platform
     configure_platform
     packages=$(get_packages | sort -u)
-    pattern=$(get-development-pattern)
+    pattern=$("$script_dir/get-development-pattern")
     url=$BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer
 
     if [ -n "${package-}" ]; then
@@ -184,7 +184,7 @@ install_pyenv() {
     fi
 
     if [ -n "${packages-}" ]; then
-	install-packages ${pattern:+-p "$pattern" }$packages
+	"$script_dir/install-packages" ${pattern:+-p "$pattern" }$packages
     fi
 
     run_unpriv /bin/sh -c "curl -L $url | bash"
@@ -322,8 +322,10 @@ validate_platform() {
     abort_not_supported "Operating system"
 }
 
-eval $(get-os-release -x)
+script_dir=$(get_realpath "$(dirname "$0")")
 
-. utility-functions.sh
+eval $("$script_dir/get-os-release" -x)
+
+. "$script_dir/utility-functions.sh"
 
 install_pyenv "$@"

@@ -42,6 +42,8 @@ get_realpath() (
     fi
 )
 
-. utility-functions.sh
+script_dir=$(get_realpath "$(dirname "$0")")
 
-get-installed-packages | grep-docker-package || true
+. "$script_dir/utility-functions.sh"
+
+"$script_dir/get-installed-packages" | "$script_dir/grep-docker-package" || true

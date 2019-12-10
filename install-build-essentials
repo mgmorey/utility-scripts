@@ -47,34 +47,41 @@ get_realpath() (
 )
 
 install_build_essentials() {
-    command=$(get-pattern-install-command)
-    manager=$(get-package-managers | awk 'NR == 1 {print $0}')
-    options=$(get-package-install-options)
-    pattern=$(get-development-pattern)
-
-    case "$kernel_name" in
-	(Linux)
-	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    $manager $command $options "$pattern"
-	    	    ;;
-		(opensuse-*|fedora)
-		    $manager $command $options "$pattern"
-	    	    ;;
-		(*)
-		    abort_not_supported Distro
-		    ;;
-	    esac
-	    ;;
-	(SunOS)
-	    $manager $command $options "$pattern"
-    	    ;;
-	(*)
-	    abort_not_supported "Operating system"
-	    ;;
-    esac
+    validate_platform
+    manager=$("$script_dir/get-package-managers" | awk 'NR == 1 {print $0}')
+    command=$("$script_dir/get-pattern-install-command" $manager)
+    options=$("$script_dir/get-package-install-options")
+    pattern=$("$script_dir/get-development-pattern")
+    $manager $command $options "$pattern"
 }
 
-eval $(get-os-release -x)
+validate_platform() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		return
+		;;
+	    (opensuse)
+		return
+		;;
+	    (rhel|fedora)
+		return
+		;;
+	    (illumos)
+		return
+		;;
+	esac
+
+	if [ -n "${pattern-}" ]; then
+	    break
+	fi
+    done
+
+    abort_not_supported "Operating system"
+}
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -x)
 
 install_build_essentials

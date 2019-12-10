@@ -84,11 +84,9 @@ get_sqlite_packages() {
 	fi
     done
 
-    get-python-packages ${packages-}
+    "$script_dir/get-python-packages" ${packages-}
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
-
-eval $(get-os-release -x)
 
 get_sqlite_packages

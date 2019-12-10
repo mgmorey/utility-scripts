@@ -189,7 +189,7 @@ get_repository_data() {
 }
 
 install_dependencies() {
-    dependencies=$(get-docker-ce-dependencies)
+    dependencies=$("$script_dir/get-docker-ce-dependencies")
 
     if [ -n "$dependencies" ]; then
 	install-packages $dependencies
@@ -199,7 +199,7 @@ install_dependencies() {
 install_docker_ce() {
     validate_platform
     preinstall_docker
-    installed_packages=$(get-installed-docker-packages)
+    installed_packages=$("$script_dir/get-installed-docker-packages")
     origin=$(get_docker_origin $installed_packages)
 
     if [ -n "$origin" ]; then
@@ -218,17 +218,17 @@ install_docker_ce() {
 	printf "Docker is not installed.\n"
     fi
 
-    selected_packages=$(get-docker-ce-packages)
+    selected_packages=$("$script_dir/get-docker-ce-packages")
     packages=$(get_difference "$installed_packages" "$selected_packages")
 
     if [ -n "$packages" ]; then
-	if ! uninstall-packages $packages; then
+	if ! "$script_dir/uninstall-packages" $packages; then
 	    return $?
 	fi
     fi
 
     if [ -n "$selected_packages" ]; then
-	if install-packages $selected_packages; then
+	if "$script_dir/install-packages" $selected_packages; then
 	    postinstall_docker $selected_packages
 	else
 	    return $?
@@ -278,7 +278,7 @@ postinstall_docker() {
 	return 0
     fi
 
-    group=$(get-docker-group "$@")
+    group=$("$script_dir/get-docker-group" "$@")
 
     if [ -n "$group" ]; then
 	install_group $group
@@ -335,6 +335,8 @@ if [ $# -gt 0 ]; then
     abort "%s: Too many arguments\n" "$0"
 fi
 
-eval $(get-os-release -x)
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -x)
 
 install_docker_ce "$@"

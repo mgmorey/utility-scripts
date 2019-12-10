@@ -97,7 +97,7 @@ get_sqlite_packages() {
 	fi
     done
 
-    get-python-packages ${packages-}
+    "$script_dir/get-python-packages" ${packages-}
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")

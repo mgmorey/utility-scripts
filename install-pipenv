@@ -56,4 +56,8 @@ if [ $(id -u) -eq 0 ]; then
     abort "%s\n" "$0: Must be run as a non-privileged user"
 fi
 
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -x)
+
 install_pipenv "$@"

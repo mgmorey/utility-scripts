@@ -127,15 +127,15 @@ get_realpath() (
 install_packages() {
     validate_platform
     configure_platform
-    managers=$(get-package-managers)
-    options=$(get-package-install-options)
+    managers=$("$script_dir/get-package-managers")
+    options=$("$script_dir/get-package-install-options")
 
     if [ $# -eq 0 ]; then
 	return 0
     fi
 
     parse_arguments "$@"
-    install-package-managers $managers
+    "$script_dir/install-package-managers" $managers
 
     if [ "$is_pattern_supported" = true ]; then
 	install_pattern_from_args || true
@@ -172,7 +172,7 @@ install_packages_using() (
     options=$2
     shift 2
 
-    install=$(get-install-command $manager)
+    install=$("$script_dir/get-install-command" $manager)
 
     case "$(basename $manager)" in
 	(brew)
@@ -205,7 +205,7 @@ install_pattern_using() (
     options=$2
     shift 2
 
-    install=$(get-pattern-install-command $manager)
+    install=$("$script_dir/get-pattern-install-command" $manager)
 
     case "$(basename $manager)" in
 	(brew)
@@ -239,7 +239,7 @@ parse_arguments() {
     done
 
     shift $(($OPTIND - 1))
-    packages=$(get-uninstalled-packages "$@")
+    packages=$("$script_dir/get-uninstalled-packages" "$@")
 }
 
 usage() {
@@ -304,8 +304,10 @@ validate_platform() {
     abort_not_supported "Operating system"
 }
 
-eval $(get-os-release -x)
+script_dir=$(get_realpath "$(dirname "$0")")
 
-. utility-functions.sh
+eval $("$script_dir/get-os-release" -x)
+
+. "$script_dir/utility-functions.sh"
 
 install_packages "$@"

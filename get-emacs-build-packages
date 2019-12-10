@@ -34,7 +34,7 @@ get_emacs_build_deps() {
 
 get_packages_in() {
     for category; do
-	get-$category-packages
+	"$script_dir/get-$category-packages"
     done
 }
 
@@ -55,6 +55,8 @@ get_realpath() (
     fi
 )
 
-eval $(get-os-release -x)
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -x)
 
 get_emacs_build_deps

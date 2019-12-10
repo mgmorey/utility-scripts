@@ -62,15 +62,15 @@ configure_platform() {
 install_python_development_tools() {
     validate_platform
     configure_platform
-    packages=$(get-python-development-packages)
-    pattern=$(get-development-pattern)
+    packages=$("$script_dir/get-python-development-packages")
+    pattern=$("$script_dir/get-development-pattern")
 
     if [ -n "$packages" ]; then
-	install-packages ${pattern:+-p "$pattern" }$packages
+	"$script_dir/install-packages" ${pattern:+-p "$pattern" }$packages
     fi
 
     if [ -n "${package:-}" ]; then
-	install-build-deps "$@" $package
+	"$script_dir/install-build-deps" "$@" $package
     fi
 }
 
@@ -128,6 +128,8 @@ validate_platform() {
     abort_not_supported "Operating system"
 }
 
-eval $(get-os-release -x)
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -x)
 
 install_python_development_tools "$@"
