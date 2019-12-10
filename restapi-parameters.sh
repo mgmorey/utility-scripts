@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 
 APP_VARS="APP_DIR APP_GID APP_LOGFILE APP_PIDFILE APP_PLUGIN APP_PORT APP_UID \
-APP_VARDIR"
+APP_VARDIR VENV_DIRECTORY"
 
 AWK_FORMAT='NR == 1 || $%d == binary {print $0}\n'
 PLUGIN_FORMAT="python%s_plugin.so\n"
