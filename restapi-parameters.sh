@@ -38,7 +38,7 @@ configure_all() {
 
 configure_baseline() {
     eval $(get-os-release -x)
-    eval $(get-app-configuration --input app.ini)
+    eval $(get-app-configuration app.ini)
 
     case "$kernel_name" in
 	(CYGWIN_NT-*)

@@ -21,11 +21,10 @@ def parse_args():
     """Parse script arguments."""
     description = 'Print application configuration parameters'
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--input',
-                        default='app.ini',
-                        metavar='INPUT',
-                        nargs='?',
-                        help='read from file INPUT')
+    parser.add_argument('files',
+                        metavar='FILES',
+                        nargs='*',
+                        help='read from files FILES')
     parser.add_argument('--prefix',
                         metavar='PREFIX',
                         nargs='?',
@@ -41,13 +40,15 @@ def main():
     """Print applicaton configuration parameters."""
     args = parse_args()
     config = configparser.ConfigParser()
-    config.read(args.input)
 
-    for section in (args.sections if args.sections else config.sections()):
-        prefix = args.prefix if args.prefix else section
+    for filename in args.files:
+        config.read(filename)
 
-        for key, value in config[section].items():
-            print(format_pair(key, value, prefix))
+        for section in (args.sections if args.sections else config.sections()):
+            prefix = args.prefix if args.prefix else section
+
+            for key, value in config[section].items():
+                print(format_pair(key, value, prefix))
 
 
 if __name__ == '__main__':

@@ -54,7 +54,7 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 . "$script_dir/utility-functions.sh"
 
-eval $("$script_dir/get-app-configuration" --input app.ini)
+eval $("$script_dir/get-app-configuration" app.ini)
 
 pipenv=$(get_command pipenv || true)
 

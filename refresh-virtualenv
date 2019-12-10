@@ -173,7 +173,7 @@ fi
 . utility-functions.sh
 
 eval $(get-os-release -x)
-eval $(get-app-configuration --input app.ini)
+eval $(get-app-configuration app.ini)
 
 parse_arguments "$@"
 refresh_virtualenv
