@@ -55,7 +55,7 @@ get_docker_ce_packages() {
     done
 
     if [ -n "${packages-}" ]; then
-	printf "%s\n" ${packages-}
+	printf "%s\n" $packages
     fi
 }
 
