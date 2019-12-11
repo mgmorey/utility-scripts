@@ -114,8 +114,8 @@ if [ "$(id -u)" -eq 0 ]; then
 fi
 
 . utility-functions.sh
-. restapi-parameters.sh
 . restapi-functions.sh
+. restapi-parameters.sh
 
 SYSTEM_PYTHON=$1
 SYSTEM_PYTHON_VERSION=$2

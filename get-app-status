@@ -102,8 +102,8 @@ if [ "$(id -u)" -eq 0 ]; then
 fi
 
 . utility-functions.sh
-. restapi-parameters.sh
 . restapi-functions.sh
+. restapi-parameters.sh
 
 configure_all
 print_status $(get_app_status)
