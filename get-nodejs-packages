@@ -1,0 +1,111 @@
+#!/bin/sh -eu
+
+# get-nodejs-packages: get Node.js package names
+# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+DEBIAN_PKGS="nodejs"
+
+FEDORA_PKGS="nodejs"
+
+FREEBSD_PKGS="nodejs"
+
+ILLUMOS_PKGS="nodejs"
+
+MACOS_PKGS="nodejs"
+
+NETBSD_PKGS="nodejs"
+
+OPENSUSE_PKGS="nodejs10 npm10"
+
+REDHAT_PKGS="nodejs"
+
+SOLARIS_PKGS="nodejs"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+get_nodejs_packages() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		packages=$DEBIAN_PKGS
+		;;
+	    (opensuse)
+		packages=$OPENSUSE_PKGS
+		;;
+	    (fedora)
+		packages=$FEDORA_PKGS
+		;;
+	    (rhel|ol|centos)
+		packages=$REDHAT_PKGS
+		;;
+	    (freebsd)
+		packages=$FREEBSD_PKGS
+		;;
+	    (illumos)
+		packages=$ILLUMOS_PKGS
+		;;
+	    (macos)
+		packages=$MACOS_PKGS
+		;;
+	    (netbsd)
+		packages=$NETBSD_PKGS
+		;;
+	    (solaris)
+		packages=$SOLARIS_PKGS
+		;;
+	esac
+
+	if [ -n "${packages-}" ]; then
+	    break
+	fi
+    done
+
+    if [ -n "${packages-}" ]; then
+	printf "%s\n" $packages
+    fi
+}
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+. "$script_dir/common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+get_nodejs_packages
