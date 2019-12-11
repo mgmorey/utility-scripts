@@ -20,21 +20,6 @@ create_tmpfile() {
     trap "/bin/rm -f $tmpfiles" EXIT INT QUIT TERM
 }
 
-get_bin_directory() (
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    dir=$1
-
-    while [ "$(dirname "$dir")" != / ]; do
-	dir="$(dirname "$dir")"
-
-	if [ -d "$dir/bin" ]; then
-	    printf "$dir/bin"
-	    return
-	fi
-    done
-)
-
 get_home_directory() {
     assert [ $# -eq 1 ]
 
