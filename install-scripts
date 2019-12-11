@@ -95,7 +95,7 @@ fi
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-. "$script_dir/utility-functions.sh"
+. "$script_dir/common-functions.sh"
 
 set_user_profile
 install_scripts

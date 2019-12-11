@@ -43,13 +43,6 @@ check_python() {
     return 0
 }
 
-create_tmpfile() {
-    tmpfile=$(mktemp)
-    assert [ -n "${tmpfile}" ]
-    tmpfiles="${tmpfiles+$tmpfiles }$tmpfile"
-    trap "/bin/rm -f $tmpfiles" EXIT INT QUIT TERM
-}
-
 create_virtualenv() (
     assert [ $# -ge 1 ]
     assert [ -n "$1" ]
@@ -300,31 +293,6 @@ get_file_metadata() {
     esac
 }
 
-get_home_directory() {
-    assert [ $# -eq 1 ]
-
-    case "${kernel_name=$(uname -s)}" in
-	(Darwin)
-	    printf "/Users/%s\n" "$1"
-	    ;;
-	(*)
-	    getent passwd "$1" | awk -F: '{print $6}'
-	    ;;
-    esac
-}
-
-get_profile_path() {
-    path=$PATH
-
-    for prefix in "$1" "$1/.local" "$1/.pyenv"; do
-	if is_to_be_included "$prefix/bin" "$path"; then
-	   path="$prefix/bin:$path"
-	fi
-    done
-
-    printf "%s\n" "$path"
-}
-
 get_pip_command() {
     if [ -n "${1-}" ]; then
 	get_command -p $1 pip
@@ -347,50 +315,6 @@ get_python_version() (
     fi
 )
 
-get_setpriv_command() (
-    version="$(setpriv --version 2>/dev/null)"
-
-    case "${version##* }" in
-	('')
-	    return 1
-	    ;;
-	([01].*)
-	    return 1
-	    ;;
-	(2.[0-9].*)
-	    return 1
-	    ;;
-	(2.[12][0-9].*)
-	    return 1
-	    ;;
-	(2.3[012].*)
-	    return 1
-	    ;;
-    esac
-
-    printf "%s\n" setpriv
-)
-
-get_setpriv_options() (
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    regid="$(id -g $1)"
-    reuid="$(id -u $1)"
-    printf -- "%s\n" "--init-groups --reset-env --reuid $reuid --regid $regid"
-)
-
-get_su_command() (
-    case "${kernel_name=$(uname -s)}" in
-	(GNU|Linux)
-	    if get_setpriv_command; then
-		return
-	    fi
-	    ;;
-    esac
-
-    printf "%s\n" su
-)
-
 get_sort_command() {
     case "${kernel_name=$(uname -s)}" in
 	(NetBSD)
@@ -403,10 +327,6 @@ get_sort_command() {
 	    printf "%s\n" "sort -Vr"
 	    ;;
     esac
-}
-
-get_user_name() {
-    printf "%s\n" "${SUDO_USER-${USER-${LOGNAME}}}"
 }
 
 get_versions_all() {
@@ -526,18 +446,6 @@ install_via_pip() (
     $pip install $options "$@" >&2
 )
 
-is_included() {
-    assert [ $# -eq 2 ]
-    assert [ -n "$1" ]
-    printf "%s\n" "$2" | egrep '(^|:)'$1'(:|$)' >/dev/null
-}
-
-is_to_be_included() {
-    assert [ $# -eq 2 ]
-    assert [ -n "$1" ]
-    test -d $1 && ! is_included $1 "$2"
-}
-
 refresh_via_pip() {
     assert [ $# -ge 1 ]
     assert [ -n "$1" ]
@@ -580,33 +488,6 @@ refresh_via_pip() {
     fi
 }
 
-run_unpriv() (
-    assert [ $# -ge 1 ]
-
-    if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
-	command="$(get_su_command $SUDO_USER)"
-
-	case "$command" in
-	    (setpriv)
-		command="$command $(get_setpriv_options $SUDO_USER)"
-		;;
-	    (su)
-		command="$command $SUDO_USER"
-
-		if [ "${1-}${2+ $2}" = "/bin/sh -c" ]; then
-		    shift
-		else
-		    command="$command -c"
-		fi
-		;;
-	esac
-    else
-	command=
-    fi
-
-    ${command+$command }"$@"
-)
-
 set_compiler() {
     case "$ID" in
 	(freebsd)
@@ -647,29 +528,6 @@ set_path() {
 		;;
 	esac
     done
-}
-
-set_user_profile() {
-    home="$(get_home_directory $(get_user_name))"
-    path="$(get_profile_path "$home")"
-
-    if [ "$HOME" != "$home" ]; then
-	if [ "${ENV_VERBOSE-false}" = true ]; then
-	    printf "Changing HOME from: %s\n" "$HOME" >&2
-	    printf "Changing HOME to: %s\n" "$home" >&2
-	fi
-
-	export HOME="$home"
-    fi
-
-    if [ "$PATH" != "$path" ]; then
-	if [ "${ENV_VERBOSE-false}" = true ]; then
-	    printf "Changing PATH from: %s\n" "$PATH" >&2
-	    printf "Changing PATH to: %s\n" "$path" >&2
-	fi
-
-	export PATH="$path"
-    fi
 }
 
 upgrade_via_pip() (

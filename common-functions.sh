@@ -146,3 +146,26 @@ run_unpriv() (
 
     ${command+$command }"$@"
 )
+
+set_user_profile() {
+    home="$(get_home_directory $(get_user_name))"
+    path="$(get_profile_path "$home")"
+
+    if [ "$HOME" != "$home" ]; then
+	if [ "${ENV_VERBOSE-false}" = true ]; then
+	    printf "Changing HOME from: %s\n" "$HOME" >&2
+	    printf "Changing HOME to: %s\n" "$home" >&2
+	fi
+
+	export HOME="$home"
+    fi
+
+    if [ "$PATH" != "$path" ]; then
+	if [ "${ENV_VERBOSE-false}" = true ]; then
+	    printf "Changing PATH from: %s\n" "$PATH" >&2
+	    printf "Changing PATH to: %s\n" "$path" >&2
+	fi
+
+	export PATH="$path"
+    fi
+}

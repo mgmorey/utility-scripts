@@ -119,9 +119,10 @@ prefix_lines() {
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-eval $("$script_dir/get-os-release" -x)
-
+. "$script_dir/common-functions.sh"
 . "$script_dir/utility-functions.sh"
+
+eval $("$script_dir/get-os-release" -x)
 
 managers=$("$script_dir/get-package-managers")
 get_installed_packages $managers

@@ -170,6 +170,7 @@ if [ -n "${VIRTUAL_ENV:-}" ]; then
     abort "%s: Must not be run within a virtual environment\n" "$0"
 fi
 
+. common-functions.sh
 . utility-functions.sh
 
 eval $(get-os-release -x)

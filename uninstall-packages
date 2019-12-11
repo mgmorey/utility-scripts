@@ -160,8 +160,11 @@ validate_platform() {
     abort_not_supported "Operating system"
 }
 
-eval $(get-os-release -x)
+script_dir=$(get_realpath "$(dirname "$0")")
 
-. utility-functions.sh
+. "$script_dir/common-functions.sh"
+. "$script_dir/utility-functions.sh"
+
+eval $("$script_dir/get-os-release" -x)
 
 uninstall_packages "$@"

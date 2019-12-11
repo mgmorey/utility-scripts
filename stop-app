@@ -73,6 +73,7 @@ stop_app() {
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
+. "$script_dir/common-functions.sh"
 . "$script_dir/utility-functions.sh"
 . "$script_dir/restapi-parameters.sh"
 . "$script_dir/restapi-functions.sh"

@@ -79,7 +79,7 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
 
-. "$script_dir/utility-functions.sh"
+. "$script_dir/common-functions.sh"
 
 grep=$(get_grep_command)
 get_uninstalled_packages "$@"
