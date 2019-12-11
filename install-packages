@@ -39,10 +39,10 @@ configure_platform() {
 
 		case "$VERSION_ID" in
 		    (7)
-			install_epel
+			install-epel
 			;;
 		    (8)
-			install_epel
+			install-epel
 			;;
 		esac
 		break
@@ -60,10 +60,10 @@ configure_platform() {
 
 		case "$VERSION_ID" in
 		    (7.*)
-			install_epel
+			install-epel
 			;;
 		    (8.*)
-			install_epel
+			install-epel
 			;;
 		esac
 		break
@@ -124,22 +124,18 @@ get_realpath() (
     fi
 )
 
-install_epel() {
-    "$script_dir/install-epel"
-}
-
 install_packages() {
     validate_platform
     configure_platform
-    managers=$("$script_dir/get-package-managers")
-    options=$("$script_dir/get-package-install-options")
+    managers=$(get-package-managers)
+    options=$(get-package-install-options)
 
     if [ $# -eq 0 ]; then
 	return 0
     fi
 
     parse_arguments "$@"
-    "$script_dir/install-package-managers" $managers
+    install-package-managers $managers
 
     if [ "$is_pattern_supported" = true ]; then
 	install_pattern_from_args || true
@@ -176,7 +172,7 @@ install_packages_using() (
     options=$2
     shift 2
 
-    install=$("$script_dir/get-install-command" $manager)
+    install=$(get-install-command $manager)
 
     case "$(basename $manager)" in
 	(brew)
@@ -209,7 +205,7 @@ install_pattern_using() (
     options=$2
     shift 2
 
-    install=$("$script_dir/get-pattern-install-command" $manager)
+    install=$(get-pattern-install-command $manager)
 
     case "$(basename $manager)" in
 	(brew)
@@ -243,7 +239,7 @@ parse_arguments() {
     done
 
     shift $(($OPTIND - 1))
-    packages=$("$script_dir/get-uninstalled-packages" "$@")
+    packages=$(get-uninstalled-packages "$@")
 }
 
 usage() {
@@ -313,6 +309,6 @@ script_dir=$(get_realpath "$(dirname "$0")")
 . "$script_dir/common-functions.sh"
 . "$script_dir/utility-functions.sh"
 
-eval $("$script_dir/get-os-release" -x)
-
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
 install_packages "$@"

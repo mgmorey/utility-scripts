@@ -26,7 +26,7 @@ assert() {
 }
 
 get_python_packages() {
-    data=$("$script_dir/get-python-metadata")
+    data=$(get-python-metadata)
 
     package_name=$(printf "%s" "$data" | awk '{print $1}')
     package_modifier=$(printf "%s" "$data" | awk '{print $2}')
@@ -64,6 +64,8 @@ get_realpath() (
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-eval $("$script_dir/get-os-release" -x)
+. "$script_dir/common-functions.sh"
 
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
 get_python_packages "$@"

@@ -166,4 +166,6 @@ fi
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
+. "$script_dir/common-functions.sh"
+
 run_in_virtualenv "$@"

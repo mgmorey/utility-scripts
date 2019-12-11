@@ -33,17 +33,17 @@ get_home_directory() {
     esac
 }
 
-get_profile_path() {
+get_profile_path() (
     path=$PATH
 
-    for prefix in "$1" "$1/.local" "$1/.pyenv"; do
-	if is_to_be_included "$prefix/bin" "$path"; then
-	   path="$prefix/bin:$path"
+    for dir in "$1/bin" "$1/.local/bin" "$1/.pyenv/bin" "$2"; do
+	if is_to_be_included "$dir" "$path"; then
+	   path="$dir:$path"
 	fi
     done
 
     printf "%s\n" "$path"
-}
+)
 
 get_setpriv_command() (
     version="$(setpriv --version 2>/dev/null)"
@@ -134,7 +134,7 @@ run_unpriv() (
 
 set_user_profile() {
     home="$(get_home_directory $(get_user_name))"
-    path="$(get_profile_path "$home")"
+    path="$(get_profile_path "$home" "$1")"
 
     if [ "$HOME" != "$home" ]; then
 	if [ "${ENV_VERBOSE-false}" = true ]; then

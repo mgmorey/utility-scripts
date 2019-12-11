@@ -110,7 +110,7 @@ generate_service_ini() {
 
 get_packages_in() {
     for category; do
-	"$script_dir/get-$category-packages"
+	get-$category-packages
     done
 }
 
@@ -269,7 +269,7 @@ parse_arguments() {
 
 preinstall_app() {
     home="$(get_home_directory "$(get_user_name)")"
-    path="$(get_profile_path "$home")"
+    path="$(get_profile_path "$home" "$script_dir")"
     script="\"$script_dir/run-app\" -d \"$(pwd)\" -h \"$home\" -p \"$path\""
 
     for command in "${PYTHON_COMMAND_LINT-}" "${PYTHON_COMMAND_TEST-}"; do
@@ -321,9 +321,8 @@ script_dir=$(get_realpath "$(dirname "$0")")
 . "$script_dir/restapi-functions.sh"
 . "$script_dir/restapi-parameters.sh"
 
-eval $("$script_dir/get-app-configuration" app.ini)
-
-set_user_profile
+set_user_profile "$script_dir"
+eval $(get-app-configuration app.ini)
 parse_arguments "$@"
 preinstall_app
 install_app

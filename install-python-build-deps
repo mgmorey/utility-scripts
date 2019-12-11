@@ -94,15 +94,15 @@ get_realpath() (
 
 install_python_build_deps() {
     validate_platform
-    packages=$("$script_dir/get-python-build-packages")
-    pattern=$("$script_dir/get-development-pattern")
+    packages=$(get-python-build-packages)
+    pattern=$(get-development-pattern)
 
     if [ -n "$packages" ]; then
-	"$script_dir/install-packages" ${pattern:+-p "$pattern" }$packages
+	install-packages ${pattern:+-p "$pattern" }$packages
     fi
 
     if [ -n "${package:-}" ]; then
-	"$script_dir/install-build-deps" "$@" $package || true
+	install-build-deps "$@" $package || true
     fi
 }
 
@@ -217,6 +217,8 @@ validate_platform() {
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-eval $("$script_dir/get-os-release" -x)
+. "$script_dir/common-functions.sh"
 
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
 install_python_build_deps "$@"

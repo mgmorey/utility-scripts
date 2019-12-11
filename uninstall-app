@@ -126,9 +126,7 @@ script_dir=$(get_realpath "$(dirname "$0")")
 . "$script_dir/restapi-functions.sh"
 . "$script_dir/restapi-parameters.sh"
 
-eval $("$script_dir/get-app-configuration" app.ini)
-
-set_user_profile
+set_user_profile "$script_dir"
 parse_arguments "$@"
 configure_baseline
 uninstall_app

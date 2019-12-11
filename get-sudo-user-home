@@ -48,6 +48,6 @@ get_sudo_user_home() {
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-. "$script_dir/utility-functions.sh"
+. "$script_dir/common-functions.sh"
 
 get_sudo_user_home

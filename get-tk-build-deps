@@ -89,11 +89,13 @@ get_tk_build_deps() {
 	    ;;
     esac
 
-    "$script_dir/get-python-packages" ${packages-}
+    get-python-packages ${packages-}
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-eval $("$script_dir/get-os-release" -x)
+. "$script_dir/common-functions.sh"
 
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
 get_tk_build_deps

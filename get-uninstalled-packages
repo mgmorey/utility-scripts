@@ -62,7 +62,8 @@ get_realpath() (
 
 get_uninstalled_packages() {
     create_tmpfile
-    "$script_dir/get-installed-packages" >$tmpfile
+    grep=$(get_grep_command)
+    get-installed-packages >$tmpfile
 
     for package; do
 	if ! grep_package $package; then
@@ -77,9 +78,8 @@ grep_package() {
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-eval $("$script_dir/get-os-release" -x)
-
 . "$script_dir/common-functions.sh"
 
-grep=$(get_grep_command)
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
 get_uninstalled_packages "$@"

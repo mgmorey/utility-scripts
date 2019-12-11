@@ -44,9 +44,10 @@ assert() {
 }
 
 get_installed_packages() {
+    managers=$("$script_dir/get-package-managers")
     prefix=
 
-    for manager; do
+    for manager in $managers; do
 	if ! which $manager >/dev/null 2>&1; then
 	    continue
 	fi
@@ -123,6 +124,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 . "$script_dir/utility-functions.sh"
 
 eval $("$script_dir/get-os-release" -x)
-
-managers=$("$script_dir/get-package-managers")
-get_installed_packages $managers
+get_installed_packages
