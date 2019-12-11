@@ -95,11 +95,11 @@ install_emacs_build_deps() {
     packages=$(get-emacs-build-packages)
 
     if [ -n "${package:-}" ]; then
-	install_build_deps $package || true
+	install-build-deps $package || true
     fi
 
     if [ -n "${packages:-}" ]; then
-	if ! install_packages $packages; then
+	if ! install-packages $packages; then
 	    return 1
 	fi
     fi
