@@ -43,7 +43,7 @@ get_realpath() (
 )
 
 install_angular_cli() {
-    install-packages nodejs
+    install-packages $(get-nodejs-packages)
     npm install -g @angular/cli
 }
 
