@@ -1,7 +1,7 @@
 #!/bin/sh -eu
 
-# install-database-packages: install MySQL database packages
-# Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
+# install-mysql-packages: install MySQL database packages
+# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
