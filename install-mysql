@@ -46,7 +46,7 @@ get_realpath() (
     fi
 )
 
-install_database() {
+install_mysql() {
     validate_platform
     packages=$(get-mysql-packages)
     install-packages $packages
@@ -192,4 +192,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-install_database
+install_mysql
