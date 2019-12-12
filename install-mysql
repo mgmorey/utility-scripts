@@ -48,25 +48,8 @@ get_realpath() (
 
 install_mysql() {
     validate_platform
-    packages=$(get-mysql-packages $categories)
+    packages=$(get-mysql-packages "$@")
     install-packages $packages
-}
-
-parse_arguments() {
-    categories="client server"
-
-    for arg; do
-	case $arg in
-	    (all)
-		categories="client server"
-		;;
-	    (client)
-		categories="${categories+$categories client}"
-		;;
-	    (client)
-		categories="${categories+$categories server}"
-		;;
-	esac
 }
 
 validate_platform() {
@@ -199,15 +182,10 @@ validate_platform() {
     esac
 }
 
-if [ $# -gt 0 ]; then
-    abort "%s: Too many arguments\n" "$0"
-fi
-
 script_dir=$(get_realpath "$(dirname "$0")")
 
 . "$script_dir/common-functions.sh"
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-parse_arguments "$@"
-install_mysql
+install_mysql "$@"
