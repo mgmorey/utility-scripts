@@ -20,7 +20,7 @@ DEBIAN_PKGS="nodejs npm"
 
 FEDORA_PKGS="nodejs npm"
 
-FREEBSD_PKGS="nodejs"
+FREEBSD_PKGS="node npm"
 
 ILLUMOS_PKGS="nodejs"
 
