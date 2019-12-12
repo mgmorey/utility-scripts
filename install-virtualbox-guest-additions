@@ -24,6 +24,8 @@ OPENSUSE_PKGS="bzip2 dkms gcc kernel-devel make perl"
 
 REDHAT_PKGS="bzip2 dkms gcc kernel-headers kernel-devel make perl"
 
+VBOX_PATTERN=VBox_GAs_*.*
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -41,10 +43,10 @@ configure_platform() {
     case "$kernel_name" in
 	(Linux|GNU)
 	    payload=VBoxLinuxAdditions.run
-	    vbox_dir=VBox_GAs_6.*
+	    vbox_dir=$VBOX_PATTERN
 
 	    case "$ID" in
-		(debian|raspbian|ubuntu|neon|linuxmint|kali)
+		(debian)
 		    cdrom_dev=/dev/cdrom
 		    mount_dir=/media/cdrom0
 		    packages=$DEBIAN_PKGS
@@ -64,6 +66,11 @@ configure_platform() {
 		    cdrom_dev=/dev/cdrom
 		    mount_dir=/run/media/${SUDO_USER-USER}/$vbox_dir
 		    packages=$REDHAT_PKGS
+		    ;;
+		(ubuntu)
+		    cdrom_dev=/dev/cdrom
+		    mount_dir=/media/$(get_user_name)
+		    packages=$DEBIAN_PKGS
 		    ;;
 	    esac
 	    ;;
