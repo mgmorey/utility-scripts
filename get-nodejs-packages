@@ -30,7 +30,7 @@ NETBSD_PKGS="nodejs"
 
 OPENSUSE_PKGS="nodejs10 npm10"
 
-REDHAT_PKGS="nodejs"
+REDHAT_PKGS="nodejs npm"
 
 SOLARIS_PKGS="nodejs"
 
