@@ -16,9 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKGS="nodejs"
+DEBIAN_PKGS="nodejs npm"
 
-FEDORA_PKGS="nodejs"
+FEDORA_PKGS="nodejs npm"
 
 FREEBSD_PKGS="nodejs"
 
@@ -30,7 +30,7 @@ NETBSD_PKGS="nodejs"
 
 OPENSUSE_PKGS="nodejs10 npm10"
 
-REDHAT_PKGS="nodejs"
+REDHAT_PKGS="nodejs npm"
 
 SOLARIS_PKGS="nodejs"
 
