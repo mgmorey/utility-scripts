@@ -48,8 +48,25 @@ get_realpath() (
 
 install_mysql() {
     validate_platform
-    packages=$(get-mysql-packages)
+    packages=$(get-mysql-packages $categories)
     install-packages $packages
+}
+
+parse_arguments() {
+    categories="client server"
+
+    for arg; do
+	case $arg in
+	    (all)
+		categories="client server"
+		;;
+	    (client)
+		categories="${categories+$categories client}"
+		;;
+	    (client)
+		categories="${categories+$categories server}"
+		;;
+	esac
 }
 
 validate_platform() {
@@ -192,4 +209,5 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
+parse_arguments "$@"
 install_mysql

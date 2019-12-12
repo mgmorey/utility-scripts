@@ -27,13 +27,13 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_database_packages() {
-    get_packages_in $CATEGORIES | sort -u
+get_mysql_packages() {
+    get_packages_in $categories | sort -u
 }
 
 get_packages_in() {
     for category; do
-	get-$category-packages
+	get-mysql-$category-packages
     done
 }
 
@@ -54,9 +54,34 @@ get_realpath() (
     fi
 )
 
+parse_arguments() {
+    categories=
+
+    for arg; do
+	case $arg in
+	    (all)
+		categories="client server"
+		;;
+	    (client)
+		categories="${categories+$categories client}"
+		;;
+	    (server)
+		categories="${categories+$categories server}"
+		;;
+	    (*)
+		abort "%s: %s -- invalid argument\n" "$0" "$arg"
+	esac
+    done
+
+    if [ -z "$categories" ]; then
+	categories="server client"
+    fi
+}
+
 script_dir=$(get_realpath "$(dirname "$0")")
 
 . "$script_dir/common-functions.sh"
 
 set_user_profile "$script_dir"
-get_database_packages
+parse_arguments "$@"
+get_mysql_packages
