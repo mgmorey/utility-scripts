@@ -43,14 +43,14 @@ get_realpath() (
 )
 
 install_angular_cli() {
-    install-nodejs
-    npm install -g @angular/cli
+    if install-nodejs; then
+	npm install -g @angular/cli
+    fi
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
 . "$script_dir/common-functions.sh"
-. "$script_dir/utility-functions.sh"
 
 set_user_profile "$script_dir"
 install_angular_cli
