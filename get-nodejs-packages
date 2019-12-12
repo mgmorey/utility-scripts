@@ -24,7 +24,7 @@ FREEBSD_PKGS="nodejs"
 
 ILLUMOS_PKGS="nodejs"
 
-MACOS_PKGS="nodejs"
+MACOS_PKGS="node"
 
 NETBSD_PKGS="nodejs"
 
