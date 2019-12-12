@@ -32,7 +32,7 @@ OPENSUSE_PKGS="nodejs10 npm10"
 
 REDHAT_PKGS="nodejs npm"
 
-SOLARIS_PKGS="nodejs"
+SOLARIS_PKGS="runtime/javascript/nodejs"
 
 abort() {
     printf "$@" >&2
