@@ -18,7 +18,7 @@
 
 DEBIAN_PKGS="nodejs npm"
 
-FEDORA_PKGS="nodejs"
+FEDORA_PKGS="nodejs npm"
 
 FREEBSD_PKGS="nodejs"
 
