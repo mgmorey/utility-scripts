@@ -152,6 +152,7 @@ install_app() {
 	    fi
 
 	    validate_parameters_preinstallation
+	    preinstall_app
 	fi
 
 	if [ -r .env ]; then
@@ -324,7 +325,6 @@ script_dir=$(get_realpath "$(dirname "$0")")
 set_user_profile "$script_dir"
 eval $(get-app-configuration app.ini)
 parse_arguments "$@"
-preinstall_app
 install_app
 signal_app_restart
 
