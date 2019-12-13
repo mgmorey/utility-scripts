@@ -32,8 +32,6 @@ OPENSUSE_PKGS="nodejs10 npm10"
 
 REDHAT_PKGS="nodejs npm"
 
-SOLARIS_PKGS="runtime/javascript/nodejs"
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -86,9 +84,6 @@ get_nodejs_packages() {
 		;;
 	    (netbsd)
 		packages=$NETBSD_PKGS
-		;;
-	    (solaris)
-		packages=$SOLARIS_PKGS
 		;;
 	esac
 
