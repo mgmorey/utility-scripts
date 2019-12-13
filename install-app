@@ -100,7 +100,7 @@ generate_service_ini() {
 	generate_sed_program $2 >$sedfile
 	create_tmpfile
 	inifile=$tmpfile
-	sed -f $sedfile uwsgi/app.ini >$inifile
+	sed -f $sedfile $UWSGI_INIFILE >$inifile
     else
 	inifile=
     fi
