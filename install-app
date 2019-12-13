@@ -159,7 +159,7 @@ install_app() {
 	    install_file 600 .env $APP_DIR/.env
 	fi
 
-	install_file 600 app.ini $APP_DIR
+	install_file 600 app.ini $APP_DIR/app.ini
 	install_app_files 644 app $APP_DIR
 	install_virtualenv $APP_DIR/${VENV_DIRECTORY-venv}
 	generate_service_ini $APP_CONFIG "$APP_VARS"
@@ -178,7 +178,7 @@ install_app_files() (
     assert [ -n "$3" ]
     assert [ -d $2 ]
 
-    for file in $(find $2 -type f ! -name '*.pyc' -print | sort); do
+    for file in $(find $2 -type f -name '*.py' -print | sort); do
 	install_file $1 $file $3/$file
     done
 )
