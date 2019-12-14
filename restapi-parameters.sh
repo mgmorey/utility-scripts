@@ -562,8 +562,6 @@ configure_unix_illumos() {
     UWSGI_BINARY_NAME=uwsgi-3.7
 
     # Set other uWSGI parameters
-    UWSGI_CC=gcc
-    UWSGI_CFLAGS=-m64
     UWSGI_ORIGIN=pkgsrc
 }
 
