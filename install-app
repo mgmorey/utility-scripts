@@ -239,8 +239,6 @@ install_virtualenv() (
 	check_permissions_single "$1"
     else
 	printf "Installing virtual environment in %s\n" "$1" >&2
-	[ -n "${UWSGI_CC-}" ] && export CC="$UWSGI_CC"
-	[ -n "${UWSGI_CFLAGS-}" ] && export CFLAGS="$UWSGI_CFLAGS"
 	pip_install_files=$PIP_INSTALL_MAIN
 	venv_force_sync=true
 	refresh_via_pip $1 $SYSTEM_PYTHON
@@ -323,7 +321,6 @@ script_dir=$(get_realpath "$(dirname "$0")")
 . "$script_dir/restapi-parameters.sh"
 
 set_user_profile "$script_dir"
-eval $(get-app-configuration app.ini)
 parse_arguments "$@"
 install_app
 signal_app_restart
