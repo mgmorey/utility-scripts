@@ -419,13 +419,19 @@ install_via_pip() (
     assert [ $# -ge 1 ]
     pip=$1
     shift
-    id="$(id -u)"
+    set_compiler
+    set_flags
+    set_path
+
+    if [ "${pip_install_verbose-$PIP_INSTALL_VERBOSE}" = true ]; then
+	printenv | egrep '^(CC|CFLAGS|CPPFLAGS|LDFLAGS|PATH)=' | sort
+    fi
 
     if [ "$PIP_INSTALL_VERBOSE" = true ]; then
 	printf "Using %s\n" "$($pip --version)" >&2
     fi
 
-    if [ "$id" -eq 0 ]; then
+    if [ "$(id -u)" -eq 0 ]; then
 	options=--no-cache-dir
     else
 	options=
@@ -433,14 +439,6 @@ install_via_pip() (
 
     if [ "$PIP_INSTALL_QUIET" = true ]; then
 	options="${options+$options }--quiet"
-    fi
-
-    if [ "$id" -eq 0 -a -z "${VIRTUAL_ENV:-}" ]; then
-	export PATH=$HOME/.local/bin:$PATH
-    fi
-
-    if [ "${pip_install_verbose-$PIP_INSTALL_VERBOSE}" = true ]; then
-	printenv | egrep '^(CC|CFLAGS|CPPFLAGS|LDFLAGS|PATH)=' | sort
     fi
 
     $pip install $options "$@" >&2
