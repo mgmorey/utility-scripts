@@ -51,6 +51,9 @@ get_realpath() (
 )
 
 run_in_virtualenv() {
+    eval $(get-os-release -x)
+    eval $(get-app-configuration app.ini)
+
     while getopts d:h:p: opt; do
 	case $opt in
 	    (d)
@@ -92,12 +95,6 @@ run_in_virtualenv() {
     done
 
     shift $(($OPTIND - 1))
-
-    . "$script_dir/utility-functions.sh"
-
-    eval $("$script_dir/get-os-release" -x)
-    eval $("$script_dir/get-app-configuration" app.ini)
-
     pipenv=$(get_command pipenv || true)
 
     if [ -z "$pipenv" ]; then
@@ -167,5 +164,7 @@ fi
 script_dir=$(get_realpath "$(dirname "$0")")
 
 . "$script_dir/common-functions.sh"
+. "$script_dir/utility-functions.sh"
 
+set_user_profile "$script_dir"
 run_in_virtualenv "$@"
