@@ -330,7 +330,6 @@ get_sort_command() {
 }
 
 get_versions_all() {
-    set_path
     pyenv install --list | awk 'NR > 1 {print $1}' | grep_version ${1-}
 }
 
@@ -390,7 +389,6 @@ install_python_version() (
 
     set_compiler
     set_flags
-    set_path
 
     if [ "${pyenv_install_verbose-$PYENV_INSTALL_VERBOSE}" = true ]; then
 	printenv | egrep '^(CC|CFLAGS|CPPFLAGS|LDFLAGS|PATH)=' | sort
@@ -421,7 +419,6 @@ install_via_pip() (
     shift
     set_compiler
     set_flags
-    set_path
 
     if [ "${pip_install_verbose-$PIP_INSTALL_VERBOSE}" = true ]; then
 	printenv | egrep '^(CC|CFLAGS|CPPFLAGS|LDFLAGS|PATH)=' | sort
@@ -508,20 +505,6 @@ set_flags() {
 	case "$id" in
 	    (solaris)
 		export CFLAGS=-m64
-		break
-		;;
-	esac
-    done
-}
-
-set_path() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (solaris)
-		if ! expr "$PATH" : /usr/gnu/bin >/dev/null; then
-		    export PATH=/usr/gnu/bin:$PATH
-		fi
-
 		break
 		;;
 	esac
