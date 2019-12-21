@@ -31,7 +31,14 @@ get_package_install_options() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (centos)
-		break
+		case "$VERSION_ID" in
+		    (7)
+			options="--nobest"
+			;;
+		    (8)
+			options="--nobest"
+			;;
+		esac
 		;;
 	    (debian)
 		options="--no-install-recommends"
