@@ -20,6 +20,7 @@ BASE_URL=https://github.com/pyenv
 DEBIAN_PKG=python3-defaults
 
 CENTOS_7_PKGS="bash curl gcc make"
+CENTOS_8_PKGS="bash curl gcc make"
 
 DEBIAN_10_PKGS="bash curl gcc make wget"
 
@@ -67,6 +68,9 @@ configure_platform() {
 		case "$VERSION_ID" in
 		    (7)
 			packages=$CENTOS_7_PKGS
+			;;
+		    (8)
+			packages=$CENTOS_8_PKGS
 			;;
 		esac
 		;;

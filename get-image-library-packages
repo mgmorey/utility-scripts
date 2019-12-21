@@ -18,6 +18,8 @@
 
 CENTOS_7_PKGS="giflib-devel libjpeg-turbo-devel libpng-devel \
 libtiff-devel"
+CENTOS_8_PKGS="libjpeg-turbo-devel libpng-devel \
+libtiff-devel"
 
 DEBIAN_PKGS="libgif-dev libjpeg-dev libmagickcore-6-headers libpng-dev \
 libtiff5-dev"
@@ -54,6 +56,9 @@ get_emacs_build_deps() {
 		case "$VERSION_ID" in
 		    (7)
 			packages=$CENTOS_7_PKGS
+			;;
+		    (8)
+			packages=$CENTOS_8_PKGS
 			;;
 		esac
 		;;

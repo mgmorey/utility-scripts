@@ -113,6 +113,9 @@ validate_platform() {
 		    (7)
 			return
 			;;
+		    (8)
+			return
+			;;
 		esac
 		;;
 	    (debian)

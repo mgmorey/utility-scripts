@@ -19,6 +19,9 @@
 CENTOS_7_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
 libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
 libXt-devel libXtst-devel"
+CENTOS_8_PKGS="gtk3-devel libICE-devel libSM-devel libX11-devel libXaw-devel \
+libXext-devel libXi-devel libXmu-devel libXpm-devel libXrandr-devel \
+libXt-devel libXtst-devel"
 
 DEBIAN_PKGS="libgtk-3-dev libice-dev libsm-dev libx11-dev libxaw7-dev \
 libxext-dev libxi-dev libxmu-dev libxpm-dev libxrandr-dev \
@@ -61,6 +64,9 @@ get_emacs_build_deps() {
 		case "$VERSION_ID" in
 		    (7)
 			packages=$CENTOS_7_PKGS
+			;;
+		    (8)
+			packages=$CENTOS_8_PKGS
 			;;
 		esac
 		;;

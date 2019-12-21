@@ -18,6 +18,7 @@
 
 CENTOS_7_PKGS="gnutls-devel lcms2-devel libacl-devel libotf-devel \
 m17n-lib-devel ncurses-devel zlib-devel"
+CENTOS_8_PKGS="gnutls-devel libacl-devel ncurses-devel zlib-devel"
 
 DEBIAN_PKGS="libacl1-dev libdbus-1-dev libgnutls28-dev libgpm-dev liblcms2-dev \
 libm17n-dev libncurses5-dev libotf-dev zlib1g-dev"
@@ -53,6 +54,9 @@ get_emacs_build_deps() {
 		case "$VERSION_ID" in
 		    (7)
 			packages=$CENTOS_7_PKGS
+			;;
+		    (8)
+			packages=$CENTOS_8_PKGS
 			;;
 		esac
 		;;

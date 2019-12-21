@@ -17,6 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 CENTOS_7_PKGS="autoconf automake gcc libtool make pkgconfig"
+CENTOS_8_PKGS="autoconf automake gcc libtool make pkgconfig"
 
 DEBIAN_PKGS="autoconf automake gcc libtool make pkgconf"
 
@@ -58,6 +59,9 @@ get_emacs_build_deps() {
 		case "$VERSION_ID" in
 		    (7)
 			packages=$CENTOS_7_PKGS
+			;;
+		    (8)
+			packages=$CENTOS_8_PKGS
 			;;
 		esac
 		;;
