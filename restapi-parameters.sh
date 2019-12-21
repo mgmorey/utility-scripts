@@ -55,6 +55,19 @@ configure_baseline() {
 	    configure_gnu
 
 	    case "$ID" in
+		(centos)
+		    case "$VERSION_ID" in
+			(7)
+			    configure_linux_centos_7
+			    ;;
+			(8)
+			    configure_linux_centos_8
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
 		(debian|raspbian)
 		    case "$VERSION_ID" in
 			(10)
@@ -65,26 +78,10 @@ configure_baseline() {
 			    ;;
 		    esac
 		    ;;
-		(ubuntu|neon)
+		(fedora)
 		    case "$VERSION_ID" in
-			(18.04)
-			    configure_linux_ubuntu_18_04
-			    ;;
-			(19.04)
-			    configure_linux_ubuntu_19_04
-			    ;;
-			(19.10)
-			    configure_linux_ubuntu_19_10
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(linuxmint)
-		    case "$VERSION_ID" in
-			(19.2)
-			    configure_linux_ubuntu_18_04
+			(31)
+			    configure_linux_fedora_31
 			    ;;
 			(*)
 			    abort_not_supported Release
@@ -95,6 +92,16 @@ configure_baseline() {
 		    case "$VERSION_ID" in
 			(2019.4)
 			    configure_linux_kali_2019_4
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(linuxmint)
+		    case "$VERSION_ID" in
+			(19.2)
+			    configure_linux_ubuntu_18_04
 			    ;;
 			(*)
 			    abort_not_supported Release
@@ -121,16 +128,6 @@ configure_baseline() {
 			    ;;
 		    esac
 		    ;;
-		(fedora)
-		    case "$VERSION_ID" in
-			(31)
-			    configure_linux_fedora_31
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
 		(rhel|ol)
 		    case "$VERSION_ID" in
 			(7.[78])
@@ -144,13 +141,16 @@ configure_baseline() {
 			    ;;
 		    esac
 		    ;;
-		(centos)
+		(ubuntu|neon)
 		    case "$VERSION_ID" in
-			(7)
-			    configure_linux_centos_7
+			(18.04)
+			    configure_linux_ubuntu_18_04
 			    ;;
-			(8)
-			    configure_linux_centos_8
+			(19.04)
+			    configure_linux_ubuntu_19_04
+			    ;;
+			(19.10)
+			    configure_linux_ubuntu_19_10
 			    ;;
 			(*)
 			    abort_not_supported Release
