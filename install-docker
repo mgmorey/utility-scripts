@@ -216,8 +216,11 @@ validate_platform() {
 		    (7)
 			return
 			;;
+		    (8)
+		    	return
+		    	;;
 		    (*)
-			abort_not_supported Release
+			break
 			;;
 		esac
 		;;
@@ -227,7 +230,7 @@ validate_platform() {
 			return
 			;;
 		    (*)
-			abort_not_supported Release
+			break
 			;;
 		esac
 		;;
@@ -240,7 +243,7 @@ validate_platform() {
 			return
 			;;
 		    (*)
-			abort_not_supported Release
+			break
 			;;
 		esac
 		;;
@@ -250,7 +253,7 @@ validate_platform() {
 			return
 			;;
 		    (*)
-			abort_not_supported Release
+			break
 			;;
 		esac
 		;;
@@ -260,7 +263,7 @@ validate_platform() {
 			return
 			;;
 		    (*)
-			abort_not_supported Release
+			break
 			;;
 		esac
 		;;
@@ -270,7 +273,7 @@ validate_platform() {
 			return
 			;;
 		    (*)
-			abort_not_supported Release
+			break
 			;;
 		esac
 		;;
@@ -280,7 +283,7 @@ validate_platform() {
 			return
 			;;
 		    (*)
-			abort_not_supported Release
+			break
 			;;
 		esac
 		;;
@@ -290,7 +293,7 @@ validate_platform() {
 			return
 			;;
 		    (*)
-			abort_not_supported Release
+			break
 			;;
 		esac
 		;;
@@ -300,7 +303,7 @@ validate_platform() {
 			return
 			;;
 		    (*)
-			abort_not_supported Release
+			break
 			;;
 		esac
 		;;
@@ -313,7 +316,7 @@ validate_platform() {
 			return
 			;;
 		    (*)
-			abort_not_supported Release
+			break
 			;;
 		esac
 		;;
@@ -323,7 +326,7 @@ validate_platform() {
 			return
 			;;
 		    (*)
-			abort_not_supported Release
+			break
 			;;
 		esac
 		;;
