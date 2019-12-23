@@ -16,8 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CENTOS_PKGS="container-selinux containerd containernetworking-plugins \
+CENTOS_7_PKGS="container-selinux containerd containernetworking-plugins \
 containers-common podman"
+CENTOS_8_PKGS="container-selinux containernetworking-plugins \
+containers-common podman runc"
 
 DEBIAN_PKGS="docker.io runc tini"
 
@@ -45,7 +47,14 @@ get_docker_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (centos)
-		packages=$CENTOS_PKGS
+		case "$VERSION_ID" in
+		    (7)
+			packages=$CENTOS_7_PKGS
+			;;
+		    (8)
+			packages=$CENTOS_8_PKGS
+			;;
+		esac
 		;;
 	    (debian)
 		packages=$DEBIAN_PKGS
