@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 CENTOS_7_PKGS="webkitgtk4-devel"
-CENTOS_8_PKGS="webkitgtk4-devel"
+CENTOS_8_PKGS="webkit2gtk3-devel"
 
 DEBIAN_PKGS="libwebkit2gtk-4.0-dev"
 
