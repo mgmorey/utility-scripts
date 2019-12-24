@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CENTOS_7_PKGS="container-selinux containerd containernetworking-plugins \
+CENTOS_7_PKGS="container-selinux containerd.io containernetworking-plugins \
 containers-common podman"
 CENTOS_8_PKGS="container-selinux containernetworking-plugins \
 containers-common podman runc"
