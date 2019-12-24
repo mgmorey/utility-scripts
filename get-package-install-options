@@ -33,7 +33,7 @@ get_package_install_options() {
 	    (centos)
 		case "$VERSION_ID" in
 		    (7)
-			options="--nobest"
+			break
 			;;
 		    (8)
 			options="--nobest"
@@ -51,10 +51,10 @@ get_package_install_options() {
 		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
-		    (7|7.*)
+		    (7.*)
 			break
 			;;
-		    (8|8.*)
+		    (8.*)
 			options="--nobest"
 			;;
 		esac
