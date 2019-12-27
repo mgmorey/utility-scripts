@@ -512,6 +512,10 @@ set_flags() {
 }
 
 upgrade_via_pip() (
+    if [ "$(id -u)" -eq 0 ]; then
+	return
+    fi
+
     pip=$(get_pip_command)
 
     if [ -z "$pip" ]; then
