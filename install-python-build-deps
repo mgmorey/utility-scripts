@@ -107,8 +107,6 @@ install_python_build_packages() {
 }
 
 validate_platform() {
-    package=
-
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (centos)
