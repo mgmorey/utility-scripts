@@ -92,7 +92,7 @@ get_realpath() (
     fi
 )
 
-install_python_build_deps() {
+install_python_build_packages() {
     validate_platform
     packages=$(get-python-build-packages)
     pattern=$(get-development-pattern)
@@ -221,4 +221,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-install_python_build_deps "$@"
+install_python_build_packages "$@"
