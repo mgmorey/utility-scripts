@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+BASE_URL=https://dist.crystal-lang.org
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -27,6 +29,26 @@ abort_not_supported() {
 
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+configure_platform() {
+    url=
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		case "$VERSION_ID" in
+		    (10)
+			url=$BASE_URL/apt/setup.sh
+			;;
+		esac
+		;;
+	esac
+
+	if [ -n "${url-}" ]; then
+	    break
+	fi
+    done
 }
 
 get_realpath() (
@@ -48,18 +70,30 @@ get_realpath() (
 
 install_crystal() {
     validate_platform
+    configure_platform
     preinstall_crystal
     packages=$(get-crystal-build-packages)
     install-packages crystal $packages
 }
 
 preinstall_crystal() {
-    curl -sSL https://dist.crystal-lang.org/apt/setup.sh | bash
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (opensuse)
+		if ! zypper lr Crystal >/dev/null 2>&1; then
+		    rpm --import $BASE_URL/rpm/RPM-GPG-KEY
+		    zypper ar -e -f $BASE_URL/rpm/ Crystal
+		fi
+
+		return
+		;;
+	esac
+    done
+
+    curl -sSL $url | bash
 }
 
 validate_platform() {
-    package=
-
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
@@ -68,6 +102,9 @@ validate_platform() {
 			return
 			;;
 		esac
+		;;
+	    (opensuse)
+		return
 		;;
 	esac
     done

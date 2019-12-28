@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-crystal-library-packages: get list of Crystal module build packages
+# get-crystal-library-packages: get list of Crystal runtime build packages
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,9 @@
 
 DEBIAN_10_PKGS="libgmp-dev libreadline-dev libssl-dev libxml2-dev libyaml-dev \
 zlib1g-dev"
+
+OPENSUSE_PKGS="gmp-devel libopenssl-devel libxml2-devel libyaml-devel \
+readline-devel zlib-devel"
 
 abort() {
     printf "$@" >&2
@@ -41,6 +44,9 @@ get_crystal_build_packages() {
 			packages=$DEBIAN_10_PKGS
 			;;
 		esac
+		;;
+	    (opensuse)
+		packages=$OPENSUSE_PKGS
 		;;
 	esac
 
