@@ -17,30 +17,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 BASE_URL=https://github.com/pyenv
+
 DEBIAN_PKG=python3-defaults
-
-CENTOS_7_PKGS="gcc make"
-CENTOS_8_PKGS="gcc make"
-
-DEBIAN_10_PKGS="gcc make wget"
-
-FEDORA_PKGS="gcc make wget"
-
-FREEBSD_11_PKGS="gmake wget"
-FREEBSD_12_PKGS="gmake wget"
-
-ILLUMOS_PKGS="developer/build/gnu-make developer/sunstudio12u1/backend \
-developer/sunstudio12u1/cc"
-
-NETBSD_PKGS="gmake wget"
-
-OPENSUSE_PKGS="gcc make wget"
-
-REDHAT_7_PKGS="gcc make wget"
-REDHAT_8_PKGS="gcc make wget"
-
-SOLARIS_PKGS="developer/build/gnu-make developer/developerstudio-126/cc \
-developer/developerstudio-126/library/c-libs system/header"
 
 abort() {
     printf "$@" >&2
@@ -57,95 +35,29 @@ assert() {
 
 configure_platform() {
     package=
-    packages=
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (centos)
-		case "$VERSION_ID" in
-		    (7)
-			packages=$CENTOS_7_PKGS
-			;;
-		    (8)
-			packages=$CENTOS_8_PKGS
-			;;
-		esac
-		;;
 	    (debian)
 		case "$VERSION_ID" in
 		    (10)
 			package=$DEBIAN_PKG
-			packages=$DEBIAN_10_PKGS
-			;;
-		esac
-		;;
-	    (fedora)
-		packages=$FEDORA_PKGS
-		;;
-	    (kali)
-		case "$VERSION_ID" in
-		    (2019.3)
-			packages=$DEBIAN_10_PKGS
-			;;
-		esac
-		;;
-	    (linuxmint)
-		case "$VERSION_ID" in
-		    (19.2)
-			packages=$DEBIAN_10_PKGS
-			;;
-		esac
-		;;
-	    (opensuse)
-		packages=$OPENSUSE_PKGS
-		;;
-	    (rhel|ol)
-		case "$VERSION_ID" in
-		    (7.*)
-			packages=$REDHAT_7_PKGS
-			;;
-		    (8.*)
-			packages=$REDHAT_8_PKGS
 			;;
 		esac
 		;;
 	    (ubuntu)
 		case "$VERSION_ID" in
 		    (18.04)
-			packages=$DEBIAN_10_PKGS
+			package=$DEBIAN_PKG
 			;;
 		    (19.10)
-			packages=$DEBIAN_10_PKGS
+			package=$DEBIAN_PKG
 			;;
 		esac
-		;;
-	    (freebsd)
-		case "$VERSION_ID" in
-		    (11.*)
-			packages=$FREEBSD_11_PKGS
-			;;
-		    (12.*)
-			packages=$FREEBSD_12_PKGS
-			;;
-		esac
-		;;
-	    (illumos)
-		packages=$ILLUMOS_PKGS
-		;;
-	    (macos)
-		packages=$MACOS_PKGS
-		;;
-	    (netbsd)
-		packages=$NETBSD_PKGS
-		;;
-	    (solaris)
-		packages=$SOLARIS_PKGS
 		;;
 	esac
 
 	if [ -n "${package-}" ]; then
-	    break
-	elif [ -n "${packages-}" ]; then
 	    break
 	fi
     done
@@ -153,6 +65,7 @@ configure_platform() {
 
 get_packages() {
     get-bootstrap-packages
+    get-development-packages
     get-python-build-packages
     printf "%s\n" $packages
 }
