@@ -33,8 +33,7 @@ MACOS_PKGSRC_PKGS=":autoconf :automake :gcc7 :gmake :libtool-base :pkgconf"
 OPENSUSE_PKGS="autoconf automake gcc libtool make pkgconf"
 
 REDHAT_7_PKGS="autoconf automake gcc libtool make pkgconfig"
-
-REDHAT_8_PKGS="autoconf automake gcc libtool make pkgconf"
+REDHAT_8_PKGS="autoconf automake gcc libtool make pkgconf-pkg-config"
 
 SOLARIS_PKGS="developer/build/autoconf developer/build/automake \
 developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
