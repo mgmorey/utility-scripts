@@ -19,7 +19,7 @@
 CENTOS_7_PKGS="autoconf automake gcc libtool make pkgconfig"
 CENTOS_8_PKGS="autoconf automake gcc libtool make pkgconf-pkg-config"
 
-DEBIAN_PKGS="autoconf automake gcc libtool make pkgconf"
+DEBIAN_PKGS="autoconf automake gcc libtool make pkg-config"
 
 FEDORA_PKGS="autoconf automake gcc libtool make pkgconf"
 
