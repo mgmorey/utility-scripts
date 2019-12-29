@@ -47,6 +47,10 @@ get_realpath() (
 )
 
 install_rustup() {
+    if [ -x "$HOME/.cargo/bin/rustup" ]; then
+	return
+    fi
+
     install-packages $(get-bootstrap-packages)
     run_unpriv curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 }
