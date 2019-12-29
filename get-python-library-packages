@@ -62,7 +62,7 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_python_build_deps() {
+get_python_library_packages() {
     packages=
 
     for id in $ID $ID_LIKE; do
@@ -101,7 +101,7 @@ get_python_build_deps() {
 			;;
 		esac
 		;;
-	    (opensuse-*)
+	    (opensuse)
 		packages=$OPENSUSE_PKGS
 		;;
 	    (rhel|ol)
@@ -184,4 +184,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-get_python_build_deps
+get_python_library_packages
