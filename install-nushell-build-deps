@@ -74,6 +74,9 @@ validate_platform() {
 			;;
 		esac
 		;;
+	    (opensuse)
+		return
+		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
 		    (8.*)
