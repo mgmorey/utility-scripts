@@ -30,7 +30,7 @@ developer/illumos-gcc system/header"
 MACOS_HOMEBREW_PKGS="autoconf automake gcc libtool make pkg-config"
 MACOS_PKGSRC_PKGS=":autoconf :automake :gcc7 :gmake :libtool-base :pkgconf"
 
-OPENSUSE_PKGS="autoconf automake gcc libtool make pkgconf"
+OPENSUSE_PKGS="autoconf automake gcc libtool make pkgconf-pkg-config"
 
 REDHAT_7_PKGS="autoconf automake gcc libtool make pkgconfig"
 REDHAT_8_PKGS="autoconf automake gcc libtool make pkgconf-pkg-config"
