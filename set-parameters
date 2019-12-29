@@ -255,7 +255,7 @@ print_parameters() {
 	    continue
 	fi
 
-	case ${SHELL##*/} in
+	case $(basename $SHELL) in
 	    (bash|fish|ksh|ksh93|rbash|zsh)
 		printf 'export %s="%s"\n' "$var" "$value"
 		;;
@@ -290,7 +290,7 @@ set_profile_parameters() {
 }
 
 validate_platform() {
-    case ${SHELL##*/} in
+    case $(basename $SHELL) in
 	(bash|fish|ksh|ksh93|rbash|zsh)
 	    :
 	    ;;

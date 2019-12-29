@@ -97,7 +97,7 @@ to_upper() {
 }
 
 validate_parameters() {
-    case ${SHELL##*/} in
+    case $(basename $SHELL) in
 	(bash|fish|ksh|ksh93|rbash|zsh)
 	    :
 	    ;;
