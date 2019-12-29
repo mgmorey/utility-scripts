@@ -1,0 +1,172 @@
+#!/bin/sh -eu
+
+# get-bootstrap-packages: get list of bootstrap packages
+# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+CENTOS_7_PKGS="bash curl"
+CENTOS_8_PKGS="bash curl"
+
+DEBIAN_10_PKGS="bash curl"
+
+FEDORA_PKGS="bash curl"
+
+FREEBSD_11_PKGS="bash curl"
+FREEBSD_12_PKGS="bash curl"
+
+ILLUMOS_PKGS="shell/bash"
+
+MACOS_PKGS="bash curl"
+
+NETBSD_PKGS="bash curl"
+
+OPENSUSE_PKGS="bash curl"
+
+REDHAT_7_PKGS="bash curl"
+REDHAT_8_PKGS="bash curl"
+
+SOLARIS_PKGS="shell/bash"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_bootstrap_packages() {
+    packages=
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			packages=$CENTOS_7_PKGS
+			;;
+		    (8)
+			packages=$CENTOS_8_PKGS
+			;;
+		esac
+		;;
+	    (debian)
+		case "$VERSION_ID" in
+		    (10)
+			packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (fedora)
+		packages=$FEDORA_PKGS
+		;;
+	    (kali)
+		case "$VERSION_ID" in
+		    (2019.3)
+			packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (linuxmint)
+		case "$VERSION_ID" in
+		    (19.2)
+			packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (opensuse)
+		packages=$OPENSUSE_PKGS
+		;;
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		    (7.*)
+			packages=$REDHAT_7_PKGS
+			;;
+		    (8.*)
+			packages=$REDHAT_8_PKGS
+			;;
+		esac
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.04)
+			packages=$DEBIAN_10_PKGS
+			;;
+		    (19.10)
+			packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (freebsd)
+		case "$VERSION_ID" in
+		    (11.*)
+			packages=$FREEBSD_11_PKGS
+			;;
+		    (12.*)
+			packages=$FREEBSD_12_PKGS
+			;;
+		esac
+		;;
+	    (illumos)
+		packages=$ILLUMOS_PKGS
+		;;
+	    (macos)
+		packages=$MACOS_PKGS
+		;;
+	    (netbsd)
+		packages=$NETBSD_PKGS
+		;;
+	    (solaris)
+		packages=$SOLARIS_PKGS
+		;;
+	esac
+
+	if [ -n "${package-}" ]; then
+	    break
+	elif [ -n "${packages-}" ]; then
+	    break
+	fi
+    done
+
+    if [ -n "${packages-}" ]; then
+	printf "%s\n" $packages
+    fi
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+. "$script_dir/common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+get_bootstrap_packages
