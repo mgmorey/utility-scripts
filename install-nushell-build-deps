@@ -74,6 +74,16 @@ validate_platform() {
 			;;
 		esac
 		;;
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		    (8.*)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
 	    (ubuntu)
 		case "$VERSION_ID" in
 		    (18.04)
