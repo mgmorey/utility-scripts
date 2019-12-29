@@ -19,31 +19,28 @@
 BASE_URL=https://github.com/pyenv
 DEBIAN_PKG=python3-defaults
 
-CENTOS_7_PKGS="bash curl gcc make"
-CENTOS_8_PKGS="bash curl gcc make"
+CENTOS_7_PKGS="gcc make"
+CENTOS_8_PKGS="gcc make"
 
-DEBIAN_10_PKGS="bash curl gcc make wget"
+DEBIAN_10_PKGS="gcc make wget"
 
-FEDORA_PKGS="bash curl gcc make wget"
+FEDORA_PKGS="gcc make wget"
 
-FREEBSD_11_PKGS="bash curl gmake wget"
-FREEBSD_12_PKGS="bash curl gmake wget"
+FREEBSD_11_PKGS="gmake wget"
+FREEBSD_12_PKGS="gmake wget"
 
 ILLUMOS_PKGS="developer/build/gnu-make developer/sunstudio12u1/backend \
-developer/sunstudio12u1/cc shell/bash"
+developer/sunstudio12u1/cc"
 
-MACOS_PKGS="bash curl"
+NETBSD_PKGS="gmake wget"
 
-NETBSD_PKGS="bash curl gmake wget"
+OPENSUSE_PKGS="gcc make wget"
 
-OPENSUSE_PKGS="bash curl gcc make wget"
-
-REDHAT_7_PKGS="bash curl gcc make wget"
-REDHAT_8_PKGS="bash curl gcc make wget"
+REDHAT_7_PKGS="gcc make wget"
+REDHAT_8_PKGS="gcc make wget"
 
 SOLARIS_PKGS="developer/build/gnu-make developer/developerstudio-126/cc \
-developer/developerstudio-126/library/c-libs shell/bash \
-system/header"
+developer/developerstudio-126/library/c-libs system/header"
 
 abort() {
     printf "$@" >&2
@@ -155,8 +152,9 @@ configure_platform() {
 }
 
 get_packages() {
-    printf "%s\n" $packages
+    get-bootstrap-packages
     get-python-build-packages
+    printf "%s\n" $packages
 }
 
 get_realpath() (
