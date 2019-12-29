@@ -73,7 +73,7 @@ set_askpass() {
 	    (git|ssh|sudo)
 		var=$(printf "%s\n" ${command}_askpass | to_upper)
 
-		case ${SHELL##*/} in
+		case $(basename $SHELL) in
 		    (bash|fish|ksh|ksh93|rbash|zsh)
 			printf 'export %s="%s"\n' "$var" "$askpass_helper"
 			;;
