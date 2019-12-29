@@ -48,8 +48,7 @@ get_realpath() (
 
 install_lilith_build_deps() {
     validate_platform
-    packages=$(get-lilith-build-packages)
-    install-packages $packages
+    install-packages $(get-lilith-build-packages)
 }
 
 validate_platform() {
