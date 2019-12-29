@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -eu
 
 # make-lilith: invoke make to build Lilith OS
 # Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
@@ -16,6 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export PATH="$HOME/git/lilith/userspace/toolchain/tools/bin:$PATH"
+export LILITH_ENV=0
+
+if [ -f ./env.sh ]; then
+    . ./env.sh
+elif [ -f ../env.sh ]; then
+    . ../env.sh
+elif [ -f ../../env.sh ]; then
+    . ../../env.sh
+fi
 
 make ARCH32=i586-suse-linux AS=as LD=ld "$@"
