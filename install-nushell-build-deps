@@ -48,12 +48,22 @@ get_realpath() (
 
 install_nushell_build_deps() {
     validate_platform
-    install-packages $(get-nushell-build-packages)
+    install-packages $(get-development-packages) $(get-nushell-build-packages)
 }
 
 validate_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
 	    (debian)
 		case "$VERSION_ID" in
 		    (10)
