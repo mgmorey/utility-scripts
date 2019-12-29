@@ -18,7 +18,7 @@
 
 # Wiki page: https://github.com/pyenv/pyenv/wiki
 
-OPENSUSE_PKGS="cross-i386-binutils qemu"
+OPENSUSE_PKGS="cross-i386-binutils cross-i386-gcc9 qemu"
 
 abort() {
     printf "$@" >&2
