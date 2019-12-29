@@ -16,4 +16,4 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-make ARCH32=i586-suse-linux AS=as LD=ld QEMU=qemu "$@"
+make ARCH32=i586-suse-linux AS=as LD=ld "$@"
