@@ -16,4 +16,80 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-printf "%s\n" gmp-devel mpc-devel mpfr-devel
+DEBIAN_10_PKGS="libgmp-dev libmpc-dev libmpfr-dev"
+
+OPENSUSE_PKGS="gmp-devel mpc-devel mpfr-devel"
+
+UBUNTU_18_PKGS="libgmp-dev libmpc-dev libmpfr-dev"
+UBUNTU_19_PKGS="libgmp-dev libmpc-dev libmpfr-dev"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_gcc_build_packages() {
+    packages=
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		case "$VERSION_ID" in
+		    (10)
+			packages=$DEBIAN_10_PKGS
+			;;
+		esac
+		;;
+	    (opensuse)
+		packages=$OPENSUSE_PKGS
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.04)
+			packages=$UBUNTU_18_PKGS
+			;;
+		    (19.10)
+			packages=$UBUNTU_19_PKGS
+			;;
+		esac
+		;;
+	esac
+
+	if [ -n "${packages-}" ]; then
+	    break
+	fi
+    done
+
+    if [ -n "${packages-}" ]; then
+	printf "%s\n" $packages
+    fi
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+. "$script_dir/common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+get_gcc_build_packages

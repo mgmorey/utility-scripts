@@ -16,11 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# Wiki page: https://github.com/pyenv/pyenv/wiki
-
 DEBIAN_10_PKGS="llvm-dev"
 
 OPENSUSE_PKGS="llvm-devel"
+
+UBUNTU_18_PKGS="llvm-dev"
+UBUNTU_19_PKGS="llvm-dev"
 
 abort() {
     printf "$@" >&2
@@ -45,6 +46,16 @@ get_crystal_compiler_packages() {
 		;;
 	    (opensuse)
 		packages=$OPENSUSE_PKGS
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.04)
+			packages=$UBUNTU_18_PKGS
+			;;
+		    (19.10)
+			packages=$UBUNTU_19_PKGS
+			;;
+		esac
 		;;
 	esac
 

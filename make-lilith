@@ -1,4 +1,4 @@
-#!/bin/sh -eu
+#!/bin/bash -eu
 
 # make-lilith: invoke make to build Lilith OS
 # Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
@@ -16,14 +16,81 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export LILITH_ENV=0
+abort() {
+    printf "$@" >&2
+    exit 1
+}
 
-if [ -f ./env.sh ]; then
-    . ./env.sh
-elif [ -f ../env.sh ]; then
-    . ../env.sh
-elif [ -f ../../env.sh ]; then
-    . ../../env.sh
-fi
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
 
-make ARCH32=i586-suse-linux AS=as LD=ld "$@"
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+configure_platform() {
+    arch=
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		arch=i686-gnu
+		;;
+	    (opensuse)
+		arch=i586-suse-linux
+		;;
+	    (ubuntu)
+		arch=i686-gnu
+		;;
+	esac
+
+	if [ -n "${arch-}" ]; then
+	    break
+	fi
+    done
+
+    if [ -n "${arch-}" ]; then
+	printf "%s\n" $arch
+    fi
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+make_lilith() {
+    configure_platform
+    export LILITH_ENV=0
+
+    if [ -f ./env.sh ]; then
+	. ./env.sh
+    elif [ -f ../env.sh ]; then
+	. ../env.sh
+    elif [ -f ../../env.sh ]; then
+	. ../../env.sh
+    fi
+
+    make ARCH32=i586-suse-linux AS=as LD=ld "$@"
+}
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+. "$script_dir/common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+make_lilith "$@"

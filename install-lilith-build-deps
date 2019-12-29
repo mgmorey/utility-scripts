@@ -55,8 +55,31 @@ install_lilith_build_deps() {
 validate_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (debian)
+		case "$VERSION_ID" in
+		    (10)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
 	    (opensuse)
 		return
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.04)
+			return
+			;;
+		    (19.10)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
 		;;
 	esac
     done
