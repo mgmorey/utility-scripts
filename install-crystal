@@ -18,6 +18,10 @@
 
 BASE_URL=https://dist.crystal-lang.org
 
+DEBIAN_10_PKGS="bash curl"
+
+OPENSUSE_PKGS="bash curl"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -39,13 +43,23 @@ configure_platform() {
 	    (debian)
 		case "$VERSION_ID" in
 		    (10)
+			packages=$DEBIAN_10_PKGS
 			url=$BASE_URL/apt/setup.sh
 			;;
 		esac
 		;;
+	    (opensuse)
+		packages=$OPENSUSE_PKGS
+		;;
+	    (ubuntu)
+		packages=$DEBIAN_10_PKGS
+		url=$BASE_URL/apt/setup.sh
+		;;
 	esac
 
-	if [ -n "${url-}" ]; then
+	if [ -n "${packages-}" ]; then
+	    break
+	elif [ -n "${url-}" ]; then
 	    break
 	fi
     done
@@ -72,11 +86,12 @@ install_crystal() {
     validate_platform
     configure_platform
     preinstall_crystal
-    packages=$(get-crystal-build-packages)
-    install-packages crystal $packages
+    install-packages crystal $(get-crystal-build-packages)
 }
 
 preinstall_crystal() {
+    install-packages $packages
+
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (opensuse)
@@ -105,6 +120,16 @@ validate_platform() {
 		;;
 	    (opensuse)
 		return
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.04)
+			return
+			;;
+		    (19.10)
+			return
+			;;
+		esac
 		;;
 	esac
     done
