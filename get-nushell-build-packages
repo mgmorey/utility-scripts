@@ -16,10 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_10_PKGS="libxcb-composite0-dev libssl-dev libx11-dev pkg-config"
+DEBIAN_10_PKGS="libxcb-composite0-dev libssl-dev libx11-dev"
 
-UBUNTU_18_PKGS="libxcb-composite0-dev libssl-dev libx11-dev pkg-config"
-UBUNTU_19_PKGS="libxcb-composite0-dev libssl-dev libx11-dev pkg-config"
+UBUNTU_18_PKGS="libxcb-composite0-dev libssl-dev libx11-dev"
+UBUNTU_19_PKGS="libxcb-composite0-dev libssl-dev libx11-dev"
 
 abort() {
     printf "$@" >&2
