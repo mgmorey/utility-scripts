@@ -18,11 +18,6 @@
 
 # Wiki page: https://github.com/pyenv/pyenv/wiki
 
-CENTOS_7_PKGS="bzip2-devel gdbm-devel libffi-devel libuuid-devel ncurses-devel \
-openssl-devel python3-devel readline-devel sqlite-devel xz-devel zlib-devel"
-CENTOS_8_PKGS="bzip2-devel gdbm-devel libffi-devel libuuid-devel ncurses-devel \
-openssl-devel python3-devel readline-devel sqlite-devel xz-devel zlib-devel"
-
 DEBIAN_10_PKGS="libbz2-dev libffi-dev libgdbm-dev libncurses5-dev \
 libncursesw5-dev libpython3-dev libreadline-dev libsqlite3-dev \
 libssl-dev libxml2-dev libxmlsec1-dev liblzma-dev uuid-dev \
@@ -70,10 +65,10 @@ get_python_library_packages() {
 	    (centos)
 		case "$VERSION_ID" in
 		    (7)
-			packages=$CENTOS_7_PKGS
+			packages=$REDHAT_7_PKGS
 			;;
 		    (8)
-			packages=$CENTOS_8_PKGS
+			packages=$REDHAT_8_PKGS
 			;;
 		esac
 		;;
