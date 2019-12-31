@@ -24,7 +24,7 @@ SOLARIS_DIRS="$(ls -d /opt/csw /opt/*studio* 2>/dev/null || true)"
 SYSTEM_DIRS="/usr /usr/gnu"
 
 COMMON_BINDIRS="/usr/lib/cups/bin"
-PROFILE_BINDIRS="bin .cargo/bin .local/bin .pyenv/bin"
+PROFILE_BINDIRS="bin .cargo/bin .linuxbrew/bin .local/bin .pyenv/bin"
 
 
 abort() {
