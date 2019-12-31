@@ -62,8 +62,9 @@ get_realpath() (
 install_homebrew() {
     validate_platform
     configure_platform
+    export PATH="$HOME/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/bin:$PATH"
 
-    if brew --version >/dev/null 2>&1; then
+    if [ $(id -u) -gt 0 ] && brew --version >/dev/null 2>&1; then
 	brew update
 	brew upgrade
     else
@@ -71,7 +72,7 @@ install_homebrew() {
 
 	case "$kernel_name" in
 	    (Darwin)
-		/usr/bin/ruby -e "$(curl -fsSL $HOMEBREW_URL)"
+		run_unpriv /usr/bin/ruby -e "$(curl -fsSL $HOMEBREW_URL)"
 		;;
 	    (Linux)
 		run_unpriv /bin/sh -c "$(curl -fsSL $LINUXBREW_URL)"
