@@ -93,10 +93,10 @@ preinstall_homebrew() {
 validate_platform() {
     case "$kernel_name" in
 	(Darwin)
-	    :
+	    true
 	    ;;
 	(Linux)
-	    :
+	    true
 	    ;;
 	(*)
 	    abort_not_supported "Operating system"
