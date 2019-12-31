@@ -18,7 +18,7 @@
 
 DEBIAN_PKGS="autoconf automake gcc libtool make pkgconf"
 
-FEDORA_PKGS="autoconf automake gcc libtool make pkgconf"
+FEDORA_PKGS="autoconf automake gcc libtool make pkgconf-pkg-config"
 
 ILLUMOS_PKGS="developer/build/autoconf developer/build/automake \
 developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
