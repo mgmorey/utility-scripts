@@ -16,17 +16,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_10_PKGS="curl file git ruby"
+DEBIAN_10_PKGS="file git"
 
-FEDORA_PKGS="curl file git ruby"
+FEDORA_PKGS="file git"
 
-OPENSUSE_PKGS="curl file git ruby"
+OPENSUSE_PKGS="file git"
 
-REDHAT_7_PKGS="curl file git ruby"
-REDHAT_8_PKGS="curl file git ruby"
+REDHAT_7_PKGS="file git"
+REDHAT_8_PKGS="file git"
 
-UBUNTU_18_PKGS="curl file git ruby"
-UBUNTU_19_PKGS="curl file git ruby"
+UBUNTU_18_PKGS="file git"
+UBUNTU_19_PKGS="file git"
 
 abort() {
     printf "$@" >&2
@@ -38,6 +38,7 @@ assert() {
 }
 
 get_homebrew_packages() {
+    get-bootstrap-packages
     packages=
 
     for id in $ID $ID_LIKE; do
