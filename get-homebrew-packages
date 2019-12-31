@@ -46,10 +46,10 @@ get_homebrew_packages() {
 	    (centos)
 		case "$VERSION_ID" in
 		    (7)
-			packages=$CENTOS_7_PKGS
+			packages=$REDHAT_7_PKGS
 			;;
 		    (8)
-			packages=$CENTOS_8_PKGS
+			packages=$REDHAT_8_PKGS
 			;;
 		esac
 		;;
