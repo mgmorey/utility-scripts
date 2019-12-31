@@ -20,7 +20,7 @@ DEBIAN_10_PKGS="file git ruby rubygems"
 
 FEDORA_PKGS="file git ruby rubygems"
 
-OPENSUSE_PKGS="file git ruby rubygems"
+OPENSUSE_PKGS="file git ruby"
 
 REDHAT_7_PKGS="file git ruby rubygems"
 REDHAT_8_PKGS="file git ruby rubygems"
