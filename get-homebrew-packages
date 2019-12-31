@@ -16,17 +16,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_10_PKGS="file git"
+DEBIAN_10_PKGS="file git ruby"
 
-FEDORA_PKGS="file git"
+FEDORA_PKGS="file git ruby"
 
-OPENSUSE_PKGS="file git"
+OPENSUSE_PKGS="file git ruby"
 
-REDHAT_7_PKGS="file git"
-REDHAT_8_PKGS="file git"
+REDHAT_7_PKGS="file git ruby"
+REDHAT_8_PKGS="file git ruby"
 
-UBUNTU_18_PKGS="file git"
-UBUNTU_19_PKGS="file git"
+UBUNTU_18_PKGS="file git ruby"
+UBUNTU_19_PKGS="file git ruby"
 
 abort() {
     printf "$@" >&2
