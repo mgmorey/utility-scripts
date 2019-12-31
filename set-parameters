@@ -18,8 +18,10 @@
 
 ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
 
-LOCAL_DIRS="/usr/local"
-PKGSRC_DIRS="$(ls -d /usr/pkg /opt/pkg /opt/local 2>/dev/null || true)"
+BREW_DIR=/home/linuxbrew/.linuxbrew
+LOCAL_DIR=/usr/local
+
+PKG_DIRS="$(ls -d /usr/pkg /opt/pkg /opt/local $BREW_DIR 2>/dev/null || true)"
 SOLARIS_DIRS="$(ls -d /opt/csw /opt/*studio* 2>/dev/null || true)"
 SYSTEM_DIRS="/usr /usr/gnu"
 
@@ -113,7 +115,7 @@ include_common_directories() {
 
     # add common prefix directories to paths (if they exist)
 
-    dirs="$SYSTEM_DIRS $SOLARIS_DIRS $PKGSRC_DIRS $LOCAL_DIRS"
+    dirs="$SYSTEM_DIRS $SOLARIS_DIRS $PKG_DIRS $LOCAL_DIR"
 
     for dir in $dirs; do
 	case "$dir" in
