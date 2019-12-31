@@ -16,9 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CENTOS_7_PKGS="bash curl"
-CENTOS_8_PKGS="bash curl"
-
 DEBIAN_10_PKGS="bash curl"
 
 FEDORA_PKGS="bash curl"
@@ -59,10 +56,10 @@ get_bootstrap_packages() {
 	    (centos)
 		case "$VERSION_ID" in
 		    (7)
-			packages=$CENTOS_7_PKGS
+			packages=$REDHAT_7_PKGS
 			;;
 		    (8)
-			packages=$CENTOS_8_PKGS
+			packages=$REDHAT_8_PKGS
 			;;
 		esac
 		;;
