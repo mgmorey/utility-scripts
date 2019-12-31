@@ -16,10 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-HOMEBREW_URL=https://raw.githubusercontent.com/Homebrew/install/master/install
-
-PKG_DIR=/Library/Developer/CommandLineTools/Packages/
-PKG_NAME=macOS_SDK_headers_for_macOS_10.14.pkg
+BASE_URL=https://raw.githubusercontent.com
+HOMEBREW_URL=$BASE_URL/Homebrew/install/master/install
+LINUXBREW_URL=$BASE_URL/Linuxbrew/install/master/install.sh
 
 abort() {
     printf "$@" >&2
@@ -32,6 +31,15 @@ abort_not_supported() {
 
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+configure_platform() {
+    case "$kernel_name" in
+	(Darwin)
+	    PKG_DIR=/Library/Developer/CommandLineTools/Packages/
+	    PKG_NAME=macOS_SDK_headers_for_macOS_10.14.pkg
+	    ;;
+    esac
 }
 
 get_realpath() (
@@ -53,19 +61,43 @@ get_realpath() (
 
 install_homebrew() {
     validate_platform
+    configure_platform
 
     if brew --version >/dev/null 2>&1; then
 	brew update
 	brew upgrade
     else
-	installer -allowUntrusted -pkg $PKG_DIR/$PKG_NAME -target /
-	/usr/bin/ruby -e "$(curl -fsSL $HOMEBREW_URL)"
+	preinstall_homebrew
+
+	case "$kernel_name" in
+	    (Darwin)
+		/usr/bin/ruby -e "$(curl -fsSL $HOMEBREW_URL)"
+		;;
+	    (Linux)
+		run_unpriv /bin/sh -c "$(curl -fsSL $LINUXBREW_URL)"
+		;;
+	esac
     fi
+}
+
+preinstall_homebrew() {
+    case "$kernel_name" in
+	(Darwin)
+	    installer -allowUntrusted -pkg $PKG_DIR/$PKG_NAME -target /
+	    ;;
+	(Linux)
+	    install-build-essentials
+	    install-packages $(get-homebrew-packages)
+	    ;;
+    esac
 }
 
 validate_platform() {
     case "$kernel_name" in
 	(Darwin)
+	    :
+	    ;;
+	(Linux)
 	    :
 	    ;;
 	(*)
@@ -80,5 +112,8 @@ fi
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-eval $("$script_dir/get-os-release" -x)
+. "$script_dir/common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
 install_homebrew
