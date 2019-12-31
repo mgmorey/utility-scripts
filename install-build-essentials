@@ -48,11 +48,11 @@ get_realpath() (
 
 install_build_essentials() {
     validate_platform
-    manager=$(get-package-managers | awk 'NR == 1 {print $0}')
-    command=$(get-pattern-install-command $manager)
-    options=$(get-package-install-options)
-    pattern=$(get-development-pattern)
-    $manager $command $options "$pattern"
+    pattern="$(get-development-pattern)"
+
+    if [ -n "$pattern" ]; then
+	install-packages -p "$pattern"
+    fi
 }
 
 validate_platform() {
@@ -71,10 +71,6 @@ validate_platform() {
 		return
 		;;
 	esac
-
-	if [ -n "${pattern-}" ]; then
-	    break
-	fi
     done
 
     abort_not_supported "Operating system"
