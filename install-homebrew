@@ -62,12 +62,8 @@ get_realpath() (
 install_homebrew() {
     validate_platform
     configure_platform
-    export PATH="$HOME/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/bin:$PATH"
 
-    if [ $(id -u) -gt 0 ] && brew --version >/dev/null 2>&1; then
-	brew update
-	brew upgrade
-    else
+    if ! which brew >/dev/null 2>&1; then
 	preinstall_homebrew
 
 	case "$kernel_name" in
@@ -87,8 +83,9 @@ preinstall_homebrew() {
 	    installer -allowUntrusted -pkg $PKG_DIR/$PKG_NAME -target /
 	    ;;
 	(Linux)
-	    install-build-essentials
-	    install-packages $(get-homebrew-packages)
+	    packages="$(get-homebrew-packages)"
+	    pattern="$(get-development-pattern)"
+	    install-packages${pattern+ -p "$pattern"} $packages
 	    ;;
     esac
 }
