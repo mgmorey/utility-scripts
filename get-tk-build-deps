@@ -20,7 +20,7 @@
 
 DARWIN_PKGS=""
 
-DEBIAN_10_PKGS="tk-dev"
+DEBIAN_PKGS="tk-dev"
 
 FREEBSD_PKGS="tcl86 tk86"
 
@@ -63,19 +63,19 @@ get_tk_build_deps() {
 		(debian|raspbian)
 		    case "$VERSION_ID" in
 			(10)
-	    		    packages=$DEBIAN_10_PKGS
+	    		    packages=$DEBIAN_PKGS
 			    ;;
 		    esac
-		    ;;
-		(ubuntu|linuxmint|neon)
-	    	    packages=$DEBIAN_10_PKGS
 		    ;;
 		(opensuse-*)
 	    	    packages=$OPENSUSE_PKGS
 	    	    ;;
-		(fedora|rhel|ol|centos)
+		(rhel|ol|centos|fedora)
 	    	    packages=$REDHAT_PKGS
 	    	    ;;
+		(ubuntu|linuxmint|neon)
+	    	    packages=$DEBIAN_PKGS
+		    ;;
 	    esac
 	    ;;
 	(Darwin)
