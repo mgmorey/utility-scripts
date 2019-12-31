@@ -239,6 +239,14 @@ parse_arguments() {
     done
 
     shift $(($OPTIND - 1))
+
+    if [ "$ID" = debian -o "$ID_LIKE" = debian ]; then
+	if [ "$pattern" = build-essential ]; then
+	    packages="$pattern $packages"
+	    pattern=
+	fi
+    fi
+
     packages=$(get-uninstalled-packages "$@")
 }
 
