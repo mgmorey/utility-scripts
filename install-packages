@@ -240,11 +240,9 @@ parse_arguments() {
 
     shift $(($OPTIND - 1))
 
-    if [ "$ID" = debian -o "$ID_LIKE" = debian ]; then
-	if [ "$pattern" = build-essential ]; then
-	    packages="$pattern $packages"
-	    pattern=
-	fi
+    if [ "$managers" = /usr/bin/apt-get -a -n "$pattern" ]; then
+	packages="$pattern $packages"
+	pattern=
     fi
 
     packages=$(get-uninstalled-packages "$@")
