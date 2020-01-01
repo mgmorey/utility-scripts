@@ -63,11 +63,15 @@ get_realpath() (
 )
 
 install_homebrew() {
+    validate_platform
+    configure_platform
     brew=$(which brew 2>/dev/null)
 
     if [ -n "$brew" ]; then
-	if [ $brew = /usr/bin/brew ]; then
-	    if [ -x /home/linuxbrew ]; then
+	if [ "$kernel_name" = Linux -a "$brew" = /usr/bin/brew ]; then
+	    if [ -x $HOME/.linuxbrew ]; then
+		return
+	    elif [ -x /home/linuxbrew ]; then
 		return
 	    fi
 	else
@@ -75,8 +79,6 @@ install_homebrew() {
 	fi
     fi
 
-    validate_platform
-    configure_platform
     preinstall_homebrew
 
     for id in $ID $ID_LIKE; do
