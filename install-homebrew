@@ -65,7 +65,7 @@ get_realpath() (
 install_homebrew() {
     validate_platform
     configure_platform
-    brew=$(which brew 2>/dev/null)
+    brew=$(which brew 2>/dev/null || true)
 
     if [ -n "$brew" ]; then
 	if [ "$kernel_name" = Linux -a "$brew" = /usr/bin/brew ]; then
