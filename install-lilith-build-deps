@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -eu
 
 # install-lilith-build-deps: install Lilith OS build dependencies
 # Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>

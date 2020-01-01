@@ -1,4 +1,4 @@
-#!/bin/sh -u
+#!/bin/sh -eu
 
 # install-homebrew: install the HomeBrew package manager brew
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
