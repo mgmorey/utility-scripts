@@ -34,12 +34,15 @@ assert() {
 }
 
 configure_platform() {
-    case "$kernel_name" in
-	(Darwin)
-	    PKG_DIR=/Library/Developer/CommandLineTools/Packages/
-	    PKG_NAME=macOS_SDK_headers_for_macOS_10.14.pkg
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (darwin)
+		PKG_DIR=/Library/Developer/CommandLineTools/Packages/
+		PKG_NAME=macOS_SDK_headers_for_macOS_10.14.pkg
+		break
+		;;
+	esac
+    done
 }
 
 get_realpath() (
@@ -60,21 +63,102 @@ get_realpath() (
 )
 
 install_homebrew() {
+    brew=$(which brew 2>/dev/null)
+
+    if [ -n "$brew" ]; then
+	if [ $brew = /usr/bin/brew ]; then
+	    if [ -x /home/linuxbrew ]; then
+		return
+	    fi
+	else
+	    return
+	fi
+    fi
+
     validate_platform
     configure_platform
+    preinstall_homebrew
 
-    if ! which brew >/dev/null 2>&1; then
-	preinstall_homebrew
-
-	case "$kernel_name" in
-	    (Darwin)
-		run_unpriv /usr/bin/ruby -e "$(curl -fsSL $HOMEBREW_URL)"
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			install_linuxbrew
+			break
+			;;
+		    (8)
+			install_linuxbrew
+			break
+			;;
+		esac
 		;;
-	    (Linux)
-		run_unpriv /bin/sh -c "$(curl -fsSL $LINUXBREW_URL)"
+	    (debian)
+		case "$VERSION_ID" in
+		    (10)
+			install_linuxbrew
+			break
+			;;
+		esac
+		;;
+	    (fedora)
+		install_linuxbrew
+		break
+		;;
+	    (kali)
+		case "$VERSION_ID" in
+		    (2019.3)
+			install_linuxbrew
+			break
+			;;
+		esac
+		;;
+	    (linuxmint)
+		case "$VERSION_ID" in
+		    (19.2)
+			install_linuxbrew
+			break
+			;;
+		esac
+		;;
+	    (opensuse)
+		install_linuxbrew
+		break
+		;;
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		    (7.*)
+			install_linuxbrew
+			break
+			;;
+		    (8.*)
+			install_linuxbrew
+			break
+			;;
+		esac
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.04)
+			install_linuxbrew
+			break
+			;;
+		    (19.10)
+			run_unpriv brew
+			break
+			;;
+		esac
+		;;
+	    (darwin)
+		run_unpriv /usr/bin/ruby -e "$(curl -fsSL $HOMEBREW_URL)"
+		break
 		;;
 	esac
-    fi
+    done
+}
+
+install_linuxbrew() {
+    run_unpriv /bin/sh -c "$(curl -fsSL $LINUXBREW_URL)"
 }
 
 preinstall_homebrew() {
@@ -91,17 +175,72 @@ preinstall_homebrew() {
 }
 
 validate_platform() {
-    case "$kernel_name" in
-	(Darwin)
-	    true
-	    ;;
-	(Linux)
-	    true
-	    ;;
-	(*)
-	    abort_not_supported "Operating system"
-	    ;;
-    esac
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			return
+			;;
+		    (8)
+			return
+			;;
+		esac
+		;;
+	    (debian)
+		case "$VERSION_ID" in
+		    (10)
+			return
+			;;
+		esac
+		;;
+	    (fedora)
+		return
+		;;
+	    (kali)
+		case "$VERSION_ID" in
+		    (2019.3)
+			return
+			;;
+		esac
+		;;
+	    (linuxmint)
+		case "$VERSION_ID" in
+		    (19.2)
+			return
+			;;
+		esac
+		;;
+	    (opensuse)
+		return
+		;;
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		    (7.*)
+			return
+			;;
+		    (8.*)
+			return
+			;;
+		esac
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.04)
+			return
+			;;
+		    (19.10)
+			return
+			;;
+		esac
+		;;
+	    (darwin)
+		return
+		;;
+	esac
+    done
+
+    abort_not_supported "Operating system"
 }
 
 if [ $# -gt 0 ]; then

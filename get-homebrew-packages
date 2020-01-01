@@ -26,7 +26,7 @@ REDHAT_7_PKGS="file git ruby rubygems"
 REDHAT_8_PKGS="file git ruby rubygems"
 
 UBUNTU_18_PKGS="file git ruby rubygems"
-UBUNTU_19_PKGS="file git ruby rubygems"
+UBUNTU_19_PKGS="linuxbrew-wrapper"
 
 abort() {
     printf "$@" >&2
