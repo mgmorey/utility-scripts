@@ -140,7 +140,7 @@ install_homebrew() {
 	    (ubuntu)
 		case "$VERSION_ID" in
 		    (18.04)
-			install_linuxbrew
+			run_unpriv brew
 			break
 			;;
 		    (19.10)
