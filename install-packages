@@ -131,10 +131,19 @@ install_packages() {
     options=$(get-package-install-options)
 
     if [ $# -eq 0 ]; then
-	return 0
+	return
     fi
 
     parse_arguments "$@"
+
+    if [ -n "$packages" ]; then
+	packages="$(get-uninstalled-packages "$packages")"
+    fi
+
+    if [ -z "$packages" -a -z "$pattern" ]; then
+	return
+    fi
+
     install-package-managers $managers
 
     if [ "$is_pattern_supported" = true ]; then
@@ -146,7 +155,7 @@ install_packages() {
 
 install_packages_from_args() (
     if [ -z "$packages" ]; then
-	return 0
+	return
     fi
 
     index=1
@@ -163,9 +172,9 @@ install_packages_using() (
     assert [ $# -ge 2 ]
 
     if [ $# -eq 2 ]; then
-	return 0
+	return
     elif [ -z "$1" ]; then
-	return 0
+	return
     fi
 
     manager=$1
@@ -186,7 +195,7 @@ install_packages_using() (
 
 install_pattern_from_args() (
     if [ -z "$pattern" ]; then
-	return 0
+	return
     fi
 
     install_pattern_using "$(get_manager 1)" "$options" "$pattern"
@@ -196,9 +205,9 @@ install_pattern_using() (
     assert [ $# -ge 2 ]
 
     if [ $# -eq 2 ]; then
-	return 0
+	return
     elif [ -z "$1" ]; then
-	return 0
+	return
     fi
 
     manager=$1
@@ -206,6 +215,14 @@ install_pattern_using() (
     shift 2
 
     install=$(get-pattern-install-command $manager)
+
+    case "$(basename $manager)" in
+	(dnf|yum)
+	    if $manager groupinfo $1 >/dev/null 2>&1; then
+		return
+	    fi
+	    ;;
+    esac
 
     case "$(basename $manager)" in
 	(brew)
