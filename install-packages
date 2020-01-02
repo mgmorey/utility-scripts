@@ -241,7 +241,7 @@ install_pattern_using() (
 	    fi
 	    ;;
 	(zypper)
-	    if $manager info -t pattern $1 >/dev/null 2>&1; then
+	    if $manager -nq info -t pattern $1 >/dev/null 2>&1; then
 		return
 	    fi
 	    ;;

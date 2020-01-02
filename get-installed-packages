@@ -91,7 +91,7 @@ get_packages_using() {
 	    $1 list installed | awk 'NF == 3 {print $1}' | awk -F. '{print $1}'
 	    ;;
 	(zypper)
-	    $1 -q search -i -t package | awk 'NR > 3 {print $3}'
+	    $1 -nq search -i -t package | awk 'NR > 3 {print $3}'
 	    ;;
     esac
 }
