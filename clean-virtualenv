@@ -29,6 +29,18 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+clean_virtualenv() {
+    pipenv=$(get_command pipenv || true)
+
+    if [ -n "$pipenv" ]; then
+	if $pipenv --venv >/dev/null 2>&1; then
+	    $pipenv --rm
+	fi
+    fi
+
+    /bin/rm -rf ${VENV_DIRECTORY-venv}
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -55,12 +67,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 . "$script_dir/utility-functions.sh"
 
 eval $("$script_dir/get-app-configuration" app.ini)
-pipenv=$(get_command pipenv || true)
-
-if [ -n "$pipenv" ]; then
-    if $pipenv --venv >/dev/null 2>&1; then
-	$pipenv --rm
-    fi
-fi
-
-/bin/rm -rf ${VENV_DIRECTORY-venv}
+clean_virtualenv
