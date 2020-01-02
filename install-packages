@@ -155,7 +155,7 @@ install_packages() {
     done
 
     if [ -n "$packages" ]; then
-	packages="$(get-uninstalled-packages "$packages")"
+	packages="$(get-uninstalled-packages $packages)"
     fi
 
     if [ -z "$packages" -a -z "$pattern" ]; then
@@ -284,6 +284,7 @@ parse_arguments() {
     done
 
     shift $(($OPTIND - 1))
+    packages="$@"
 }
 
 usage() {
