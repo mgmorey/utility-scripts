@@ -22,7 +22,7 @@ OPENSUSE_PATTERN="devel_basis"
 
 REDHAT_PATTERN="Development Tools"
 
-ILLUMOS_PATTERN="build-essential"
+ILLUMOS_PATTERN="metapackages/build-essential"
 
 abort() {
     printf "$@" >&2
