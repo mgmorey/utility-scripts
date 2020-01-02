@@ -73,6 +73,7 @@ configure_platform() {
 		break
 		;;
 	    (solaris)
+		is_pattern_supported=true
 		set-publisher-sfe
 		break
 		;;
@@ -139,6 +140,19 @@ install_packages() {
     fi
 
     parse_arguments "$@"
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		move_patterns_to_packages
+		break
+		;;
+	    (solaris)
+		move_patterns_to_packages
+		break
+		;;
+	esac
+    done
 
     if [ -n "$packages" ]; then
 	packages="$(get-uninstalled-packages "$packages")"
@@ -243,6 +257,11 @@ install_pattern_using() (
     esac
 )
 
+move_patterns_to_packages() {
+    packages="$pattern${packages:+ $packages}"
+    pattern=
+}
+
 parse_arguments() {
     packages=
     pattern=
@@ -265,13 +284,6 @@ parse_arguments() {
     done
 
     shift $(($OPTIND - 1))
-
-    if [ "$managers" = /usr/bin/apt-get -a -n "$pattern" ]; then
-	packages="$pattern $packages"
-	pattern=
-    fi
-
-    packages=$(get-uninstalled-packages "$@")
 }
 
 usage() {
