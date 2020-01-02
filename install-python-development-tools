@@ -62,12 +62,9 @@ configure_platform() {
 install_python_development_tools() {
     validate_platform
     configure_platform
-    packages=$(get-python-development-packages)
-    pattern=$(get-development-pattern)
-
-    if [ -n "$packages" ]; then
-	install-packages ${pattern:+-p "$pattern" }$packages
-    fi
+    packages="$(get-python-development-packages)"
+    pattern="$(get-development-pattern)"
+    install-packages ${pattern:+-p "$pattern" }$packages
 
     if [ -n "${package:-}" ]; then
 	install-build-deps "$@" $package

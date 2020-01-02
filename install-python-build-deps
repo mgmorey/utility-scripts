@@ -94,12 +94,9 @@ get_realpath() (
 
 install_python_build_packages() {
     validate_platform
-    packages=$(get-python-build-packages)
-    pattern=$(get-development-pattern)
-
-    if [ -n "$packages" ]; then
-	install-packages ${pattern:+-p "$pattern" }$packages
-    fi
+    packages="$(get-python-build-packages)"
+    pattern="$(get-development-pattern)"
+    install-packages ${pattern:+-p "$pattern" }$packages
 
     if [ -n "${package:-}" ]; then
 	install-build-deps "$@" $package || true

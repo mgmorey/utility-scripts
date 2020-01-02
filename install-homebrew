@@ -171,7 +171,7 @@ preinstall_homebrew() {
 	(Linux)
 	    packages="$(get-homebrew-packages)"
 	    pattern="$(get-development-pattern)"
-	    install-packages${pattern+ -p "$pattern"} $packages
+	    install-packages ${pattern:+-p "$pattern" }$packages
 	    ;;
     esac
 }
