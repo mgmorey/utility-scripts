@@ -98,7 +98,7 @@ install_homebrew() {
 	    (debian)
 		case "$VERSION_ID" in
 		    (10)
-			run_unpriv brew
+			install_linuxbrew
 			break
 			;;
 		esac
