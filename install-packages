@@ -144,11 +144,11 @@ install_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
-		move_patterns_to_packages
+		move_pattern_to_packages
 		break
 		;;
 	    (solaris)
-		move_patterns_to_packages
+		move_pattern_to_packages
 		break
 		;;
 	esac
@@ -257,7 +257,7 @@ install_pattern_using() (
     esac
 )
 
-move_patterns_to_packages() {
+move_pattern_to_packages() {
     packages="$pattern${packages:+ $packages}"
     pattern=
 }
