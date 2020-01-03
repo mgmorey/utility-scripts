@@ -71,6 +71,21 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+configure_daemon_group() {
+    assert [ $# -ge 1 ]
+
+    if [ -z "${SUDO_USER-}" ] || [ "$(id -u)" -gt 0 ]; then
+	return 0
+    fi
+
+    group=$(get-docker-group "$@")
+
+    if [ -n "$group" ]; then
+	install_group $group
+	modify_user $group
+    fi
+}
+
 enable_additional_repositories() {
     case "$ID" in
 	(ol)
@@ -218,10 +233,6 @@ install_docker_ce() {
 	printf "Docker is not installed.\n"
     fi
 
-    if [ -z "${SUDO_USER-}" ] || [ "$(id -u)" -gt 0 ]; then
-	return
-    fi
-
     selected_packages=$(get-docker-ce-packages)
     packages=$(get_difference "$installed_packages" "$selected_packages")
 
@@ -232,12 +243,7 @@ install_docker_ce() {
     fi
 
     if [ -n "$selected_packages" ]; then
-	group=$(get-docker-group $selected_packages)
-
-	if [ -n "$group" ]; then
-	    install_group $group
-	    modify_user $group
-	fi
+	configure_daemon_group $selected_packages
 
 	if install-packages $selected_packages; then
 	    postinstall_docker $selected_packages

@@ -29,6 +29,25 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+configure_daemon_group() {
+    assert [ $# -ge 1 ]
+
+    if [ -z "${SUDO_USER-}" ] || [ "$(id -u)" -gt 0 ]; then
+	return 0
+    elif [ "$has_daemon" = false ]; then
+	return 0
+    elif [ "$has_getent" = false ]; then
+	return 0
+    fi
+
+    group=$(get-docker-group "$@")
+
+    if [ -n "$group" ]; then
+	install_group $group
+	modify_user $group
+    fi
+}
+
 configure_platform() {
     has_daemon=true
     has_getent=true
@@ -149,9 +168,9 @@ install_docker() {
     fi
 
     if [ -n "$selected_packages" ]; then
-	if install-packages $selected_packages; then
-	    postinstall_docker $selected_packages
-	else
+	configure_daemon_group $selected_packages
+
+	if ! install-packages $selected_packages; then
 	    return $?
 	fi
     fi
@@ -179,23 +198,6 @@ modify_user() (
 	printf "Please restart the machine before using docker.\n"
     fi
 )
-
-postinstall_docker() {
-    if [ -z "${SUDO_USER-}" ] || [ "$(id -u)" -gt 0 ]; then
-	return 0
-    elif [ "$has_daemon" = false ]; then
-	return 0
-    elif [ "$has_getent" = false ]; then
-	return 0
-    fi
-
-    group=$(get-docker-group "$@")
-
-    if [ -n "$group" ]; then
-	install_group $group
-	modify_user $group
-    fi
-}
 
 validate_platform() {
     arch=$(get_architecture)
