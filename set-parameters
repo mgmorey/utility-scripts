@@ -28,7 +28,6 @@ SYSTEM_DIRS="/usr /usr/gnu"
 COMMON_BINDIRS="/usr/lib/cups/bin"
 PROFILE_BINDIRS="bin .cargo/bin .linuxbrew/bin .local/bin .pyenv/bin"
 
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -54,6 +53,29 @@ configure_platform() {
 	bindirs="sbin bin"
     fi
 }
+
+get_homebrew_binary() (
+    for dir in /home/linuxbrew/.linuxbrew $HOME/.linuxbrew /usr/local; do
+	if [ -x $dir/bin/brew ]; then
+	    printf "%s\n" "$dir/bin/brew"
+	fi
+    done
+)
+
+get_homebrew_prefix() (
+    brew=$(get_homebrew_binary)
+
+    if [ -z "$brew" ]; then
+	return
+    fi
+
+    dir="$(get_realpath "$(dirname "$brew")/../opt")"
+
+    if [ -d "$dir" ]; then
+	printf "%s\n" "$dir"
+	break
+    fi
+)
 
 get_realpath() (
     assert [ $# -ge 1 ]
@@ -150,18 +172,12 @@ include_common_directories() {
     done
 }
 
-include_macos_directories() {
-    # configure environment for Homebrew packages
+include_homebrew_keg_directories() {
+    prefix=$(get_homebrew_prefix)
 
-    if [ -x /usr/bin/xcrun ]; then
-	dir=$(/usr/bin/xcrun --show-sdk-path)
-	CPPFLAGS="-I$dir/usr/include"
-	LDFLAGS="-L$dir/usr/lib -R$dir/usr/lib"
+    if [ -z "${prefix-}" ]; then
+	return
     fi
-
-    MANPATH=${MANPATH:-$(manpath)}
-
-    prefix=/usr/local/opt
 
     for pkg in $($HOME/bin/brew-list-keg-only 2>/dev/null || true); do
 	if [ -d $prefix/$pkg/include ]; then
@@ -191,6 +207,17 @@ include_macos_directories() {
 	fi
     done
 
+}
+
+include_macos_directories() {
+    if [ -x /usr/bin/xcrun ]; then
+	dir=$(/usr/bin/xcrun --show-sdk-path)
+	CPPFLAGS="-I$dir/usr/include"
+	LDFLAGS="-L$dir/usr/lib -R$dir/usr/lib"
+    fi
+
+    MANPATH=${MANPATH:-$(manpath)}
+
     # set PATH so it includes user's private Python 3 bin if it exists
     for version in 3.8 3.7 3.6; do
 	if [ -d "$HOME/Library/Python/$version/bin" ] ; then
@@ -206,6 +233,8 @@ include_platform_directories() {
 	    include_macos_directories
 	    ;;
     esac
+
+    include_homebrew_keg_directories
 }
 
 include_profile_directories() {
