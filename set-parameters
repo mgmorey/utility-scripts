@@ -55,7 +55,7 @@ configure_platform() {
 }
 
 get_homebrew_binary() (
-    for dir in /home/linuxbrew/.linuxbrew $HOME/.linuxbrew /usr/local; do
+    for dir in $HOME/.linuxbrew $BREW_DIR /usr/local; do
 	if [ -x $dir/bin/brew ]; then
 	    printf "%s\n" "$dir/bin/brew"
 	fi
