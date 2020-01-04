@@ -335,7 +335,7 @@ set_askpass_parameters() {
 }
 
 set_profile_parameters() {
-    validate_platform
+    validate_arguments
     configure_platform
     include_common_directories
     include_platform_directories
@@ -355,7 +355,7 @@ usage() {
 	EOF
 }
 
-validate_platform() {
+validate_arguments() {
     case $(basename $shell) in
 	(bash|fish|ksh|ksh93|rbash|zsh)
 	    true
