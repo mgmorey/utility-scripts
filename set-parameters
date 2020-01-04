@@ -109,24 +109,6 @@ include_binary_directories() {
     done
 }
 
-include_config_directories() {
-    pkgdir=$dir/lib/pkgconfig
-
-    if is_to_be_included $pkgdir "${PKG_CONFIG_PATH-}"; then
-	case "$dir" in
-	    (/opt/csw)
-	    	true
-	    	;;
-	    (/opt/local)
-	    	PKG_CONFIG_PATH="${PKG_CONFIG_PATH:+$PKG_CONFIG_PATH:}$pkgdir"
-	    	;;
-	    (*)
-		PKG_CONFIG_PATH="$pkgdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-		;;
-	esac
-    fi
-}
-
 include_common_directories() {
     # add common binary directories to PATH (if they exist)
     for dir in $COMMON_BINDIRS; do
@@ -168,7 +150,7 @@ include_common_directories() {
 	fi
 
 	include_binary_directories $bindirs
-	include_config_directories
+	include_pkgconf_directories $dir
     done
 }
 
@@ -225,6 +207,24 @@ include_macos_directories() {
 	    break
 	fi
     done
+}
+
+include_pkgconf_directories() {
+    pkgdir=$1/lib/pkgconfig
+
+    if is_to_be_included $pkgdir "${PKG_CONFIG_PATH-}"; then
+	case "$1" in
+	    (/opt/csw)
+	    	true
+	    	;;
+	    (/opt/local)
+	    	PKG_CONFIG_PATH="${PKG_CONFIG_PATH:+$PKG_CONFIG_PATH:}$pkgdir"
+	    	;;
+	    (*)
+		PKG_CONFIG_PATH="$pkgdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+		;;
+	esac
+    fi
 }
 
 include_platform_directories() {
