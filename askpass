@@ -49,12 +49,16 @@ get_realpath() (
 
 parse_arguments() {
     is_query=false
+    shell=$SHELL
 
-    while getopts hq opt; do
+    while getopts hs:q opt; do
 	case $opt in
 	    (h)
 		usage
 		exit 0
+		;;
+	    (s)
+		shell=$OPTARG
 		;;
 	    (q)
 		is_query=true
@@ -85,7 +89,7 @@ usage() {
     fi
 
     cat <<-EOF >&2
-	Usage: $0 [COMMAND [COMMAND] ...]
+	Usage: $0 [-s SHELL] [COMMAND [COMMAND] ...]
 	       $0 -h
 	       $0 -q
 	EOF
@@ -98,5 +102,5 @@ parse_arguments "$@"
 if [ $is_query = true ]; then
     "$script_dir/get-askpass"
 else
-    "$script_dir/set-askpass" ${commands-}
+    "$script_dir/set-askpass" -s $shell ${commands-}
 fi
