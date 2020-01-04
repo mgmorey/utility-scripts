@@ -45,12 +45,32 @@ get_realpath() (
 )
 
 parse_arguments() {
+    shell=$SHELL
+
+    while getopts hs: opt; do
+	case $opt in
+	    (h)
+		usage
+		exit 0
+		;;
+	    (s)
+		shell=$OPTARG
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
     commands="$*"
 
     for command in ${commands:-$COMMANDS}; do
 	case "$command" in
 	    (git|ssh|sudo)
-		:
+		true
 		;;
 	    (*)
 		abort "%s: %s: Not a valid command\n" "$0" "$command"
@@ -59,7 +79,7 @@ parse_arguments() {
 }
 
 set_askpass() {
-    validate_parameters
+    validate_arguments
     askpass_helper=$("$script_dir/get-askpass" | awk '! /^#/')
 
     if [ -z "$askpass_helper" ]; then
@@ -73,7 +93,7 @@ set_askpass() {
 	    (git|ssh|sudo)
 		var=$(printf "%s\n" ${command}_askpass | to_upper)
 
-		case $(basename $SHELL) in
+		case $(basename $shell) in
 		    (bash|fish|ksh|ksh93|rbash|zsh)
 			printf 'export %s="%s"\n' "$var" "$askpass_helper"
 			;;
@@ -96,19 +116,31 @@ to_upper() {
     tr '[:lower:]' '[:upper:]'
 }
 
-validate_parameters() {
-    case $(basename $SHELL) in
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
+    fi
+
+    cat <<-EOF >&2
+	Usage: $0: [-s SHELL]
+	       $0: -h
+	EOF
+}
+
+validate_arguments() {
+    case $(basename $shell) in
 	(bash|fish|ksh|ksh93|rbash|zsh)
-	    :
+	    true
 	    ;;
 	(csh|tcsh)
-	    :
+	    true
 	    ;;
 	(sh)
-	    :
+	    true
 	    ;;
 	(*)
-	    abort "%s: %s: Shell not supported\n" "$0" "$SHELL"
+	    abort "%s: %s: Shell not supported\n" "$0" "$shell"
 	    ;;
     esac
 }
