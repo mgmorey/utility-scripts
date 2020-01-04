@@ -316,7 +316,7 @@ print_parameters() {
 	    (csh|tcsh)
 		printf 'setenv %s "%s";\n' "$var" "$value"
 		;;
-	    (sh)
+	    (*)
 		printf '%s="%s"\n' "$var" "$value"
 		printf 'export %s\n' "$var"
 		;;
@@ -356,15 +356,15 @@ usage() {
 }
 
 validate_platform() {
-    case $(basename $SHELL) in
+    case $(basename $shell) in
 	(bash|fish|ksh|ksh93|rbash|zsh)
-	    :
+	    true
 	    ;;
 	(csh|tcsh)
-	    :
+	    true
 	    ;;
 	(sh)
-	    :
+	    true
 	    ;;
 	(*)
 	    abort "%s: %s: Shell not supported\n" "$0" "$SHELL"
@@ -376,6 +376,6 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
 
-parse_arguments
+parse_arguments "$@"
 set_askpass_parameters
 set_profile_parameters
