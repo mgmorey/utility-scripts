@@ -277,7 +277,7 @@ is_to_be_included() {
 }
 
 parse_arguments() {
-    shell=sh
+    shell=$SHELL
 
     while getopts hs: opt; do
 	case $opt in
@@ -341,6 +341,18 @@ set_profile_parameters() {
     include_platform_directories
     include_profile_directories
     print_parameters $ALL_PARAMETERS
+}
+
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
+    fi
+
+    cat <<-EOF >&2
+	Usage: $0: [-s SHELL]
+	       $0: -h
+	EOF
 }
 
 validate_platform() {
