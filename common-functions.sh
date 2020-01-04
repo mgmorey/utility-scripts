@@ -42,7 +42,7 @@ get_home_directory() {
 	(Darwin)
 	    printf "/Users/%s\n" "$1"
 	    ;;
-	(FreeBSD)
+	(*BSD)
 	    awk -F: '$1 == "'"$1"'" {print $6}' /etc/passwd
 	    ;;
 	(*)
@@ -70,7 +70,7 @@ get_shell() {
 	(Darwin)
 	    printf "%s\n" /bin/bash
 	    ;;
-	(FreeBSD)
+	(*BSD)
 	    awk -F: '$1 == "'"$1"'" {print $7}' /etc/passwd
 	    ;;
 	(*)
