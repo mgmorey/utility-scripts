@@ -276,6 +276,29 @@ is_to_be_included() {
     test -d $1 && ! is_included $1 "$2"
 }
 
+parse_arguments() {
+    shell=sh
+
+    while getopts hs: opt; do
+	case $opt in
+	    (h)
+		usage
+		exit 0
+		;;
+	    (s)
+		shell=$OPTARG
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+}
+
 print_parameters() {
     assert [ $# -gt 0 ]
 
@@ -286,7 +309,7 @@ print_parameters() {
 	    continue
 	fi
 
-	case $(basename $SHELL) in
+	case $(basename $shell) in
 	    (bash|fish|ksh|ksh93|rbash|zsh)
 		printf 'export %s="%s"\n' "$var" "$value"
 		;;
@@ -341,5 +364,6 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
 
+parse_arguments
 set_askpass_parameters
 set_profile_parameters
