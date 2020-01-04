@@ -66,16 +66,6 @@ parse_arguments() {
 
     shift $(($OPTIND - 1))
     commands="$*"
-
-    for command in ${commands:-$COMMANDS}; do
-	case "$command" in
-	    (git|ssh|sudo)
-		true
-		;;
-	    (*)
-		abort "%s: %s: Not a valid command\n" "$0" "$command"
-	esac
-    done
 }
 
 set_askpass() {
@@ -143,6 +133,16 @@ validate_arguments() {
 	    abort "%s: %s: Shell not supported\n" "$0" "$shell"
 	    ;;
     esac
+
+    for command in ${commands:-$COMMANDS}; do
+	case "$command" in
+	    (git|ssh|sudo)
+		true
+		;;
+	    (*)
+		abort "%s: %s: Not a valid command\n" "$0" "$command"
+	esac
+    done
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
