@@ -331,7 +331,7 @@ remove_directory() {
 }
 
 set_askpass_parameters() {
-    "$script_dir/set-askpass" || true
+    "$script_dir/set-askpass" -s $shell || true
 }
 
 set_profile_parameters() {
@@ -367,7 +367,7 @@ validate_arguments() {
 	    true
 	    ;;
 	(*)
-	    abort "%s: %s: Shell not supported\n" "$0" "$SHELL"
+	    abort "%s: %s: Shell not supported\n" "$0" "$shell"
 	    ;;
     esac
 }
