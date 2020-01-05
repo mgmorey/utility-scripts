@@ -57,7 +57,7 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_mysql_client_packages() {
+get_mysql_common_packages() {
     package=$(get-installed-mysql-package client)
 
     case "$package" in
@@ -158,4 +158,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-get_mysql_client_packages
+get_mysql_common_packages
