@@ -1,0 +1,141 @@
+#!/bin/sh -eu
+
+# get-mysql-python-packages: get MySQL database python package names
+# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+DEBIAN_PKGS="%s-pymysql %s-sqlalchemy"
+
+FEDORA_PKGS="%s-PyMySQL %s-sqlalchemy"
+
+FREEBSD_PKGS="%s-pymysql %s-sqlalchemy12"
+
+ILLUMOS_PKGS=":%s-pymysql :%s-sqlalchemy"
+
+NETBSD_PKGS="%s-pymysql %s-sqlalchemy"
+
+OPENSUSE_PKGS="%s-PyMySQL %s-SQLAlchemy"
+
+UBUNTU_PKGS="%s-pymysql %s-sqlalchemy"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_mysql_python_packages() {
+    packages=
+
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian)
+		    case "$VERSION_ID" in
+			(10)
+			    packages=$DEBIAN_PKGS
+			    ;;
+		    esac
+		    ;;
+		(ubuntu|neon)
+		    case "$VERSION_ID" in
+			(18.04)
+			    packages=$UBUNTU_PKGS
+			    ;;
+			(19.10)
+			    packages=$UBUNTU_PKGS
+			    ;;
+		    esac
+		    ;;
+		(linuxmint)
+		    case "$VERSION_ID" in
+			(19.2)
+			    packages=$UBUNTU_PKGS
+			    ;;
+		    esac
+		    ;;
+		(kali)
+		    case "$VERSION_ID" in
+			(2019.3)
+			    packages=$DEBIAN_PKGS
+			    ;;
+		    esac
+		    ;;
+		(fedora)
+		    packages=$FEDORA_PKGS
+		    ;;
+		(opensuse-*)
+		    packages=$OPENSUSE_PKGS
+		    ;;
+		(rhel|ol|centos)
+		    packages=
+		    ;;
+	    esac
+	    ;;
+	(Darwin)
+	    packages=
+	    ;;
+	(FreeBSD)
+	    packages=$FREEBSD_PKGS
+	    ;;
+	(NetBSD)
+	    packages=$NETBSD_PKGS
+	    ;;
+	(SunOS)
+	    case "$ID" in
+		(illumos)
+		    packages=$ILLUMOS_PKGS
+		    ;;
+		(solaris)
+		    packages=$SOLARIS_PKG
+		    ;;
+	    esac
+	    ;;
+    esac
+
+    get-python-packages ${packages-}
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+. "$script_dir/common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+get_mysql_python_packages
