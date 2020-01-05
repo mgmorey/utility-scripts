@@ -48,7 +48,7 @@ get_realpath() (
 
 uninstall_mysql() {
     validate_platform
-    packages=$(get-mysql-packages "$@" | grep -v python)
+    packages=$(get-mysql-packages client common server)
     uninstall-packages $packages
 }
 
@@ -188,4 +188,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-uninstall_mysql "$@"
+uninstall_mysql

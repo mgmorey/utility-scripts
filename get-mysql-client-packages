@@ -19,22 +19,16 @@
 DARWIN_PKG="mariadb"
 
 DEBIAN_10_PKG="mariadb-client-10.3"
-DEBIAN_PKGS="%s-pymysql %s-sqlalchemy"
 
 FEDORA_PKG="mariadb"
-FEDORA_PKGS="%s-PyMySQL %s-sqlalchemy"
 
 FREEBSD_PKG="mariadb103-client"
-FREEBSD_PKGS="%s-pymysql %s-sqlalchemy12"
 
 ILLUMOS_PKG="database/mariadb-101/client"
-ILLUMOS_PKGS=":%s-pymysql :%s-sqlalchemy"
 
 NETBSD_PKG="mariadb-client"
-NETBSD_PKGS="%s-pymysql %s-sqlalchemy"
 
 OPENSUSE_PKG="mariadb-client"
-OPENSUSE_PKGS="%s-PyMySQL %s-SQLAlchemy"
 
 REDHAT_PKG="mariadb"
 
@@ -42,7 +36,6 @@ SOLARIS_PKG="database/mysql-57/client"
 
 UBUNTU_18_04_PKG="mariadb-client-10.1"
 UBUNTU_19_10_PKG="mariadb-client-10.3"
-UBUNTU_PKGS="%s-pymysql %s-sqlalchemy"
 
 abort() {
     printf "$@" >&2
@@ -72,39 +65,39 @@ get_mysql_client_packages() {
 		(debian|raspbian)
 		    case "$VERSION_ID" in
 			(10)
-			    packages="${package:-$DEBIAN_10_PKG} $DEBIAN_PKGS"
+			    packages="${package:-$DEBIAN_10_PKG}"
 			    ;;
 		    esac
 		    ;;
 		(ubuntu|neon)
 		    case "$VERSION_ID" in
 			(18.04)
-			    packages="${package:-$UBUNTU_18_04_PKG} $UBUNTU_PKGS"
+			    packages="${package:-$UBUNTU_18_04_PKG}"
 			    ;;
 			(19.10)
-			    packages="${package:-$UBUNTU_19_10_PKG} $UBUNTU_PKGS"
+			    packages="${package:-$UBUNTU_19_10_PKG}"
 			    ;;
 		    esac
 		    ;;
 		(linuxmint)
 		    case "$VERSION_ID" in
 			(19.2)
-			    packages="${package:-$UBUNTU_18_04_PKG} $UBUNTU_PKGS"
+			    packages="${package:-$UBUNTU_18_04_PKG}"
 			    ;;
 		    esac
 		    ;;
 		(kali)
 		    case "$VERSION_ID" in
 			(2019.3)
-			    packages="${package:-$DEBIAN_10_PKG} $DEBIAN_PKGS"
+			    packages="${package:-$DEBIAN_10_PKG}"
 			    ;;
 		    esac
 		    ;;
 		(opensuse-*)
-		    packages="${package:-$OPENSUSE_PKG} $OPENSUSE_PKGS"
+		    packages="${package:-$OPENSUSE_PKG}"
 		    ;;
 		(fedora)
-		    packages="${package:-$FEDORA_PKG} $FEDORA_PKGS"
+		    packages="${package:-$FEDORA_PKG}"
 		    ;;
 		(rhel|ol|centos)
 		    packages="${package:-$REDHAT_PKG}"
@@ -115,15 +108,15 @@ get_mysql_client_packages() {
 	    packages="${package:-$DARWIN_PKG}"
 	    ;;
 	(FreeBSD)
-	    packages="${package:-$FREEBSD_PKG} $FREEBSD_PKGS"
+	    packages="${package:-$FREEBSD_PKG}"
 	    ;;
 	(NetBSD)
-	    packages="${package:-$NETBSD_PKG} $NETBSD_PKGS"
+	    packages="${package:-$NETBSD_PKG}"
 	    ;;
 	(SunOS)
 	    case "$ID" in
 		(illumos)
-		    packages="${package:-$ILLUMOS_PKG} $ILLUMOS_PKGS"
+		    packages="${package:-$ILLUMOS_PKG}"
 		    ;;
 		(solaris)
 		    packages="${package:-$SOLARIS_PKG}"
@@ -132,7 +125,7 @@ get_mysql_client_packages() {
 	    ;;
     esac
 
-    get-python-packages ${packages-}
+    printf "%s\n" ${packages-}
 }
 
 get_realpath() (

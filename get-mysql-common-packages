@@ -18,31 +18,24 @@
 
 DARWIN_PKG=""
 
-DEBIAN_10_PKG=""
-DEBIAN_PKGS=""
+DEBIAN_10_PKG="mariadb-common"
 
 FEDORA_PKG=""
-FEDORA_PKGS=""
 
 FREEBSD_PKG=""
-FREEBSD_PKGS=""
 
 ILLUMOS_PKG=""
-ILLUMOS_PKGS=""
 
 NETBSD_PKG=""
-NETBSD_PKGS=""
 
 OPENSUSE_PKG=""
-OPENSUSE_PKGS=""
 
 REDHAT_PKG=""
 
 SOLARIS_PKG=""
 
-UBUNTU_18_04_PKG=""
-UBUNTU_19_10_PKG=""
-UBUNTU_PKGS=""
+UBUNTU_18_04_PKG="mariadb-common"
+UBUNTU_19_10_PKG="mariadb-common"
 
 abort() {
     printf "$@" >&2
@@ -58,13 +51,7 @@ assert() {
 }
 
 get_mysql_common_packages() {
-    package=$(get-installed-mysql-package client)
-
-    case "$package" in
-	(*-client-core-*)
-	    package=$(printf "%s\n" $package | sed -e 's/-core-/-/')
-	    ;;
-    esac
+    packages=
 
     case "$kernel_name" in
 	(Linux|GNU)
@@ -72,67 +59,67 @@ get_mysql_common_packages() {
 		(debian|raspbian)
 		    case "$VERSION_ID" in
 			(10)
-			    packages="${package:-$DEBIAN_10_PKG} $DEBIAN_PKGS"
+			    packages=$DEBIAN_10_PKG
 			    ;;
 		    esac
 		    ;;
 		(ubuntu|neon)
 		    case "$VERSION_ID" in
 			(18.04)
-			    packages="${package:-$UBUNTU_18_04_PKG} $UBUNTU_PKGS"
+			    packages=$UBUNTU_18_04_PKG
 			    ;;
 			(19.10)
-			    packages="${package:-$UBUNTU_19_10_PKG} $UBUNTU_PKGS"
+			    packages=$UBUNTU_19_10_PKG
 			    ;;
 		    esac
 		    ;;
 		(linuxmint)
 		    case "$VERSION_ID" in
 			(19.2)
-			    packages="${package:-$UBUNTU_18_04_PKG} $UBUNTU_PKGS"
+			    packages=$UBUNTU_18_04_PKG
 			    ;;
 		    esac
 		    ;;
 		(kali)
 		    case "$VERSION_ID" in
 			(2019.3)
-			    packages="${package:-$DEBIAN_10_PKG} $DEBIAN_PKGS"
+			    packages=$DEBIAN_10_PKG
 			    ;;
 		    esac
 		    ;;
 		(opensuse-*)
-		    packages="${package:-$OPENSUSE_PKG} $OPENSUSE_PKGS"
+		    packages=$OPENSUSE_PKG
 		    ;;
 		(fedora)
-		    packages="${package:-$FEDORA_PKG} $FEDORA_PKGS"
+		    packages=$FEDORA_PKG
 		    ;;
 		(rhel|ol|centos)
-		    packages="${package:-$REDHAT_PKG}"
+		    packages=$REDHAT_PKG
 		    ;;
 	    esac
 	    ;;
 	(Darwin)
-	    packages="${package:-$DARWIN_PKG}"
+	    packages=$DARWIN_PKG
 	    ;;
 	(FreeBSD)
-	    packages="${package:-$FREEBSD_PKG} $FREEBSD_PKGS"
+	    packages=$FREEBSD_PKG
 	    ;;
 	(NetBSD)
-	    packages="${package:-$NETBSD_PKG} $NETBSD_PKGS"
+	    packages=$NETBSD_PKG
 	    ;;
 	(SunOS)
 	    case "$ID" in
 		(illumos)
-		    packages="${package:-$ILLUMOS_PKG} $ILLUMOS_PKGS"
+		    packages=$ILLUMOS_PKG
 		    ;;
 		(solaris)
-		    packages="${package:-$SOLARIS_PKG}"
+		    packages=$SOLARIS_PKG
 		    ;;
 	    esac
 	    ;;
     esac
 
-    get-python-packages ${packages-}
+    printf "%s\n" ${packages-}
 }
 
 get_realpath() (
