@@ -120,7 +120,10 @@ configure_baseline() {
 		    ;;
 		(opensuse-tumbleweed)
 		    case "$VERSION_ID" in
-			(2019*|2020*)
+			(2019????)
+			    configure_linux_opensuse_tw
+			    ;;
+			(2020????)
 			    configure_linux_opensuse_tw
 			    ;;
 			(*)
@@ -133,7 +136,7 @@ configure_baseline() {
 			(7.[78])
 			    configure_linux_redhat_7
 			    ;;
-			(8.[012])
+			(8.[01])
 			    configure_linux_redhat_8
 			    ;;
 			(*)
