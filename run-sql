@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+SQL_DIRS="scripts sql"
+
 : ${DATABASE_DIALECT:=sqlite}
 : ${DATABASE_FILENAME:=}
 
@@ -62,6 +64,8 @@ get_realpath() (
 )
 
 parse_argument() {
+    script=
+
     case "$1" in
 	(*.sql)
 	    file=$1
@@ -85,10 +89,17 @@ parse_argument() {
 	return 1
     elif [ -e "$file" ]; then
 	script="$1"
-    elif [ -e "$sql_dir/$file" ]; then
-	script="$sql_dir/$file"
     else
-	abort "%s: No such script file\n" "$file"
+	for sql_dir in $SQL_DIRS; do
+	    if [ -e "$sql_dir/$file" ]; then
+		script="$sql_dir/$file"
+		break
+	    fi
+	done
+
+	if [ -z "${script}" ]; then
+	    abort "%s: No such script file\n" "$file"
+	fi
     fi
 
     scripts="${scripts:+$scripts }$script"
@@ -143,6 +154,5 @@ if [ -n "$env_file" ]; then
     . "$env_file"
 fi
 
-sql_dir=$env_dir/sql
 parse_arguments "$@"
 run_sql
