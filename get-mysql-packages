@@ -58,13 +58,10 @@ parse_arguments() {
     for arg; do
 	case $arg in
 	    (all)
-		categories="client common python server"
+		categories="client python server"
 		;;
 	    (client)
 		categories="${categories+$categories client}"
-		;;
-	    (common)
-		categories="${categories+$categories common}"
 		;;
 	    (python)
 		categories="${categories+$categories python}"
@@ -78,7 +75,7 @@ parse_arguments() {
     done
 
     if [ -z "$categories" ]; then
-	categories="client common python server"
+	categories="client python server"
     fi
 }
 
