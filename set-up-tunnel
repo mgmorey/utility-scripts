@@ -48,25 +48,36 @@ get_realpath() (
     fi
 )
 
-eval $(get-os-release -x)
+set_up_tunnel() {
+    validate_platform
+    iptables -t nat -A POSTROUTING -s $NETWORK -j MASQUERADE
+    iptables -A FORWARD -s $NETWORK -j ACCEPT
+    iptables -A FORWARD -d $NETWORK -j ACCEPT
+    echo 1 | sh -c "cat >/proc/sys/net/ipv4/ip_forward"
+    echo 1 | sh -c "cat >/proc/sys/net/ipv4/conf/all/proxy_arp"
+}
 
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (debian|raspbian|ubuntu|linuxmint|neon|kali)
+validate_platform() {
+    case "$kernel_name" in
+	(Linux|GNU)
+	    case "$ID" in
+		(debian|raspbian|ubuntu|linuxmint|neon|kali)
 	    	;;
-	    (*)
-		abort_not_supported Distro
-		;;
-	esac
-	;;
-    (*)
-	abort_not_supported "Operating system"
-	;;
-esac
+		(*)
+		    abort_not_supported Distro
+		    ;;
+	    esac
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
 
-iptables -t nat -A POSTROUTING -s $NETWORK -j MASQUERADE
-iptables -A FORWARD -s $NETWORK -j ACCEPT
-iptables -A FORWARD -d $NETWORK -j ACCEPT
-echo 1 | sh -c "cat >/proc/sys/net/ipv4/ip_forward"
-echo 1 | sh -c "cat >/proc/sys/net/ipv4/conf/all/proxy_arp"
+script_dir=$(get_realpath "$(dirname "$0")")
+
+. "$script_dir/common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+set_up_tunnel
