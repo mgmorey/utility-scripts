@@ -54,43 +54,20 @@ install_mysql() {
 
 validate_platform() {
     case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
 	(debian|raspbian)
 	    case "$VERSION_ID" in
 		(10)
-		    :
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(ubuntu)
-	    case "$VERSION_ID" in
-		(18.04)
-		    :
-		    ;;
-		(19.10)
-		    :
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(opensuse-leap)
-	    case "$VERSION_ID" in
-		(15.0|15.1)
-		    :
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(opensuse-tumbleweed)
-	    case "$VERSION_ID" in
-		(2019*)
-		    :
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -100,7 +77,27 @@ validate_platform() {
 	(fedora)
 	    case "$VERSION_ID" in
 		(31)
-		    :
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(opensuse-leap)
+	    case "$VERSION_ID" in
+		(15.0|15.1)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(opensuse-tumbleweed)
+	    case "$VERSION_ID" in
+		(2019*)
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -110,20 +107,23 @@ validate_platform() {
 	(rhel|ol)
 	    case "$VERSION_ID" in
 		(7.[78])
-		    :
+		    true
 		    ;;
 		(8.[012])
-		    :
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
 		    ;;
 	    esac
 	    ;;
-	(centos)
+	(ubuntu)
 	    case "$VERSION_ID" in
-		(7)
-		    :
+		(18.04)
+		    true
+		    ;;
+		(19.10)
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -133,10 +133,10 @@ validate_platform() {
 	(freebsd)
 	    case "$VERSION_ID" in
 		(11.*)
-		    :
+		    true
 		    ;;
 		(12.*)
-		    :
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -146,7 +146,7 @@ validate_platform() {
 	(illumos)
 	    case "$VERSION_ID" in
 		(2019.10)
-		    :
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -156,7 +156,7 @@ validate_platform() {
 	(macos)
 	    case "$VERSION_ID" in
 		(10.14.*)
-		    :
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -164,12 +164,12 @@ validate_platform() {
 	    esac
 	    ;;
 	(netbsd)
-	    :
+	    true
 	    ;;
 	(solaris)
 	    case "$VERSION_ID" in
 		(11.4)
-		    :
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
