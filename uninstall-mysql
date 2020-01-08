@@ -59,6 +59,9 @@ validate_platform() {
 		(7)
 		    true
 		    ;;
+		(8)
+		    true
+		    ;;
 		(*)
 		    abort_not_supported Release
 		    ;;
