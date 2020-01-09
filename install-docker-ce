@@ -322,9 +322,14 @@ validate_platform() {
 	    return
 	    ;;
 	(redhat|ol|centos)
-	    if [ "${VERSION_ID%.*}" -eq 7 ]; then
-		return
-	    fi
+	    case "$VERSION_ID" in
+		(7|7.*)
+		    return
+		    ;;
+		(8|8.*)
+		    return
+		    ;;
+	    esac
 	    ;;
 	(ubuntu)
 	    if [ "${VERSION_ID%.*}" -ge 18 ]; then
