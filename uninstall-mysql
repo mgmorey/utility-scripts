@@ -99,7 +99,10 @@ validate_platform() {
 	    ;;
 	(opensuse-tumbleweed)
 	    case "$VERSION_ID" in
-		(2019*)
+		(2019????)
+		    true
+		    ;;
+		(2020????)
 		    true
 		    ;;
 		(*)
