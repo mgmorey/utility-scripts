@@ -1,0 +1,8 @@
+#!/bin/sh -eu
+
+BASE_URL=https://github.com/docker/compose/releases/download
+FILE=/usr/local/bin/docker-compose
+
+url="$BASE_URL/1.25.0/docker-compose-$(uname -s)-$(uname -m)"
+curl -L "$url" -o $FILE
+chmod a+x $FILE
