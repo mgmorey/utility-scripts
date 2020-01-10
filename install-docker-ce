@@ -321,7 +321,7 @@ validate_platform() {
 	(fedora)
 	    return
 	    ;;
-	(redhat|ol|centos)
+	(rhel|ol|centos)
 	    case "$VERSION_ID" in
 		(7|7.*)
 		    return
