@@ -285,12 +285,15 @@ preinstall_docker() {
 
 postinstall_docker() {
     case "$ID" in
-	(ol)
-	    semanage permissive -a container_runtime_t
-	    ;;
-	(rhel)
+	(rhel|ol)
 	    systemctl stop firewalld
 	    systemctl disable firewalld
+	    ;;
+    esac
+
+    case "$ID" in
+	(ol)
+	    semanage permissive -a container_runtime_t
 	    ;;
     esac
 }
