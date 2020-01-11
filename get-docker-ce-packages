@@ -21,6 +21,7 @@ DEBIAN_PKGS="containerd.io docker-ce docker-ce-cli"
 FEDORA_PKGS="containerd.io docker-ce docker-ce-cli"
 
 REDHAT_7_PKGS="container-selinux containerd docker-ce docker-ce-cli"
+REDHAT_8_PKGS="container-selinux containerd docker-ce docker-ce-cli"
 
 abort() {
     printf "$@" >&2
@@ -34,16 +35,29 @@ assert() {
 get_docker_ce_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			packages=$REDHAT_7_PKGS
+			;;
+		    (8)
+			packages=$REDHAT_8_PKGS
+			;;
+		esac
+		;;
 	    (debian)
 		packages=$DEBIAN_PKGS
 		;;
 	    (fedora)
 		packages=$FEDORA_PKGS
 		;;
-	    (rhel|ol|centos)
+	    (rhel|ol)
 		case "$VERSION_ID" in
-		    (7|7.*)
+		    (7.*)
 			packages=$REDHAT_7_PKGS
+			;;
+		    (8.*)
+			packages=$REDHAT_8_PKGS
 			;;
 		esac
 		;;
