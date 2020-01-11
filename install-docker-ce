@@ -42,6 +42,13 @@ add_gpg_key() {
     done
 }
 
+get_package_manager_basename() {
+    manager_pathname=$(get-package-managers | awk 'NR == 1 {print $0}')
+    manager_basename=$(basename $manager_pathname)
+    printf "%s\n" $manager_basename
+}
+
+
 add_repositories() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
@@ -54,8 +61,9 @@ add_repositories() {
 		break
 		;;
 	    (fedora|rhel|ol|centos)
+		manager=$(get_package_manager_basename)
 		repo_id=docker-ce-stable/$(uname -m)
-		data=$(yum repolist | get_repository_data $repo_id)
+		data=$($manager repolist | get_repository_data $repo_id)
 
 		if [ -z "$data" ]; then
 		    yum-config-manager --add-repo "$repo" >/dev/null
@@ -285,7 +293,7 @@ preinstall_docker() {
 
 postinstall_docker() {
     case "$ID" in
-	(rhel|ol)
+	(rhel|ol|centos)
 	    systemctl stop firewalld
 	    systemctl disable firewalld
 	    ;;
