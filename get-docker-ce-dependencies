@@ -28,7 +28,7 @@ ORACLE_7_PKGS="device-mapper-persistent-data lvm2 redhat-lsb-core yum-utils"
 ORACLE_8_PKGS="device-mapper-persistent-data lvm2 redhat-lsb-core yum-utils"
 
 REDHAT_7_PKGS="device-mapper-persistent-data lvm2 redhat-lsb-core yum-utils"
-REDHAT_8_PKGS="device-mapper-persistent-data dnf-utils lvm2 redhat-lsb-core"
+REDHAT_8_PKGS="device-mapper-persistent-data lvm2 redhat-lsb-core yum-utils"
 
 abort() {
     printf "$@" >&2
