@@ -16,6 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+CENTOS_7_PKGS="device-mapper-persistent-data lvm2 redhat-lsb-core yum-utils"
+CENTOS_8_PKGS="device-mapper-persistent-data dnf-utils lvm2 redhat-lsb-core"
+
 DEBIAN_PKGS="apt-transport-https ca-certificates curl gnupg2 \
 software-properties-common"
 
@@ -42,10 +45,10 @@ get_docker_ce_dependencies() {
 	    (centos)
 		case "$VERSION_ID" in
 		    (7)
-			packages=$REDHAT_7_PKGS
+			packages=$CENTOS_7_PKGS
 			;;
 		    (8)
-			packages=$REDHAT_8_PKGS
+			packages=$CENTOS_8_PKGS
 			;;
 		esac
 		;;
