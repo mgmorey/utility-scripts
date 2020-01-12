@@ -21,6 +21,9 @@ software-properties-common"
 
 FEDORA_PKGS="device-mapper-persistent-data dnf-utils lvm2 redhat-lsb-core"
 
+ORACLE_7_PKGS="device-mapper-persistent-data lvm2 redhat-lsb-core yum-utils"
+ORACLE_8_PKGS="device-mapper-persistent-data lvm2 redhat-lsb-core yum-utils"
+
 REDHAT_7_PKGS="device-mapper-persistent-data lvm2 redhat-lsb-core yum-utils"
 REDHAT_8_PKGS="device-mapper-persistent-data dnf-utils lvm2 redhat-lsb-core"
 
@@ -52,7 +55,17 @@ get_docker_ce_dependencies() {
 	    (fedora)
 		packages=$FEDORA_PKGS
 		;;
-	    (rhel|ol)
+	    (ol)
+		case "$VERSION_ID" in
+		    (7.*)
+			packages=$ORACLE_7_PKGS
+			;;
+		    (8.*)
+			packages=$ORACLE_8_PKGS
+			;;
+		esac
+		;;
+	    (rhel)
 		case "$VERSION_ID" in
 		    (7.*)
 			packages=$REDHAT_7_PKGS
