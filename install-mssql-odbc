@@ -1,0 +1,89 @@
+#!/bin/sh
+
+# install-ms-sql-odbc: install Microsoft SQL Server ODBC packages
+# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+BASE_URL=https://packages.microsoft.com
+MSSQL_RELEASE=/etc/apt/sources.list.d/mssql-release.list
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+install_mssql_odbc() {
+    validate_platform
+    cd /tmp
+    curl $BASE_URL/keys/microsoft.asc | apt-key add -
+    curl $BASE_URL/config/$ID/$VERSION_ID/prod.list >$MSSQL_RELEASE
+    apt-get update
+    ACCEPT_EULA=Y apt-get install msodbcsql17 mssql-tools
+    sudo ln -sf /opt/mssql-tools/bin/* /usr/local/bin
+}
+
+validate_platform() {
+    case "$ID" in
+	(debian)
+	    case "$VERSION_ID" in
+		(10)
+		    return
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    return
+		    ;;
+	    esac
+	    ;;
+    esac
+
+    abort_not_supported "Operating system"
+}
+
+if [ $# -gt 0 ]; then
+    abort "%s: Too many arguments\n" "$0"
+fi
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+. "$script_dir/common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+install_mssql_odbc
