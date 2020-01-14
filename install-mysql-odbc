@@ -62,9 +62,9 @@ install_mysql_odbc() {
     ln -sf $prefix/bin/* /usr/local/bin
     install-packages libodbc1
 
-    for driver_type in ANSI UNICODE; do
-	eval name="\$NAME_${driver_type}"
-	eval object="\$OBJECT_${driver_type}"
+    for encoding in ANSI UNICODE; do
+	eval name="\$NAME_$encoding"
+	eval object="\$OBJECT_$encoding"
 	myodbc-installer -r -d -n "$name"
 	myodbc-installer -a -d -n "$name" -t Driver="$prefix/lib/$object"
     done
