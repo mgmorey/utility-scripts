@@ -50,8 +50,8 @@ pipenv_lock() {
     done
 }
 
-if [ $(id -u) -eq 0 ]; then
-    abort "%s\n" "This script must be run as a non-privileged user"
+if [ "$(id -u)" -eq 0 ]; then
+    abort "%s\n" "Must be run as a non-privileged user"
 fi
 
 tmpfile=$(mktemp)
