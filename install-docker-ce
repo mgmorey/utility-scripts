@@ -61,7 +61,6 @@ add_repositories() {
 		break
 		;;
 	    (fedora|rhel|ol|centos)
-		manager=$(get_package_manager_basename)
 		repo_id=docker-ce-stable/$(uname -m)
 		data=$($manager repolist | get_repository_data $repo_id)
 
@@ -92,6 +91,10 @@ configure_daemon_group() {
 	install_group $group
 	modify_user $group
     fi
+}
+
+configure_platform() {
+    manager=$(get_package_manager_basename)
 }
 
 enable_additional_repositories() {
@@ -221,6 +224,7 @@ install_dependencies() {
 
 install_docker_ce() {
     validate_platform
+    configure_platform
     preinstall_docker
     installed_packages=$(get-installed-docker-packages)
     origin=$(get_docker_origin $installed_packages)
