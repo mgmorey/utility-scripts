@@ -124,7 +124,8 @@ configure_platform_unix_macos() {
 
 configure_platform_unix_solaris() {
     include_prefix $OPENCSW_PREFIX amd64
-    configure_compiler "/opt/developerstudio12.6/bin/cc -m64" "${incdirs-}" -m64 "${libdirs-}"
+    # configure_compiler "/opt/developerstudio12.6/bin/cc -m64" "${incdirs-}" -m64 "${libdirs-}"
+    configure_compiler "/usr/bin/gcc -m64" "${incdirs-}" -m64 "${libdirs-}"
 }
 
 configure_python() {
