@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 BASE_URL=https://www.python.org/ftp
-PYTHON_VERSION=3.6.9
+PYTHON_VERSION=3.6.10
 
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
@@ -67,8 +67,8 @@ configure_compiler() {
 	cppflags="$(get_include_flags "$2")"
     fi
 
-    if [ -n "${3-}" ]; then
-	ldflags="$(get_linker_flags "$3")"
+    if [ -n "${3-}" -o -n "${4-}" ]; then
+	ldflags="$(get_linker_flags "$3" "$4")"
     fi
 
     pkg_config_path="$(get_pkg_config_path)"
@@ -110,21 +110,21 @@ configure_platform_unix_netbsd() {
     make=gmake
     with_gnutls=false
     include_prefix /usr/pkg
-    configure_compiler /usr/bin/gcc "${incdirs-}" "${libdirs-}"
+    configure_compiler /usr/bin/gcc "${incdirs-}" "" "${libdirs-}"
 }
 
 configure_platform_unix_illumos() {
     include_prefix $LOCAL_PREFIX
-    configure_compiler "/usr/bin/gcc -m64" "${incdirs-}" "${libdirs-}"
+    configure_compiler "/usr/bin/gcc -m64" "${incdirs-}" "" "${libdirs-}"
 }
 
 configure_platform_unix_macos() {
-    configure_compiler /usr/bin/clang "${incdirs-}" "${libdirs-}"
+    configure_compiler /usr/bin/clang "${incdirs-}" "" "${libdirs-}"
 }
 
 configure_platform_unix_solaris() {
     include_prefix $OPENCSW_PREFIX amd64
-    configure_compiler "/opt/developerstudio12.6/bin/cc -m64" "${incdirs-}" "${libdirs-}"
+    configure_compiler "/opt/developerstudio12.6/bin/cc -m64" "${incdirs-}" -m64 "${libdirs-}"
 }
 
 configure_python() {
@@ -257,17 +257,17 @@ get_include_flags() {
 }
 
 get_linker_flags() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    ldflags=
+    assert [ $# -eq 2 ]
+    assert [ -n "$2" ]
+    ldflags="$1"
 
-    for libdir; do
+    for libdir in $2; do
 	case "$os_family" in
 	    (gnu-*)
-		ldflags="-Wl,--rpath=$libdir"
+		ldflags="${ldflags+$ldflags }-Wl,--rpath=$libdir"
 		;;
 	    (unix)
-		ldflags="-L$libdir -R$libdir"
+		ldflags="${ldflags+$ldflags }-L$libdir -R$libdir"
 		;;
 	esac
     done
