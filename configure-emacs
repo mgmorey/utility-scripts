@@ -127,6 +127,7 @@ configure_platform() {
 		        break
 		        ;;
                 esac
+		;;
 	    (illumos)
 		configure_platform_unix_illumos
 		break
