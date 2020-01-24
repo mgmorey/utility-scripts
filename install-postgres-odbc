@@ -1,0 +1,87 @@
+#!/bin/sh
+
+# install-postgres-odbc: install PostgreSQL ODBC connector
+# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+PGDG_LIST=/etc/apt/sources.list.d/pgdg.list
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
+
+add_apt_source() {
+    install-packages postgresql-common
+
+    if [ ! -f $PGDG_LIST ]; then
+	sh /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+    fi
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+install_postgres_odbc() {
+    add_apt_source
+    install-packages odbc-postgresql
+    libdir=/usr/lib/x86_64-linux-gnu/odbc
+
+    for file in $libdir/*.so; do
+	ln -sf $file /usr/local/lib
+    done
+}
+
+validate_platform() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		return
+		;;
+	esac
+    done
+
+    abort_not_supported "Operating system"
+}
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+. "$script_dir/common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+install_postgres_odbc
