@@ -22,7 +22,7 @@ NAME_UNICODE="MySQL ODBC 8.0 Unicode Driver"
 OBJECT_ANSI=libmyodbc8a.so
 OBJECT_UNICODE=libmyodbc8w.so
 
-DRIVER_VERSION=8.0.18
+DRIVER_VERSION=8.0.19
 
 abort() {
     printf "$@" >&2
