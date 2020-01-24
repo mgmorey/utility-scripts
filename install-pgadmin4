@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+PGDG_LIST=/etc/apt/sources.list.d/pgdg.list
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -23,6 +25,14 @@ abort() {
 
 abort_not_supported() {
     abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
+
+add_apt_source() {
+    install-packages postgresql-common
+
+    if [ ! -f $PGDG_LIST ]; then
+	sh /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+    fi
 }
 
 assert() {
@@ -47,12 +57,7 @@ get_realpath() (
 )
 
 install_pgadmin4() {
-    install-packages postgresql-common
-
-    if [ ! -f /etc/apt/sources.list.d/pgdg.list ]; then
-	sh /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
-    fi
-
+    add_apt_source
     install-packages pgadmin4
 }
 
