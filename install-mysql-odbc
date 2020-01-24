@@ -51,23 +51,39 @@ get_realpath() (
 )
 
 install_mysql_odbc() {
-    package=mysql-connector-odbc-$DRIVER_VERSION-linux-$ID$VERSION_ID-x86-64bit
     prefix=/opt/$package
 
     if [ ! -d $prefix ]; then
-	tar -C /opt -xvf $1
+	tar -C /opt -xf $tarfile
+	/bin/mv -f /opt/$dirname /opt/$package
     fi
 
-    chmod a+x $prefix/lib/libmyodbc*.so
-    ln -sf $prefix/bin/* /usr/local/bin
+    chown -R root:root $prefix
     install-packages libodbc1
 
     for encoding in ANSI UNICODE; do
 	eval name="\$NAME_$encoding"
 	eval object="\$OBJECT_$encoding"
-	myodbc-installer -r -d -n "$name"
-	myodbc-installer -a -d -n "$name" -t Driver="$prefix/lib/$object"
+	driver=$prefix/lib/$object
+	$prefix/bin/myodbc-installer -r -d -n "$name"
+	$prefix/bin/myodbc-installer -a -d -n "$name" -t Driver="$driver"
     done
+
+    for file in $prefix/bin/*; do
+	ln -sf $file /usr/local/bin
+    done
+}
+
+parse_arguments() {
+    case "$1" in
+	(mysql-connector-odbc-8.*-linux-*-x86-64bit.tar.gz)
+	    tarfile=$1
+	    dirname=${tarfile%.tar.gz}
+	    package=${dirname%-linux-*-x86-64bit}
+	    ;;
+	(*)
+	    abort "%s: invalid argument" "$1"
+    esac
 }
 
 validate_platform() {
@@ -103,4 +119,5 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-install_mysql_odbc "$@"
+parse_arguments "$@"
+install_mysql_odbc
