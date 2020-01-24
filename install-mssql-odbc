@@ -24,6 +24,14 @@ abort() {
     exit 1
 }
 
+add_apt_source() {
+    if [ ! -f $MSSQL_RELEASE ]; then
+       curl $BASE_URL/keys/microsoft.asc | apt-key add -
+       curl $BASE_URL/config/$ID/$VERSION_ID/prod.list >$MSSQL_RELEASE
+       apt-get update
+    fi
+}
+
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
@@ -47,11 +55,9 @@ get_realpath() (
 
 install_mssql_odbc() {
     validate_platform
-    cd /tmp
-    curl $BASE_URL/keys/microsoft.asc | apt-key add -
-    curl $BASE_URL/config/$ID/$VERSION_ID/prod.list >$MSSQL_RELEASE
-    apt-get update
-    ACCEPT_EULA=Y apt-get install msodbcsql17 mssql-tools
+    add_apt_source
+    export ACCEPT_EULA=Y
+    install-packages msodbcsql17 mssql-tools unixodbc unixodbc-dev
     sudo ln -sf /opt/mssql-tools/bin/* /usr/local/bin
 }
 
