@@ -1,4 +1,4 @@
-#!/bin/sh -eu
+#!/bin/sh -eux
 
 # configure-python: download and configure python
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
@@ -75,7 +75,10 @@ configure_compiler() {
 }
 
 configure_platform() {
-    install-packages $(get-bootstrap-packages) $(get-python-build-packages)
+    if [ "$(id -u)" -eq 0 ]; then
+	install-packages $(get-bootstrap-packages) $(get-python-build-packages)
+    fi
+
     python_version=$PYTHON_VERSION
     force=false
     make=make
@@ -109,9 +112,7 @@ configure_platform() {
 
 configure_platform_unix_freebsd() {
     make=gmake
-    include_prefix /usr/local
-    libdirs="${libdirs+$libdirs }/usr/local/lib/gcc9"
-    configure_compiler /usr/local/bin/gcc "${incdirs-}" "" "${libdirs-}"
+    configure_compiler /usr/local/bin/clang "${incdirs-}" "" "${libdirs-}"
 }
 
 configure_platform_unix_illumos() {
@@ -225,23 +226,7 @@ get_configure_command() {
 }
 
 get_configure_options() {
-    if [ "${with_cairo-}" = true ]; then
-	options="${options:+$options }--with-cairo${cairo:+=$cairo}"
-    elif [ "${with_cairo-}" = false ]; then
-	options="${options:+$options }--without-cairo${cairo:+=$cairo}"
-    fi
-
-    if [ "${with_toolkit-}" = true ]; then
-	options="${options:+$options }--with-x-toolkit${toolkit:+=$toolkit}"
-    elif [ "${with_toolkit-}" = false ]; then
-	options="${options:+$options }--with-x-toolkit=no"
-    fi
-
-    if [ "${with_widgets-}" = true ]; then
-	options="${options:+$options }--with-xwidgets${widgets:+=$widgets}"
-    elif [ "${with_widgets-}" = false ]; then
-	options="${options:+$options }--without-xwidgets${widgets:+=$widgets}"
-    fi
+    options=
 
     if [ -n "${options:-}" ]; then
 	printf "%s\n" "$options"
