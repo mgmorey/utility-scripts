@@ -43,12 +43,10 @@ get_realpath() (
 )
 
 install_pipenv() {
-    install-pip
-
     pip=$(get-python-command pip)
 
     if [ "$pip" != false ]; then
-	run_unpriv $pip install --upgrade --user pip pipenv
+	$pip install --upgrade --user pip pipenv
     else
 	abort "$0: No pip in path"
     fi
@@ -60,4 +58,10 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-install_pipenv "$@"
+install-pip
+
+if [ "$(id -u)" -eq 0 ]; then
+    run_unpriv "$0"
+else
+    install_pipenv
+fi
