@@ -259,6 +259,11 @@ get_linker_flags() {
     fi
 }
 
+get_packages() {
+    get-bootstrap-packages
+    get-python-build-packages
+}
+
 get_pkg_config_path() {
     for pkgdir in ${pkgdirs-}; do
 	pkg_config_path=${pkg_config_path+$pkg_config_path:}$pkgdir
@@ -296,6 +301,16 @@ include_prefix() {
 
     if [ -d "$libdir/pkgconfig" ]; then
 	pkgdirs="${pkgdirs+$pkgdirs }$libdir/pkgconfig"
+    fi
+}
+
+install_dependencies() {
+    packages="$(get_packages | sort -u)"
+    pattern="$(get-development-pattern)"
+    install-packages ${pattern:+-p "$pattern" }$packages
+
+    if [ -n "${package:-}" ]; then
+	install-build-deps "$@" $package || true
     fi
 }
 
@@ -419,8 +434,9 @@ configure_platform
 parse_arguments "$@"
 
 if [ "$(id -u)" -eq 0 ]; then
-    install-packages $(get-bootstrap-packages) $(get-python-build-packages)
+    install_dependencies
     run_unpriv "$0"
 else
+    install_dependencies
     configure_python
 fi
