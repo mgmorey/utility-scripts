@@ -86,50 +86,9 @@ get_realpath() (
 )
 
 install_pyenv() {
-    validate_platform
-    configure_platform
-    packages="$(get_packages | sort -u)"
-    pattern="$(get-development-pattern)"
     url=$BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer
-    install-packages ${pattern:+-p "$pattern" }$packages
-
-    if [ -n "${package:-}" ]; then
-	install-build-deps "$@" $package || true
-    fi
-
-    run_unpriv /bin/sh -c "curl -L $url | bash"
+    curl -L $url | bash
 }
-
-get_setpriv_command() (
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    version="$(setpriv --version 2>/dev/null)"
-
-    case "${version##* }" in
-	('')
-	    return 1
-	    ;;
-	([01].*)
-	    return 1
-	    ;;
-	(2.[0-9].*)
-	    return 1
-	    ;;
-	(2.[12][0-9].*)
-	    return 1
-	    ;;
-	(2.3[012].*)
-	    return 1
-	    ;;
-	(*)
-	    options="--init-groups --reset-env"
-	    ;;
-    esac
-
-    regid="$(id -g $1)"
-    reuid="$(id -u $1)"
-    printf "setpriv --reuid %s --regid %s %s\n" "$reuid" "$regid" "$options"
-)
 
 validate_platform() {
     for id in $ID $ID_LIKE; do
@@ -239,4 +198,19 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-install_pyenv "$@"
+validate_platform
+configure_platform
+
+if [ "$(id -u)" -eq 0 ]; then
+    packages="$(get_packages | sort -u)"
+    pattern="$(get-development-pattern)"
+    install-packages ${pattern:+-p "$pattern" }$packages
+
+    if [ -n "${package:-}" ]; then
+	install-build-deps "$@" $package || true
+    fi
+
+    run_unpriv "$0"
+else
+    install_pyenv
+fi
