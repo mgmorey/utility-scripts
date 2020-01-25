@@ -75,6 +75,7 @@ configure_compiler() {
 }
 
 configure_platform() {
+    install-packages $(get-bootstrap-packages) $(get-python-build-packages)
     python_version=$PYTHON_VERSION
     force=false
     make=make
@@ -82,6 +83,10 @@ configure_platform() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    # (freebsd)
+	    # 	configure_platform_unix_freebsd
+	    # 	break
+	    # 	;;
 	    (illumos)
 		configure_platform_unix_illumos
 		break
@@ -102,16 +107,22 @@ configure_platform() {
     fi
 }
 
-configure_platform_unix_netbsd() {
+configure_platform_unix_freebsd() {
     make=gmake
-    with_gnutls=false
-    include_prefix /usr/pkg
-    configure_compiler /usr/bin/gcc "${incdirs-}" "" "${libdirs-}"
+    include_prefix /usr/local
+    libdirs="${libdirs+$libdirs }/usr/local/lib/gcc9"
+    configure_compiler /usr/local/bin/gcc "${incdirs-}" "" "${libdirs-}"
 }
 
 configure_platform_unix_illumos() {
     include_prefix $LOCAL_PREFIX
     configure_compiler "/usr/bin/gcc -m64" "${incdirs-}" "" "${libdirs-}"
+}
+
+configure_platform_unix_netbsd() {
+    make=gmake
+    include_prefix /usr/pkg
+    configure_compiler /usr/bin/gcc "${incdirs-}" "" "${libdirs-}"
 }
 
 configure_platform_unix_solaris() {
@@ -220,12 +231,6 @@ get_configure_options() {
 	options="${options:+$options }--without-cairo${cairo:+=$cairo}"
     fi
 
-    if [ "${with_gnutls-}" = true ]; then
-	options="${options:+$options }--with-gnutls${gnutls:+=$gnutls}"
-    elif [ "${with_gnutls-}" = false ]; then
-	options="${options:+$options }--without-gnutls${gnutls:+=$gnutls}"
-    fi
-
     if [ "${with_toolkit-}" = true ]; then
 	options="${options:+$options }--with-x-toolkit${toolkit:+=$toolkit}"
     elif [ "${with_toolkit-}" = false ]; then
@@ -254,14 +259,18 @@ get_linker_flags() {
     ldflags="$1"
 
     for libdir in $2; do
-	case "$os_family" in
-	    (gnu-*)
-		ldflags="${ldflags+$ldflags }-Wl,--rpath=$libdir"
-		;;
-	    (unix)
-		ldflags="${ldflags+$ldflags }-L$libdir -R$libdir"
-		;;
-	esac
+	for id in $ID $ID_LIKE $os_family; do
+	    case "$id" in
+		(freebsd|gnu-*)
+		    ldflags="${ldflags+$ldflags }-Wl,--rpath=$libdir"
+		    break
+		    ;;
+		(unix)
+		    ldflags="${ldflags+$ldflags }-L$libdir -R$libdir"
+		    break
+		    ;;
+	    esac
+	done
     done
 
     if [ "${ldflags-}" ]; then
@@ -418,9 +427,18 @@ validate_platform() {
     abort_not_supported "Operating system"
 }
 
-eval $(get-os-release -x)
+script_dir=$(get_realpath "$(dirname "$0")")
 
+. "$script_dir/common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
 validate_platform
 configure_platform
 parse_arguments "$@"
-configure_python
+
+if [ "$(id -u)" -eq 0 ]; then
+    run_unpriv "$0"
+else
+    configure_python
+fi

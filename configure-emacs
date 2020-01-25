@@ -109,6 +109,7 @@ configure_emacs() {
 }
 
 configure_platform() {
+    install-packages $(get-bootstrap-packages)
     emacs_version=$EMACS_VERSION
     force=false
     make=make
@@ -446,8 +447,12 @@ validate_platform() {
     abort_not_supported "Operating system"
 }
 
-eval $(get-os-release -x)
+script_dir=$(get_realpath "$(dirname "$0")")
 
+. "$script_dir/common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
 validate_platform
 configure_platform
 parse_arguments "$@"

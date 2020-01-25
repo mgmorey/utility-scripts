@@ -65,7 +65,6 @@ configure_platform() {
 
 get_packages() {
     get-bootstrap-packages
-    get-development-packages
     get-python-build-packages
 }
 

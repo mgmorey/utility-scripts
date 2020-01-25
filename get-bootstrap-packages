@@ -16,28 +16,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_10_PKGS="bash curl"
+DEBIAN_10_PKGS="bash curl wget"
 
-FEDORA_PKGS="bash curl"
+FEDORA_PKGS="bash curl wget"
 
-FREEBSD_11_PKGS="bash curl"
-FREEBSD_12_PKGS="bash curl"
+FREEBSD_11_PKGS="bash curl wget"
+FREEBSD_12_PKGS="bash curl wget"
 
 ILLUMOS_PKGS="shell/bash"
 
-MACOS_PKGS="bash curl"
+MACOS_PKGS="bash curl wget"
 
-NETBSD_PKGS="bash curl"
+NETBSD_PKGS="bash curl wget"
 
-OPENSUSE_PKGS="bash curl"
+OPENSUSE_PKGS="bash curl wget"
 
-REDHAT_7_PKGS="bash curl"
-REDHAT_8_PKGS="bash curl"
+REDHAT_7_PKGS="bash curl wget"
+REDHAT_8_PKGS="bash curl wget"
 
 SOLARIS_PKGS="shell/bash"
 
-UBUNTU_18_PKGS="bash curl"
-UBUNTU_19_PKGS="bash curl"
+UBUNTU_18_PKGS="bash curl wget"
+UBUNTU_19_PKGS="bash curl wget"
 
 abort() {
     printf "$@" >&2

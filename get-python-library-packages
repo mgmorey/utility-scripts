@@ -27,7 +27,7 @@ FEDORA_PKGS="bzip2-devel gdbm-devel libffi-devel libuuid-devel ncurses-devel \
 openssl-devel python3-devel readline-devel sqlite-devel xz-devel zlib-devel"
 
 FREEBSD_11_PKGS="bzip2 gdbm libffi lzma ncurses readline sqlite3"
-FREEBSD_12_PKGS="bzip2 gdbm libffi lzma ncurses openssl111 readline sqlite3"
+FREEBSD_12_PKGS="bzip2 gdbm libffi lzma ncurses readline sqlite3"
 
 ILLUMOS_PKGS="database/sqlite-3 library/libffi library/ncurses library/readline"
 
