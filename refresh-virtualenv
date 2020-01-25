@@ -170,11 +170,13 @@ if [ -n "${VIRTUAL_ENV:-}" ]; then
     abort "%s: Must not be run within a virtual environment\n" "$0"
 fi
 
-. common-functions.sh
-. utility-functions.sh
+script_dir=$(get_realpath "$(dirname "$0")")
 
+. "$script_dir/common-functions.sh"
+. "$script_dir/utility-functions.sh"
+
+set_user_profile "$script_dir"
 eval $(get-os-release -x)
 eval $(get-app-configuration app.ini)
-
 parse_arguments "$@"
 refresh_virtualenv
