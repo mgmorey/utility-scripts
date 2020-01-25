@@ -42,6 +42,10 @@ get_realpath() (
     fi
 )
 
+install_dependencies() {
+    install-packages $(get-python-pip-packages)
+}
+
 install_pipenv() {
     pip=$(get-python-command pip)
 
@@ -60,8 +64,9 @@ set_user_profile "$script_dir"
 eval $(get-os-release -x)
 
 if [ "$(id -u)" -eq 0 ]; then
-    install-packages $(get-python-pip-packages)
+    install_dependencies
     run_unpriv "$0"
 else
+    install_dependencies
     install_pipenv
 fi
