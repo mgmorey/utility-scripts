@@ -85,6 +85,16 @@ get_realpath() (
     fi
 )
 
+install_dependencies() {
+    packages="$(get_packages | sort -u)"
+    pattern="$(get-development-pattern)"
+    install-packages ${pattern:+-p "$pattern" }$packages
+
+    if [ -n "${package:-}" ]; then
+	install-build-deps "$@" $package || true
+    fi
+}
+
 install_pyenv() {
     url=$BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer
     curl -L $url | bash
@@ -202,15 +212,9 @@ validate_platform
 configure_platform
 
 if [ "$(id -u)" -eq 0 ]; then
-    packages="$(get_packages | sort -u)"
-    pattern="$(get-development-pattern)"
-    install-packages ${pattern:+-p "$pattern" }$packages
-
-    if [ -n "${package:-}" ]; then
-	install-build-deps "$@" $package || true
-    fi
-
+    install_dependencies
     run_unpriv "$0"
 else
+    install_dependencies
     install_pyenv
 fi
