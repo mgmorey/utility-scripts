@@ -177,10 +177,6 @@ usage() {
 	EOF
 }
 
-if [ "$(id -u)" -eq 0 ]; then
-    abort "%s: Must be run as a non-privileged user\n" "$0"
-fi
-
 if [ -n "${VIRTUAL_ENV:-}" ]; then
     abort "%s: Must not be run within a virtual environment\n" "$0"
 fi
