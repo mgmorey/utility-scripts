@@ -58,9 +58,9 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-install-pip
 
 if [ "$(id -u)" -eq 0 ]; then
+    install-pip
     run_unpriv "$0"
 else
     install_pipenv

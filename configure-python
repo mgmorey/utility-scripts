@@ -75,10 +75,6 @@ configure_compiler() {
 }
 
 configure_platform() {
-    if [ "$(id -u)" -eq 0 ]; then
-	install-packages $(get-bootstrap-packages) $(get-python-build-packages)
-    fi
-
     python_version=$PYTHON_VERSION
     force=false
     make=make
@@ -423,6 +419,7 @@ configure_platform
 parse_arguments "$@"
 
 if [ "$(id -u)" -eq 0 ]; then
+    install-packages $(get-bootstrap-packages) $(get-python-build-packages)
     run_unpriv "$0"
 else
     configure_python
