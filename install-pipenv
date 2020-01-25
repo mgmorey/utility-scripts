@@ -60,7 +60,7 @@ set_user_profile "$script_dir"
 eval $(get-os-release -x)
 
 if [ "$(id -u)" -eq 0 ]; then
-    install-pip
+    install-packages $(get-python-pip-packages)
     run_unpriv "$0"
 else
     install_pipenv
