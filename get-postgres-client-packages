@@ -20,6 +20,8 @@ DEBIAN_10_PKGS="postgresql-client-11"
 
 FEDORA_PKGS="postgresql"
 
+FREEBSD_PKGS="postgresql11-client"
+
 MACOS_HOMEBREW_PKGS="postgresql"
 
 OPENSUSE_PKGS="postgresql"
@@ -121,6 +123,16 @@ get_postgres_packages() {
 			;;
 		    (19.*)
 			packages=$UBUNTU_19_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (freebsd)
+		case "$VERSION_ID" in
+		    (12.1-STABLE)
+			packages=$FREEBSD_PKGS
 			;;
 		    (*)
 			break

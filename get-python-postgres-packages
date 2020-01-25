@@ -20,6 +20,8 @@ DEBIAN_PKGS="libpq-dev %s-psycopg2"
 
 FEDORA_PKGS="libpq-devel %s-psycopg2"
 
+FREEBSD_PKGS="%s-psycopg2"
+
 MACOS_HOMEBREW_PKGS="libpq"
 
 OPENSUSE_PKGS="postgresql-devel"
@@ -105,6 +107,16 @@ get_python_postgres_packages() {
 			;;
 		    (8.*)
 			packages=$REDHAT_8_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (freebsd)
+		case "$VERSION_ID" in
+		    (12.1-STABLE)
+			packages=$FREEBSD_PKGS
 			;;
 		    (*)
 			break
