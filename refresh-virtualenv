@@ -56,6 +56,11 @@ generate_requirements() (
     chmod a+r "$@"
 )
 
+get_packages() {
+    get-bootstrap-packages
+    get-python-build-packages
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -72,6 +77,16 @@ get_realpath() (
 	done
     fi
 )
+
+install_dependencies() {
+    packages="$(get_packages | sort -u)"
+    pattern="$(get-development-pattern)"
+    install-packages ${pattern:+-p "$pattern" }$packages
+
+    if [ -n "${package:-}" ]; then
+	install-build-deps "$@" $package || true
+    fi
+}
 
 parse_arguments() {
     while getopts p:v:h opt; do
@@ -179,4 +194,11 @@ set_user_profile "$script_dir"
 eval $(get-os-release -x)
 eval $(get-app-configuration app.ini)
 parse_arguments "$@"
-refresh_virtualenv
+
+if [ "$(id -u)" -eq 0 ]; then
+    install_dependencies
+    run_unpriv "$0"
+else
+    install_dependencies
+    refresh_virtualenv
+fi
