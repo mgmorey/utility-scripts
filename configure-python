@@ -86,10 +86,6 @@ configure_platform() {
 		configure_platform_unix_illumos
 		break
 		;;
-	    (macos)
-		configure_platform_unix_macos
-		break
-		;;
 	    (netbsd)
 	    	configure_platform_unix_netbsd
 	    	break
@@ -116,10 +112,6 @@ configure_platform_unix_netbsd() {
 configure_platform_unix_illumos() {
     include_prefix $LOCAL_PREFIX
     configure_compiler "/usr/bin/gcc -m64" "${incdirs-}" "" "${libdirs-}"
-}
-
-configure_platform_unix_macos() {
-    configure_compiler /usr/bin/clang "${incdirs-}" "" "${libdirs-}"
 }
 
 configure_platform_unix_solaris() {
