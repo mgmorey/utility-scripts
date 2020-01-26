@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+MACOS_PKGS="postgresql"
+
 REDHAT_8_PKGS="postgresql"
 
 UBUNTU_PKGS="postgresql-client-10"
@@ -61,6 +63,9 @@ get_postgres_packages() {
 		;;
 	    (ubuntu)
 		packages=$UBUNTU_PKGS
+		;;
+	    (macos)
+		packages=$MACOS_PKGS
 		;;
 	esac
 
