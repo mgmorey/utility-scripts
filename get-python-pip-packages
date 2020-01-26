@@ -25,7 +25,6 @@ FEDORA_PKGS="%s-packaging %s-pip"
 ILLUMOS_PKGS=":%s-packaging :%s-pip"
 
 MACOS_HOMEBREW_PKGS=
-MACOS_PKGSRC_PKGS=":%s-packaging :%s-pip"
 
 NETBSD_PKGS="%s-packaging %s-pip"
 

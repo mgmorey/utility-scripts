@@ -23,7 +23,6 @@ FEDORA_PKGS="util-linux uwsgi uwsgi-plugin-%s"
 FREEBSD_PKGS="uwsgi"
 
 MACOS_HOMEBREW_PKGS="uwsgi"
-MACOS_PKGSRC_PKGS=":%s-uwsgi"
 
 NETBSD_PKGS="%s-uwsgi"
 

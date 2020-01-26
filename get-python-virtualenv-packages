@@ -25,7 +25,6 @@ FEDORA_PKGS="%s-virtualenv"
 ILLUMOS_PKGS=":%s-virtualenv"
 
 MACOS_HOMEBREW_PKGS=
-MACOS_PKGSRC_PKGS=":%s-virtualenv"
 
 NETBSD_PKGS="%s-virtualenv"
 

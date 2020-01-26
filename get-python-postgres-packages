@@ -17,7 +17,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 MACOS_HOMEBREW_PKGS="libpq"
-MACOS_PKGSRC_PKGS="libpq :%s-psycopg2"
 
 REDHAT_8_PKGS="libpq-devel %s-psycopg2"
 

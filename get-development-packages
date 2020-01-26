@@ -25,7 +25,6 @@ developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
 developer/illumos-gcc system/header"
 
 MACOS_HOMEBREW_PKGS="autoconf automake gcc libtool make pkg-config"
-MACOS_PKGSRC_PKGS=":autoconf :automake :gcc7 :gmake :libtool-base :pkgconf"
 
 OPENSUSE_PKGS="autoconf automake gcc libtool make pkgconf-pkg-config"
 

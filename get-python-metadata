@@ -26,7 +26,6 @@ FREEBSD_12_DATA="python3 py37"
 ILLUMOS_DATA=":python37 py37"
 
 MACOS_HOMEBREW_DATA="python"
-MACOS_PKGSRC_DATA=":python37 py37"
 
 NETBSD_DATA="python37 py37"
 
