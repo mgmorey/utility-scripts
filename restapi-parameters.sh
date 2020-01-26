@@ -612,10 +612,17 @@ configure_unix_macos() {
     SYSTEM_PYTHON=/usr/local/bin/python3
 
     # Set uWSGI prefix directory
-    UWSGI_PREFIX=/usr/local/bin
+    UWSGI_PREFIX=/usr/local
+
+    # Set uWSGI binary/plugin directories
+    UWSGI_BINARY_DIR=/usr/local/opt/uwsgi/bin
+    UWSGI_PLUGIN_DIR=/usr/local/opt/uwsgi/libexec/uwsgi
 
     # Set uWSGI binary file
     UWSGI_BINARY_NAME=uwsgi
+
+    # Set uWSGI plugin file
+    UWSGI_PLUGIN_NAME=python3_plugin.so
 
     # Set other uWSGI parameters
     UWSGI_ORIGIN=homebrew
@@ -764,6 +771,12 @@ is_uwsgi_service() {
 	    case "$UWSGI_ORIGIN" in
 		(distro)
 		    is_service=true
+		    ;;
+		(homebrew)
+		    is_service=true
+		    ;;
+		(opencsw)
+		    is_service=false
 		    ;;
 		(pkgsrc)
 		    is_service=false
