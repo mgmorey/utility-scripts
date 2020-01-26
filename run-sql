@@ -40,6 +40,13 @@ exec_sql_cli() {
 		--user=${DATABASE_USER:-$USER} \
 		--password=${DATABASE_PASSWORD:-}
 	    ;;
+	(postgresql)
+	    ${1+$1 }psql \
+		--host=${DATABASE_HOST:-localhost} \
+		--port=${DATABASE_PORT:-5432} \
+		--username=${DATABASE_USER:-$USER} \
+		--password
+	    ;;
 	(sqlite)
 	    ${1+$1 }sqlite3 $DATABASE_FILENAME
 	    ;;
