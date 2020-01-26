@@ -16,9 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-REDHAT_8_PKGS="libpq-devel %s-psychopg2"
+MACOS_PKGS="libpq :%s-psycopg2"
 
-UBUNTU_PKGS="libpq-dev postgresql-common %s-psychopg2"
+REDHAT_8_PKGS="libpq-devel %s-psycopg2"
+
+UBUNTU_PKGS="libpq-dev postgresql-common %s-psycopg2"
 
 abort() {
     printf "$@" >&2
@@ -61,6 +63,9 @@ get_python_postgres_packages() {
 		;;
 	    (ubuntu)
 		packages=$UBUNTU_PKGS
+		;;
+	    (macos)
+		packages=$MACOS_PKGS
 		;;
 	esac
 
