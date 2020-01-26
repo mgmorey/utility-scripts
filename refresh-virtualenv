@@ -58,7 +58,8 @@ generate_requirements() (
 
 get_packages() {
     get-bootstrap-packages
-    get-python-build-packages
+    get-development-packages
+    get-python-library-packages
 }
 
 get_realpath() (
