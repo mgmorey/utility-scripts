@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+REDHAT_8_PKGS="libpq-devel %s-psychopg2"
+
 UBUNTU_PKGS="libpq-dev postgresql-common %s-psychopg2"
 
 abort() {
@@ -47,6 +49,16 @@ get_realpath() (
 get_python_postgres_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		    (7.*)
+			break
+			;;
+		    (8.*)
+			packages=$REDHAT_8_PKGS
+			;;
+		esac
+		;;
 	    (ubuntu)
 		packages=$UBUNTU_PKGS
 		;;
