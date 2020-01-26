@@ -51,6 +51,16 @@ get_realpath() (
 get_python_postgres_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			break
+			;;
+		    (8)
+			packages=$REDHAT_8_PKGS
+			;;
+		esac
+		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
 		    (7.*)

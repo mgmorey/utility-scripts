@@ -31,7 +31,7 @@ NETBSD_PKGS="%s-codestyle %s-pylint %s-test"
 OPENSUSE_PKGS="%s-pycodestyle %s-pylint %s-pytest"
 
 REDHAT_7_PKGS=":%s-codestyle :%s-pylint :%s-test"
-REDHAT_8_PKGS="%s-pytest"
+REDHAT_8_PKGS="%s-pycodestyle %s-pylint %s-pytest"
 
 SOLARIS_PKGS="developer/python/pylint-%s library/python/pytest-%s"
 
