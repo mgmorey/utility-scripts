@@ -164,7 +164,11 @@ install_app() {
 	install_virtualenv $APP_DIR/${VENV_DIRECTORY-venv}
 	generate_service_ini $APP_CONFIG "$APP_VARS"
 	create_dirs $APP_VARDIR $APP_LOGDIR $APP_RUNDIR
-	run_in_virtualenv $APP_SET_UP
+
+	if [ -n "${APP_SET_UP-}" ]; then
+	    run_in_virtualenv $APP_SET_UP
+	fi
+
 	change_owner $APP_ETCDIR $APP_DIR $APP_VARDIR
     done
 
