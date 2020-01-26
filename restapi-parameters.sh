@@ -609,7 +609,7 @@ configure_unix_macos() {
     APP_UID=_www
 
     # Set system Python interpreter
-    SYSTEM_PYTHON=/usr/local/opt/python@3.8/bin/python3
+    SYSTEM_PYTHON=/usr/local/bin/python3
 
     # Set uWSGI prefix directory
     UWSGI_PREFIX=/usr/local/bin
