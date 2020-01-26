@@ -609,16 +609,16 @@ configure_unix_macos() {
     APP_UID=_www
 
     # Set system Python interpreter
-    SYSTEM_PYTHON=/opt/pkg/bin/python3.7
+    SYSTEM_PYTHON=/usr/local/opt/python@3.8/bin/python3
 
     # Set uWSGI prefix directory
-    UWSGI_PREFIX=/opt/pkg
+    UWSGI_PREFIX=/usr/local/bin
 
     # Set uWSGI binary file
-    UWSGI_BINARY_NAME=uwsgi-3.7
+    UWSGI_BINARY_NAME=uwsgi
 
     # Set other uWSGI parameters
-    UWSGI_ORIGIN=pkgsrc
+    UWSGI_ORIGIN=homebrew
 }
 
 configure_unix_netbsd() {
@@ -731,6 +731,12 @@ is_uwsgi_packaged() {
     case "$UWSGI_ORIGIN" in
 	(distro)
  	    is_packaged=true
+	    ;;
+	(homebrew)
+	    is_packaged=true
+	    ;;
+	(opencsw)
+	    is_packaged=true
 	    ;;
 	(pkgsrc)
 	    is_packaged=true

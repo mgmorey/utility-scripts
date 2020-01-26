@@ -66,10 +66,14 @@ get_realpath() (
 )
 
 install_package_manager() {
-    package_manager="$(get_package_manager)"
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    package_manager="$(get_package_manager $1)"
 
     if [ -n "$package_manager" ]; then
 	"$script_dir/$package_manager"
+    else
+	abort "%s" "Unable to find manager for package type %s\n" "$1"
     fi
 }
 

@@ -24,7 +24,7 @@ FREEBSD_PKGS="sqlite3"
 
 ILLUMOS_PKGS="database/sqlite-3"
 
-MACOS_PKGS="sqlite"
+MACOS_HOMEBREW_PKGS="sqlite"
 
 NETBSD_PKGS="sqlite3"
 
@@ -82,7 +82,7 @@ get_sqlite_packages() {
 		packages=$ILLUMOS_PKGS
 		;;
 	    (macos)
-		packages=$MACOS_PKGS
+		packages=$MACOS_HOMEBREW_PKGS
 		;;
 	    (netbsd)
 		packages=$NETBSD_PKGS

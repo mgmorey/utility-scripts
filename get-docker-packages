@@ -25,7 +25,7 @@ DEBIAN_PKGS="docker.io runc tini"
 
 FREEBSD_PKGS="docker docker-machine"
 
-MACOS_PKGS="docker"
+MACOS_HOMEBREW_PKGS="docker"
 
 OPENSUSE_PKGS="catatonit containerd docker docker-libnetwork docker-runc"
 
@@ -72,7 +72,7 @@ get_docker_packages() {
 		packages=$FREEBSD_PKGS
 		;;
 	    (macos)
-		packages=$MACOS_PKGS
+		packages=$MACOS_HOMEBREW_PKGS
 		;;
 	esac
 

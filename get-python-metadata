@@ -25,7 +25,8 @@ FREEBSD_12_DATA="python3 py37"
 
 ILLUMOS_DATA=":python37 py37"
 
-MACOS_DATA=":python37 py37"
+MACOS_HOMEBREW_DATA="python3 py3"
+MACOS_PKGSRC_DATA=":python37 py37"
 
 NETBSD_DATA="python37 py37"
 
@@ -78,7 +79,7 @@ get_python_metadata() {
 		esac
 		;;
 	    (macos)
-		data="$MACOS_DATA"
+		data="$MACOS_HOMEBREW_DATA"
 		;;
 	    (netbsd)
 		data="$NETBSD_DATA"

@@ -24,7 +24,7 @@ FREEBSD_PKGS="node npm"
 
 ILLUMOS_PKGS=":nodejs :npm"
 
-MACOS_PKGS="node"
+MACOS_HOMEBREW_PKGS="node"
 
 NETBSD_PKGS="nodejs"
 
@@ -80,7 +80,7 @@ get_nodejs_packages() {
 		packages=$ILLUMOS_PKGS
 		;;
 	    (macos)
-		packages=$MACOS_PKGS
+		packages=$MACOS_HOMEBREW_PKGS
 		;;
 	    (netbsd)
 		packages=$NETBSD_PKGS

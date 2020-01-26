@@ -31,7 +31,8 @@ FREEBSD_12_PKGS="bzip2 gdbm libffi lzma ncurses readline sqlite3"
 
 ILLUMOS_PKGS="database/sqlite-3 library/libffi library/ncurses library/readline"
 
-MACOS_PKGS="bzip2 gdbm libffi ncurses openssl readline sqlite xz zlib \
+MACOS_HOMEBREW_PKGS="bzip2 gdbm gettext libffi ncurses openssl readline sqlite xz zlib"
+MACOS_PKGSRC_PKGS="bzip2 gdbm libffi ncurses openssl readline sqlite xz zlib \
 :gettext-lib"
 
 NETBSD_PKGS="bzip2 gdbm libffi lzma ncurses readline sqlite3"
@@ -142,7 +143,7 @@ get_python_library_packages() {
 		packages=$ILLUMOS_PKGS
 		;;
 	    (macos)
-		packages=$MACOS_PKGS
+		packages=$MACOS_HOMEBREW_PKGS
 		;;
 	    (netbsd)
 		packages=$NETBSD_PKGS

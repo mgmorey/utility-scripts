@@ -24,7 +24,8 @@ FEDORA_PKGS="%s-virtualenv"
 
 ILLUMOS_PKGS=":%s-virtualenv"
 
-MACOS_PKGS=":%s-virtualenv"
+MACOS_HOMEBREW_PKGS=
+MACOS_PKGSRC_PKGS=":%s-virtualenv"
 
 NETBSD_PKGS="%s-virtualenv"
 
@@ -100,7 +101,7 @@ get_python_virtualenv_packages() {
 		packages=$ILLUMOS_PKGS
 		;;
 	    (macos)
-		packages=$MACOS_PKGS
+		packages=$MACOS_HOMEBREW_PKGS
 		;;
 	    (netbsd)
 		packages=$NETBSD_PKGS

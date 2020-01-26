@@ -24,7 +24,8 @@ FEDORA_PKGS="%s-packaging %s-pip"
 
 ILLUMOS_PKGS=":%s-packaging :%s-pip"
 
-MACOS_PKGS=":%s-packaging :%s-pip"
+MACOS_HOMEBREW_PKGS=
+MACOS_PKGSRC_PKGS=":%s-packaging :%s-pip"
 
 NETBSD_PKGS="%s-packaging %s-pip"
 
@@ -100,7 +101,7 @@ get_python_pip_packages() {
 		packages=$ILLUMOS_PKGS
 		;;
 	    (macos)
-		packages=$MACOS_PKGS
+		packages=$MACOS_HOMEBREW_PKGS
 		;;
 	    (netbsd)
 		packages=$NETBSD_PKGS

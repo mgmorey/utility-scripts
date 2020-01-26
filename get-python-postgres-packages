@@ -16,7 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-MACOS_PKGS="libpq :%s-psycopg2"
+MACOS_HOMEBREW_PKGS="libpq"
+MACOS_PKGSRC_PKGS="libpq :%s-psycopg2"
 
 REDHAT_8_PKGS="libpq-devel %s-psycopg2"
 
@@ -65,7 +66,7 @@ get_python_postgres_packages() {
 		packages=$UBUNTU_PKGS
 		;;
 	    (macos)
-		packages=$MACOS_PKGS
+		packages=$MACOS_HOMEBREW_PKGS
 		;;
 	esac
 
