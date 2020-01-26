@@ -52,7 +52,7 @@ get_realpath() (
     fi
 )
 
-get_sqlite_packages() {
+get_python_sqlite_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (rhel|ol|centos)
@@ -93,4 +93,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-get_sqlite_packages
+get_python_sqlite_packages

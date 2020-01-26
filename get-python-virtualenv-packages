@@ -61,7 +61,7 @@ get_realpath() (
     fi
 )
 
-get_python_devel_packages() {
+get_python_virtualenv_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
@@ -124,4 +124,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-get_python_devel_packages
+get_python_virtualenv_packages
