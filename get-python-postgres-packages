@@ -16,11 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+DEBIAN_PKGS="libpq-dev %s-psycopg2"
+
 MACOS_HOMEBREW_PKGS="libpq"
 
 REDHAT_8_PKGS="libpq-devel %s-psycopg2"
-
-UBUNTU_PKGS="libpq-dev %s-psycopg2"
 
 abort() {
     printf "$@" >&2
@@ -64,6 +64,9 @@ get_python_postgres_packages() {
 			;;
 		esac
 		;;
+	    (debian)
+		packages=$DEBIAN_PKGS
+		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
 		    (7.*)
@@ -76,9 +79,6 @@ get_python_postgres_packages() {
 			break
 			;;
 		esac
-		;;
-	    (ubuntu)
-		packages=$UBUNTU_PKGS
 		;;
 	    (macos)
 		packages=$MACOS_HOMEBREW_PKGS

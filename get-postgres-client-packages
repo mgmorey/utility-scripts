@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+DEBIAN_10_PKGS="postgresql-client-11"
+
 MACOS_HOMEBREW_PKGS="postgresql"
 
 REDHAT_8_PKGS="postgresql"
@@ -59,6 +61,16 @@ get_postgres_packages() {
 			;;
 		    (8)
 			packages=$REDHAT_8_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (debian)
+		case "$VERSION_ID" in
+		    (10)
+			packages=$DEBIAN_10_PKGS
 			;;
 		    (*)
 			break
