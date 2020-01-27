@@ -20,7 +20,7 @@ MACOS_HOMEBREW_PKGS="libpq"
 
 REDHAT_8_PKGS="libpq-devel %s-psycopg2"
 
-UBUNTU_PKGS="libpq-dev postgresql-common %s-psycopg2"
+UBUNTU_PKGS="libpq-dev %s-psycopg2"
 
 abort() {
     printf "$@" >&2
