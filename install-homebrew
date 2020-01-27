@@ -36,7 +36,7 @@ assert() {
 configure_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (darwin)
+	    (macos)
 		PKG_DIR=/Library/Developer/CommandLineTools/Packages/
 		PKG_NAME=macOS_SDK_headers_for_macOS_10.14.pkg
 		break
@@ -151,7 +151,7 @@ install_homebrew() {
 			;;
 		esac
 		;;
-	    (darwin)
+	    (macos)
 		run_unpriv /usr/bin/ruby -e "$(curl -fsSL $HOMEBREW_URL)"
 		break
 		;;
@@ -165,13 +165,13 @@ install_linuxbrew() {
 
 preinstall_homebrew() {
     case "$kernel_name" in
-	(Darwin)
-	    installer -allowUntrusted -pkg $PKG_DIR/$PKG_NAME -target /
-	    ;;
 	(Linux)
 	    packages="$(get-homebrew-packages)"
 	    pattern="$(get-development-pattern)"
 	    install-packages ${pattern:+-p "$pattern" }$packages
+	    ;;
+	(Darwin)
+	    installer -allowUntrusted -pkg $PKG_DIR/$PKG_NAME -target /
 	    ;;
     esac
 }
@@ -236,7 +236,7 @@ validate_platform() {
 			;;
 		esac
 		;;
-	    (darwin)
+	    (macos)
 		return
 		;;
 	esac
