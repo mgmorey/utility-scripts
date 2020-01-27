@@ -159,6 +159,7 @@ install_app() {
 	    install_file 600 .env $APP_DIR/.env
 	fi
 
+	install_file 644 Pipfile $APP_DIR/Pipfile
 	install_file 600 app.ini $APP_DIR/app.ini
 	install_app_files 644 app $APP_DIR
 	install_virtualenv $APP_DIR/${VENV_DIRECTORY-venv}
