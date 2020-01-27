@@ -67,7 +67,14 @@ get_python_postgres_packages() {
 		esac
 		;;
 	    (debian)
-		packages=$DEBIAN_PKGS
+		case "$VERSION_ID" in
+		    (10)
+			packages=$DEBIAN_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
 		;;
 	    (opensuse-leap)
 		case "$VERSION_ID" in
