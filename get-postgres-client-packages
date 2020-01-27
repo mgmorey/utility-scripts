@@ -20,6 +20,8 @@ DEBIAN_10_PKGS="postgresql-client-11"
 
 MACOS_HOMEBREW_PKGS="postgresql"
 
+OPENSUSE_PKGS="postgresql"
+
 REDHAT_8_PKGS="postgresql"
 
 UBUNTU_18_PKGS="postgresql-client-10"
@@ -71,6 +73,16 @@ get_postgres_packages() {
 		case "$VERSION_ID" in
 		    (10)
 			packages=$DEBIAN_10_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (opensuse-leap)
+		case "$VERSION_ID" in
+		    (15.1)
+			packages=$OPENSUSE_PKGS
 			;;
 		    (*)
 			break

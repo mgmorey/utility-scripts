@@ -20,6 +20,8 @@ DEBIAN_PKGS="libpq-dev %s-psycopg2"
 
 MACOS_HOMEBREW_PKGS="libpq"
 
+OPENSUSE_PKGS="postgresql-devel"
+
 REDHAT_8_PKGS="libpq-devel %s-psycopg2"
 
 abort() {
@@ -66,6 +68,16 @@ get_python_postgres_packages() {
 		;;
 	    (debian)
 		packages=$DEBIAN_PKGS
+		;;
+	    (opensuse-leap)
+		case "$VERSION_ID" in
+		    (15.1)
+			packages=$OPENSUSE_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
 		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
