@@ -59,6 +59,9 @@ get_python_postgres_packages() {
 		    (8)
 			packages=$REDHAT_8_PKGS
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (rhel|ol)
@@ -68,6 +71,9 @@ get_python_postgres_packages() {
 			;;
 		    (8.*)
 			packages=$REDHAT_8_PKGS
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;
