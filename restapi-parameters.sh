@@ -608,21 +608,21 @@ configure_unix_macos() {
     APP_GID=_www
     APP_UID=_www
 
+    # Set application prefix
+    APP_PREFIX=/usr/local
+
     # Set system Python interpreter
     SYSTEM_PYTHON=/usr/local/bin/python3
-
-    # Set uWSGI prefix directory
-    UWSGI_PREFIX=/usr/local
 
     # Set uWSGI binary/plugin directories
     UWSGI_BINARY_DIR=/usr/local/opt/uwsgi/bin
     UWSGI_PLUGIN_DIR=/usr/local/opt/uwsgi/libexec/uwsgi
 
-    # Set uWSGI binary file
-    UWSGI_BINARY_NAME=uwsgi
+    # # Set uWSGI binary file
+    # UWSGI_BINARY_NAME=uwsgi
 
-    # Set uWSGI plugin file
-    UWSGI_PLUGIN_NAME=python3_plugin.so
+    # # Set uWSGI plugin file
+    # UWSGI_PLUGIN_NAME=python3_plugin.so
 
     # Set other uWSGI parameters
     UWSGI_ORIGIN=homebrew
