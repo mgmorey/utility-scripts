@@ -20,7 +20,8 @@ MACOS_HOMEBREW_PKGS="postgresql"
 
 REDHAT_8_PKGS="postgresql"
 
-UBUNTU_PKGS="postgresql-client-10"
+UBUNTU_18_PKGS="postgresql-client-10"
+UBUNTU_19_PKGS="postgresql-client-11"
 
 abort() {
     printf "$@" >&2
@@ -72,7 +73,14 @@ get_postgres_packages() {
 		esac
 		;;
 	    (ubuntu)
-		packages=$UBUNTU_PKGS
+		case "$VERSION_ID" in
+		    (18.*)
+			packages=$UBUNTU_18_PKGS
+			;;
+		    (19.*)
+			packages=$UBUNTU_19_PKGS
+			;;
+		esac
 		;;
 	    (macos)
 		packages=$MACOS_HOMEBREW_PKGS
