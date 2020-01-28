@@ -124,7 +124,14 @@ get_python_postgres_packages() {
 		esac
 		;;
 	    (macos)
-		packages=$MACOS_HOMEBREW_PKGS
+		case "$VERSION_ID" in
+		    (10.14.*)
+			packages=$MACOS_HOMEBREW_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
 		;;
 	esac
 
