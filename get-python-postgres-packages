@@ -18,6 +18,8 @@
 
 DEBIAN_PKGS="libpq-dev %s-psycopg2"
 
+FEDORA_PKGS="libpq-devel %s-psycopg2"
+
 MACOS_HOMEBREW_PKGS="libpq"
 
 OPENSUSE_PKGS="postgresql-devel"
@@ -70,6 +72,16 @@ get_python_postgres_packages() {
 		case "$VERSION_ID" in
 		    (10)
 			packages=$DEBIAN_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (fedora)
+		case "$VERSION_ID" in
+		    (31)
+			packages=$FEDORA_PKGS
 			;;
 		    (*)
 			break

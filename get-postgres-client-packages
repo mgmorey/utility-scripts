@@ -18,6 +18,8 @@
 
 DEBIAN_10_PKGS="postgresql-client-11"
 
+FEDORA_PKGS="postgresql"
+
 MACOS_HOMEBREW_PKGS="postgresql"
 
 OPENSUSE_PKGS="postgresql"
@@ -73,6 +75,16 @@ get_postgres_packages() {
 		case "$VERSION_ID" in
 		    (10)
 			packages=$DEBIAN_10_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (fedora)
+		case "$VERSION_ID" in
+		    (31)
+			packages=$FEDORA_PKGS
 			;;
 		    (*)
 			break
