@@ -115,7 +115,10 @@ get_python_postgres_packages() {
 		;;
 	    (freebsd)
 		case "$VERSION_ID" in
-		    (12.1-STABLE)
+		    (11.3-*)
+			packages=$FREEBSD_PKGS
+			;;
+		    (12.1-*)
 			packages=$FREEBSD_PKGS
 			;;
 		    (*)

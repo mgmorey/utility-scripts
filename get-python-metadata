@@ -20,7 +20,7 @@ DEBIAN_DATA="python3 python3"
 
 FEDORA_DATA="python3 python3"
 
-FREEBSD_11_DATA="python3 py36"
+FREEBSD_11_DATA="python3 py37"
 FREEBSD_12_DATA="python3 py37"
 
 ILLUMOS_DATA=":python37 py37"
@@ -69,11 +69,14 @@ get_python_metadata() {
 		;;
 	    (freebsd)
 		case "$VERSION_ID" in
-		    (11.*)
+		    (11.3-*)
 			data="$FREEBSD_11_DATA"
 			;;
-		    (12.*)
+		    (12.1-*)
 			data="$FREEBSD_12_DATA"
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;
