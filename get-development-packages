@@ -32,7 +32,8 @@ REDHAT_7_PKGS="autoconf automake gcc libtool make pkgconfig"
 REDHAT_8_PKGS="autoconf automake gcc libtool make pkgconf-pkg-config"
 
 FREEBSD_11_PKGS="autoconf automake gcc libtool gmake pkgconf"
-FREEBSD_12_PKGS="autoconf automake gcc libtool gmake \
+FREEBSD_12_RELEASE_PKGS="autoconf automake gcc libtool gmake pkgconf"
+FREEBSD_12_STABLE_PKGS="autoconf automake gcc libtool gmake \
 os-generic-userland-devtools pkgconf"
 
 SOLARIS_PKGS="developer/build/autoconf developer/build/automake \
@@ -88,8 +89,11 @@ get_emacs_build_deps() {
 		    (11.3-*)
 			packages=$FREEBSD_11_PKGS
 			;;
-		    (12.1-*)
-			packages=$FREEBSD_12_PKGS
+		    (12.1-RELEASE-*)
+			packages=$FREEBSD_12_RELEASE_PKGS
+			;;
+		    (12.1-STABLE)
+			packages=$FREEBSD_12_STABLE_PKGS
 			;;
 		    (*)
 			break
