@@ -181,10 +181,10 @@ configure_baseline() {
 	    configure_unix_bsd
 
 	    case "$VERSION_ID" in
-		(11.*)
+		(11.3-*)
 		    configure_unix_freebsd_11
 		    ;;
-		(12.*)
+		(12.1-*)
 		    configure_unix_freebsd_12
 		    ;;
 		(*)

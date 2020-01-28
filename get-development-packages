@@ -85,11 +85,14 @@ get_emacs_build_deps() {
 		;;
 	    (freebsd)
 		case "$VERSION_ID" in
-		    (11.*)
+		    (11.3-*)
 			packages=$FREEBSD_11_PKGS
 			;;
-		    (12.*)
+		    (12.1-*)
 			packages=$FREEBSD_12_PKGS
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;
