@@ -24,7 +24,7 @@ FREEBSD_PKGS="%s-psycopg2"
 
 MACOS_HOMEBREW_PKGS="libpq"
 
-OPENSUSE_PKGS="postgresql-devel"
+OPENSUSE_PKGS=
 
 REDHAT_8_PKGS="libpq-devel %s-psycopg2"
 
@@ -95,6 +95,16 @@ get_python_postgres_packages() {
 	    (opensuse-leap)
 		case "$VERSION_ID" in
 		    (15.1)
+			packages=$OPENSUSE_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (opensuse-tumbleweed)
+		case "$VERSION_ID" in
+		    (2020????)
 			packages=$OPENSUSE_PKGS
 			;;
 		    (*)

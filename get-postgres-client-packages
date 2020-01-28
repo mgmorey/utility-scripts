@@ -105,6 +105,16 @@ get_postgres_packages() {
 			;;
 		esac
 		;;
+	    (opensuse-tumbleweed)
+		case "$VERSION_ID" in
+		    (2020????)
+			packages=$OPENSUSE_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
 		    (7.*)
