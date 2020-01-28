@@ -28,6 +28,8 @@ OPENSUSE_PKGS="postgresql-devel"
 
 REDHAT_8_PKGS="libpq-devel %s-psycopg2"
 
+SOLARIS_PKGS="database/postgres"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -130,6 +132,16 @@ get_python_postgres_packages() {
 		case "$VERSION_ID" in
 		    (10.14.*)
 			packages=$MACOS_HOMEBREW_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (solaris)
+		case "$VERSION_ID" in
+		    (11.4)
+			packages=$SOLARIS_PKGS
 			;;
 		    (*)
 			break
