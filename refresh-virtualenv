@@ -80,6 +80,12 @@ get_realpath() (
 )
 
 install_dependencies() {
+    case "$ID" in
+	(windows)
+	    return 0
+	    ;;
+    esac
+
     packages="$(get_packages | sort -u)"
     pattern="$(get-development-pattern)"
     install-packages ${pattern:+-p "$pattern" }$packages
