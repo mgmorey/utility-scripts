@@ -22,8 +22,6 @@ NAME_UNICODE="MySQL ODBC 8.0 Unicode Driver"
 OBJECT_ANSI=libmyodbc8a.so
 OBJECT_UNICODE=libmyodbc8w.so
 
-DRIVER_VERSION=8.0.19
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -76,7 +74,7 @@ install_mysql_odbc() {
 
 parse_arguments() {
     case "$1" in
-	(mysql-connector-odbc-8.*-linux-*-x86-64bit.tar.gz)
+	(mysql-connector-odbc-*-linux-$ID$VERSION_ID-x86-64bit.tar.gz)
 	    tarfile=$1
 	    dirname=${tarfile%.tar.gz}
 	    package=${dirname%-linux-*-x86-64bit}
@@ -98,6 +96,9 @@ validate_platform() {
 	(ubuntu)
 	    case "$VERSION_ID" in
 		(18.04)
+		    return
+		    ;;
+		(19.10)
 		    return
 		    ;;
 	    esac
