@@ -16,11 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-NAME_ANSI="MySQL ODBC 8.0 ANSI Driver"
-NAME_UNICODE="MySQL ODBC 8.0 Unicode Driver"
+NAME_ANSI="MySQL 8.0 ANSI"
+NAME_UNICODE="MySQL 8.0 Unicode"
 
 OBJECT_ANSI=libmyodbc8a.so
 OBJECT_UNICODE=libmyodbc8w.so
+
+PKG_NAME=mysql-connector-odbc
 
 abort() {
     printf "$@" >&2
@@ -74,7 +76,7 @@ install_mysql_odbc() {
 
 parse_arguments() {
     case "$1" in
-	(mysql-connector-odbc-*-linux-$ID$VERSION_ID-x86-64bit.tar.gz)
+	($PKG_NAME-8.0.*-linux-$ID$VERSION_ID-x86-64bit.tar.gz)
 	    tarfile=$1
 	    dirname=${tarfile%.tar.gz}
 	    package=${dirname%-linux-*-x86-64bit}
