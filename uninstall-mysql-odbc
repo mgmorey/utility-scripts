@@ -1,0 +1,122 @@
+#!/bin/sh
+
+# uninstall-mysql-odbc: uninstall MySQL ODBC packages
+# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+NAME_ANSI="MySQL 8.0 ANSI"
+NAME_UNICODE="MySQL 8.0 Unicode"
+
+OBJECT_ANSI=libmyodbc8a.so
+OBJECT_UNICODE=libmyodbc8w.so
+
+PKG_NAME=mysql-connector-odbc
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+uninstall_mysql_odbc() {
+    prefix=/opt/$package
+
+    for encoding in ANSI UNICODE; do
+	eval name="\$NAME_$encoding"
+	eval object="\$OBJECT_$encoding"
+	driver=$prefix/lib/$object
+
+	if [ -x $prefix/bin/myodbc-installer ]; then
+	    $prefix/bin/myodbc-installer -r -d -n "$name"
+	fi
+    done
+
+    for file in $prefix/bin/*; do
+	/bin/rm -f /usr/local/bin/$(basename $file)
+    done
+
+    /bin/rm -rf $prefix
+}
+
+parse_arguments() {
+    case "$1" in
+	($PKG_NAME-8.0.*-linux-$ID$VERSION_ID-x86-64bit.tar.gz)
+	    tarfile=$1
+	    dirname=${tarfile%.tar.gz}
+	    package=${dirname%-linux-*-x86-64bit}
+	    ;;
+	(*)
+	    abort "%s: invalid argument" "$1"
+    esac
+}
+
+validate_platform() {
+    case "$ID" in
+	(debian)
+	    case "$VERSION_ID" in
+		(10)
+		    return
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    return
+		    ;;
+		(19.10)
+		    return
+		    ;;
+	    esac
+	    ;;
+    esac
+
+    abort_not_supported "Operating system"
+}
+
+if [ $# -lt 1 ]; then
+    abort "%s: Not enough arguments\n" "$0"
+elif [ $# -gt 1 ]; then
+    abort "%s: Too many arguments\n" "$0"
+fi
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+. "$script_dir/common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+parse_arguments "$@"
+uninstall_mysql_odbc
