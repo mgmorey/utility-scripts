@@ -37,22 +37,45 @@ format_protocol() {
     fi
 }
 
+format_root_password() {
+    if [ "${dialect:=$(get_default_dialect)}" = mysql ]; then
+	root_password=${root_password:=$(generate_password)}
+	printf "${QUALIFIER}ROOT_PASSWORD=$root_password\n"
+    fi
+}
+
 format_qualifier() {
     printf "${qualifier:=$(get_default_qualifier)}_\n" | to_upper
+}
+
+format_schema() {
+    case "${dialect:=$(get_default_dialect)}" in
+	(mysql)
+	    printf "${QUALIFIER}DATABASE=${schema:=$(get_default_user)}\n"
+	    ;;
+	(postgresql)
+	    printf "${QUALIFIER}DB=${schema:=$(get_default_user)}\n"
+	    ;;
+    esac
 }
 
 generate_env() {
     QUALIFIER=$(format_qualifier)
     format_dialect
+
+    if [ "${dialect:=$(get_default_dialect)}" = sqlite ]; then
+	return 0
+    fi
+
     format_protocol
     cat <<EOF
 ${QUALIFIER}HOST=${host:=$(get_default_host)}
 ${QUALIFIER}PORT=${port:=$(get_default_port)}
 ${QUALIFIER}USER=${user:=$(get_default_user)}
 ${QUALIFIER}PASSWORD=${password:=$(generate_password)}
-${QUALIFIER}ROOT_PASSWORD=${root_password:=$(generate_password)}
-${QUALIFIER}DB=${schema:=$(get_default_user)}
 EOF
+    format_root_password
+    format_schema
 }
 
 generate_password() {
