@@ -50,6 +50,7 @@ ${QUALIFIER}HOST=${host:=$(get_default_host)}
 ${QUALIFIER}PORT=${port:=$(get_default_port)}
 ${QUALIFIER}USER=${user:=$(get_default_user)}
 ${QUALIFIER}PASSWORD=${password:=$(get_default_password)}
+${QUALIFIER}ROOT_PASSWORD=${root_password:=$(get_default_password)}
 EOF
 }
 
@@ -131,9 +132,10 @@ parse_arguments() {
     password=
     protocol=
     qualifier=
+    root_password=
     user=
 
-    while getopts hDd:H:P:p:q:stu: opt; do
+    while getopts hDd:H:P:p:q:r:stu: opt; do
 	case $opt in
 	    (h)
 		usage
@@ -154,7 +156,8 @@ parse_arguments() {
 			dialect=sqlite
 			;;
 		    (*)
-			abort "%s: Invalid argument: %s" "$0" "$OPTARG"
+			usage "%s: invalid argument -- %s\n" "$0" "$OPTARG"
+			exit 1
 			;;
 		esac
 		;;
@@ -176,9 +179,13 @@ parse_arguments() {
 			qualifier=postgres
 			;;
 		    (*)
-			abort "%s: Invalid argument: %s" "$0" "$OPTARG"
+			usage "%s: invalid argument -- %s\n" "$0" "$OPTARG"
+			exit 1
 			;;
 		esac
+		;;
+	    (r)
+		root_password="$OPTARG"
 		;;
 	    (s)
 		protocol=SOCKET
@@ -212,7 +219,8 @@ usage() {
     fi
 
     cat <<EOF >&2
-Usage: $0 [-d DIALECT] [-H HOST] [-P PORT] [-s|-t] [-q QUALIFIER] [-u USER]
+Usage: $0 [-d DIALECT] [-H HOST] [-P PORT] [-p PASSWORD] [-r ROOT_PASSWORD]
+       $0 [-s|-t] [-D|-q QUALIFIER] [-u USER]
        $0 -h
 EOF
 }
