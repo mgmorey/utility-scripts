@@ -49,9 +49,17 @@ generate_env() {
 ${QUALIFIER}HOST=${host:=$(get_default_host)}
 ${QUALIFIER}PORT=${port:=$(get_default_port)}
 ${QUALIFIER}USER=${user:=$(get_default_user)}
-${QUALIFIER}PASSWORD=${password:=$(get_default_password)}
-${QUALIFIER}ROOT_PASSWORD=${root_password:=$(get_default_password)}
+${QUALIFIER}PASSWORD=${password:=$(generate_password)}
+${QUALIFIER}ROOT_PASSWORD=${root_password:=$(generate_password)}
 EOF
+}
+
+generate_password() {
+    case "${dialect:=$(get_default_dialect)}" in
+	(mysql|postgresql)
+	    pwgen 16 1
+	    ;;
+    esac
 }
 
 get_default_dialect() {
@@ -72,14 +80,6 @@ get_default_host() {
 	    ;;
 	(postgresql)
 	    printf "%s\n" localhost
-	    ;;
-    esac
-}
-
-get_default_password() {
-    case "${dialect:=$(get_default_dialect)}" in
-	(mysql|postgresql)
-	    pwgen 16 1
 	    ;;
     esac
 }
