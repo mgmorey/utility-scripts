@@ -219,8 +219,8 @@ usage() {
     fi
 
     cat <<EOF >&2
-Usage: $0 [-d DIALECT] [-H HOST] [-P PORT] [-p PASSWORD] [-r ROOT-PASSWORD]
-       [-s|-t] [-D|-q QUALIFIER] [-u USER]
+Usage: $0 [-D] [-d DIALECT] [-H HOST] [-P PORT] [-p PASSWORD]
+       [-q QUALIFIER] [-r ROOT-PASSWORD] [-s|-t] [-u USER]
        $0 -h
 EOF
 }
