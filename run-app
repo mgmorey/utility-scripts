@@ -52,7 +52,7 @@ get_realpath() (
 
 run_in_virtualenv() {
     eval $(get-os-release -x)
-    eval $(get-app-configuration app.ini)
+    eval $(get-configuration app.ini)
 
     while getopts d:h:p: opt; do
 	case $opt in

@@ -195,7 +195,7 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-eval $(get-app-configuration app.ini)
+eval $(get-configuration app.ini)
 parse_arguments "$@"
 
 if [ "$(id -u)" -eq 0 ]; then

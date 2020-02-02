@@ -54,6 +54,6 @@ fi
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-eval $("$script_dir/get-app-configuration" app.ini)
+eval $("$script_dir/get-configuration" app.ini)
 
 /bin/rm -rf $(find_caches)

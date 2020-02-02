@@ -66,5 +66,5 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 . "$script_dir/utility-functions.sh"
 
-eval $("$script_dir/get-app-configuration" app.ini)
+eval $("$script_dir/get-configuration" app.ini)
 clean_virtualenv
