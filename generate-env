@@ -31,6 +31,18 @@ format_dialect() {
     fi
 }
 
+format_endpoint() {
+    if [ $qualifier = database ]; then
+	printf "${QUALIFIER}HOST=${host:=$(get_default_host)}\n"
+	printf "${QUALIFIER}PORT=${port:=$(get_default_port)}\n"
+    fi
+}
+
+format_login() {
+    printf "${QUALIFIER}USER=${user:=$(get_default_user)}\n"
+    printf "${QUALIFIER}PASSWORD=${password:=$(generate_password)}\n"
+}
+
 format_protocol() {
     if [ "${qualifier:=$(get_default_qualifier)}" = mysql ]; then
 	printf "${QUALIFIER}PROTOCOL=${protocol:=$(get_default_protocol)}\n"
@@ -68,12 +80,8 @@ generate_env() {
     fi
 
     format_protocol
-    cat <<EOF
-${QUALIFIER}HOST=${host:=$(get_default_host)}
-${QUALIFIER}PORT=${port:=$(get_default_port)}
-${QUALIFIER}USER=${user:=$(get_default_user)}
-${QUALIFIER}PASSWORD=${password:=$(generate_password)}
-EOF
+    format_endpoint
+    format_login
     format_root_password
     format_schema
 }
