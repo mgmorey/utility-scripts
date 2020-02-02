@@ -32,7 +32,7 @@ format_dialect() {
 }
 
 format_endpoint() {
-    if [ $qualifier = database ]; then
+    if [ "${qualifier:=$(get_default_qualifier)}" = database ]; then
 	printf "${QUALIFIER}HOST=${host:=$(get_default_host)}\n"
 	printf "${QUALIFIER}PORT=${port:=$(get_default_port)}\n"
     fi
