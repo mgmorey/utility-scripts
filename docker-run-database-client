@@ -61,9 +61,7 @@ get_database_image_name() {
 if [ $# -gt 0 ]; then
     options="$@"
 else
-    options="--network=host --rm"
+    options="--network=host --rm $(get_database_image_name)"
 fi
 
-docker run -it $options \
-       $(get_database_image_name) \
-       $(get_database_client_command)
+docker run -it $options $(get_database_client_command)
