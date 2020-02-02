@@ -70,6 +70,11 @@ get_docker_options() {
 }
 
 . ./.env
-docker run -d \
-       $(get_docker_options) \
-       $(get_docker_image_name)
+
+if [ $# -gt 0 ]; then
+    options="$@"
+else
+    options="--rm $(get_docker_image_name)"
+fi
+
+docker run -d $(get_docker_options) $options
