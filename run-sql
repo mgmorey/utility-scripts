@@ -53,6 +53,10 @@ exec_sql_cli() {
     esac
 }
 
+format_pathname() {
+    printf "$1/$2\n" "$DATABASE_DIALECT"
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -75,7 +79,7 @@ parse_argument() {
 
     case "$1" in
 	(*.sql)
-	    file=$1
+	    name=$1
 	    ;;
 	(*.sqlite)
 	    if [ "$DATABASE_DIALECT" = sqlite ]; then
@@ -84,28 +88,27 @@ parse_argument() {
 		abort "Invalid SQL script name: %s\n" "$1"
 	    fi
 	    ;;
-	(*.*)
-	    abort "Invalid SQL script name: %s\n" "$1"
-	    ;;
 	(*)
-	    file="$1.sql"
+	    name="$1.sql"
 	    ;;
     esac
 
-    if [ -z "${file:-}" ]; then
+    if [ -z "${name:-}" ]; then
 	return 1
-    elif [ -e "$file" ]; then
+    elif [ -e "$name" ]; then
 	script="$1"
     else
 	for sql_dir in $SQL_DIRS; do
-	    if [ -e "$sql_dir/$file" ]; then
-		script="$sql_dir/$file"
+	    file="$(format_pathname $sql_dir $name)"
+
+	    if [ -e "$file" ]; then
+		script="$file"
 		break
 	    fi
 	done
 
 	if [ -z "${script}" ]; then
-	    abort "%s: No such script file\n" "$file"
+	    abort "%s: No such script file\n" "$name"
 	fi
     fi
 
