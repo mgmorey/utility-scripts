@@ -51,6 +51,7 @@ ${QUALIFIER}PORT=${port:=$(get_default_port)}
 ${QUALIFIER}USER=${user:=$(get_default_user)}
 ${QUALIFIER}PASSWORD=${password:=$(generate_password)}
 ${QUALIFIER}ROOT_PASSWORD=${root_password:=$(generate_password)}
+${QUALIFIER}DB=${schema:=$(get_default_user)}
 EOF
 }
 
@@ -135,7 +136,7 @@ parse_arguments() {
     root_password=
     user=
 
-    while getopts hDd:H:P:p:q:r:stu: opt; do
+    while getopts hDd:H:P:p:q:r:S:stu: opt; do
 	case $opt in
 	    (h)
 		usage
@@ -187,6 +188,9 @@ parse_arguments() {
 	    (r)
 		root_password="$OPTARG"
 		;;
+	    (S)
+		schema="$OPTARG"
+		;;
 	    (s)
 		protocol=SOCKET
 		;;
@@ -220,7 +224,8 @@ usage() {
 
     cat <<EOF >&2
 Usage: $0 [-D] [-d DIALECT] [-H HOST] [-P PORT] [-p PASSWORD]
-       [-q QUALIFIER] [-r ROOT-PASSWORD] [-s|-t] [-u USER]
+       [-q QUALIFIER] [-r ROOT-PASSWORD] [-S SCHEMA] [-s|-t]
+       [-u USER]
        $0 -h
 EOF
 }
