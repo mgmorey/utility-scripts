@@ -25,7 +25,18 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_database_image_name() {
+get_container_port() {
+    case "$DATABASE_DIALECT" in
+	(mysql)
+	    printf "%s\n" 3306
+	    ;;
+	(postgresql)
+	    printf "%s\n" 5432
+	    ;;
+    esac
+}
+
+get_docker_image_name() {
     case "$DATABASE_DIALECT" in
 	(mysql)
 	    printf "%s\n" mysql
@@ -36,7 +47,7 @@ get_database_image_name() {
     esac
 }
 
-get_docker_database_options() {
+get_docker_options() {
     case "$DATABASE_DIALECT" in
 	(mysql)
 	    . ./.env-mysql
@@ -44,20 +55,21 @@ get_docker_database_options() {
 		   -e MYSQL_DATABASE=$MYSQL_DATABASE \
 		   -e MYSQL_USER=$MYSQL_USER \
 		   -e MYSQL_PASSWORD=$MYSQL_PASSWORD \
-		   -e MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+		   -e MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
+		   -p $DATABASE_PORT:$(get_container_port)
 	    ;;
 	(postgresql)
 	    . ./.env-postgres
 	    printf "%s\n" \
 		   -e POSTGRES_DB=$POSTGRES_DB \
 		   -e POSTGRES_USER=$POSTGRES_USER \
-		   -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+		   -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+		   -p $DATABASE_PORT:$(get_container_port)
 	    ;;
     esac
 }
 
 . ./.env
 docker run -d \
-       $(get_docker_database_options) \
-       --network=host "$@" \
-       $(get_database_image_name)
+       $(get_docker_options) \
+       $(get_docker_image_name)
