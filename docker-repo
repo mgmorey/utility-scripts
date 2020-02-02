@@ -1,7 +1,5 @@
 #!/bin/sh -eu
 
-TAG=latest
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -9,6 +7,10 @@ abort() {
 
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_default_image_tag() {
+    git rev-parse --short HEAD
 }
 
 get_default_local_image() {
@@ -37,23 +39,26 @@ get_realpath() (
 )
 
 get_user_name() {
-    printf "%s\n" "${SUDO_USER-${USER-$LOGIN}}}"
+    printf "%s\n" "${SUDO_USER-${USER-$LOGIN}}"
 }
 
 docker_repo() {
-    eval $(get-configuration app.ini)
+    eval $($script_dir/get-configuration app.ini)
+    image_tag=$(get_default_image_tag)
     local_image=$(get_default_local_image)
     remote_image=$(get_default_remote_image)
 
     case "$1" in
 	(pull)
-	    docker pull $remote_image:$TAG
+	    docker pull $remote_image
 	    ;;
 	(push)
-	    docker push $remote_image:$TAG
+	    docker push $remote_image:$image_tag
+	    docker push $remote_image:latest
 	    ;;
 	(tag)
-	    docker tag $local_image:$TAG $remote_image:$TAG
+	    docker tag $local_image $remote_image:$image_tag
+	    docker tag $local_image $remote_image:latest
 	    ;;
 	(*)
 	    usage "%s: invalid argument -- %s\n" "$0" "$1"
@@ -77,7 +82,4 @@ EOF
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-. "$script_dir/common-functions.sh"
-
-set_user_profile "$script_dir"
 docker_repo "$@"
