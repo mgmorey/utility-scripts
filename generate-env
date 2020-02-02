@@ -1,0 +1,221 @@
+#!/bin/sh -eu
+
+# generate-env: print parameters for an environment file
+# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+format_dialect() {
+    if [ "${qualifier:=$(get_default_qualifier)}" = database ]; then
+	printf "${QUALIFIER}DIALECT=${dialect:=$(get_default_dialect)}\n"
+    fi
+}
+
+format_protocol() {
+    if [ "${qualifier:=$(get_default_qualifier)}" = mysql ]; then
+	printf "${QUALIFIER}PROTOCOL=${protocol:=$(get_default_protocol)}\n"
+    fi
+}
+
+format_qualifier() {
+    printf "${qualifier:=$(get_default_qualifier)}_\n" | to_upper
+}
+
+generate_env() {
+    QUALIFIER=$(format_qualifier)
+    format_dialect
+    format_protocol
+    cat <<EOF
+${QUALIFIER}HOST=${host:=$(get_default_host)}
+${QUALIFIER}PORT=${port:=$(get_default_port)}
+${QUALIFIER}USER=${user:=$(get_default_user)}
+${QUALIFIER}PASSWORD=${password:=$(get_default_password)}
+EOF
+}
+
+get_default_dialect() {
+    printf "%s\n" sqlite
+}
+
+get_default_host() {
+    case "${dialect:=$(get_default_dialect)}" in
+	(mysql)
+	    case ${protocol:=$(get_default_protocol)} in
+		(SOCKET)
+		    printf "%s\n" localhost
+		    ;;
+		(TCP)
+		    printf "%s\n" 127.0.0.1
+		    ;;
+	    esac
+	    ;;
+	(postgresql)
+	    printf "%s\n" localhost
+	    ;;
+    esac
+}
+
+get_default_password() {
+    case "${dialect:=$(get_default_dialect)}" in
+	(mysql|postgresql)
+	    pwgen 16 1
+	    ;;
+    esac
+}
+
+get_default_port() {
+    case "${dialect:=$(get_default_dialect)}" in
+	(mysql)
+	    printf "%s\n" 3306
+	    ;;
+	(postgresql)
+	    printf "%s\n" 5432
+	    ;;
+    esac
+}
+
+get_default_protocol() {
+    case "${dialect:=$(get_default_dialect)}" in
+	(mysql)
+	    printf "%s\n" SOCKET
+	    ;;
+    esac
+}
+
+get_default_qualifier() {
+    case "${dialect:=$(get_default_dialect)}" in
+	(mysql)
+	    printf "%s\n" mysql
+	    ;;
+	(postgresql)
+	    printf "%s\n" postgres
+	    ;;
+	(sqlite)
+	    printf "%s\n" database
+	    ;;
+    esac
+}
+
+get_default_user() {
+    case "${dialect:=$(get_default_dialect)}" in
+	(mysql|postgresql)
+	    printf "%s\n" "${SUDO_USER-${USER-$LOGIN}}"
+	    ;;
+    esac
+}
+
+parse_arguments() {
+    dialect=
+    host=
+    port=
+    password=
+    protocol=
+    qualifier=
+    user=
+
+    while getopts hDd:H:P:p:q:stu: opt; do
+	case $opt in
+	    (h)
+		usage
+		exit 0
+		;;
+	    (D)
+		qualifier=database
+		;;
+	    (d)
+		case "$OPTARG" in
+		    (mysql)
+			dialect=mysql
+			;;
+		    (postgres|postgresql)
+			dialect=postgresql
+			;;
+		    (sqlite)
+			dialect=sqlite
+			;;
+		    (*)
+			abort "%s: Invalid argument: %s" "$0" "$OPTARG"
+			;;
+		esac
+		;;
+	    (H)
+		host="$OPTARG"
+		;;
+	    (P)
+		port="$OPTARG"
+		;;
+	    (p)
+		password="$OPTARG"
+		;;
+	    (q)
+		case "$OPTARG" in
+		    (database|mysql)
+			qualifier=${OPTARG}
+			;;
+		    (postgres|postgresql)
+			qualifier=postgres
+			;;
+		    (*)
+			abort "%s: Invalid argument: %s" "$0" "$OPTARG"
+			;;
+		esac
+		;;
+	    (s)
+		protocol=SOCKET
+		;;
+	    (t)
+		protocol=TCP
+		;;
+	    (u)
+		user="$OPTARG"
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+}
+
+to_upper() {
+    tr '[:lower:]' '[:upper:]'
+}
+
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
+    fi
+
+    cat <<EOF >&2
+Usage: $0 [-d DIALECT] [-H HOST] [-P PORT] [-s|-t] [-q QUALIFIER] [-u USER]
+       $0 -h
+EOF
+}
+
+parse_arguments "$@"
+generate_env
