@@ -1,5 +1,21 @@
 #!/bin/sh -eu
 
+# docker-image: wrapper script for common Docker CLI commands
+# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -19,6 +35,10 @@ get_default_local_image() {
 
 get_default_remote_image() {
     printf "%s\n" "$(get_user_name)/$APP_NAME"
+}
+
+get_default_run_options() {
+    printf "%s\n" -dp $APP_PORT:$APP_PORT --rm
 }
 
 get_realpath() (
@@ -47,14 +67,21 @@ docker_repo() {
     image_tag=$(get_default_image_tag)
     local_image=$(get_default_local_image)
     remote_image=$(get_default_remote_image)
+    run_options=$(get_default_run_options)
 
     case "$1" in
+	(build)
+	    docker build -t $local_image .
+	    ;;
 	(pull)
 	    docker pull $remote_image
 	    ;;
 	(push)
 	    docker push $remote_image:$image_tag
 	    docker push $remote_image:latest
+	    ;;
+	(run)
+	    docker run $run_options $local_image
 	    ;;
 	(tag)
 	    docker tag $local_image $remote_image:$image_tag
@@ -79,6 +106,12 @@ Usage: $0 pull
        $0 tag
 EOF
 }
+
+if [ $# -lt 1 ]; then
+    abort "%s: Not enough arguments\n" "$0"
+elif [ $# -gt 1 ]; then
+    abort "%s: Too many arguments\n" "$0"
+fi
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
