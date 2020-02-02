@@ -1,0 +1,63 @@
+#!/bin/sh -eu
+
+# docker-run-database-client: invoke SQL DBMS command line client
+# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_database_client_command() {
+    case "$DATABASE_DIALECT" in
+	(mysql)
+	    printf "%s\n" mysql \
+		--protocol=${DATABASE_PROTOCOL:-TCP} \
+		--host=${DATABASE_HOST:-localhost} \
+		--port=${DATABASE_PORT:-3306} \
+		--user=${DATABASE_USER:-$USER} \
+		--password=${DATABASE_PASSWORD:-}
+	    ;;
+	(postgresql)
+	    printf "%s\n" psql \
+		--host=${DATABASE_HOST:-localhost} \
+		--port=${DATABASE_PORT:-5432} \
+		--username=${DATABASE_USER:-$USER} \
+		--password
+	    ;;
+    esac
+}
+
+get_database_image_name() {
+    case "$DATABASE_DIALECT" in
+	(mysql)
+	    printf "%s\n" mysql
+	    ;;
+	(postgresql)
+	    printf "%s\n" postgres
+	    ;;
+    esac
+}
+
+. ./.env
+docker run -it \
+       --network=host "$@" \
+       $(get_database_image_name) \
+       $(get_database_client_command)
