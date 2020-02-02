@@ -57,7 +57,13 @@ get_database_image_name() {
 }
 
 . ./.env
-docker run -it \
-       --network=host "$@" \
+
+if [ $# -gt 0 ]; then
+    options="$@"
+else
+    options="--network=host --rm"
+fi
+
+docker run -it $options \
        $(get_database_image_name) \
        $(get_database_client_command)
