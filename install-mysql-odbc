@@ -51,15 +51,15 @@ get_realpath() (
 )
 
 install_mysql_odbc() {
+    install-packages libodbc1
     prefix=/opt/$package
 
     if [ ! -d $prefix ]; then
-	tar -C /opt -xf $tarfile
+	tar -C /opt -xf $tarpath
 	/bin/mv -f /opt/$dirname /opt/$package
     fi
 
     chown -R root:root $prefix
-    install-packages libodbc1
 
     for encoding in ANSI UNICODE; do
 	eval name="\$NAME_$encoding"
@@ -76,8 +76,9 @@ install_mysql_odbc() {
 
 parse_arguments() {
     case "$1" in
-	($PKG_NAME-8.0.*-linux-$ID$VERSION_ID-x86-64bit.tar.gz)
-	    tarfile=$1
+	(*/$PKG_NAME-8.0.*-linux-$ID$VERSION_ID-x86-64bit.tar.gz)
+	    tarpath=$1
+            tarfile=$(basename $tarpath)
 	    dirname=${tarfile%.tar.gz}
 	    package=${dirname%-linux-*-x86-64bit}
 	    ;;
