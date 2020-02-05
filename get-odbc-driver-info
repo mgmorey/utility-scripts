@@ -54,6 +54,7 @@ def enumerate_drivers():
 
 def main():
     drivers = enumerate_drivers()
+    print(drivers)
 
     for driver in drivers:
         print(SQL_DIALECTS[driver])
