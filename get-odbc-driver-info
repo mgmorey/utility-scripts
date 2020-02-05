@@ -17,47 +17,51 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import configparser
+import json
 import os
 import re
 
 DRIVER_MSSQL = re.compile(r'libmsodbcsql-\d+\.\d+\.so\.\d+\.\d+')
-DRIVER_MYSQL = re.compile(r'libmyodbc\d+w\.so')
-DRIVER_POSTGRES = re.compile(r'psqlodbcw\.so')
+DRIVER_MYSQL = re.compile(r'libmyodbc\d+[aw]\.so')
+DRIVER_POSTGRES = re.compile(r'psqlodbc[aw]\.so')
+
+ODBC_DIALECTS = {
+    DRIVER_MSSQL: 'mysql',
+    DRIVER_MYSQL: 'mysql',
+    DRIVER_POSTGRES: 'postgres',
+}
 
 ODBC_DRIVERS = '/etc/odbcinst.ini'
 
-SQL_DIALECTS = {
-    'mssql': (DRIVER_MSSQL, 1403, 'sa', 'MSSQL'),
-    'mysql': (DRIVER_MYSQL, 3306, 'root', 'MySQL'),
-    'postgres': (DRIVER_POSTGRES, 5432, 'postgres', 'PostgreSQL'),
-}
 
-
-def enumerate_drivers():
+def enumerate_drivers() -> list:
     inifile = configparser.ConfigParser()
     inifile.read(ODBC_DRIVERS)
-    drivers = {}
+    drivers = []
 
-    for driver in inifile.sections():
-        pathname = inifile[driver]['Driver']
-        filename = os.path.basename(pathname)
+    for section in inifile.sections():
+        driver = inifile[section]
+        dialect = get_dialect(driver)
+        items = {k: driver[k] for k in driver}
+        row = [dialect, section, items]
+        drivers.append(tuple(row))
 
-        for dialect in SQL_DIALECTS:
-            sql_dialect = SQL_DIALECTS[dialect]
-            regex = sql_dialect[0]
+    return sorted(drivers)
 
-            if regex.fullmatch(filename):
-                drivers[dialect] = driver
 
-    return drivers
+def get_dialect(driver: dict) -> str:
+    dialect = 'unknown'
+    library = os.path.basename(driver['driver'])
+
+    for pattern in ODBC_DIALECTS:
+        if pattern.fullmatch(library):
+            dialect = ODBC_DIALECTS[pattern]
+
+    return dialect
 
 
 def main():
-    drivers = enumerate_drivers()
-    print(drivers)
-
-    for driver in drivers:
-        print(SQL_DIALECTS[driver])
+    print(json.dumps(enumerate_drivers(), indent=4, sort_keys=True))
 
 
 if __name__ == '__main__':
