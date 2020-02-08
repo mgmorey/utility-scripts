@@ -78,14 +78,12 @@ docker_repo() {
 	    ;;
 	(push)
 	    docker push $remote_image:$image_tag
-	    docker push $remote_image:latest
 	    ;;
 	(run)
 	    docker run $run_options $local_image
 	    ;;
 	(tag)
 	    docker tag $local_image $remote_image:$image_tag
-	    docker tag $local_image $remote_image:latest
 	    ;;
 	(*)
 	    usage "%s: invalid argument -- %s\n" "$0" "$1"
