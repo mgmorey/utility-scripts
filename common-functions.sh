@@ -39,6 +39,9 @@ get_home_directory() {
     assert [ $# -eq 1 ]
 
     case "${kernel_name=$(uname -s)}" in
+	(MINGW64_NT-*)
+	    printf "/c/Users/%s\n" "$1"
+	    ;;
 	(Darwin)
 	    printf "/Users/%s\n" "$1"
 	    ;;
@@ -67,6 +70,9 @@ get_shell() {
     assert [ $# -eq 1 ]
 
     case "${kernel_name=$(uname -s)}" in
+	(MINGW64_NT-*)
+	    printf "%s\n" /bin/bash
+	    ;;
 	(Darwin)
 	    printf "%s\n" /bin/bash
 	    ;;
