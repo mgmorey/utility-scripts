@@ -124,7 +124,7 @@ get_su_command() (
 )
 
 get_user_name() {
-    printf "%s\n" "${SUDO_USER-${USER-${LOGNAME}}}"
+    printf "%s\n" "${SUDO_USER-${USER-${USERNAME-${LOGNAME-}}}}"
 }
 
 is_included() {
