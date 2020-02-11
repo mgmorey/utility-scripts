@@ -51,10 +51,10 @@ collect_data() {
 
     case "$kernel_name" in
 	(CYGWIN_NT-*)
-	    collect_data_for_cygwin $kernel_data
+	    collect_data_for_windows $kernel_data
 	    ;;
 	(MINGW64_NT-*)
-	    collect_data_for_mingw64 $kernel_data
+	    collect_data_for_windows $kernel_data
 	    ;;
 	(Linux|GNU)
 	    collect_data_for_gnu $kernel_data
@@ -72,14 +72,6 @@ collect_data() {
     esac
 
     collect_defaults
-}
-
-collect_data_for_cygwin() {
-    kernel_release=$(printf "%s\n" "${kernel_data#* }" | sed -e 's/(.*)//')
-    os_family=gnu-cygwin
-    NAME="Microsoft Windows"
-    VERSION=${kernel_name#*-}
-    ID=windows
 }
 
 collect_data_for_darwin() {
@@ -104,14 +96,6 @@ collect_data_for_gnu() {
     if [ "$is_extended_set" = true ]; then
 	os_version_id=$(get_os_version_id)
     fi
-}
-
-collect_data_for_mingw64() {
-    kernel_release=$(printf "%s\n" "${kernel_data#* }" | sed -e 's/(.*)//')
-    os_family=gnu-mingw64
-    NAME="Microsoft Windows"
-    VERSION=${kernel_name#*-}
-    ID=windows
 }
 
 collect_data_for_sunos() {
@@ -148,6 +132,14 @@ collect_data_for_unix() {
     VERSION=$kernel_release
     ID=$(printf "%s\n" "$NAME" | to_lower)
     PRETTY_NAME=$kernel_data
+}
+
+collect_data_for_windows() {
+    kernel_release=$(printf "%s\n" "${kernel_data#* }" | sed -e 's/(.*)//')
+    os_family=ms-windows
+    NAME="Microsoft Windows"
+    VERSION=${kernel_name#*-}
+    ID=windows
 }
 
 collect_defaults() {
