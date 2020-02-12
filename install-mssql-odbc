@@ -62,7 +62,7 @@ install_mssql_odbc() {
     add_apt_source
     export ACCEPT_EULA=Y
     install-packages msodbcsql17 mssql-tools unixodbc unixodbc-dev
-    sudo ln -sf /opt/mssql-tools/bin/* /usr/local/bin
+    ln -sf /opt/mssql-tools/bin/* /usr/local/bin
 }
 
 validate_platform() {
