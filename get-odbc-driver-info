@@ -26,7 +26,7 @@ DRIVER_MYSQL = re.compile(r'libmyodbc\d+[aw]\.so')
 DRIVER_POSTGRES = re.compile(r'psqlodbc[aw]\.so')
 
 ODBC_DIALECTS = {
-    DRIVER_MSSQL: 'mysql',
+    DRIVER_MSSQL: 'mssql',
     DRIVER_MYSQL: 'mysql',
     DRIVER_POSTGRES: 'postgres',
 }
