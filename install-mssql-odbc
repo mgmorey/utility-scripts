@@ -24,6 +24,10 @@ abort() {
     exit 1
 }
 
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
+
 add_apt_source() {
     if [ ! -f $MSSQL_RELEASE ]; then
        curl $BASE_URL/keys/microsoft.asc | apt-key add -
