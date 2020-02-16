@@ -43,6 +43,14 @@ get_realpath() (
 )
 
 install_dependencies() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (windows)
+		return 0
+		;;
+	esac
+    done
+
     install-packages $(get-python-pip-packages)
 }
 
