@@ -503,6 +503,9 @@ set_compiler() {
 set_flags() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (illumos)
+		break
+		;;
 	    (solaris)
 		export CFLAGS=-m64
 		break
