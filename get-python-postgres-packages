@@ -138,6 +138,16 @@ get_python_postgres_packages() {
 			;;
 		esac
 		;;
+	    (illumos)
+		case "$VERSION_ID" in
+		    (2019.10)
+			packages=$SOLARIS_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
 	    (macos)
 		case "$VERSION_ID" in
 		    (10.14.*)
