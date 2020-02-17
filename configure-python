@@ -86,10 +86,10 @@ configure_platform() {
 	    # 	configure_platform_unix_freebsd
 	    # 	break
 	    # 	;;
-	    (illumos)
-		configure_platform_unix_illumos
-		break
-		;;
+	    # (illumos)
+	    # 	configure_platform_unix_illumos
+	    # 	break
+	    # 	;;
 	    (netbsd)
 	    	configure_platform_unix_netbsd
 	    	break
