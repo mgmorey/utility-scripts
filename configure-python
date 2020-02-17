@@ -305,6 +305,14 @@ include_prefix() {
 }
 
 install_dependencies() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (windows)
+		return 0
+		;;
+	esac
+    done
+
     packages="$(get_packages | sort -u)"
     pattern="$(get-development-pattern)"
     install-packages ${pattern:+-p "$pattern" }$packages
