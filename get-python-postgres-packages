@@ -22,6 +22,8 @@ FEDORA_PKGS="libpq-devel %s-psycopg2"
 
 FREEBSD_PKGS="%s-psycopg2"
 
+ILLUMOS_PKGS="database/postgres-11/developer"
+
 MACOS_HOMEBREW_PKGS="libpq"
 
 OPENSUSE_PKGS=
@@ -141,7 +143,7 @@ get_python_postgres_packages() {
 	    (illumos)
 		case "$VERSION_ID" in
 		    (2019.10)
-			packages=$SOLARIS_PKGS
+			packages=$ILLUMOS_PKGS
 			;;
 		    (*)
 			break
