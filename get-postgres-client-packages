@@ -22,6 +22,8 @@ FEDORA_PKGS="postgresql"
 
 FREEBSD_PKGS="postgresql11-client"
 
+ILLUMOS_PKGS="database/postgres-11"
+
 MACOS_HOMEBREW_PKGS="postgresql"
 
 OPENSUSE_PKGS="postgresql"
@@ -148,6 +150,16 @@ get_postgres_packages() {
 			;;
 		    (12.1-*)
 			packages=$FREEBSD_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (illumos)
+		case "$VERSION_ID" in
+		    (2019.10)
+			packages=$ILLUMOS_PKGS
 			;;
 		    (*)
 			break
