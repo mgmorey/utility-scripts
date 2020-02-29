@@ -146,20 +146,20 @@ collect_defaults() {
 	PRETTY_NAME="$NAME $VERSION"
     fi
 
-    if [ "$is_extended_set" = false ]; then
-	return
-    fi
-
-    if [ -z "${os_version_id-}" ]; then
-	os_version_id=$VERSION_ID
-    fi
-
     if [ -z "${kernel_name-}" ]; then
         kernel_name=$system_name
     fi
 
+    if [ "$is_extended_set" = false ]; then
+	return
+    fi
+
     if [ -z "${kernel_release-}" ]; then
 	kernel_release=$system_release
+    fi
+
+    if [ -z "${os_version_id-}" ]; then
+	os_version_id=$VERSION_ID
     fi
 }
 
