@@ -32,7 +32,8 @@ OPENSUSE_PKGS="catatonit containerd docker docker-libnetwork docker-runc"
 REDHAT_PKGS="container-selinux containernetworking-plugins containers-common \
 podman podman-docker runc"
 
-UBUNTU_PKGS="containerd docker.io runc tini"
+UBUNTU_18_PKGS="containerd docker.io runc"
+UBUNTU_19_PKGS="containerd docker.io runc tini"
 
 abort() {
     printf "$@" >&2
@@ -66,7 +67,14 @@ get_docker_packages() {
 		packages=$REDHAT_PKGS
 		;;
 	    (ubuntu)
-		packages=$UBUNTU_PKGS
+		case "$VERSION_ID" in
+		    (18.04)
+			packages=$UBUNTU_18_PKGS
+			;;
+		    (19.10)
+			packages=$UBUNTU_18_PKGS
+			;;
+		esac
 		;;
 	    (freebsd)
 		packages=$FREEBSD_PKGS
