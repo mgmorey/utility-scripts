@@ -45,28 +45,25 @@ abort_too_many_arguments() {
 }
 
 collect_data() {
-    kernel_data=$(uname -sr)
-    kernel_name=${kernel_data% *}
-    kernel_release=${kernel_data#* }
+    system_data=$(uname -sr)
+    system_name=${system_data% *}
+    system_release=${system_data#* }
 
-    case "$kernel_name" in
-	(CYGWIN_NT-*)
-	    collect_data_for_windows $kernel_data
+    case "$system_name" in
+	(CYGWIN_NT-*|MINGW64_NT-*)
+	    collect_data_for_windows
 	    ;;
-	(MINGW64_NT-*)
-	    collect_data_for_windows $kernel_data
-	    ;;
-	(Linux|GNU)
-	    collect_data_for_gnu $kernel_data
+	(GNU|Linux)
+	    collect_data_for_gnu
 	    ;;
 	(Darwin)
-	    collect_data_for_darwin $kernel_data
+	    collect_data_for_darwin
 	    ;;
 	(SunOS)
-	    collect_data_for_sunos $kernel_data
+	    collect_data_for_sunos
 	    ;;
 	(*)
-	    collect_data_for_unix $kernel_data
+	    collect_data_for_unix
 	    ;;
 
     esac
@@ -75,14 +72,16 @@ collect_data() {
 }
 
 collect_data_for_darwin() {
-    os_family=unix
+    ID=macos
     NAME=$(sw_vers -productName)
     VERSION=$(sw_vers -productVersion)
-    ID=macos
+    os_family=unix
 }
 
 collect_data_for_gnu() {
-    case "$kernel_name" in
+    . $FILE_OS_RELEASE
+
+    case "$system_name" in
 	(GNU)
 	    os_family=gnu-hurd
 	    ;;
@@ -91,55 +90,47 @@ collect_data_for_gnu() {
 	    ;;
     esac
 
-    . $FILE_OS_RELEASE
-
     if [ "$is_extended_set" = true ]; then
 	os_version_id=$(get_os_version_id)
     fi
 }
 
 collect_data_for_sunos() {
+    os_data=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE_RELEASE)
     ID="$(uname -o | to_lower)"
 
     case "$ID" in
 	(illumos)
-	    os_data=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE_RELEASE)
-	    os_family=unix
 	    ID_LIKE="solaris sunos"
-	    NAME=${os_data%:*}
-	    VERSION=${os_data#*:}
 	    ;;
 	(solaris)
-	    os_data=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE_RELEASE)
-	    os_family=unix
 	    ID_LIKE="sunos"
-	    NAME=${os_data%:*}
-	    VERSION=${os_data#*:}
 	    ;;
 	(*)
-	    os_data=$(awk 'NR == 1 {printf("%s %s:%s\n", $1, $2, $3)}' $FILE_RELEASE)
-	    os_family=unix
 	    ID_LIKE="sunos"
-	    NAME=${os_data%:*}
-	    VERSION=${os_data#*:}
 	    ;;
     esac
+
+    NAME=${os_data%:*}
+    VERSION=${os_data#*:}
+    os_family=unix
 }
 
 collect_data_for_unix() {
+    ID=$(printf "%s\n" "$system_name" | to_lower)
+    NAME=$system_name
+    VERSION=$system_release
+    PRETTY_NAME=$system_data
     os_family=unix
-    NAME=$kernel_name
-    VERSION=$kernel_release
-    ID=$(printf "%s\n" "$NAME" | to_lower)
-    PRETTY_NAME=$kernel_data
 }
 
 collect_data_for_windows() {
-    kernel_release=$(printf "%s\n" "${kernel_data#* }" | sed -e 's/(.*)//')
-    os_family=ms-windows
-    NAME="Microsoft Windows"
-    VERSION=${kernel_name#*-}
     ID=windows
+    NAME="Microsoft Windows"
+    VERSION=${system_name#*-}
+    kernel_name=${system_name%-*}
+    kernel_release=$(printf "%s\n" "$system_release" | sed -e 's/(.*)//')
+    os_family=ms-windows
 }
 
 collect_defaults() {
@@ -162,10 +153,18 @@ collect_defaults() {
     if [ -z "${os_version_id-}" ]; then
 	os_version_id=$VERSION_ID
     fi
+
+    if [ -z "${kernel_name-}" ]; then
+        kernel_name=$system_name
+    fi
+
+    if [ -z "${kernel_release-}" ]; then
+	kernel_release=$system_release
+    fi
 }
 
 get_os_version_id() {
-    case "$kernel_name" in
+    case "$system_name" in
 	(Linux|GNU)
 	    case "$ID" in
 		(debian|raspbian)
