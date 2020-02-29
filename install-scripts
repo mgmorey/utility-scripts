@@ -76,13 +76,11 @@ install_scripts() {
 		:
 		;;
 	    (*.sh)
-		if [ ! -e "bin/$(basename "$file")" ]; then
-		    ln -s "$file" bin
-		fi
+		ln -sf "$file" bin
 		;;
 	    (*)
-		if [ ! -e "bin/$(basename "$file")" -a -x "$file" ]; then
-		    ln -s "$file" bin
+		if [ -x "$file" ]; then
+		    ln -sf "$file" bin
 		fi
 		;;
 	esac
