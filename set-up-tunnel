@@ -62,7 +62,8 @@ validate_platform() {
 	(Linux|GNU)
 	    case "$ID" in
 		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-	    	;;
+		    true
+	    	    ;;
 		(*)
 		    abort_not_supported Distro
 		    ;;
