@@ -16,10 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DARWIN_PKG_DIR=/Library/Developer/CommandLineTools/Packages/
-DARWIN_PKG_NAME=macOS_SDK_headers_for_macOS_10.14.pkg
-
-DEBIAN_PKG=python3-defaults
+DARWIN_PKG_BASENAME=macOS_SDK_headers_for_macOS_%s.pkg
+DARWIN_PKG_DIRNAME=/Library/Developer/CommandLineTools/Packages/
 
 abort() {
     printf "$@" >&2
@@ -32,6 +30,10 @@ abort_not_supported() {
 
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_darwin_pkg_pathname() {
+    printf "%s/$DARWIN_PKG_BASENAME\n" $DARWIN_PKG_DIRNAME $VERSION_ID
 }
 
 get_realpath() (
@@ -55,8 +57,12 @@ install_macos_sdk_headers() {
     case "$kernel_name" in
 	(Darwin)
 	    case "$VERSION_ID" in
-		(10.14.*)
-		    installer -pkg $DARWIN_PKG_DIR/$DARWIN_PKG_NAME -target /
+		(10.14.*|10.15.*)
+		    darwin_pkg_pathname=$(get_darwin_pkg_pathname)
+
+		    if [ -e $darwin_pkg_pathname ]; then
+			installer -pkg $darwin_pkg_pathname -target /
+		    fi
 		    ;;
 		(*)
 		    abort_not_supported Release

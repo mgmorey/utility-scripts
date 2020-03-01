@@ -16,6 +16,73 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk \
-       MACOSX_DEPLOYMENT_TARGET=10.14 \
-       pyenv install "$@"
+DARWIN_SDK_BASENAME=MacOSX%s.sdk
+DARWIN_SDK_DIRNAME=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_darwin_sdkroot() {
+    printf "%s/$DARWIN_SDK_BASENAME\n" $DARWIN_SDK_DIRNAME $VERSION_ID
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+install_pyenv_on_macos() {
+    case "$kernel_name" in
+	(Darwin)
+	    case "$VERSION_ID" in
+		(10.14.*|10.15.*)
+		    darwin_sdkroot=$(get_darwin_sdkroot)
+
+		    if [ -e $darwin_sdkroot ]; then
+			export MACOSX_DEPLOYMENT_TARGET=$VERSION_ID
+			export SDKROOT=$darwin_sdkroot
+		    fi
+
+		    brew install pyenv
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
+
+if [ $# -gt 0 ]; then
+    abort "%s: Too many arguments\n" "$0"
+fi
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+eval $("$script_dir/get-os-release" -x)
+install_pyenv_on_macos "$@"

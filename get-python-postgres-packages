@@ -155,6 +155,9 @@ get_python_postgres_packages() {
 		    (10.14.*)
 			packages=$MACOS_HOMEBREW_PKGS
 			;;
+		    (10.15.*)
+			packages=$MACOS_HOMEBREW_PKGS
+			;;
 		    (*)
 			break
 			;;

@@ -158,6 +158,9 @@ validate_platform() {
 		(10.14.*)
 		    :
 		    ;;
+		(10.15.*)
+		    :
+		    ;;
 		(*)
 		    abort_not_supported Release
 		    ;;

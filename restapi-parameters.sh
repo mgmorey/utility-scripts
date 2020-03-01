@@ -172,6 +172,9 @@ configure_baseline() {
 		(10.14.*)
 		    configure_unix_macos
 		    ;;
+		(10.15.*)
+		    configure_unix_macos
+		    ;;
 		(*)
 		    abort_not_supported Release
 		    ;;
