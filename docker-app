@@ -61,17 +61,17 @@ docker_app() {
 
     case "$action" in
 	(build)
-	    docker build -t $image${tag+:$tag} .
-	    docker tag $image${tag+:$tag} $image:latest
+	    docker build -t $image${tag:+:$tag} .
+	    docker tag $image${tag:+:$tag} $image:latest
 	    ;;
 	(pull)
-	    docker pull $image${tag+:$tag}
+	    docker pull $image${tag:+:$tag}
 	    ;;
 	(push)
-	    docker push $image${tag+:$tag}
+	    docker push $image${tag:+:$tag}
 	    ;;
 	(run)
-	    docker run $opts $image${tag+:$tag}
+	    docker run $opts $image${tag:+:$tag}
 	    ;;
 	(*)
 	    usage "%s: invalid argument -- %s\n" "$0" "$1"
