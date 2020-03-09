@@ -618,14 +618,8 @@ configure_unix_macos() {
     SYSTEM_PYTHON=/usr/local/bin/python3
 
     # Set uWSGI binary/plugin directories
-    UWSGI_BINARY_DIR=/usr/local/opt/uwsgi/bin
-    UWSGI_PLUGIN_DIR=/usr/local/opt/uwsgi/libexec/uwsgi
-
-    # # Set uWSGI binary file
-    # UWSGI_BINARY_NAME=uwsgi
-
-    # # Set uWSGI plugin file
-    # UWSGI_PLUGIN_NAME=python3_plugin.so
+    UWSGI_BINARY_DIR=/usr/local/bin
+    UWSGI_PLUGIN_DIR=$(get_brew_cellar uwsgi)/libexec/uwsgi
 
     # Set other uWSGI parameters
     UWSGI_ORIGIN=homebrew
@@ -693,6 +687,12 @@ find_uwsgi_plugin() {
     if [ $UWSGI_HAS_PLUGIN = true ]; then
 	find_plugins | head -n 1
     fi
+}
+
+get_brew_cellar() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    brew info $1 | awk 'NR == 4 {print $1}'
 }
 
 get_service_processes() {
