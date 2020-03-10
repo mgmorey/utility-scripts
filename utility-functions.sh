@@ -46,7 +46,7 @@ check_python() {
 create_virtualenv() (
     assert [ $# -ge 1 ]
     assert [ -n "$1" ]
-    python=${2-}
+    python="${2-}"
 
     if [ -z "${python-}" ]; then
 	python=$(find_system_python | awk '{print $1}')
@@ -55,13 +55,13 @@ create_virtualenv() (
 	    abort "%s\n" "No suitable system Python interpreter found"
 	fi
 
-	python=$(find_user_python $python)
+	python="$(find_user_python "$python")"
 
 	if [ -z "${python-}" ]; then
 	    abort "%s\n" "No suitable user Python interpreter found"
 	fi
 
-	version="$(get_python_version $python)"
+	version="$(get_python_version "$python")"
 
 	if ! check_python "$python" "$version"; then
 	    abort "%s\n" "No suitable Python interpreter found"
@@ -75,12 +75,12 @@ create_virtualenv() (
     for utility in ${venv_utilities-$VENV_UTILITIES}; do
 	case "$utility" in
 	    (pyvenv)
-		command=$(get_command -p $python $utility || true)
+		command=$(get_command -p "$python" $utility || true)
 		options="$1"
 		;;
 	    (virtualenv)
 		command=$(get_command $utility || true)
-		options="-p $python $1"
+		options="-p \"$python\" $1"
 		;;
 	    (*)
 		command=
@@ -100,7 +100,7 @@ create_virtualenv() (
 		   "$(which $pathname)" >&2
 	fi
 
-	if $command $options; then
+	if eval $command $options; then
 	    return 0
 	fi
     done
@@ -110,8 +110,8 @@ create_virtualenv() (
 
 find_python() (
     python=$(find_system_python | awk '{print $1}')
-    python=$(find_user_python $python)
-    version="$(get_python_version $python)"
+    python=$(find_user_python "$python")
+    version="$(get_python_version "$python")"
 
     if ! check_python "$python" "$version" >&2; then
 	abort "%s\n" "No suitable Python interpreter found"
@@ -174,7 +174,7 @@ find_user_python() (
 
 	    if [ -z "$python" ]; then
 		if install_python_version >&2; then
-		    python=$(find_user_python_installed $pyenv_root $version)
+		    python="$(find_user_python_installed $pyenv_root $version)"
 		else
 		    break
 		fi
@@ -188,7 +188,7 @@ find_user_python() (
     fi
 
     for version in $python_versions; do
-	python=$($which python$version 2>/dev/null || true)
+	python="$($which python$version 2>/dev/null || true)"
 
 	if [ -n "$python" ]; then
 	    printf "%s\n" "$python"
@@ -207,7 +207,7 @@ find_user_python_installed() (
     pythons="$(ls $1/versions/$2.*/bin/python 2>/dev/null | $sort_versions)"
 
     for python in $pythons; do
-	if $python --version >/dev/null 2>&1; then
+	if "$python" --version >/dev/null 2>&1; then
 	    printf "%s\n" "$python"
 	    return 0
 	fi
@@ -307,8 +307,12 @@ get_pip_requirements() {
     printf -- "--requirement %s\n" ${pip_install_files:-$PIP_INSTALL_MAIN}
 }
 
+get_pip_version() {
+    "$1" --version | awk '{print $2}'
+}
+
 get_python_version() (
-    output="$($1 --version)"
+    output="$("$1" --version)"
 
     if [ -n "$output" ]; then
 	printf "%s\n" "${output#Python }"
@@ -425,7 +429,7 @@ install_via_pip() (
     fi
 
     if [ "$PIP_INSTALL_VERBOSE" = true ]; then
-	printf "Using %s\n" "$($pip --version)" >&2
+	printf "Using %s\n" "$("$pip" --version)" >&2
     fi
 
     if [ "$(id -u)" -eq 0 ]; then
@@ -434,8 +438,14 @@ install_via_pip() (
 	options=
     fi
 
+    case "$(get_pip_version "$pip")" in
+	(19.3.1)
+	    options="${options:+$options }--no-warn-script-location"
+	    ;;
+    esac
+
     if [ "$PIP_INSTALL_QUIET" = true ]; then
-	options="${options+$options }--quiet"
+	options="${options:+$options }--quiet"
     fi
 
     $pip install $options "$@" >&2
