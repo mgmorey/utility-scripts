@@ -16,13 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-BASE_URL=https://github.com/mgmorey
-PROJECT=startup-files
+BASE_URL=https://%s@github.com/mgmorey
+PROJECT_NAME=startup-files
+
+PROJECT_URL=$BASE_URL/$PROJECT_NAME.git
 
 STARTUP_FILES=".bashrc .editorconfig .profile"
 STARTUP_FILES_LEGACY=".bash_profile .emacs"
-
-STARTUP_FILES_URL=$BASE_URL/$PROJECT.git
 
 abort() {
     printf "$@" >&2
@@ -104,6 +104,10 @@ get_realpath() (
     fi
 )
 
+get_user_name() {
+    printf "%s\n" "${SUDO_USER-${USER-${USERNAME-${LOGNAME-}}}}"
+}
+
 install_startup_files() {
     if [ ! -h $0 ]; then
 	abort "Please change from source directory before running this script\n"
@@ -112,8 +116,8 @@ install_startup_files() {
     create_git_directory
     cd git
 
-    if [ ! -d $PROJECT ]; then
-	git clone $STARTUP_FILES_URL
+    if [ ! -d $PROJECT_NAME ]; then
+	git clone $(printf "$PROJECT_URL\n" "$(get_user_name)")
     fi
 
     cd
