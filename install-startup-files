@@ -128,9 +128,9 @@ install_startup_files() {
 
 	    if [ -r /etc/skel/$file -a "$file" = .profile ]; then
 		$install -bm 644 /etc/skel/$file $file
-		cat $HOME/git/$PROJECT/$file >>$file
+		cat $HOME/git/$PROJECT_NAME/$file >>$file
 	    else
-		$install -bm 644 $HOME/git/$PROJECT/$file $file
+		$install -bm 644 $HOME/git/$PROJECT_NAME/$file $file
 	    fi
 	fi
     done
@@ -145,7 +145,7 @@ install_startup_files() {
 
 	if [ ! -e init.el ]; then
 	    printf "Installing %s\n" .emacs.d/init.el
-	    $install -bm 644 $HOME/git/$PROJECT/.emacs.d/init.el init.el
+	    $install -bm 644 $HOME/git/$PROJECT_NAME/.emacs.d/init.el init.el
 	fi
     fi
 
