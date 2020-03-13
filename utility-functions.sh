@@ -308,7 +308,7 @@ get_pip_requirements() {
 }
 
 get_pip_version() {
-    $1 --version | awk '{print $2}'
+    "$@" --version | awk '{print $2}'
 }
 
 get_python_version() (
@@ -438,7 +438,7 @@ install_via_pip() (
 	options=
     fi
 
-    case "$(get_pip_version "$pip")" in
+    case "$(get_pip_version $pip)" in
 	(19.3.1)
 	    options="${options:+$options }--no-warn-script-location"
 	    ;;
