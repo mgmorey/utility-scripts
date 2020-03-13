@@ -308,7 +308,7 @@ get_pip_requirements() {
 }
 
 get_pip_version() {
-    "$1" --version | awk '{print $2}'
+    $1 --version | awk '{print $2}'
 }
 
 get_python_version() (
