@@ -25,6 +25,11 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+docker_run_database_server() {
+    docker run -d $(get_docker_options) $options \
+	   $(get_docker_image_name)
+}
+
 get_container_port() {
     case "$DATABASE_DIALECT" in
 	(mysql)
@@ -69,12 +74,15 @@ get_docker_options() {
     esac
 }
 
+parse_arguments() {
+    if [ $# -gt 0 ]; then
+	options="$@"
+    else
+	options="--rm"
+    fi
+}
+
 . ./.env
 
-if [ $# -gt 0 ]; then
-    options="$@"
-else
-    options="--rm $(get_docker_image_name)"
-fi
-
-docker run -d $(get_docker_options) $options
+parse_arguments "$@"
+docker_run_database_server

@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+ENV_FILE=$HOME/.env
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -25,22 +27,32 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+docker_run_database_client() {
+    docker run -it $options \
+	   $(get_database_image_name) \
+	   $(get_database_client_command)
+}
+
 get_database_client_command() {
     case "$DATABASE_DIALECT" in
 	(mysql)
 	    printf "%s\n" mysql \
-		--protocol=${DATABASE_PROTOCOL:-TCP} \
-		--host=${DATABASE_HOST:-localhost} \
-		--port=${DATABASE_PORT:-3306} \
-		--user=${DATABASE_USER:-$USER} \
-		--password=${DATABASE_PASSWORD:-}
+		   --protocol=${DATABASE_PROTOCOL:-TCP} \
+		   --host=${DATABASE_HOST:-localhost} \
+		   --port=${DATABASE_PORT:-3306} \
+		   --user=${DATABASE_USER:-$USER} \
+		   --password=${DATABASE_PASSWORD:-}
+	    ;;
+	(oracle)
+	    printf "%s\n" sqlplus \
+		   "system/${DATABASE_PASSWORD}@//localhost:5121/ORCLCDB"
 	    ;;
 	(postgresql)
 	    printf "%s\n" psql \
-		--host=${DATABASE_HOST:-localhost} \
-		--port=${DATABASE_PORT:-5432} \
-		--username=${DATABASE_USER:-$USER} \
-		--password
+		   --host=${DATABASE_HOST:-localhost} \
+		   --port=${DATABASE_PORT:-5432} \
+		   --username=${DATABASE_USER:-$USER} \
+		   --password
 	    ;;
     esac
 }
@@ -50,18 +62,28 @@ get_database_image_name() {
 	(mysql)
 	    printf "%s\n" mysql
 	    ;;
+	(oracle)
+	    printf "%s\n" oracle/database:19.3.0-se2
+	    ;;
 	(postgresql)
 	    printf "%s\n" postgres
 	    ;;
     esac
 }
 
-. ./.env
+parse_arguments() {
+    if [ $# -gt 0 ]; then
+	options="$@"
+    else
+	options="--network=host --rm"
+    fi
+}
 
-if [ $# -gt 0 ]; then
-    options="$@"
-else
-    options="--network=host --rm $(get_database_image_name)"
+if [ ! -r $ENV_FILE ]; then
+    abort "%s: %s: No such environment file\n" "$0" $ENV_FILE
 fi
 
-docker run -it $options $(get_database_client_command)
+. $ENV_FILE
+
+parse_arguments "$@"
+docker_run_database_client
