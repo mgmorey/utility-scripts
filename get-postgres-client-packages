@@ -64,11 +64,18 @@ get_realpath() (
 get_postgres_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (centos)
+	    (amzn)
 		case "$VERSION_ID" in
-		    (7)
+		    (2)
+			packages=$REDHAT_7_PKGS
+			;;
+		    (*)
 			break
 			;;
+		esac
+		;;
+	    (centos)
+		case "$VERSION_ID" in
 		    (8)
 			packages=$REDHAT_8_PKGS
 			;;
@@ -119,9 +126,6 @@ get_postgres_packages() {
 		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
-		    (7.*)
-			break
-			;;
 		    (8.*)
 			packages=$REDHAT_8_PKGS
 			;;

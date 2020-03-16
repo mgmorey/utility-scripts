@@ -51,6 +51,9 @@ get_emacs_build_deps() {
 		    (8)
 			packages=$CENTOS_8_PKGS
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (debian)
@@ -66,6 +69,9 @@ get_emacs_build_deps() {
 			;;
 		    (8.*)
 			packages=$REDHAT_8_PKGS
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;

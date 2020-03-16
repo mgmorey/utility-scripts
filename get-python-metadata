@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+AMAZON_2_DATA="python37 python3"
+
 DEBIAN_DATA="python3 python3"
 
 FEDORA_DATA="python3 python3"
@@ -48,6 +50,16 @@ assert() {
 get_python_metadata() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (amzn)
+		case "$VERSION_ID" in
+		    (2)
+			data="$AMAZON_2_DATA"
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
 	    (debian)
 		data="$DEBIAN_DATA"
 		;;
@@ -64,6 +76,9 @@ get_python_metadata() {
 			;;
 		    (8|8.*)
 			data="$REDHAT_8_DATA"
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;

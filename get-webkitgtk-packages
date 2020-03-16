@@ -48,6 +48,16 @@ get_emacs_build_deps() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (amzn)
+		case "$VERSION_ID" in
+		    (2)
+			packages=$CENTOS_7_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
 	    (centos)
 		case "$VERSION_ID" in
 		    (7)
@@ -55,6 +65,9 @@ get_emacs_build_deps() {
 			;;
 		    (8)
 			packages=$CENTOS_8_PKGS
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;
@@ -74,6 +87,9 @@ get_emacs_build_deps() {
 			;;
 		    (8.*)
 			packages=$REDHAT_8_PKGS
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;

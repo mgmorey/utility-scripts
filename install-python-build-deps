@@ -106,6 +106,13 @@ install_python_build_packages() {
 validate_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (amzn)
+		case "$VERSION_ID" in
+		    (2)
+			return
+			;;
+		esac
+		;;
 	    (centos)
 		case "$VERSION_ID" in
 		    (7)

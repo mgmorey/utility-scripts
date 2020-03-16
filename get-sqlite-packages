@@ -72,7 +72,7 @@ get_sqlite_packages() {
 	    (fedora)
 		packages=$FEDORA_PKGS
 		;;
-	    (rhel|ol|centos)
+	    (rhel|ol|centos|amzn)
 		packages=$REDHAT_PKGS
 		;;
 	    (freebsd)

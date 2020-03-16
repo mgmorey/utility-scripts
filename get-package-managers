@@ -28,6 +28,16 @@ assert() {
 get_package_managers() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (amzn)
+		case "$VERSION_ID" in
+		    (2)
+			managers="/usr/bin/yum"
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
 	    (debian)
 		managers="/usr/bin/apt-get"
 		;;
@@ -44,6 +54,9 @@ get_package_managers() {
 			;;
 		    (8|8.*)
 			managers="/usr/bin/dnf"
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;
