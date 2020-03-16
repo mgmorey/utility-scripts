@@ -87,8 +87,8 @@ install_scripts() {
     done
 }
 
-if [ -h $0 ]; then
-    abort "This script must be run as %s.\n" "$(realpath $0)"
+if [ "$(basename $(pwd))" != utility-scripts ]; then
+    abort "Please change to source directory before running this script\n"
 fi
 
 script_dir=$(get_realpath "$(dirname "$0")")

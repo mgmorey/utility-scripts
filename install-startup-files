@@ -109,10 +109,6 @@ get_user_name() {
 }
 
 install_startup_files() {
-    if [ ! -h $0 ]; then
-	abort "Please change from source directory before running this script\n"
-    fi
-
     create_git_directory
     cd git
 
@@ -170,6 +166,10 @@ is_to_be_installed() {
 	$diff -qs /etc/skel/$1 $1
     fi
 }
+
+if [ "$(basename $(pwd))" = utility-scripts ]; then
+    abort "Please change from source directory before running this script\n"
+fi
 
 eval $(get-os-release -x)
 
