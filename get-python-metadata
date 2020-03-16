@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-AMAZON_2_DATA="python37 python3"
+AMAZON_2_DATA="python3 python3"
 
 DEBIAN_DATA="python3 python3"
 
