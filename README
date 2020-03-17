@@ -5,6 +5,8 @@ This project has been tested on the following platforms:
 +===========+===============+===============================+
 | OS Family | Distribution  | OS Version (OS Ports)         |
 +===========+===============+===============================+
+| GNU/Linux | Amazon Linux  | 2 (x86_64)                    |
++-----------+---------------+-------------------------------+
 | GNU/Linux | CentOS        | 7 (x86_64)                    |
 +-----------+---------------+-------------------------------+
 | GNU/Linux | CentOS        | 8 (x86_64)                    |
@@ -16,8 +18,6 @@ This project has been tested on the following platforms:
 | GNU/Linux | openSUSE      | Leap 15.1 (aarch64, x86_64)   |
 +-----------+---------------+-------------------------------+
 | GNU/Linux | openSUSE      | Tumbleweed 20200228 (x86_64)  |
-+-----------+---------------+-------------------------------+
-| GNU/Linux | Oracle Linux  | 7.7 (x86_64)                  |
 +-----------+---------------+-------------------------------+
 | GNU/Linux | Oracle Linux  | 8.1 (x86_64)                  |
 +-----------+---------------+-------------------------------+
