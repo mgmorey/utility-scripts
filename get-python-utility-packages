@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+AMAZON_2_PKGS="%s-codestyle %s-pylint %s-test"
+
 DEBIAN_PKGS="%s-pycodestyle %s-pytest"
 
 FREEBSD_PKGS="pylint-%s %s-pycodestyle %s-pytest"
@@ -64,6 +66,16 @@ get_realpath() (
 get_python_utility_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (amzn)
+		case "$VERSION_ID" in
+		    (2)
+			packages=$AMAZON_2_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
 	    (debian)
 		packages="$DEBIAN_PKGS pylint3"
 		;;
@@ -81,6 +93,9 @@ get_python_utility_packages() {
 		    (8|8.*)
 			packages=$REDHAT_8_PKGS
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (ubuntu)
@@ -90,6 +105,9 @@ get_python_utility_packages() {
 			;;
 		    (19.*)
 			packages="$DEBIAN_PKGS pylint"
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;

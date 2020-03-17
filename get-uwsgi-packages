@@ -65,6 +65,16 @@ get_realpath() (
 get_uwsgi_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (amzn)
+		case "$VERSION_ID" in
+		    (2)
+			packages=$REDHAT_7_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
 	    (debian)
 		packages=$DEBIAN_10_PKGS
 		;;
@@ -75,6 +85,9 @@ get_uwsgi_packages() {
 			;;
 		    (19.*)
 			packages=$UBUNTU_19_PKGS
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;
@@ -91,6 +104,9 @@ get_uwsgi_packages() {
 			;;
 		    (8|8.*)
 			packages=$REDHAT_8_PKGS
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;

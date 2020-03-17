@@ -70,7 +70,7 @@ get_tk_build_deps() {
 		(opensuse-*)
 	    	    packages=$OPENSUSE_PKGS
 	    	    ;;
-		(rhel|ol|centos|fedora)
+		(rhel|ol|centos|fedora|amzn)
 	    	    packages=$REDHAT_PKGS
 	    	    ;;
 		(ubuntu|linuxmint|neon)

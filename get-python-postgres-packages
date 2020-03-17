@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+AMAZON_2_PKGS="libpq-devel %s-psycopg2"
+
 DEBIAN_PKGS="libpq-dev %s-psycopg2"
 
 FEDORA_PKGS="libpq-devel %s-psycopg2"
@@ -61,11 +63,18 @@ get_realpath() (
 get_python_postgres_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (centos)
+	    (amzn)
 		case "$VERSION_ID" in
-		    (7)
+		    (2)
+			packages=$AMAZON_2_PKGS
+			;;
+		    (*)
 			break
 			;;
+		esac
+		;;
+	    (centos)
+		case "$VERSION_ID" in
 		    (8)
 			packages=$REDHAT_8_PKGS
 			;;
@@ -116,9 +125,6 @@ get_python_postgres_packages() {
 		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
-		    (7.*)
-			break
-			;;
 		    (8.*)
 			packages=$REDHAT_8_PKGS
 			;;

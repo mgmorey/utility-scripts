@@ -30,13 +30,23 @@ get_package_install_options() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (centos)
+	    (amzn)
 		case "$VERSION_ID" in
-		    (7)
+		    (2)
+			options=""
+			;;
+		    (*)
 			break
 			;;
+		esac
+		;;
+	    (centos)
+		case "$VERSION_ID" in
 		    (8)
 			options="--nobest"
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;
@@ -51,11 +61,11 @@ get_package_install_options() {
 		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
-		    (7.*)
-			break
-			;;
 		    (8.*)
 			options="--nobest"
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;

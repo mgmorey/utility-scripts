@@ -18,6 +18,9 @@
 
 # Wiki page: https://github.com/pyenv/pyenv/wiki
 
+AMAZON_2_PKGS="bzip2-devel gdbm-devel libffi-devel libuuid-devel ncurses-devel \
+openssl-devel python3-devel readline-devel sqlite-devel xz-devel zlib-devel"
+
 DEBIAN_10_PKGS="libbz2-dev libffi-dev libgdbm-dev libncurses5-dev \
 libncursesw5-dev libpython3-dev libreadline-dev libsqlite3-dev \
 libssl-dev libxml2-dev libxmlsec1-dev liblzma-dev uuid-dev \
@@ -70,6 +73,16 @@ get_python_library_packages() {
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (amzn)
+		case "$VERSION_ID" in
+		    (2)
+			packages=$AMAZON_2_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
 	    (centos)
 		case "$VERSION_ID" in
 		    (7)
@@ -78,12 +91,18 @@ get_python_library_packages() {
 		    (8)
 			packages=$REDHAT_8_PKGS
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (debian)
 		case "$VERSION_ID" in
 		    (10)
 			packages=$DEBIAN_10_PKGS
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;
@@ -95,12 +114,18 @@ get_python_library_packages() {
 		    (2019.3)
 			packages=$DEBIAN_10_PKGS
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (linuxmint)
 		case "$VERSION_ID" in
 		    (19.2)
 			packages=$DEBIAN_10_PKGS
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;
@@ -115,6 +140,9 @@ get_python_library_packages() {
 		    (8.*)
 			packages=$REDHAT_8_PKGS
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (ubuntu|neon)
@@ -124,6 +152,9 @@ get_python_library_packages() {
 			;;
 		    (19.10)
 			packages=$UBUNTU_19_PKGS
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;

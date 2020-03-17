@@ -74,6 +74,13 @@ install_python_development_tools() {
 validate_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (amzn)
+                case "$VERSION_ID" in
+		    (2)
+			return
+                        ;;
+                esac
+		;;
 	    (debian)
                 case "$VERSION_ID" in
 		    (10)

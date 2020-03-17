@@ -43,6 +43,16 @@ assert() {
 get_python_flask_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (amzn)
+		case "$VERSION_ID" in
+		    (2)
+			packages=$REDHAT_7_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
 	    (debian)
 		packages=$DEBIAN_PKGS
 		;;
@@ -59,6 +69,9 @@ get_python_flask_packages() {
 			;;
 		    (8|8.*)
 			packages=$REDHAT_8_PKGS
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;

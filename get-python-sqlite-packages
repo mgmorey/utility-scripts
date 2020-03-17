@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+AMAZON_2_PKGS="%s-sqlite3"
+
 FREEBSD_PKGS="%s-sqlite3"
 
 ILLUMOS_PKGS=":%s-sqlite3"
@@ -55,12 +57,22 @@ get_realpath() (
 get_python_sqlite_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
+	    (amzn)
+		case "$VERSION_ID" in
+		    (2)
+			packages=$AMAZON_2_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
 	    (rhel|ol|centos)
 		case "$VERSION_ID" in
 		    (7|7.*)
 			packages=$REDHAT_7_PKGS
 			;;
-		    (8|8.*)
+		    (*)
 			break
 			;;
 		esac
