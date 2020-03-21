@@ -21,7 +21,7 @@ PROJECT_NAME=startup-files
 
 PROJECT_URL=$BASE_URL/$PROJECT_NAME.git
 
-STARTUP_FILES=".bashrc .editorconfig .profile"
+STARTUP_FILES=".editorconfig .profile"
 STARTUP_FILES_LEGACY=".bash_profile .emacs"
 
 abort() {
