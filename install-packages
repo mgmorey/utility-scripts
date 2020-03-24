@@ -62,14 +62,15 @@ configure_platform() {
 	    (rhel|ol)
 		is_pattern_supported=true
 
-		case "$VERSION_ID" in
-		    (7.*)
-			install-epel
-			;;
-		    (8.*)
-			install-epel
-			;;
-		esac
+		# case "$VERSION_ID" in
+		#     (7.*)
+		# 	install-epel
+		# 	;;
+		#     (8.*)
+		# 	install-epel
+		# 	;;
+		# esac
+
 		break
 		;;
 	    (solaris)
