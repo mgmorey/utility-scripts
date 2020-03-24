@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CATEGORIES="pip utility virtualenv"
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -28,13 +26,8 @@ assert() {
 }
 
 get_python_devel_packages() {
-    get_packages_in $CATEGORIES | sort -u
-}
-
-get_packages_in() {
-    for category; do
-	get-python-$category-packages
-    done
+    (get-python-pip-packages
+     get-python-virtualenv-packages) | sort -u
 }
 
 get_realpath() (
