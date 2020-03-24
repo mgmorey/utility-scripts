@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CATEGORIES="development python-library"
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -27,14 +25,9 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_packages_in() {
-    for category; do
-	get-$category-packages
-    done
-}
-
 get_python_build_packages() {
-    get_packages_in $CATEGORIES | sort -u
+    (get-development-packages
+     get-python-library-packages) | sort -u
 }
 
 get_realpath() (
