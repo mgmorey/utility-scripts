@@ -34,18 +34,23 @@ exec_sql_cli() {
     case "$DATABASE_DIALECT" in
 	(mysql)
 	    ${1+$1 }$DATABASE_DIALECT \
-		--protocol=${DATABASE_PROTOCOL:-TCP} \
-		--host=${DATABASE_HOST:-localhost} \
-		--port=${DATABASE_PORT:-3306} \
-		--user=${DATABASE_USER:-$USER} \
-		--password=${DATABASE_PASSWORD:-}
+		    --protocol=${DATABASE_PROTOCOL:-TCP} \
+		    --host=${DATABASE_HOST:-localhost} \
+		    --port=${DATABASE_PORT:-3306} \
+		    --user=${DATABASE_USER:-$USER} \
+		    --password=${DATABASE_PASSWORD:-}
+	    ;;
+	(oracle)
+	    endpoint="${DATABASE_HOST:-localhost}:${DATABASE_PORT:-5432}"
+	    login="${DATABASE_USER:-$USER}/$DATABASE_PASSWORD"
+	    ${1+$1 }sqlplus "$login@//$endpoint/ORCLCDB"
 	    ;;
 	(postgresql)
 	    ${1+$1 }psql \
-		--host=${DATABASE_HOST:-localhost} \
-		--port=${DATABASE_PORT:-5432} \
-		--username=${DATABASE_USER:-$USER} \
-		--password
+		    --host=${DATABASE_HOST:-localhost} \
+		    --port=${DATABASE_PORT:-5432} \
+		    --username=${DATABASE_USER:-$USER} \
+		    --password
 	    ;;
 	(sqlite)
 	    ${1+$1 }sqlite3 $DATABASE_FILENAME
