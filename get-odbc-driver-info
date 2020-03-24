@@ -23,11 +23,13 @@ import re
 
 DRIVER_MSSQL = re.compile(r'libmsodbcsql-\d+\.\d+\.so\.\d+\.\d+')
 DRIVER_MYSQL = re.compile(r'libmyodbc\d+[aw]\.so')
+DRIVER_ORACLE = re.compile(r'libsqora\.so\.\d+\.\d+')
 DRIVER_POSTGRES = re.compile(r'psqlodbc[aw]\.so')
 
 ODBC_DIALECTS = {
     DRIVER_MSSQL: 'mssql',
     DRIVER_MYSQL: 'mysql',
+    DRIVER_ORACLE: 'oracle',
     DRIVER_POSTGRES: 'postgres',
 }
 
