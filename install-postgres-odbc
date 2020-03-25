@@ -57,6 +57,7 @@ get_realpath() (
 )
 
 install_postgres_odbc() {
+    validate_platform
     add_apt_source
     install-packages odbc-postgresql
     libdir=/usr/lib/x86_64-linux-gnu/odbc
