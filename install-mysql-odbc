@@ -55,6 +55,7 @@ get_realpath() (
 )
 
 install_mysql_odbc() {
+    validate_platform
     install-packages libodbc1
     prefix=/opt/$package
 
