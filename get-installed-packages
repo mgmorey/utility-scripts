@@ -69,7 +69,7 @@ get_packages_using() {
 	    run_unpriv /bin/sh -c "$1 list -1"
 	    ;;
 	(dnf)
-	    $1 list installed | awk 'NF == 3 {print $1}' | awk -F. '{print $1}'
+	    rpm --queryformat "%{NAME}\n" -qa | sort
 	    ;;
 	(pkg)
 	    case "$ID" in
@@ -88,7 +88,7 @@ get_packages_using() {
 	    $1 --list | awk '{print $1}'
 	    ;;
 	(yum)
-	    $1 list installed | awk 'NF == 3 {print $1}' | awk -F. '{print $1}'
+	    rpm --queryformat "%{NAME}\n" -qa | sort
 	    ;;
 	(zypper)
 	    $1 -nq search -i -t package | awk 'NR > 3 {print $3}'
