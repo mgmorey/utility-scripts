@@ -91,7 +91,7 @@ get_packages_using() {
 	    rpm --queryformat "%{NAME}\n" -qa | sort
 	    ;;
 	(zypper)
-	    $1 -nq search -i -t package | awk 'NR > 3 {print $3}'
+	    rpm --queryformat "%{NAME}\n" -qa | sort
 	    ;;
     esac
 }
