@@ -54,7 +54,6 @@ get_realpath() (
 
 install_oracle_odbc() {
     validate_platform
-    prefix=/usr/lib/oracle/${CLIENT_VERSION}/client64
 
     if ! rpm -q $PKG_NAME >/dev/null 2>&1; then
 	rpm -ihv $rpmpath
