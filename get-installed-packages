@@ -69,7 +69,7 @@ get_packages_using() {
 	    run_unpriv /bin/sh -c "$1 list -1"
 	    ;;
 	(dnf)
-	    rpm --queryformat "%{NAME}\n" -qa | sort
+	    rpm --queryformat "%{NAME}\n" -qa
 	    ;;
 	(pkg)
 	    case "$ID" in
@@ -88,10 +88,10 @@ get_packages_using() {
 	    $1 --list | awk '{print $1}'
 	    ;;
 	(yum)
-	    rpm --queryformat "%{NAME}\n" -qa | sort
+	    rpm --queryformat "%{NAME}\n" -qa
 	    ;;
 	(zypper)
-	    rpm --queryformat "%{NAME}\n" -qa | sort
+	    rpm --queryformat "%{NAME}\n" -qa
 	    ;;
     esac
 }
