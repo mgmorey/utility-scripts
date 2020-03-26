@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-NAME_ANSI="MySQL 8.0 ANSI"
-NAME_UNICODE="MySQL 8.0 Unicode"
+NAME_ANSI="MySQL ODBC 8.0 ANSI Driver"
+NAME_UNICODE="MySQL ODBC 8.0 Unicode Driver"
 
 OBJECT_ANSI=libmyodbc8a.so
 OBJECT_UNICODE=libmyodbc8w.so
