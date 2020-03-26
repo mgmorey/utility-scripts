@@ -53,6 +53,9 @@ get_odbc_development_packages() {
 		    (8.*)
 			packages=$REDHAT_8_PKGS
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	esac
