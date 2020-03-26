@@ -1,0 +1,101 @@
+#!/bin/sh
+
+# install-oracle-odbc: install Oracle ODBC packages
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+CLIENT_VERSION=19.6
+
+PKG_NAME=oracle-instantclient${CLIENT_VERSION}-odbc
+
+RPMFILE=${PKG_NAME}-${CLIENT_VERSION}.0.0.0-1.x86_64.rpm
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+install_oracle_odbc() {
+    validate_platform
+    prefix=/usr/lib/oracle/${CLIENT_VERSION}/client64
+
+    if ! rpm -q $PKG_NAME >/dev/null 2>&1; then
+	rpm -ihv $rpmpath
+    fi
+}
+
+parse_arguments() {
+    case "$(basename "$1")" in
+	($RPMFILE)
+	    rpmpath=$1
+	    ;;
+	(*)
+	    abort "%s: invalid argument" "$1"
+    esac
+}
+
+validate_platform() {
+    case "$ID" in
+	(ol)
+	    case "$VERSION_ID" in
+		(8.1)
+		    return
+		    ;;
+	    esac
+	    ;;
+    esac
+
+    abort_not_supported "Operating system"
+}
+
+if [ $# -lt 1 ]; then
+    abort "%s: Not enough arguments\n" "$0"
+elif [ $# -gt 1 ]; then
+    abort "%s: Too many arguments\n" "$0"
+fi
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+. "$script_dir/common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+parse_arguments "$@"
+install_oracle_odbc
