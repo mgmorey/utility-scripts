@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# docker-run-database-server: run Oracle server in container
+# docker-run-oracle-server: run Oracle server in container
 # Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,10 @@ ENV_FILE=$HOME/.env
 IMAGE_NAME=oracle/database
 IMAGE_TAG=19.3.0-se2
 
+NAMES="startup setup"
 PORTS="1521 5500"
+
+SCRIPTS=/opt/oracle/scripts
 
 abort() {
     printf "$@" >&2
@@ -34,25 +37,35 @@ assert() {
 
 docker_run_oracle_server() {
     set_options
-    docker run $options $IMAGE_NAME:$IMAGE_TAG
+    docker run $opts $IMAGE_NAME:$IMAGE_TAG
 }
 
 parse_arguments() {
     if [ $# -gt 0 ]; then
-        user_options="$@"
+        user_opts="$@"
     else
-        user_options="-d"
+        user_opts="-d"
     fi
 }
 
 set_options() {
-    env_options="-e ORACLE_PWD=$DATABASE_PASSWORD"
+    env_opts="-e ORACLE_PWD=$DATABASE_PASSWORD"
+    port_opts=
+    vol_opts=
 
     for port in $PORTS; do
-        port_options="${port_options+$port_options }-p $port:$port"
+        port_opts="${port_opts:+$port_opts }-p $port:$port"
     done
 
-    options="$env_options $port_options $user_options"
+    for name in $NAMES; do
+	host_dir=$HOME/oracle/$name
+
+	if [ -d $host_dir ]; then
+	    vol_opts="${vol_opts:+$vol_opts }-v $host_dir:$SCRIPTS/$name"
+	fi
+    done
+
+    opts="$env_opts ${port_opts:+$port_opts }${vol_opts:+$vol_opts }$user_opts"
 }
 
 if [ ! -r $ENV_FILE ]; then
