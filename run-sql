@@ -41,7 +41,7 @@ exec_sql_cli() {
 		    --password=${DATABASE_PASSWORD:-}
 	    ;;
 	(oracle)
-	    endpoint="${DATABASE_HOST:-localhost}:${DATABASE_PORT:-5432}"
+	    endpoint="${DATABASE_HOST:-localhost}:${DATABASE_PORT:-1521}"
 	    login="${DATABASE_USER:-$USER}/$DATABASE_PASSWORD"
 	    ${1+$1 }sqlplus "$login@//$endpoint/ORCLCDB"
 	    ;;
