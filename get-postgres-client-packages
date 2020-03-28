@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-postgres-packages: get PostgreSQL package names
+# get-postgres-client-packages: get PostgreSQL client package names
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -61,7 +61,7 @@ get_realpath() (
     fi
 )
 
-get_postgres_packages() {
+get_postgres_client_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (amzn)
@@ -209,4 +209,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-get_postgres_packages
+get_postgres_client_packages
