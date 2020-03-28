@@ -30,6 +30,10 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+configure_platform() {
+    user=$(get_user_name)
+}
+
 exec_sql_cli() {
     case "$DATABASE_DIALECT" in
 	(mysql)
@@ -37,20 +41,20 @@ exec_sql_cli() {
 		    --protocol=${DATABASE_PROTOCOL:-TCP} \
 		    --host=${DATABASE_HOST:-localhost} \
 		    --port=${DATABASE_PORT:-3306} \
-		    --user=${DATABASE_USER:-$USER} \
+		    --user=${DATABASE_USER:-$user} \
 		    --password=${DATABASE_PASSWORD:-} \
 		    --database=${DATABASE_NAME:-mysql}
 	    ;;
 	(oracle)
 	    endpoint="${DATABASE_HOST:-localhost}:${DATABASE_PORT:-1521}"
-	    login="${DATABASE_USER:-$USER}/$DATABASE_PASSWORD"
+	    login="${DATABASE_USER:-$user}/$DATABASE_PASSWORD"
 	    ${1+$1 }sqlplus "$login@//$endpoint/ORCLCDB"
 	    ;;
 	(postgresql)
 	    ${1+$1 }psql \
 		    --host=${DATABASE_HOST:-localhost} \
 		    --port=${DATABASE_PORT:-5432} \
-		    --username=${DATABASE_USER:-$USER} \
+		    --username=${DATABASE_USER:-$user} \
 		    --password
 	    ;;
 	(sqlite)
@@ -79,6 +83,10 @@ get_realpath() (
 	done
     fi
 )
+
+get_user_name() {
+    printf "%s\n" "${SUDO_USER-${USER-${USERNAME-${LOGNAME-}}}}"
+}
 
 parse_argument() {
     script=
@@ -132,6 +140,8 @@ parse_arguments() {
 }
 
 run_sql() {
+    configure_platform
+
     if [ -n "$scripts" ]; then
 	for script in $scripts; do
 	    if [ -f $script ]; then
