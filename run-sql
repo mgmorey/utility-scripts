@@ -30,33 +30,33 @@ assert() {
 }
 
 configure_platform() {
-    default_user=$(get_user_name)
+    user=$(get_user_name)
 }
 
 exec_sql_cli() {
     case "$DATABASE_DIALECT" in
 	(mysql)
 	    ${1+$1 }$DATABASE_DIALECT \
-		    --protocol=${DATABASE_PROTOCOL:-TCP} \
+		    --protocol=${DATABASE_PROTOCOL:-${MYSQL_PROTOCOL:-TCP}} \
 		    --host=${DATABASE_HOST:-${MYSQL_HOST:-localhost}} \
 		    --port=${DATABASE_PORT:-${MYSQL_PORT:-3306}} \
-		    --user=${DATABASE_USER:-$default_user} \
-		    --password=${DATABASE_PASSWORD-} \
-		    --database=${DATABASE_INSTANCE:-mysql}
+		    --user=${DATABASE_USER:-${MYSQL_USER:-$user}} \
+		    --password=${DATABASE_PASSWORD:-${MYSQL_PASSWORD-}} \
+		    --database=${DATABASE_INSTANCE:-${MYSQL_INSTANCE:-mysql}}
 	    ;;
 	(oracle)
 	    host=${DATABASE_HOST:-${ORACLE_HOST:-localhost}}
 	    port=${DATABASE_PORT:-${ORACLE_PORT:-1521}}
-	    username=${DATABASE_USER:-$default_user}
-	    password=$DATABASE_PASSWORD
-	    login="$username/$password"
-	    ${1+$1 }sqlplus "$login@//$host:$port/ORCLCDB"
+	    username=${DATABASE_USER:-${ORACLE_USER:-$user}}
+	    password=${DATABASE_PASSWORD:-${ORACLE_PASSWORD-}}
+	    instance=${DATABASE_INSTANCE:-${ORACLE_INSTANCE:-ORCLCDB}}
+	    ${1+$1 }sqlplus "$username/$password@//$host:$port/$instance"
 	    ;;
 	(postgresql)
 	    ${1+$1 }psql \
 		    --host=${DATABASE_HOST:-${POSTGRES_HOST:-localhost}} \
 		    --port=${DATABASE_PORT:-${POSTGRES_PORT:-5432}} \
-		    --username=${DATABASE_USER:-$default_user} \
+		    --username=${DATABASE_USER:-${POSTGRES_USER:-$user}} \
 		    --password
 	    ;;
 	(sqlite)
