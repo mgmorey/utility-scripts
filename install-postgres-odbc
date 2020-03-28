@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# install-postgres-odbc: install PostgreSQL ODBC connector
+# install-postgres-odbc: install PostgreSQL ODBC packages
 # Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+NAME_ANSI="PostgreSQL ANSI"
+NAME_UNICODE="PostgreSQL Unicode"
+
+OBJECT_ANSI=psqlodbca.so
+OBJECT_UNICODE=psqlodbcw.so
+
+ODBC_INST=/etc/odbcinst.ini
 PGDG_LIST=/etc/apt/sources.list.d/pgdg.list
 
 abort() {
@@ -27,16 +34,24 @@ abort_not_supported() {
     abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
 }
 
-add_apt_source() {
-    install-packages postgresql-common
-
-    if [ ! -f $PGDG_LIST ]; then
-	sh /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
-    fi
-}
-
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+configure_platform() {
+    case "$ID" in
+	(debian|ubuntu)
+	    libdir=/usr/lib/x86_64-linux-gnu/odbc
+	    ;;
+	(rhel|ol)
+	    libdir=/usr/lib64
+	    ;;
+    esac
+}
+
+get_packages() {
+    (get-odbc-packages
+     get-postgres-odbc-packages) | sort -u
 }
 
 get_realpath() (
@@ -56,25 +71,89 @@ get_realpath() (
     fi
 )
 
+install_odbc_driver() {
+		cat >>$ODBC_INST <<EOF
+[$2]
+Driver=$1
+
+EOF
+}
+
 install_postgres_odbc() {
     validate_platform
-    add_apt_source
-    install-packages odbc-postgresql
-    libdir=/usr/lib/x86_64-linux-gnu/odbc
+    configure_platform
+    preinstall_platform
+    install-packages $(get_packages)
+    postinstall_platform
+}
 
-    for file in $libdir/*.so; do
-	ln -sf $file /usr/local/lib
-    done
+postinstall_platform() {
+    case "$ID" in
+	(debian|ubuntu)
+	    if [ -d $libdir ]; then
+		for file in $libdir/*.so; do
+		    ln -sf $file /usr/local/lib
+		done
+	    fi
+	    ;;
+	(rhel|ol)
+	    for encoding in ANSI UNICODE; do
+		eval name="\$NAME_$encoding"
+		eval object="\$OBJECT_$encoding"
+		install_odbc_driver $libdir/$object "$name"
+	    done
+	    ;;
+    esac
+}
+
+preinstall_platform() {
+    case "$ID" in
+	(debian|ubuntu)
+	    install-packages postgresql-common
+
+	    if [ ! -f $PGDG_LIST ]; then
+		sh /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+	    fi
+	    ;;
+    esac
 }
 
 validate_platform() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (debian)
-		return
-		;;
-	esac
-    done
+    case "$ID" in
+	(debian)
+	    case "$VERSION_ID" in
+		(10)
+		    return
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(8.*)
+		    return
+		    ;;
+		(*)
+		    return
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    return
+		    ;;
+		(19.10)
+		    return
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+    esac
 
     abort_not_supported "Operating system"
 }
