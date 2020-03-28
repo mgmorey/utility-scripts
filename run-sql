@@ -19,7 +19,6 @@
 SQL_DIRS="scripts sql"
 
 : ${DATABASE_DIALECT:=sqlite}
-: ${DATABASE_FILENAME:=}
 
 abort() {
     printf "$@" >&2
@@ -31,7 +30,7 @@ assert() {
 }
 
 configure_platform() {
-    user=$(get_user_name)
+    default_user=$(get_user_name)
 }
 
 exec_sql_cli() {
@@ -39,26 +38,29 @@ exec_sql_cli() {
 	(mysql)
 	    ${1+$1 }$DATABASE_DIALECT \
 		    --protocol=${DATABASE_PROTOCOL:-TCP} \
-		    --host=${DATABASE_HOST:-localhost} \
-		    --port=${DATABASE_PORT:-3306} \
-		    --user=${DATABASE_USER:-$user} \
-		    --password=${DATABASE_PASSWORD:-} \
+		    --host=${DATABASE_HOST:-${MYSQL_HOST:-localhost}} \
+		    --port=${DATABASE_PORT:-${MYSQL_PORT:-3306}} \
+		    --user=${DATABASE_USER:-$default_user} \
+		    --password=${DATABASE_PASSWORD-} \
 		    --database=${DATABASE_INSTANCE:-mysql}
 	    ;;
 	(oracle)
-	    endpoint="${DATABASE_HOST:-localhost}:${DATABASE_PORT:-1521}"
-	    login="${DATABASE_USER:-$user}/$DATABASE_PASSWORD"
-	    ${1+$1 }sqlplus "$login@//$endpoint/ORCLCDB"
+	    host=${DATABASE_HOST:-${ORACLE_HOST:-localhost}}
+	    port=${DATABASE_PORT:-${ORACLE_PORT:-1521}}
+	    username=${DATABASE_USER:-$default_user}
+	    password=$DATABASE_PASSWORD
+	    login="$username/$password"
+	    ${1+$1 }sqlplus "$login@//$host:$port/ORCLCDB"
 	    ;;
 	(postgresql)
 	    ${1+$1 }psql \
-		    --host=${DATABASE_HOST:-localhost} \
-		    --port=${DATABASE_PORT:-5432} \
-		    --username=${DATABASE_USER:-$user} \
+		    --host=${DATABASE_HOST:-${POSTGRES_HOST:-localhost}} \
+		    --port=${DATABASE_PORT:-${POSTGRES_PORT:-5432}} \
+		    --username=${DATABASE_USER:-$default_user} \
 		    --password
 	    ;;
 	(sqlite)
-	    ${1+$1 }sqlite3 $DATABASE_FILENAME
+	    ${1+$1 }sqlite3 ${DATABASE_PATHNAME:-${SQLITE_PATHNAME-}}
 	    ;;
     esac
 }
@@ -97,7 +99,7 @@ parse_argument() {
 	    ;;
 	(*.sqlite)
 	    if [ "$DATABASE_DIALECT" = sqlite ]; then
-		DATABASE_FILENAME=$1
+		DATABASE_PATHNAME=$1
 	    else
 		abort "Invalid SQL script name: %s\n" "$1"
 	    fi
