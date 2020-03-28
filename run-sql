@@ -38,7 +38,8 @@ exec_sql_cli() {
 		    --host=${DATABASE_HOST:-localhost} \
 		    --port=${DATABASE_PORT:-3306} \
 		    --user=${DATABASE_USER:-$USER} \
-		    --password=${DATABASE_PASSWORD:-}
+		    --password=${DATABASE_PASSWORD:-} \
+		    --database=${DATABASE_NAME:-mysql}
 	    ;;
 	(oracle)
 	    endpoint="${DATABASE_HOST:-localhost}:${DATABASE_PORT:-1521}"
