@@ -57,25 +57,19 @@ get_realpath() (
 install_mysql_odbc() {
     validate_platform
     install-packages $(get-odbc-packages)
+    install_platform
+    postinstall_platform
+}
 
+install_platform() {
     case "$ID" in
 	(debian|ubuntu)
-	    prefix=/opt/$package
-
 	    if [ ! -d $prefix ]; then
 		tar -C /opt -xf $tarpath
-		/bin/mv -f /opt/$dirname /opt/$package
+		/bin/mv -f /opt/$basename $prefix
 	    fi
 
 	    chown -R root:root $prefix
-
-	    for encoding in ANSI UNICODE; do
-		eval name="\$NAME_$encoding"
-		eval object="\$OBJECT_$encoding"
-		driver=$prefix/lib/$object
-		$prefix/bin/myodbc-installer -r -d -n "$name"
-		$prefix/bin/myodbc-installer -a -d -n "$name" -t Driver="$driver"
-	    done
 
 	    for file in $prefix/bin/*; do
 		ln -sf $file /usr/local/bin
@@ -114,6 +108,7 @@ parse_arguments() {
 		    tarfile=$(basename $tarpath)
 		    basename=${tarfile%.tar.gz}
 		    package=${basename%-linux-*-x86-64bit}
+		    prefix=/opt/$package
 		    ;;
 		(*)
 		    abort "%s: invalid argument" "$1"
@@ -130,6 +125,20 @@ parse_arguments() {
 		(*)
 		    abort "%s: invalid argument" "$1"
 	    esac
+	    ;;
+    esac
+}
+
+postinstall_platform() {
+    case "$ID" in
+	(debian|ubuntu)
+	    for encoding in ANSI UNICODE; do
+		eval name="\$NAME_$encoding"
+		eval object="\$OBJECT_$encoding"
+		driver=$prefix/lib/$object
+		$prefix/bin/myodbc-installer -r -d -n "$name"
+		$prefix/bin/myodbc-installer -a -d -n "$name" -t Driver="$driver"
+	    done
 	    ;;
     esac
 }
