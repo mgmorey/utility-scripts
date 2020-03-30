@@ -35,6 +35,13 @@ configure_platform() {
 
 exec_sql_cli() {
     case "$DATABASE_DIALECT" in
+	(mssql)
+	    ${1+$1 }sqlcmd \
+		    -H ${DATABASE_HOST:-${MSSQL_HOST:-localhost}} \
+		    -U ${DATABASE_USER:-${MSSQL_USER:-$user}} \
+		    -P ${DATABASE_PASSWORD:-${MYSQL_PASSWORD-}} \
+		    # -d ${DATABASE_INSTANCE:-${MYSQL_INSTANCE-}}
+	    ;;
 	(mysql)
 	    ${1+$1 }$DATABASE_DIALECT \
 		    --protocol=${DATABASE_PROTOCOL:-${MYSQL_PROTOCOL:-TCP}} \
