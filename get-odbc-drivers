@@ -45,15 +45,10 @@ ODBC_ENCODINGS = ['ansi', 'unicode']
 ODBC_INST_FILE = '/etc/odbcinst.ini'
 
 
-def filter_drivers(drivers_in: dict, dialect: list, encoding: str) -> dict:
-    drivers_out = {}
-
-    for name in drivers_in:
-        if ((not dialect or drivers_in[name]['dialect'] in dialect) and
-            (not encoding or drivers_in[name]['encoding'] == encoding)):
-            drivers_out[name] = drivers_in[name]
-
-    return drivers_out
+def filter_drivers(drivers: dict, dialect: list, encoding: str) -> dict:
+    return {name: drivers[name] for name in drivers
+            if ((not dialect or drivers[name]['dialect'] in dialect) and
+                (not encoding or drivers[name]['encoding'] == encoding))}
 
 
 def get_data(section: configparser.SectionProxy) -> str:
