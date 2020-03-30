@@ -42,9 +42,9 @@ def enumerate_drivers() -> dict:
     drivers = {}
 
     for section in inifile.sections():
-        driver = inifile[section]
-        driver_data = {key: driver[key] for key in driver}
-        sql_dialect = get_dialect(driver)
+        driver_dict = inifile[section]
+        driver_data = {key: driver_dict[key] for key in driver_dict}
+        sql_dialect = get_dialect(driver_dict)
         drivers[section] = {
             'dialect': sql_dialect,
             'parameters': driver_data,
@@ -60,8 +60,7 @@ def get_dialect(driver: dict) -> str:
     for pattern in ODBC_DIALECTS:
         if pattern.fullmatch(library):
             dialect = ODBC_DIALECTS[pattern]
-
-    return dialect
+            return dialect
 
 
 def main():
