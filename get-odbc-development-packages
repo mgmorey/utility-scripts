@@ -16,7 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-REDHAT_8_PKGS="gcc gcc-c++ unixODBC unixODBC-devel"
+DEBIAN_10_PKGS="gcc g++ unixodbc-dev"
+
+REDHAT_8_PKGS="gcc gcc-c++ unixODBC-devel"
+
+UBUNTU_18_PKGS="gcc g++ unixodbc-dev"
+UBUNTU_19_PKGS="gcc g++ unixodbc-dev"
 
 abort() {
     printf "$@" >&2
@@ -45,6 +50,16 @@ get_odbc_development_packages() {
 			;;
 		esac
 		;;
+	    (debian)
+		case "$VERSION_ID" in
+		    (10)
+			packages=$DEBIAN_10_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
 		    (7.*)
@@ -52,6 +67,19 @@ get_odbc_development_packages() {
 			;;
 		    (8.*)
 			packages=$REDHAT_8_PKGS
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.04)
+			packages=$UBUNTU_18_PKGS
+			;;
+		    (19.10)
+			packages=$UBUNTU_19_PKGS
 			;;
 		    (*)
 			break
