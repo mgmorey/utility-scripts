@@ -56,7 +56,7 @@ get_realpath() (
 
 install_mysql_odbc() {
     validate_platform
-    install-packages $(get-odbc-packages)
+    install-packages $(get-odbc-development-packages)
     install_platform
     postinstall_platform
 }
