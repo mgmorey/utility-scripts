@@ -54,13 +54,14 @@ def enumerate_drivers() -> dict:
 
 
 def get_dialect(driver: dict) -> str:
-    dialect = 'unknown'
     library = os.path.basename(driver['driver'])
 
     for pattern in ODBC_DIALECTS:
         if pattern.fullmatch(library):
             dialect = ODBC_DIALECTS[pattern]
             return dialect
+
+    return 'unknown'
 
 
 def main():
