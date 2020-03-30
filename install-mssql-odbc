@@ -34,7 +34,7 @@ assert() {
 
 get_packages() {
     printf "%s\n" msodbcsql17 mssql-tools
-    get-odbc-packages
+    get-odbc-development-packages
 }
 
 get_realpath() (
