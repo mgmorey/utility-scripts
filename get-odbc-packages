@@ -16,12 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_10_PKGS="unixodbc"
+DEBIAN_10_PKGS="unixodbc unixodbc-dev"
 
 REDHAT_8_PKGS="unixODBC"
 
-UBUNTU_18_PKGS="unixodbc"
-UBUNTU_19_PKGS="unixodbc"
+UBUNTU_18_PKGS="unixodbc unixodbc-dev"
+UBUNTU_19_PKGS="unixodbc unixodbc-dev"
 
 abort() {
     printf "$@" >&2
