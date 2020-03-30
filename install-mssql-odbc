@@ -1,7 +1,7 @@
 #!/bin/sh -eu
 
 # install-mssql-odbc: install Microsoft SQL Server ODBC packages
-# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,16 +28,13 @@ abort_not_supported() {
     abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
 }
 
-add_apt_source() {
-    if [ ! -f $MSSQL_RELEASE ]; then
-       curl $BASE_URL/keys/microsoft.asc | apt-key add -
-       curl $BASE_URL/config/$ID/$VERSION_ID/prod.list >$MSSQL_RELEASE
-       apt-get update
-    fi
-}
-
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_packages() {
+    printf "%s\n" msodbcsql17 mssql-tools
+    get-odbc-packages
 }
 
 get_realpath() (
@@ -59,10 +56,25 @@ get_realpath() (
 
 install_mssql_odbc() {
     validate_platform
-    add_apt_source
-    export ACCEPT_EULA=Y
-    install-packages msodbcsql17 mssql-tools unixodbc unixodbc-dev
+    preinstall_platform
+    install-packages $(get_packages)
+    postinstall_platform
+}
+
+postinstall_platform() {
     ln -sf /opt/mssql-tools/bin/* /usr/local/bin
+}
+
+preinstall_platform() {
+    case "$ID" in
+	(debian|ubuntu)
+	    if [ ! -f $MSSQL_RELEASE ]; then
+		curl $BASE_URL/keys/microsoft.asc | apt-key add -
+		curl $BASE_URL/config/$ID/$VERSION_ID/prod.list >$MSSQL_RELEASE
+		apt-get update
+	    fi
+	    ;;
+    esac
 }
 
 validate_platform() {
@@ -92,6 +104,8 @@ validate_platform() {
 if [ $# -gt 0 ]; then
     abort "%s: Too many arguments\n" "$0"
 fi
+
+export ACCEPT_EULA=Y
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
