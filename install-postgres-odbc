@@ -50,7 +50,7 @@ configure_platform() {
 }
 
 get_packages() {
-    (get-odbc-packages
+    (get-odbc-development-packages
      get-postgres-odbc-packages) | sort -u
 }
 
