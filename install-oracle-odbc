@@ -54,10 +54,18 @@ get_realpath() (
 
 install_oracle_odbc() {
     validate_platform
+    install-packages $(get-odbc-development-packages)
+    install_platform
+}
 
-    if ! rpm -q $PKG_NAME >/dev/null 2>&1; then
-	rpm -ihv $rpmpath
-    fi
+install_platform() {
+    case "$ID" in
+	(rhel|ol)
+	    if ! rpm -q $PKG_NAME >/dev/null 2>&1; then
+		rpm -ihv $rpmpath
+	    fi
+	    ;;
+    esac
 }
 
 parse_arguments() {
@@ -72,7 +80,7 @@ parse_arguments() {
 
 validate_platform() {
     case "$ID" in
-	(ol)
+	(rhel|ol)
 	    case "$VERSION_ID" in
 		(8.1)
 		    return
