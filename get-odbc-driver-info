@@ -37,20 +37,10 @@ ODBC_DRIVERS = '/etc/odbcinst.ini'
 
 
 def enumerate_drivers() -> dict:
-    inifile = configparser.ConfigParser()
-    inifile.read(ODBC_DRIVERS)
-    drivers = {}
-
-    for section in inifile.sections():
-        driver_dict = inifile[section]
-        driver_data = {key: driver_dict[key] for key in driver_dict}
-        sql_dialect = get_dialect(driver_dict)
-        drivers[section] = {
-            'dialect': sql_dialect,
-            'parameters': driver_data,
-        }
-
-    return drivers
+    config = configparser.ConfigParser()
+    config.read(ODBC_DRIVERS)
+    return {section: get_dictionary(config[section]) for section in
+            config.sections()}
 
 
 def get_dialect(driver: dict) -> str:
@@ -62,6 +52,12 @@ def get_dialect(driver: dict) -> str:
             return dialect
 
     return 'unknown'
+
+
+def get_dictionary(section: configparser.SectionProxy) -> dict:
+    dialect = get_dialect(section)
+    parameters = {key: section[key] for key in section}
+    return dict(dialect=dialect, parameters=parameters)
 
 
 def main():
