@@ -6,5 +6,5 @@ end_of_line = lf
 trim_trailing_whitespace = true
 insert_final_newline = true
 
-[{get-configuration,get-odbc-driver-info,test-python-version}]
+[{get-configuration,get-odbc-drivers,test-python-version}]
 indent_style = space
