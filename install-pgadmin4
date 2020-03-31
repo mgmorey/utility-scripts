@@ -70,7 +70,6 @@ preinstall_platform() {
 	    fi
 	    ;;
     esac
-    :
 }
 
 validate_platform() {
