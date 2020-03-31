@@ -42,7 +42,7 @@ ODBC_DATA = {
 
 ODBC_DIALECTS = ['mssql', 'mysql', 'oracle', 'postgres']
 ODBC_ENCODINGS = ['ansi', 'unicode']
-ODBC_INST_FILE = '/etc/odbcinst.ini'
+ODBC_INIFILE = '/etc/odbcinst.ini'
 
 
 def filter_drivers(drivers: dict, dialect: list, encoding: str) -> dict:
@@ -99,7 +99,7 @@ def parse_args() -> argparse.Namespace:
 
 def main():
     args = parse_args()
-    drivers = get_odbc_drivers(ODBC_INST_FILE, args.name)
+    drivers = get_odbc_drivers(ODBC_INIFILE, args.name)
 
     if args.dialect or args.encoding:
         drivers = filter_drivers(drivers, args.dialect, args.encoding)
