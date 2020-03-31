@@ -22,8 +22,10 @@ NAME_UNICODE="PostgreSQL Unicode"
 OBJECT_ANSI=psqlodbca.so
 OBJECT_UNICODE=psqlodbcw.so
 
-ODBC_INST=/etc/odbcinst.ini
-PGDG_LIST=/etc/apt/sources.list.d/pgdg.list
+ODBC_INIFILE=/etc/odbcinst.ini
+PGDG_INSTALLER=/usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+PGDG_LISTFILE=/etc/apt/sources.list.d/pgdg.list
+PGDG_PACKAGE=pgdg-redhat-repo
 
 abort() {
     printf "$@" >&2
@@ -72,7 +74,7 @@ get_realpath() (
 )
 
 install_odbc_driver() {
-		cat >>$ODBC_INST <<EOF
+		cat >>$ODBC_INIFILE <<EOF
 [$2]
 Driver=$1
 
@@ -111,8 +113,8 @@ preinstall_platform() {
 	(debian|ubuntu)
 	    install-packages postgresql-common
 
-	    if [ ! -f $PGDG_LIST ]; then
-		sh /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+	    if [ ! -f $PGDG_LISTFILE ]; then
+		sh $PGDG_INSTALLER
 	    fi
 	    ;;
     esac
