@@ -23,9 +23,6 @@ OBJECT_ANSI=psqlodbca.so
 OBJECT_UNICODE=psqlodbcw.so
 
 ODBC_INIFILE=/etc/odbcinst.ini
-PGDG_INSTALLER=/usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
-PGDG_LISTFILE=/etc/apt/sources.list.d/pgdg.list
-PGDG_PACKAGE=pgdg-redhat-repo
 
 abort() {
     printf "$@" >&2
@@ -74,7 +71,11 @@ get_realpath() (
 )
 
 install_odbc_driver() {
-		cat >>$ODBC_INIFILE <<EOF
+    if egrep '^[PostgreSQL .+]$' $ODBC_INIFILE >/dev/null 2>&1; then
+	return 0
+    fi
+
+    cat >>$ODBC_INIFILE <<EOF
 [$2]
 Driver=$1
 
@@ -84,9 +85,10 @@ EOF
 install_postgres_odbc() {
     validate_platform
     configure_platform
-    preinstall_platform
-    install-packages $(get_packages)
-    postinstall_platform
+    if install-pgdg; then
+	install-packages $(get_packages)
+	postinstall_platform
+    fi
 }
 
 postinstall_platform() {
@@ -104,18 +106,6 @@ postinstall_platform() {
 		eval object="\$OBJECT_$encoding"
 		install_odbc_driver $libdir/$object "$name"
 	    done
-	    ;;
-    esac
-}
-
-preinstall_platform() {
-    case "$ID" in
-	(debian|ubuntu)
-	    install-packages postgresql-common
-
-	    if [ ! -f $PGDG_LISTFILE ]; then
-		sh $PGDG_INSTALLER
-	    fi
 	    ;;
     esac
 }

@@ -16,10 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-PGDG_INSTALLER=/usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
-PGDG_LISTFILE=/etc/apt/sources.list.d/pgdg.list
-PGDG_PACKAGE=pgdg-redhat-repo
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -51,25 +47,9 @@ get_realpath() (
 )
 
 install_pgadmin4() {
-    preinstall_platform
-    install-packages $(get-pgadmin4-packages)
-}
-
-preinstall_platform() {
-    case "$ID" in
-	(debian|ubuntu)
-	    install-packages postgresql-common
-
-	    if [ ! -f $PGDG_LISTFILE ]; then
-		sh $PGDG_INSTALLER
-	    fi
-	    ;;
-	(rhel|ol)
-	    if ! rpm -q $PGDG_PACKAGE >/dev/null 2>&1; then
-		abort "%s: %s: No such package installed\n" "$0" $PGDG_PACKAGE
-	    fi
-	    ;;
-    esac
+    if install-pgdg; then
+	install-packages $(get-pgadmin4-packages)
+    fi
 }
 
 validate_platform() {
