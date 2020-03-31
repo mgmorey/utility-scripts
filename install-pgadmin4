@@ -16,7 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-PGDG_LIST=/etc/apt/sources.list.d/pgdg.list
+PGDG_INSTALLER=/usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+PGDG_LISTFILE=/etc/apt/sources.list.d/pgdg.list
+PGDG_PACKAGE=pgdg-redhat-repo
 
 abort() {
     printf "$@" >&2
@@ -25,14 +27,6 @@ abort() {
 
 abort_not_supported() {
     abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
-}
-
-add_apt_source() {
-    install-packages postgresql-common
-
-    if [ ! -f $PGDG_LIST ]; then
-	sh /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
-    fi
 }
 
 assert() {
@@ -57,21 +51,71 @@ get_realpath() (
 )
 
 install_pgadmin4() {
-    add_apt_source
-    install-packages pgadmin4
+    preinstall_platform
+    install-packages $(get-pgadmin4-packages)
+}
+
+preinstall_platform() {
+    case "$ID" in
+	(debian|ubuntu)
+	    install-packages postgresql-common
+
+	    if [ ! -f $PGDG_LISTFILE ]; then
+		sh $PGDG_INSTALLER
+	    fi
+	    ;;
+	(rhel|ol)
+	    if ! rpm -q $PGDG_PACKAGE >/dev/null 2>&1; then
+		abort "%s: %s: No such package installed\n" "$0" $PGDG_PACKAGE
+	    fi
+	    ;;
+    esac
+    :
 }
 
 validate_platform() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (debian)
-		return
-		;;
-	esac
-    done
+    case "$ID" in
+	(debian)
+	    case "$VERSION_ID" in
+		(10)
+		    return
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(8.*)
+		    return
+		    ;;
+		(*)
+		    return
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    return
+		    ;;
+		(19.10)
+		    return
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+    esac
 
     abort_not_supported "Operating system"
 }
+
+if [ $# -gt 0 ]; then
+    abort "%s: Too many arguments\n" "$0"
+fi
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
