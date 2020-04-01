@@ -1,0 +1,290 @@
+#!/usr/bin/env python3
+# pylint: disable=c-extension-no-member,global-statement,invalid-name
+# pylint: disable=missing-docstring,no-name-in-module
+
+# test-odbc-driver: test ODBC driver
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import argparse
+import copy
+import json
+import logging
+import os
+import sys
+
+import pyodbc
+
+DATACFG = 'data.json'
+DBMSCFG = 'dbms.json'
+
+LOG_DATEFMT = '%H:%M:%S'
+LOG_FORMAT = '%(asctime)s %(levelname)-8s %(message)s'
+
+PROMPT = ("Please type a list of ODBC driver names, one per line.\n"
+          "Type EOF (Ctrl-D or Ctrl-Z) to end, or Ctrl-C to quit:")
+
+datacfg = None
+dbmscfg = None
+
+
+def connect(argvars: dict, driver: str, database):
+    for key in {'password', 'user'}:
+        if argvars[key] is None:
+            argvars[key] = ''
+
+    connstr = get_connection_string(argvars, driver, database)
+    logging.info("Connecting to %s", get_description(argvars, database))
+
+    for item in connstr.split(';'):
+        logging.info("%s", item)
+
+    return pyodbc.connect(connstr,
+                          user=argvars['user'],
+                          password=argvars['password'])
+
+
+def execute_sql(sqlfile: str, conn: pyodbc.Connection, argvars: dict):
+    sqlpath = os.path.join(argvars['datadir'], sqlfile)
+    with open(sqlpath, mode='r', encoding='utf-8', newline='') as sqltext:
+        try:
+            logging.info("Executing SQL from file %s", sqlfile)
+            statements = sqltext.read().split(';')
+
+            for statement in statements:
+                statement = statement.strip()
+
+                if statement:
+                    conn.execute(statement)
+        except pyodbc.Error as error:
+            conn.rollback()
+            raise error
+        else:
+            conn.commit()
+
+
+def get_connection_string(argvars: dict, driver: str, database: str) -> str:
+    items = ["Driver={{{0}}}"]
+
+    if argvars['host'] is not None:
+        items.append("Server={1}")
+
+    if argvars['port'] is not None:
+        items.append("Port={2}")
+
+    if argvars['socket'] is not None:
+        items.append("Socket={3}")
+
+    if database is not None:
+        items.append("Database={4}")
+
+    format_str = ';'.join(items)
+    return format_str.format(driver,
+                             argvars['host'],
+                             argvars['port'],
+                             argvars['socket'],
+                             database)
+
+
+def get_description(argvars: dict, database: str) -> str:
+    format_str = "{0} instance"
+
+    if argvars['host'] or argvars['port'] or argvars['socket']:
+        format_str += " "
+
+        if argvars['host']:
+            format_str += "{2}"
+
+        if argvars['port']:
+            format_str += ":{3}"
+        elif argvars['socket']:
+            format_str += ":{4}"
+
+    if database is not None:
+        format_str += " database {5}"
+
+    if argvars['user']:
+        format_str += " as {1}"
+
+    return format_str.format(argvars['dialect'],
+                             argvars['user'],
+                             argvars['host'],
+                             argvars['port'],
+                             argvars['socket'],
+                             database)
+
+
+def get_pathname(filename: str, args: argparse.Namespace):
+    if os.path.dirname(filename):
+        return filename
+
+    if args.datadir is None:
+        return filename
+
+    return os.path.join(args.datadir, filename)
+
+
+def test_odbc_driver(driver: str, argvars: dict):
+    set_defaults(driver, argvars)
+    database = argvars['database']
+
+    try:
+        conn = connect(argvars, driver, database)
+    except pyodbc.Error as error:
+        logging.error("Error connecting: %s", str(error))
+    else:
+        sqlfiles = datacfg['sqlfiles']
+
+        try:
+            sqlfile = sqlfiles[argvars['dialect']]
+            execute_sql(sqlfile, conn, argvars)
+        except FileNotFoundError:
+            logging.warning("%s: No such SQL file for %s", sqlfile, driver)
+        except pyodbc.Error as error:
+            logging.error("%s: Error executing SQL: %s", sqlfile, error)
+
+
+def main():
+    global datacfg
+    global dbmscfg
+    logging.basicConfig(level=logging.INFO,
+                        format=LOG_FORMAT,
+                        datefmt=LOG_DATEFMT)
+    args = parse_args()
+
+    try:
+        with open(get_pathname(args.datacfg, args), 'r') as cfgfile:
+            datacfg = json.load(cfgfile)
+    except FileNotFoundError:
+        logging.error("No such configuration file: '%s'", args.datacfg)
+        sys.exit(1)
+    else:
+        try:
+            with open(get_pathname(args.dbmscfg, args), 'r') as cfgfile:
+                dbmscfg = json.load(cfgfile)
+        except FileNotFoundError:
+            pass
+
+        if dbmscfg is None and args.dialect is None:
+            logging.error("No SQL dialect specified")
+            sys.exit(1)
+
+        if dbmscfg is None and args.user is None:
+            logging.error("No username specified")
+            sys.exit(1)
+
+        if not args.driver:
+            args.driver = read_input_lines()
+
+        for driver in args.driver:
+            test_odbc_driver(driver, copy.deepcopy(vars(args)))
+
+
+def parse_args():
+    description = 'Test ODBC drivers'
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('--database',
+                        metavar='DATABASE',
+                        nargs='?',
+                        help='connect to database DATABASE')
+    parser.add_argument('--datacfg',
+                        default=DATACFG,
+                        metavar='DATACFG',
+                        nargs='?',
+                        help='read configuration DATACFG')
+    parser.add_argument('--datadir',
+                        default='.',
+                        metavar='DATADIR',
+                        nargs='?',
+                        help='find data files in DATADIR')
+    parser.add_argument('--dbmscfg',
+                        default=DBMSCFG,
+                        metavar='DBMSCFG',
+                        nargs='?',
+                        help='read configuration DBMSCFG')
+    parser.add_argument('--dialect',
+                        metavar='DIALECT',
+                        nargs='?',
+                        help='use SQL dialect DIALECT')
+    parser.add_argument('driver',
+                        metavar='DRIVER',
+                        nargs='*',
+                        help='use ODBC driver DRIVER')
+    parser.add_argument('--host',
+                        metavar='HOST',
+                        nargs='?',
+                        help='connect to host HOST')
+    parser.add_argument('--password',
+                        metavar='PASSWD',
+                        nargs='?',
+                        help='log in with password PASSWD')
+    parser.add_argument('--port',
+                        metavar='PORT',
+                        nargs='?',
+                        type=int,
+                        help='connect to port PORT')
+    parser.add_argument('--socket',
+                        metavar='SOCKET',
+                        nargs='?',
+                        help='connect to socket SOCKET')
+    parser.add_argument('--user',
+                        metavar='USER',
+                        nargs='?',
+                        help='log in as USER')
+    return parser.parse_args()
+
+
+def read_input_lines() -> list:
+    if sys.stdin.isatty():
+        print(PROMPT, file=sys.stderr)
+
+    try:
+        text = sys.stdin.read().split('\n')
+    except KeyboardInterrupt:
+        print('')
+        sys.exit(1)
+    else:
+        return [s.strip() for s in text if s.strip()]
+
+
+def set_defaults(driver: str, argvars: dict):
+    if dbmscfg is not None:
+        dialects = dbmscfg['dialects']
+        drivers = dbmscfg['drivers']
+
+        if argvars['dialect'] is None:
+            argvars['dialect'] = drivers[driver]
+
+        dialect_vars = dialects[argvars['dialect']]
+
+        if argvars['host'] is None:
+            if 'host' in dialect_vars:
+                argvars['host'] = dialect_vars['host']
+
+            if argvars['socket'] is None and 'socket' in dialect_vars:
+                argvars['socket'] = dialect_vars['socket']
+        else:
+            if argvars['port'] is None and 'port' in dialect_vars:
+                argvars['port'] = dialect_vars['port']
+
+        if argvars['user'] is None and 'user' in dialect_vars:
+            argvars['user'] = dialect_vars['user']
+
+        if argvars['database'] is None and 'database' in dialect_vars:
+            argvars['database'] = dialect_vars['database']
+
+
+if __name__ == '__main__':
+    main()
