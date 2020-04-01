@@ -67,7 +67,11 @@ def execute_sql(sqlfile: str, conn: pyodbc.Connection, argvars: dict):
                 statement = statement.strip()
 
                 if statement:
-                    conn.execute(statement)
+                    cursor = conn.execute(statement)
+                    rows = cursor.fetchall()
+
+                    for row in rows:
+                        print(', '.join(row))
         except pyodbc.Error as error:
             conn.rollback()
             raise error
