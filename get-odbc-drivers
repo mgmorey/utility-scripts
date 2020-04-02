@@ -2,7 +2,7 @@
 # pylint: disable=bad-continuation,invalid-name,missing-docstring
 
 # get-odbc-driver-info: print installed ODBC driver details
-# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,8 +47,7 @@ ODBC_INIFILE = '/etc/odbcinst.ini'
 
 def filter_drivers(drivers: dict, dialect: list, encoding: str) -> dict:
     return {name: drivers[name] for name in drivers
-            if ((not dialect or drivers[name]['dialect'] in dialect) and
-                (not encoding or drivers[name]['encoding'] == encoding))}
+            if has_driver(drivers[name], dialect, encoding)}
 
 
 def get_data(section: configparser.SectionProxy) -> str:
@@ -74,31 +73,71 @@ def get_odbc_drivers(pathname: str, name: list) -> dict:
             config.sections() if (not name or section in name)}
 
 
+def has_driver(driver: dict, dialect: list, encoding: str) -> bool:
+    return ((not dialect or driver['dialect'] in dialect) and
+            (not encoding or driver['encoding'] == encoding))
+
+
 def parse_args() -> argparse.Namespace:
     description = 'Print ODBC driver configuration'
-    parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--dialect',
-                        choices=ODBC_DIALECTS,
-                        metavar='DIALECT',
-                        nargs='+',
-                        help='select SQL dialect DIALECT')
-    parser.add_argument('--encoding',
-                        choices=ODBC_ENCODINGS,
-                        metavar='ENCODING',
-                        nargs='?',
-                        help='select encoding ENCODING')
-    parser.add_argument('--name',
-                        metavar='NAME',
-                        nargs='+',
-                        help='select ODBC driver NAME')
-    parser.add_argument('--text',
-                        action="store_true",
-                        help='print plaintext summary')
-    return parser.parse_args()
+    arg_parser = argparse.ArgumentParser(description=description)
+    arg_parser.add_argument('--name',
+                            metavar='NAME',
+                            nargs='+',
+                            help='select ODBC driver NAME')
+    arg_parser.add_argument('--text',
+                            action="store_true",
+                            help='print plaintext summary')
+    dialect = arg_parser.add_mutually_exclusive_group()
+    dialect.add_argument('--dialect',
+                         choices=ODBC_DIALECTS,
+                         metavar='DIALECT',
+                         nargs='+',
+                         help='select SQL dialect DIALECT')
+    dialect.add_argument('--mssql',
+                          action='store_true',
+                          help='select MSSQL SQL dialect')
+    dialect.add_argument('--mysql',
+                          action='store_true',
+                          help='select MySQL SQL dialect')
+    dialect.add_argument('--oracle',
+                          action='store_true',
+                          help='select Oracle SQL dialect')
+    dialect.add_argument('--postgres',
+                          action='store_true',
+                          help='select PostgreSQL SQL dialect')
+    encoding = arg_parser.add_mutually_exclusive_group()
+    encoding.add_argument('--ansi',
+                          action='store_true',
+                          help='select ANSI encoding')
+    encoding.add_argument('--encoding',
+                          choices=ODBC_ENCODINGS,
+                          metavar='ENCODING',
+                          nargs='?',
+                          help='select encoding ENCODING')
+    encoding.add_argument('--unicode',
+                          action='store_true',
+                          help='select Unicode encoding')
+    return arg_parser.parse_args()
 
 
 def main():
     args = parse_args()
+
+    if (args.mssql):
+        args.dialect = 'mssql'
+    elif (args.mysql):
+        args.dialect = 'mysql'
+    elif (args.oracle):
+        args.dialect = 'oracle'
+    elif (args.postgres):
+        args.dialect = 'postgres'
+
+    if (args.ansi):
+        args.encoding = 'ansi'
+    elif (args.unicode):
+        args.encoding = 'unicode'
+
     drivers = get_odbc_drivers(ODBC_INIFILE, args.name)
 
     if args.dialect or args.encoding:
