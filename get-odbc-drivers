@@ -87,10 +87,10 @@ def parse_args() -> argparse.Namespace:
                             action="store_true",
                             help='print plaintext summary')
     encoding = arg_parser.add_mutually_exclusive_group()
-    encoding.add_argument('--ansi',
+    encoding.add_argument('--ansi_encoding',
                           action='store_true',
                           help='select ANSI encoding')
-    encoding.add_argument('--unicode',
+    encoding.add_argument('--unicode_encoding',
                           action='store_true',
                           help='select Unicode encoding')
     return arg_parser.parse_args()
@@ -100,9 +100,9 @@ def main():
     args = parse_args()
     drivers = get_odbc_drivers(ODBC_INIFILE)
 
-    if args.ansi:
+    if args.ansi_encoding:
         encoding = 'ansi'
-    elif args.unicode:
+    elif args.unicode_encoding:
         encoding = 'unicode'
     else:
         encoding = None
