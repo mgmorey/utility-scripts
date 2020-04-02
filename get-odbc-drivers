@@ -95,17 +95,17 @@ def parse_args() -> argparse.Namespace:
                          nargs='+',
                          help='select SQL dialect DIALECT')
     dialect.add_argument('--mssql',
-                          action='store_true',
-                          help='select MSSQL SQL dialect')
+                         action='store_true',
+                         help='select MSSQL SQL dialect')
     dialect.add_argument('--mysql',
-                          action='store_true',
-                          help='select MySQL SQL dialect')
+                         action='store_true',
+                         help='select MySQL SQL dialect')
     dialect.add_argument('--oracle',
-                          action='store_true',
-                          help='select Oracle SQL dialect')
+                         action='store_true',
+                         help='select Oracle SQL dialect')
     dialect.add_argument('--postgres',
-                          action='store_true',
-                          help='select PostgreSQL SQL dialect')
+                         action='store_true',
+                         help='select PostgreSQL SQL dialect')
     encoding = arg_parser.add_mutually_exclusive_group()
     encoding.add_argument('--ansi',
                           action='store_true',
