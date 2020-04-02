@@ -111,10 +111,10 @@ def main():
     else:
         encoding = None
 
-    if args.json_format:
-        formatting = 'json'
-    elif args.text_format:
+    if args.text_format:
         formatting = 'text'
+    else:
+        formatting = 'json'
 
     if args.dialect or encoding:
         drivers = filter_drivers(drivers, args.dialect, encoding)
