@@ -99,12 +99,13 @@ def parse_args() -> argparse.Namespace:
 def main():
     args = parse_args()
     drivers = get_odbc_drivers(ODBC_INIFILE)
-    encoding = None
 
     if args.ansi:
         encoding = 'ansi'
     elif args.unicode:
         encoding = 'unicode'
+    else:
+        encoding = None
 
     if args.dialect or encoding:
         drivers = filter_drivers(drivers, args.dialect, encoding)
