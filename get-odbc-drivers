@@ -124,18 +124,18 @@ def parse_args() -> argparse.Namespace:
 def main():
     args = parse_args()
 
-    if (args.mssql):
+    if args.mssql:
         args.dialect = 'mssql'
-    elif (args.mysql):
+    elif args.mysql:
         args.dialect = 'mysql'
-    elif (args.oracle):
+    elif args.oracle:
         args.dialect = 'oracle'
-    elif (args.postgres):
+    elif args.postgres:
         args.dialect = 'postgres'
 
-    if (args.ansi):
+    if args.ansi:
         args.encoding = 'ansi'
-    elif (args.unicode):
+    elif args.unicode:
         args.encoding = 'unicode'
 
     drivers = get_odbc_drivers(ODBC_INIFILE, args.name)
