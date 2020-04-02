@@ -40,7 +40,6 @@ ODBC_DATA = {
     DRIVER_POSTGRES_UNICODE: ('postgres', 'unicode'),
 }
 
-ODBC_DIALECTS = ['mssql', 'mysql', 'oracle', 'postgres']
 ODBC_ENCODINGS = ['ansi', 'unicode']
 ODBC_INIFILE = '/etc/odbcinst.ini'
 
@@ -81,6 +80,10 @@ def has_driver(driver: dict, dialect: list, encoding: str) -> bool:
 def parse_args() -> argparse.Namespace:
     description = 'Print ODBC driver configuration'
     arg_parser = argparse.ArgumentParser(description=description)
+    arg_parser.add_argument('dialect',
+                            metavar='DIALECT',
+                            nargs='*',
+                            help='select SQL dialect DIALECT')
     arg_parser.add_argument('--name',
                             metavar='NAME',
                             nargs='+',
@@ -88,24 +91,6 @@ def parse_args() -> argparse.Namespace:
     arg_parser.add_argument('--text',
                             action="store_true",
                             help='print plaintext summary')
-    dialect = arg_parser.add_mutually_exclusive_group()
-    dialect.add_argument('--dialect',
-                         choices=ODBC_DIALECTS,
-                         metavar='DIALECT',
-                         nargs='+',
-                         help='select SQL dialect DIALECT')
-    dialect.add_argument('--mssql',
-                         action='store_true',
-                         help='select MSSQL SQL dialect')
-    dialect.add_argument('--mysql',
-                         action='store_true',
-                         help='select MySQL SQL dialect')
-    dialect.add_argument('--oracle',
-                         action='store_true',
-                         help='select Oracle SQL dialect')
-    dialect.add_argument('--postgres',
-                         action='store_true',
-                         help='select PostgreSQL SQL dialect')
     encoding = arg_parser.add_mutually_exclusive_group()
     encoding.add_argument('--ansi',
                           action='store_true',
@@ -123,15 +108,6 @@ def parse_args() -> argparse.Namespace:
 
 def main():
     args = parse_args()
-
-    if args.mssql:
-        args.dialect = 'mssql'
-    elif args.mysql:
-        args.dialect = 'mysql'
-    elif args.oracle:
-        args.dialect = 'oracle'
-    elif args.postgres:
-        args.dialect = 'postgres'
 
     if args.ansi:
         args.encoding = 'ansi'
