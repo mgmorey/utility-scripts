@@ -77,22 +77,26 @@ def has_driver(driver: dict, dialect: list, encoding: str) -> bool:
 
 
 def parse_args() -> argparse.Namespace:
-    description = 'Print ODBC driver configuration'
+    description = 'Print ODBC driver configuration as JSON or text'
     arg_parser = argparse.ArgumentParser(description=description)
     arg_parser.add_argument('dialect',
                             metavar='DIALECT',
                             nargs='*',
                             help='select SQL dialect DIALECT')
-    arg_parser.add_argument('--text_summary',
-                            action="store_true",
-                            help='print text summary')
     encoding = arg_parser.add_mutually_exclusive_group()
     encoding.add_argument('--ansi_encoding',
                           action='store_true',
-                          help='select ANSI encoding')
+                          help='select driver with ANSI encoding')
     encoding.add_argument('--unicode_encoding',
                           action='store_true',
-                          help='select Unicode encoding')
+                          help='select driver with Unicode encoding')
+    format = arg_parser.add_mutually_exclusive_group()
+    format.add_argument('--json_format',
+                        action='store_true',
+                        help='format output as JSON (default)')
+    format.add_argument('--text_format',
+                        action='store_true',
+                        help='format output as text')
     return arg_parser.parse_args()
 
 
@@ -107,10 +111,15 @@ def main():
     else:
         encoding = None
 
+    if args.json_format:
+        formatting = 'json'
+    elif args.text_format:
+        formatting = 'text'
+
     if args.dialect or encoding:
         drivers = filter_drivers(drivers, args.dialect, encoding)
 
-    if args.text_summary:
+    if formatting == 'text':
         for name in drivers:
             print(name)
     else:
