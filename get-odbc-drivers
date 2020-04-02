@@ -83,9 +83,9 @@ def parse_args() -> argparse.Namespace:
                             metavar='DIALECT',
                             nargs='*',
                             help='select SQL dialect DIALECT')
-    arg_parser.add_argument('--text',
+    arg_parser.add_argument('--text_summary',
                             action="store_true",
-                            help='print plaintext summary')
+                            help='print text summary')
     encoding = arg_parser.add_mutually_exclusive_group()
     encoding.add_argument('--ansi_encoding',
                           action='store_true',
@@ -110,7 +110,7 @@ def main():
     if args.dialect or encoding:
         drivers = filter_drivers(drivers, args.dialect, encoding)
 
-    if args.text:
+    if args.text_summary:
         for name in drivers:
             print(name)
     else:
