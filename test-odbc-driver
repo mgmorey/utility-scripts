@@ -73,6 +73,8 @@ def execute_sql(sqlfile: str, conn: pyodbc.Connection, argvars: dict):
                     for row in rows:
                         print(', '.join(row))
         except pyodbc.Error as error:
+            logging.error("%s: Error executing SQL statement '%s': %s",
+                          sqlpath, statement, str(error))
             conn.rollback()
             raise error
         else:
