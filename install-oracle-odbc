@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -eu
 
 # install-oracle-odbc: install Oracle ODBC packages
 # Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
