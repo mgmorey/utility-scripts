@@ -18,9 +18,15 @@
 
 CLIENT_VERSION=19.6
 
-PKG_NAME=oracle-instantclient${CLIENT_VERSION}-odbc
+FORMAT='%s-%s.0.0.0-1.%s.rpm\n'
 
-RPMFILE=${PKG_NAME}-${CLIENT_VERSION}.0.0.0-1.x86_64.rpm
+INSTANTCLIENT_BASIC=oracle-instantclient${CLIENT_VERSION}-basic
+INSTANTCLIENT_ODBC=oracle-instantclient${CLIENT_VERSION}-odbc
+
+ODBC_DRIVER_DESC='Oracle ODBC driver for Oracle 19'
+ODBC_DRIVER_FILE=/etc/odbcinst.ini
+ODBC_DRIVER_NAME='Oracle 19 ODBC driver'
+ODBC_DRIVER_LIB=/usr/lib/oracle/$CLIENT_VERSION/client64/lib/libsqora.so.19.1
 
 abort() {
     printf "$@" >&2
@@ -33,6 +39,14 @@ abort_not_supported() {
 
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_package_files() {
+    for package in $INSTANTCLIENT_BASIC $INSTANTCLIENT_ODBC; do
+	if ! rpm -q $package >/dev/null 2>&1; then
+	    printf "$FORMAT" $package $CLIENT_VERSION "$(uname -m)"
+	fi
+    done
 }
 
 get_realpath() (
@@ -59,23 +73,24 @@ install_oracle_odbc() {
 }
 
 install_platform() {
-    case "$ID" in
-	(rhel|ol)
-	    if ! rpm -q $PKG_NAME >/dev/null 2>&1; then
-		rpm -ihv $rpmpath
-	    fi
-	    ;;
-    esac
-}
+    package_files=$(get_package_files)
 
-parse_arguments() {
-    case "$(basename "$1")" in
-	($RPMFILE)
-	    rpmpath=$1
-	    ;;
-	(*)
-	    abort "%s: invalid argument" "$1"
-    esac
+    if [ -n "$package_files" ]; then
+	rpm -iv $package_files
+    fi
+
+    if ! grep "\[$ODBC_DRIVER_NAME\]" $ODBC_DRIVER_FILE >/dev/null 2>&1; then
+	cat <<EOF >$ODBC_DRIVER_FILE
+[$ODBC_DRIVER_NAME]
+Description=$ODBC_DRIVER_DESC
+Driver=$ODBC_DRIVER_LIB
+Setup=
+FileUsage=
+CPTimeout=
+CPReuse=
+
+EOF
+    fi
 }
 
 validate_platform() {
@@ -92,9 +107,7 @@ validate_platform() {
     abort_not_supported "Operating system"
 }
 
-if [ $# -lt 1 ]; then
-    abort "%s: Not enough arguments\n" "$0"
-elif [ $# -gt 1 ]; then
+if [ $# -gt 0 ]; then
     abort "%s: Too many arguments\n" "$0"
 fi
 
@@ -104,5 +117,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-parse_arguments "$@"
 install_oracle_odbc
