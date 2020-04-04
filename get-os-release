@@ -205,13 +205,13 @@ output_data() {
 
     if [ "$is_shell_format" = true ]; then
 	for var in $vars; do
-	    eval val="\${$var-}"
-	    printf "%s=\"%s\"\n" "$var" "$val"
+	    eval value="\${$var-}"
+	    printf "%s=\"%s\"\n" "$var" "$value"
 	done
     else
 	for var in $vars; do
-	    eval val="\${$var-}"
-	    printf "%s\n" "$val"
+	    eval value="\${$var-}"
+	    printf "%s\n" "$value"
 	done
     fi
 }
