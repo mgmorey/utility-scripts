@@ -57,7 +57,7 @@ get_cli_command() {
 	    get_cli_sqlite
 	    ;;
 	(*)
-	    abort "%s: Invalid dialect '%s'\n" "$DATABASE_DIALECT"
+	    abort "%s: Invalid SQL dialect '%s'\n" "$DATABASE_DIALECT"
     esac
 }
 
@@ -132,7 +132,7 @@ parse_argument() {
 	    if [ "$DATABASE_DIALECT" = sqlite ]; then
 		DATABASE_PATHNAME=$1
 	    else
-		abort "Invalid SQL script name: %s\n" "$1"
+		abort "%s: Invalid SQL script name: %s\n" "$0" "$1"
 	    fi
 	    ;;
 	(*)
@@ -181,9 +181,9 @@ run_sql() {
 		exec <$script
 		exec_sql_command
 	    elif [ -d $script ]; then
-		abort "%s: Is a directory\n" "$script"
+		abort "%s: %s: Is a directory\n" "$0" "$script"
 	    else
-		abort "%s: No such script file\n" "$script"
+		abort "%s: %s: No such script file\n" "$0" "$script"
 	    fi
 	done
     else
