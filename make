@@ -16,11 +16,33 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-
 if [ -f GNUmakefile ]; then
-    make="$(which gmake 2>/dev/null)"
+    make="$(which gmake 2>/dev/null || true)"
 else
     make=
 fi
 
-exec "${make:-/usr/bin/make}" "$@"
+if [ -z "$make" ]; then
+    case "$(uname -s)" in
+	(CYGWIN_NT-*|MINGW64_NT-*)
+	    make=/usr/bin/make
+	    ;;
+	(Darwin)
+	    make=/usr/bin/make
+	    ;;
+	(FreeBSD)
+	    make=/usr/local/bin/make
+	    ;;
+	(GNU|Linux)
+	    make=/usr/bin/make
+	    ;;
+	(SunOS)
+	    make=/usr/bin/make
+	    ;;
+	(*)
+	    make=/usr/bin/make
+	    ;;
+    esac
+fi
+
+exec "$make" "$@"
