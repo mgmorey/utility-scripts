@@ -573,9 +573,6 @@ configure_unix_freebsd() {
     # Set uWSGI prefix directory
     UWSGI_PREFIX=/usr/local
 
-    # Set uWSGI binary file
-    UWSGI_BINARY_NAME=uwsgi-3.6
-
     # Set other uWSGI parameters
     UWSGI_HAS_PLUGIN=false
 }
