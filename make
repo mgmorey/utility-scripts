@@ -24,16 +24,22 @@ fi
 
 if [ -z "$make" ]; then
     case "$(uname -s)" in
-	(CYGWIN_NT-*|MINGW64_NT-*)
+	(*BSD)
+	    make=/usr/bin/make
+	    ;;
+	(CYGWIN_NT-*)
 	    make=/usr/bin/make
 	    ;;
 	(Darwin)
 	    make=/usr/bin/make
 	    ;;
-	(FreeBSD)
-	    make=/usr/local/bin/make
+	(GNU)
+	    make=/usr/bin/make
 	    ;;
-	(GNU|Linux)
+	(Linux)
+	    make=/usr/bin/make
+	    ;;
+	(MINGW64_NT-*)
 	    make=/usr/bin/make
 	    ;;
 	(SunOS)
