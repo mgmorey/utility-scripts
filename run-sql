@@ -18,8 +18,6 @@
 
 SQL_DIRS="scripts sql"
 
-: ${DATABASE_DIALECT:=sqlite}
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -34,46 +32,72 @@ configure_platform() {
 }
 
 exec_sql_cli() {
-    case "$DATABASE_DIALECT" in
-	(mssql)
-	    ${1+$1 }sqlcmd \
-		    -H ${DATABASE_HOST:-${MSSQL_HOST:-localhost}} \
-		    -U ${DATABASE_USER:-${MSSQL_USER:-$user}} \
-		    -P ${DATABASE_PASSWORD:-${MYSQL_PASSWORD-}} \
-		    # -d ${DATABASE_INSTANCE:-${MYSQL_INSTANCE-}}
-	    ;;
-	(mysql)
-	    ${1+$1 }$DATABASE_DIALECT \
-		    --protocol=${DATABASE_PROTOCOL:-${MYSQL_PROTOCOL:-TCP}} \
-		    --host=${DATABASE_HOST:-${MYSQL_HOST:-localhost}} \
-		    --port=${DATABASE_PORT:-${MYSQL_PORT:-3306}} \
-		    --user=${DATABASE_USER:-${MYSQL_USER:-$user}} \
-		    --password=${DATABASE_PASSWORD:-${MYSQL_PASSWORD-}} \
-		    --database=${DATABASE_INSTANCE:-${MYSQL_INSTANCE:-mysql}}
-	    ;;
-	(oracle)
-	    host=${DATABASE_HOST:-${ORACLE_HOST:-localhost}}
-	    port=${DATABASE_PORT:-${ORACLE_PORT:-1521}}
-	    username=${DATABASE_USER:-${ORACLE_USER:-$user}}
-	    password=${DATABASE_PASSWORD:-${ORACLE_PASSWORD-}}
-	    instance=${DATABASE_INSTANCE:-${ORACLE_INSTANCE:-ORCLCDB}}
-	    ${1+$1 }sqlplus "$username/$password@//$host:$port/$instance"
-	    ;;
-	(postgresql)
-	    ${1+$1 }psql \
-		    --host=${DATABASE_HOST:-${POSTGRES_HOST:-localhost}} \
-		    --port=${DATABASE_PORT:-${POSTGRES_PORT:-5432}} \
-		    --username=${DATABASE_USER:-${POSTGRES_USER:-$user}} \
-		    --password
-	    ;;
-	(sqlite)
-	    ${1+$1 }sqlite3 ${DATABASE_PATHNAME:-${SQLITE_PATHNAME-}}
-	    ;;
-    esac
+    ${1+$1 }$(get_cli_command)
 }
 
 format_pathname() {
-    printf "$1/$2\n" "$DATABASE_DIALECT"
+    printf "$1/$2\n"
+}
+
+get_cli_command() {
+    case "$DATABASE_DIALECT" in
+	(mssql)
+	    get_cli_mssql
+	    ;;
+	(mysql)
+	    get_cli_mysql
+	    ;;
+	(oracle)
+	    get_cli_oracle
+	    ;;
+	(postgresql)
+	    get_cli_postgresql
+	    ;;
+	(sqlite)
+	    get_cli_sqlite
+	    ;;
+	(*)
+	    abort "%s: Invalid dialect '%s'\n" "$DATABASE_DIALECT"
+    esac
+}
+
+get_cli_mssql() {
+    printf "%s\n" sqlcmd \
+	   -H ${DATABASE_HOST:-${MSSQL_HOST:-localhost}} \
+	   -U ${DATABASE_USER:-${MSSQL_USER:-$user}} \
+	   -P ${DATABASE_PASSWORD:-${MYSQL_PASSWORD-}} \
+	   # -d ${DATABASE_INSTANCE:-${MYSQL_INSTANCE-}}
+}
+
+get_cli_mysql() {
+    printf "%s\n" mysql \
+	   --protocol=${DATABASE_PROTOCOL:-${MYSQL_PROTOCOL:-TCP}} \
+	   --host=${DATABASE_HOST:-${MYSQL_HOST:-localhost}} \
+	   --port=${DATABASE_PORT:-${MYSQL_PORT:-3306}} \
+	   --user=${DATABASE_USER:-${MYSQL_USER:-$user}} \
+	   --password=${DATABASE_PASSWORD:-${MYSQL_PASSWORD-}} \
+	   --database=${DATABASE_INSTANCE:-${MYSQL_INSTANCE:-mysql}}
+}
+
+get_cli_oracle() {
+    host=${DATABASE_HOST:-${ORACLE_HOST:-localhost}}
+    port=${DATABASE_PORT:-${ORACLE_PORT:-1521}}
+    username=${DATABASE_USER:-${ORACLE_USER:-$user}}
+    password=${DATABASE_PASSWORD:-${ORACLE_PASSWORD-}}
+    instance=${DATABASE_INSTANCE:-${ORACLE_INSTANCE:-ORCLCDB}}
+    printf "%s\n" sqlplus "$username/$password@//$host:$port/$instance"
+}
+
+get_cli_postgresql() {
+    printf "%s\n" psql \
+	   --host=${DATABASE_HOST:-${POSTGRES_HOST:-localhost}} \
+	   --port=${DATABASE_PORT:-${POSTGRES_PORT:-5432}} \
+	   --username=${DATABASE_USER:-${POSTGRES_USER:-$user}} \
+	   --password
+}
+
+get_cli_sqlite() {
+    printf "%s\n" sqlite3 ${DATABASE_PATHNAME:-${SQLITE_PATHNAME-}}
 }
 
 get_realpath() (
@@ -187,6 +211,10 @@ if [ -n "$env_file" ]; then
     fi
 
     . "$env_file"
+fi
+
+if [ -z "${DATABASE_DIALECT-}" ]; then
+    DATABASE_DIALECT=sqlite
 fi
 
 parse_arguments "$@"
