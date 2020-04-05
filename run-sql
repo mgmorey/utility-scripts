@@ -31,7 +31,7 @@ configure_platform() {
     user=$(get_user_name)
 }
 
-exec_sql_cli() {
+exec_sql_command() {
     ${1+$1 }$(get_cli_command)
 }
 
@@ -179,7 +179,7 @@ run_sql() {
 	for script in $scripts; do
 	    if [ -f $script ]; then
 		exec <$script
-		exec_sql_cli
+		exec_sql_command
 	    elif [ -d $script ]; then
 		abort "%s: Is a directory\n" "$script"
 	    else
@@ -187,7 +187,7 @@ run_sql() {
 	    fi
 	done
     else
-	exec_sql_cli exec
+	exec_sql_command exec
     fi
 }
 
