@@ -163,7 +163,27 @@ parse_argument() {
 }
 
 parse_arguments() {
+    command=
     scripts=
+
+    while getopts hc: opt; do
+	case $opt in
+	    (c)
+		command=$OPTARG
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
 
     if [ $# -gt 0 ]; then
 	for arg; do
@@ -189,6 +209,19 @@ run_sql() {
     else
 	exec_sql_command exec
     fi
+}
+
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
+    fi
+
+    cat <<-EOF >&2
+	Usage: $0: [-c COMMAND]
+	       $0: [SCRIPT ...]
+	       $0: -h
+	EOF
 }
 
 env_dir=$(pwd)
