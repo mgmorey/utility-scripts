@@ -1,0 +1,149 @@
+#!/bin/sh -eu
+
+# manage-app-database: create/drop application database
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+format_action() {
+    printf "%s\n" "$1" | to_upper
+}
+
+format_database() {
+    case "$DATABASE_DIALECT" in
+	(mssql)
+	    printf '"%s"\n' "$1"
+	    ;;
+	(mysql)
+	    printf '"%s"\n' "$1"
+	    ;;
+	(oracle)
+	    printf '"%s"\n' "$1"
+	    ;;
+	(postgresql)
+	    printf '"%s"\n' "$1"
+	    ;;
+	(*)
+	    abort "%s: Invalid SQL dialect: %s\n" "$0" "$1"
+	    ;;
+    esac
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+manage_app_database() {
+    eval $(get-configuration app.ini)
+    run-sql -c "$(format_action $action) $(format_database $DATABASE_INSTANCE)"
+}
+
+parse_arguments() {
+    action=$1
+
+    case "$action" in
+	(create)
+	    true
+	    ;;
+	(drop)
+	    true
+	    ;;
+	(*)
+	    usage "%s: Invalid action: %s\n" "$0" "$1"
+	    ;;
+    esac
+}
+
+to_upper() {
+    tr '[:lower:]' '[:upper:]'
+}
+
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
+    fi
+
+    cat <<-EOF >&2
+	Usage: $0: create
+	       $0: drop
+	       $0: -h
+	EOF
+}
+
+if [ $# -lt 1 ]; then
+    abort "%s: Not enough arguments\n" "$0"
+elif [ $# -gt 1 ]; then
+    abort "%s: Too many arguments\n" "$0"
+fi
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+. "$script_dir/common-functions.sh"
+
+set_user_profile "$script_dir"
+env_dir=$(pwd)
+
+until [ "$env_dir" = / -o -r "$env_dir/.env" ]; do
+    env_dir="$(dirname $env_dir)"
+done
+
+if [ -r "$env_dir/.env" ]; then
+    env_file="$env_dir/.env"
+elif [ -r "$HOME/.env" ]; then
+    env_file="$HOME/.env"
+else
+    env_file=
+fi
+
+if [ -n "$env_file" ]; then
+    if [ "${VENV_VERBOSE-false}" = true ]; then
+	printf "%s\n" "Loading .env environment variables" >&2
+    fi
+
+    . "$env_file"
+fi
+
+if [ -z "${DATABASE_DIALECT-}" ]; then
+    DATABASE_DIALECT=sqlite
+fi
+
+parse_arguments "$@"
+manage_app_database
