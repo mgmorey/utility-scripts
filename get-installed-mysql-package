@@ -25,6 +25,15 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_installed_mysql_package() {
+    create_tmpfile
+    get-installed-packages >$tmpfile
+    grep-mysql-package $mode-core <$tmpfile || \
+	grep-mysql-package $mode <$tmpfile || \
+	grep-mysql-package <$tmpfile || \
+	true
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -42,21 +51,32 @@ get_realpath() (
     fi
 )
 
+parse_arguments() {
+    mode=$1
+
+    case "$mode" in
+	(client)
+	    true
+	    ;;
+	(server)
+	    true
+	    ;;
+	(*)
+	    abort "%s: Invalid argument -- %s\n" "$0" "$1"
+	    ;;
+    esac
+}
+
 if [ $# -ne 1 ]; then
     abort "%s: Invalid number of arguments\n" "$0"
 elif [ "$1" != client -a "$1" != server ]; then
     abort "%s: Invalid argument -- %s\n" "$0" "$1"
 fi
 
-mode=$1
 script_dir=$(get_realpath "$(dirname "$0")")
 
 . "$script_dir/common-functions.sh"
 
-create_tmpfile
 set_user_profile "$script_dir"
-get-installed-packages >$tmpfile
-grep-mysql-package $mode-core <$tmpfile || \
-    grep-mysql-package $mode <$tmpfile || \
-    grep-mysql-package <$tmpfile || \
-    true
+parse_arguments "$@"
+get_installed_mysql_package
