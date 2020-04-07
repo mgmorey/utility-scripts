@@ -67,10 +67,10 @@ parse_arguments() {
     esac
 }
 
-if [ $# -ne 1 ]; then
-    abort "%s: Invalid number of arguments\n" "$0"
-elif [ "$1" != client -a "$1" != server ]; then
-    abort "%s: Invalid argument -- %s\n" "$0" "$1"
+if [ $# -lt 1 ]; then
+    abort "%s: Not enough arguments\n" "$0"
+elif [ $# -gt 1 ]; then
+    abort "%s: Too many arguments\n" "$0"
 fi
 
 script_dir=$(get_realpath "$(dirname "$0")")
