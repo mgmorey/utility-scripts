@@ -32,7 +32,7 @@ configure_platform() {
 }
 
 exec_sql_command() {
-    ${1+$1 }$(get_cli_command)
+    eval ${1+$1 }$(get_cli_command)
 }
 
 format_pathname() {
@@ -77,6 +77,10 @@ get_cli_mysql() {
 	   --user=${DATABASE_USER:-${MYSQL_USER:-$user}} \
 	   --password=${DATABASE_PASSWORD:-${MYSQL_PASSWORD-}} \
 	   --database=${DATABASE_INSTANCE:-${MYSQL_INSTANCE:-mysql}}
+
+    if [ -n "${command-}" ]; then
+	printf "%s\n" --execute="\"$command\""
+    fi
 }
 
 get_cli_oracle() {
@@ -94,6 +98,10 @@ get_cli_postgresql() {
 	   --port=${DATABASE_PORT:-${POSTGRES_PORT:-5432}} \
 	   --username=${DATABASE_USER:-${POSTGRES_USER:-$user}} \
 	   --password
+
+    if [ -n "${command-}" ]; then
+	printf "%s\n" --command="\"$command\""
+    fi
 }
 
 get_cli_sqlite() {
