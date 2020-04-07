@@ -30,22 +30,22 @@ assert() {
 }
 
 format_action() {
-    printf "%s\n" "$1" | to_upper
+    printf "%s\n" "$1 database" | to_upper
 }
 
 format_database() {
     case "$DATABASE_DIALECT" in
 	(mssql)
-	    printf '"%s"\n' "$1"
+	    printf '\"%s\"\n' "$1"
 	    ;;
 	(mysql)
-	    printf '"%s"\n' "$1"
+	    printf '\`%s\`\n' "$1"
 	    ;;
 	(oracle)
-	    printf '"%s"\n' "$1"
+	    printf '\"%s\"\n' "$1"
 	    ;;
 	(postgresql)
-	    printf '"%s"\n' "$1"
+	    printf '\"%s\"\n' "$1"
 	    ;;
 	(*)
 	    abort "%s: Invalid SQL dialect: %s\n" "$0" "$1"
@@ -72,7 +72,7 @@ get_realpath() (
 
 manage_app_database() {
     eval $(get-configuration app.ini)
-    run-sql -c "$(format_action $action) $(format_database $DATABASE_INSTANCE)"
+    run-sql -c "$(format_action $action) $(format_database $DATABASE_INSTANCE);"
 }
 
 parse_arguments() {
