@@ -93,12 +93,17 @@ create_database() {
     assert [ -n "$logfile" ]
     tnsfile=$(get_tnsfile ${TNS_ADMIN-$ORACLE_HOME/network/admin})
     assert [ -n "$tnsfile" ]
+    printf 'Generating server parameter file %s\n' $(basename $initfile)
     cat_init $ORACLE_SID $ORACLE_HOME >$initfile
-    cat_sql_create $ORACLE_SID "$ORACLE_PWD" | sqlplus /nolog
+    printf 'Creating and starting database SID %s\n' $ORACLE_SID
+    cat_sql_create $ORACLE_SID "$ORACLE_PWD" | sqlplus /nolog >$logfile
+    printf 'Building data dictionary views\n'
     cat_sql_sysdba | sqlplus /nolog >>$logfile
     cat_sql_system | sqlplus /nolog >>$logfile
+    printf 'Creating entry in %s\n' $(basename $tnsfile)
     cat_tns $ORACLE_SID >>"$tnsfile"
-    gzip -9 *.log || true
+    printf 'Compressing %s\n' $(basename $logfile)
+    gzip -9 $logfile || true
 }
 
 create_databases() {
@@ -111,6 +116,9 @@ create_databases() {
     for database; do
         create_database "$database"
     done
+
+    printf 'Contents of %s:\n' $tnsfile
+    cat $tnsfile
 }
 
 filter_sid() {
