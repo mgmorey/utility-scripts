@@ -16,43 +16,140 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-ORACLE_BASE=/opt/oracle
+DATABASES=
+DIRS="$ORACLE_BASE $ORACLE_HOME"
 
-create_database() {
-    export ORACLE_SID=$1
+abort() {
+    printf "$@" >&2
+    exit 1
+}
 
-    cat >$ORACLE_HOME/dbs/init$ORACLE_SID.ora <<EOF
-db_name='$ORACLE_SID'
-processes=150
-audit_file_dest='$audit_dir'
-audit_trail='db'
-db_block_size=8192
-db_domain=''
-db_recovery_file_dest='$recovery_dir'
-db_recovery_file_dest_size=2G
-diagnostic_dest='$ORACLE_BASE'
-dispatchers='(PROTOCOL=TCP) (SERVICE=ORCLXDB)'
-open_cursors=300
-remote_login_passwordfile='EXCLUSIVE'
-undo_management=AUTO
-control_files=(ora_control1, ora_control2)
-compatible='11.2.0'
-EOF
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+}
 
-    sqlplus / as sysdba <<EOF
-CREATE SPFILE FROM PFILE;
-STARTUP NOMOUNT;
-CREATE DATABASE $ORACLE_SID;
-SHUTDOWN IMMEDIATE;
+check_dirs() {
+    for dir in $DIRS; do
+	if [ ! -d $dir ]; then
+	    abort '%s: %s: No such directory\n' "$0" "$dir"
+	fi
+    done
+}
+
+cat_init() {
+    cat <<EOF
+DB_NAME=$1
+DB_CREATE_FILE_DEST=$2/dbs
 EOF
 }
 
-if [ -d $ORACLE_BASE ]; then
-    audit_dir=$ORACLE_BASE/admin/orcl/adump
-    recovery_dir=$ORACLE_BASE/fast_recovery_area
-    mkdir -p $audit_dir $recovery_dir
+cat_sql_create() {
+    cat <<EOF
+CONNECT / AS SYSDBA;
+CREATE SPFILE FROM PFILE;
+STARTUP NOMOUNT;
+CREATE DATABASE $1
+USER SYS IDENTIFIED BY "$2"
+USER SYSTEM IDENTIFIED BY "$2";
+EOF
+}
+
+cat_sql_sysdba() {
+    cat <<EOF
+CONNECT / AS SYSDBA;
+@?/rdbms/admin/catalog.sql
+@?/rdbms/admin/catproc.sql
+@?/rdbms/admin/utlrp.sql
+EOF
+}
+
+cat_sql_system() {
+    cat <<EOF
+CONNECT /;
+@?/sqlplus/admin/pupbld.sql
+EOF
+}
+
+cat_tns() {
+    cat <<EOF
+$1=
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = $1)
+    )
+  )
+EOF
+}
+
+create_database() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    export ORACLE_SID=$(get_oracle_sid "$1")
+    initfile=$(get_initfile $ORACLE_HOME $ORACLE_SID)
+    assert [ -n "$initfile" ]
+    logfile=$(get_logfile "$HOME" "$ORACLE_SID")
+    assert [ -n "$logfile" ]
+    tnsfile=$(get_tnsfile ${TNS_ADMIN-$ORACLE_HOME/network/admin})
+    assert [ -n "$tnsfile" ]
+    cat_init $ORACLE_SID $ORACLE_HOME >$initfile
+    cat_sql_create $ORACLE_SID "$ORACLE_PWD" | sqlplus /nolog
+    cat_sql_sysdba | sqlplus /nolog >>$logfile
+    cat_sql_system | sqlplus /nolog >>$logfile
+    cat_tns $ORACLE_SID >>"$tnsfile"
+    gzip -9 *.log || true
+}
+
+create_databases() {
+    : ${ORACLE_BASE?}
+    : ${ORACLE_HOME?}
+    : ${ORACLE_PWD?}
+    unset TWO_TASK
+    check_dirs
 
     for database; do
-        create_database $database
+        create_database "$database"
     done
-fi
+}
+
+filter_sid() {
+    tr -cd '[:alnum:]_' | tr '[:lower:]' '[:upper:]' | cut -c 1-8
+}
+
+get_initfile() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    printf '%s/dbs/init%s.ora\n' "$1" "$2"
+}
+
+get_logfile() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    printf '%s/create-database-%s.log\n' "$1" "$2"
+}
+
+get_tnsfile() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf '%s/tnsnames.ora\n' "$1"
+}
+
+get_oracle_sid() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf '%s\n' "$1" | filter_sid
+}
+
+parse_arguments() {
+    databases=
+
+    if [ $# -gt 0 ]; then
+        databases="$@"
+    fi
+}
+
+parse_arguments "$@"
+create_databases $databases
