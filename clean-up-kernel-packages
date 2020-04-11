@@ -31,13 +31,35 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+clean_up_kernel_dumps() {
+    kernel_dump_files=$(get_kernel_dump_files)
+
+    for file in $kernel_dump_files; do
+	kernel_file=$(get_kernel_file $file)
+
+	if [ ! -f $kernel_file ]; then
+	    /bin/rm $file
+	fi
+    done
+}
+
 clean_up_kernel_packages() {
     validate_platform
-    packages=$(get_packages)
+    packages=$(get_packages || true)
 
     if [ -n "$packages" ]; then
 	uninstall-packages $packages
     fi
+}
+
+get_kernel_dump_files() {
+    find /boot -type f -name 'initramfs-*kdump.img'
+}
+
+get_kernel_file() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf '%s\n' "$1" | sed 's/kdump\.img$/.img/'
 }
 
 get_kernel_release() {
@@ -99,3 +121,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 set_user_profile "$script_dir"
 eval $(get-os-release -X)
 clean_up_kernel_packages
+clean_up_kernel_dumps
