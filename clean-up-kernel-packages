@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-KERNEL_REGEX='kernel(|-core|-default|-modules)-[0-9]+\.[0-9]+'
+KERNEL_REGEX='(kernel(|-core|-default|-modules)|linux-image)-[0-9]+\.[0-9]+'
 
 abort() {
     printf "$@" >&2
@@ -62,13 +62,29 @@ get_kernel_file() {
     printf '%s\n' "$1" | sed 's/kdump\.img$/.img/'
 }
 
-get_kernel_release() {
-    "$kernel_release"
+get_installed_packages() {
+    case "$ID" in
+	(centos)
+	    rpm -qa
+	    ;;
+	(debian|ubuntu)
+	    get-installed-packages
+	    ;;
+	(fedora)
+	    rpm -qa
+	    ;;
+	(opensuse-*)
+	    rpm -qa
+	    ;;
+	(rhel|ol)
+	    rpm -qa
+	    ;;
+    esac
 }
 
 get_packages() {
     kernel_release=$(uname -r | sed 's/-default$//')
-    rpm -qa | egrep "$KERNEL_REGEX" | grep -v $kernel_release
+    get_installed_packages | egrep "$KERNEL_REGEX" | grep -v $kernel_release
 }
 
 get_realpath() (
@@ -93,6 +109,9 @@ validate_platform() {
 	(centos)
 	    return
 	    ;;
+	(debian)
+	    return
+	    ;;
 	(fedora)
 	    return
 	    ;;
@@ -103,6 +122,9 @@ validate_platform() {
 	    return
 	    ;;
 	(rhel)
+	    return
+	    ;;
+	(ubuntu)
 	    return
 	    ;;
     esac
