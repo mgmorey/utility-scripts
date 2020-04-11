@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+KERNEL_REGEX='kernel(|-core|-modules)-[0-9]+\.[0-9]+'
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -39,7 +41,7 @@ clean_up_kernel_packages() {
 }
 
 get_packages() {
-    rpm -qa | egrep 'kernel-(core|modules)' | grep -v "$kernel_release"
+    rpm -qa | egrep "$KERNEL_REGEX" | grep -v "$kernel_release"
 }
 
 get_realpath() (
