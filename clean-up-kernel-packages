@@ -39,7 +39,7 @@ clean_up_kernel_packages() {
 }
 
 get_packages() {
-    rpm -qa | egrep 'kernel-(headers|modules)' | grep -v "$kernel_release"
+    rpm -qa | egrep 'kernel-(core|modules)' | grep -v "$kernel_release"
 }
 
 get_realpath() (
@@ -60,37 +60,20 @@ get_realpath() (
 )
 
 validate_platform() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (debian)
-		return
-		;;
-	    (fedora)
-		return
-		;;
-	    (opensuse)
-		return
-		;;
-	    (rhel|ol|centos)
-		return
-		;;
-	    (freebsd)
-		return
-		;;
-	    (illumos)
-		return
-		;;
-	    (macos)
-		return
-		;;
-	    (netbsd)
-		return
-		;;
-	    (solaris)
-		return
-		;;
-	esac
-    done
+    case "$ID" in
+	(centos)
+	    return
+	    ;;
+	(fedora)
+	    return
+	    ;;
+	(ol)
+	    return
+	    ;;
+	(rhel)
+	    return
+	    ;;
+    esac
 
     abort_not_supported "Operating system"
 }
