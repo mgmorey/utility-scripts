@@ -37,6 +37,9 @@ check_dirs() {
 }
 
 cat_init() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
     cat <<EOF
 DB_NAME=$1
 DB_CREATE_FILE_DEST=$2/dbs
@@ -44,6 +47,9 @@ EOF
 }
 
 cat_sql_create() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
     cat <<EOF
 CONNECT / AS SYSDBA;
 CREATE SPFILE FROM PFILE;
@@ -51,6 +57,7 @@ STARTUP NOMOUNT;
 CREATE DATABASE $1
 USER SYS IDENTIFIED BY "$2"
 USER SYSTEM IDENTIFIED BY "$2";
+EXIT;
 EOF
 }
 
@@ -60,6 +67,7 @@ CONNECT / AS SYSDBA;
 @?/rdbms/admin/catalog.sql
 @?/rdbms/admin/catproc.sql
 @?/rdbms/admin/utlrp.sql
+EXIT;
 EOF
 }
 
@@ -67,17 +75,21 @@ cat_sql_system() {
     cat <<EOF
 CONNECT /;
 @?/sqlplus/admin/pupbld.sql
+EXIT;
 EOF
 }
 
 cat_tns() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
     cat <<EOF
 $1=
   (DESCRIPTION =
     (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
     (CONNECT_DATA =
       (SERVER = DEDICATED)
-      (SERVICE_NAME = $1)
+      (SERVICE_NAME = $2)
     )
   )
 EOF
@@ -86,22 +98,22 @@ EOF
 create_database() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    export ORACLE_SID=$(get_oracle_sid "$1")
-    initfile=$(get_initfile $ORACLE_HOME $ORACLE_SID)
+    export ORACLE_SID=$(get_system_id "$1")
+    db_name=$(get_db_name "$ORACLE_SID")
+    initfile=$(get_initfile "$ORACLE_SID" "$ORACLE_HOME")
     assert [ -n "$initfile" ]
-    logfile=$(get_logfile "$HOME" "$ORACLE_SID")
+    logfile=$(get_logfile "$db_name" "$HOME")
     assert [ -n "$logfile" ]
-    tnsfile=$(get_tnsfile ${TNS_ADMIN-$ORACLE_HOME/network/admin})
+    tnsfile=$(get_tnsfile "${TNS_ADMIN-$ORACLE_HOME/network/admin}")
     assert [ -n "$tnsfile" ]
-    printf 'Generating server parameter file %s\n' $(basename $initfile)
-    cat_init $ORACLE_SID $ORACLE_HOME >$initfile
-    printf 'Creating and starting database SID %s\n' $ORACLE_SID
-    cat_sql_create $ORACLE_SID "$ORACLE_PWD" | sqlplus /nolog >$logfile
+    printf 'Creating and starting database %s SID %s\n' "$db_name" "$ORACLE_SID"
+    cat_init $db_name $ORACLE_HOME >$initfile
+    cat_sql_create $db_name "$ORACLE_PWD" | sqlplus /nolog | tee $logfile
     printf 'Building data dictionary views\n'
     cat_sql_sysdba | sqlplus /nolog >>$logfile
     cat_sql_system | sqlplus /nolog >>$logfile
     printf 'Creating entry in %s\n' $(basename $tnsfile)
-    cat_tns $ORACLE_SID >>"$tnsfile"
+    cat_tns $db_name $ORACLE_SID >>"$tnsfile"
     printf 'Compressing %s\n' $(basename $logfile)
     gzip -9 $logfile || true
 }
@@ -116,27 +128,28 @@ create_databases() {
     for database; do
         create_database "$database"
     done
+}
 
-    printf 'Contents of %s:\n' $tnsfile
-    cat $tnsfile
+filter_db_name() {
+    cut -c 1-8
 }
 
 filter_sid() {
-    tr -cd '[:alnum:]_' | tr '[:lower:]' '[:upper:]' | cut -c 1-8
+    tr -cd '[:alnum:]_' | uppercase | cut -c 1-8
 }
 
 get_initfile() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
     assert [ -n "$2" ]
-    printf '%s/dbs/init%s.ora\n' "$1" "$2"
+    printf '%s/dbs/init%s.ora\n' "$2" "$1"
 }
 
 get_logfile() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
     assert [ -n "$2" ]
-    printf '%s/create-%s.log\n' "$1" "$2"
+    printf '%s/create-%s.log\n' "$2" "$1"
 }
 
 get_tnsfile() {
@@ -145,7 +158,13 @@ get_tnsfile() {
     printf '%s/tnsnames.ora\n' "$1"
 }
 
-get_oracle_sid() {
+get_db_name() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf '%s\n' "$1" | filter_db_name
+}
+
+get_system_id() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     printf '%s\n' "$1" | filter_sid
@@ -157,6 +176,10 @@ parse_arguments() {
     if [ $# -gt 0 ]; then
         databases="$@"
     fi
+}
+
+uppercase() {
+    tr '[:lower:]' '[:upper:]'
 }
 
 parse_arguments "$@"
