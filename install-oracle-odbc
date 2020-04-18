@@ -18,11 +18,14 @@
 
 COMPONENTS="basic odbc"
 DRIVER_FILE=/etc/odbcinst.ini
+
 MACHINE_TYPE_RPM=$(uname -m)
 MACHINE_TYPE_ZIP=$(uname -m | sed 's/x86_64/x64/')
 
-RPM_FORMAT="%s/oracle-instantclient%s-%s.0.0.0-1.$MACHINE_TYPE_RPM.rpm\n"
-ZIP_FORMAT="%s/instantclient-%s-linux.${MACHINE_TYPE_ZIP}-%s.0.0.0dbru.zip\n"
+PATHNAME_RPM="%s/oracle-instantclient%s-%s-%s.0.0.0-1.$MACHINE_TYPE_RPM.rpm\n"
+PATHNAME_ZIP="%s/instantclient-%s-linux.$MACHINE_TYPE_ZIP-%s.0.0.0dbru.zip\n"
+
+SUFFIX_RPM="-%s.0.0.0-1.$MACHINE_TYPE_RPM.rpm\n"
 
 abort() {
     printf "$@" >&2
@@ -50,21 +53,31 @@ CPReuse=
 EOF
 }
 
-get_package_filename() {
+get_package_pathname() {
+    assert [ $# -eq 3 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    assert [ -n "$3" ]
     case "$ID" in
 	(debian|ubuntu)
-	    printf "$ZIP_FORMAT" "$(pwd)" "$1" "$CLIENT_VERSION"
+	    printf "$PATHNAME_ZIP" "$3" "$1" "$2"
 	    ;;
 	(rhel|ol)
-	    printf "$RPM_FORMAT" "$(pwd)" "$CLIENT_VERSION" "$1"
+	    printf "$PATHNAME_RPM" "$3" "$2" "$1" "$2"
 	    ;;
     esac
 }
 
-get_package_filenames() {
+get_package_pathnames() {
     for component in basic odbc; do
-	get_package_filename $component
+	get_package_pathname $component "$CLIENT_VERSION" "$(pwd)"
     done
+}
+
+get_package_suffix() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf -- "$SUFFIX_RPM" "$1"
 }
 
 get_realpath() (
@@ -95,18 +108,18 @@ install_oracle_odbc() {
 }
 
 install_platform() {
-    package_files=$(get_package_filenames)
+    package_pathnames=$(get_package_pathnames)
 
-    if [ -z "$package_files" ]; then
+    if [ -z "$package_pathnames" ]; then
 	return 0
     fi
 
     case "$ID" in
 	(debian|ubuntu)
-	    install_zip_files $package_files
+	    install_zip_files $package_pathnames
 	    ;;
 	(rhel|ol)
-	    install_rpm_files $package_files
+	    install_rpm_files $package_pathnames
 	    ;;
     esac
 
@@ -116,7 +129,13 @@ install_platform() {
 }
 
 install_rpm_files() {
-    rpm -iv $package_files
+    suffix=$(get_package_suffix "$CLIENT_VERSION")
+
+    for package_pathname; do
+	if ! rpm -q $(basename ${package_pathname%$suffix}); then
+	    rpm -iv $package_pathname
+	fi
+    done
 }
 
 install_zip_files() (
@@ -125,9 +144,9 @@ install_zip_files() (
     mkdir -p /tmp/$dirname
     cd /tmp
 
-    for package_file in $package_files; do
-	if [ -r $package_file ]; then
-	    unzip $package_file
+    for package_pathname; do
+	if [ -r $package_pathname ]; then
+	    unzip $package_pathname
 	fi
     done
 
