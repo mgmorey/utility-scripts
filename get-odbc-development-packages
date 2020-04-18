@@ -18,8 +18,8 @@
 
 DEBIAN_10_PKGS="gcc g++ libodbc1 unixodbc unixodbc-dev"
 
-REDHAT_7_PKGS="gcc gcc-c++ libaio1 unixODBC unixODBC-devel"
-REDHAT_8_PKGS="gcc gcc-c++ libaio1 unixODBC unixODBC-devel"
+REDHAT_7_PKGS="gcc gcc-c++ libaio unixODBC unixODBC-devel"
+REDHAT_8_PKGS="gcc gcc-c++ libaio unixODBC unixODBC-devel"
 
 UBUNTU_18_PKGS="gcc g++ libodbc1 unixodbc unixodbc-dev"
 UBUNTU_19_PKGS="gcc g++ libodbc1 unixodbc unixodbc-dev"
