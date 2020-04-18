@@ -22,8 +22,8 @@ DRIVER_FILE=/etc/odbcinst.ini
 MACHINE_TYPE_RPM=$(uname -m)
 MACHINE_TYPE_ZIP=$(uname -m | sed 's/x86_64/x64/')
 
-PREFIX_RPM="%s/oracle-instantclient%s-%s"
-PREFIX_ZIP="%s/instantclient-%s"
+PREFIX_RPM="oracle-instantclient%s-%s"
+PREFIX_ZIP="instantclient-%s"
 
 SUFFIX_RPM="%s.0.0.0-1.$MACHINE_TYPE_RPM.rpm"
 SUFFIX_ZIP="linux.$MACHINE_TYPE_ZIP-%s.0.0.0dbru.zip"
@@ -54,12 +54,6 @@ CPReuse=
 EOF
 }
 
-get_archive_dirname() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    printf 'instantclient.%s\n' $CLIENT_VERSION
-}
-
 get_package_pathname() {
     assert [ $# -eq 3 ]
     assert [ -n "$1" ]
@@ -67,10 +61,10 @@ get_package_pathname() {
     assert [ -n "$3" ]
     case "$ID" in
 	(debian|ubuntu)
-	    printf "$PREFIX_ZIP-$SUFFIX_ZIP\n" "$3" "$1" "$2"
+	    printf "%s/$PREFIX_ZIP-$SUFFIX_ZIP\n" "$3" "$1" "$2"
 	    ;;
 	(rhel|ol)
-	    printf "$PREFIX_RPM-$SUFFIX_RPM\n" "$3" "$2" "$1" "$2"
+	    printf "%s/$PREFIX_RPM-$SUFFIX_RPM\n" "$3" "$2" "$1" "$2"
 	    ;;
     esac
 }
@@ -81,10 +75,30 @@ get_package_pathnames() {
     done
 }
 
+get_package_prefix() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    case "$ID" in
+	(debian|ubuntu)
+	    printf "$PREFIX_ZIP\n" "$1"
+	    ;;
+	(rhel|ol)
+	    printf "$PREFIX_RPM\n" "$1"
+	    ;;
+    esac
+}
+
 get_package_suffix() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    printf "$SUFFIX_RPM\n" "$1"
+    case "$ID" in
+	(debian|ubuntu)
+	    printf "$SUFFIX_ZIP\n" "$1"
+	    ;;
+	(rhel|ol)
+	    printf "$SUFFIX_RPM\n" "$1"
+	    ;;
+    esac
 }
 
 get_realpath() (
@@ -142,9 +156,10 @@ install_rpm_files() {
 }
 
 install_zip_files() (
-    dirname=$(get_archive_dirname "$CLIENT_VERSION")
-    /bin/rm -r /tmp/$dirname
-    mkdir -p /tmp/$dirname
+    dirname=$(get_package_prefix "$CLIENT_VERSION")
+    tmp_dirname=$(printf '%s\n' $dirname | tr -- '-.' '__')
+    mkdir -p /opt/oracle/$dirname
+    /bin/rm -rf /tmp/$tmp_dirname
     cd /tmp
 
     for package_pathname; do
@@ -153,7 +168,6 @@ install_zip_files() (
 	fi
     done
 
-    tmp_dirname=$(printf '%s\n' $dirname | tr '.' '_')
     /bin/cp -R $tmp_dirname/* /opt/oracle/$dirname
     /bin/rm -r $tmp_dirname
 )
