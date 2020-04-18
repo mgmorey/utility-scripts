@@ -101,6 +101,11 @@ get_package_suffix() {
     esac
 }
 
+get_packages() {
+    (get-odbc-development-packages
+     get-oracle-client-packages) | sort -u
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -120,7 +125,7 @@ get_realpath() (
 
 install_oracle_odbc() {
     validate_platform
-    install-packages $(get-odbc-development-packages)
+    install-packages $(get_packages)
     install_platform
 }
 
