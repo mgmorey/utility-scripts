@@ -70,7 +70,7 @@ get_package_pathname() {
 }
 
 get_package_pathnames() {
-    for component in basic odbc; do
+    for component in $COMPONENTS; do
 	get_package_pathname $component "$CLIENT_VERSION" "$(pwd)"
     done
 }
