@@ -52,11 +52,11 @@ EOF
 
 get_package_filename() {
     case "$ID" in
+	(debian|ubuntu)
+	    printf "$ZIP_FORMAT" "$(pwd)" "$1" "$CLIENT_VERSION"
+	    ;;
 	(rhel|ol)
 	    printf "$RPM_FORMAT" "$(pwd)" "$CLIENT_VERSION" "$1"
-	    ;;
-	(ubuntu)
-	    printf "$ZIP_FORMAT" "$(pwd)" "$1" "$CLIENT_VERSION"
 	    ;;
     esac
 }
@@ -84,8 +84,8 @@ get_realpath() (
     fi
 )
 
-get_zipped_dirname() {
-    printf 'instantclient.%s' $CLIENT_VERSION | tr '.' '_'
+get_archive_dirname() {
+    printf 'instantclient.%s' $CLIENT_VERSION
 }
 
 install_oracle_odbc() {
@@ -102,11 +102,11 @@ install_platform() {
     fi
 
     case "$ID" in
+	(debian|ubuntu)
+	    install_zip_files $package_files
+	    ;;
 	(rhel|ol)
 	    install_rpm_files $package_files
-	    ;;
-	(ubuntu)
-	    install_zip_files $package_files
 	    ;;
     esac
 
@@ -120,22 +120,31 @@ install_rpm_files() {
 }
 
 install_zip_files() (
-    dirname=$(get_zipped_dirname)
-    mkdir -p /opt/oracle
-    cd /opt/oracle
-
-    if [ -d $dirname ]; then
-	return 0
-    fi
+    dirname=$(get_archive_dirname)
+    /bin/rm -r /tmp/$dirname
+    mkdir -p /tmp/$dirname
+    cd /tmp
 
     for package_file in $package_files; do
-	unzip $package_file
-	/bin/mv -f $dirname $(printf '%s\n' $dirname | tr '_' '.')
+	if [ -r $package_file ]; then
+	    unzip $package_file
+	fi
     done
+
+    tmp_dirname=$(printf '%s\n' $dirname | tr '.' '_')
+    /bin/cp -R $tmp_dirname/* /opt/oracle/$dirname
+    /bin/rm -r $tmp_dirname
 )
 
 validate_platform() {
     case "$ID" in
+	(debian)
+	    case "$VERSION_ID" in
+		(10)
+		    return
+		    ;;
+	    esac
+	    ;;
 	(rhel|ol)
 	    case "$VERSION_ID" in
 		(8.1)
@@ -159,12 +168,12 @@ if [ $# -gt 0 ]; then
     abort "%s: Too many arguments\n" "$0"
 fi
 
-script_dir=$(get_realpath "$(dirname "$0")")
+script_basename="$(basename "$0")"
+script_dirname="$(get_realpath "$(dirname "$0")")"
 
-. "$script_dir/common-functions.sh"
-. "$script_dir/oracle-config.sh"
-. "$script_dir/oracle-library.sh"
+. "$script_dirname/common-functions.sh"
+. "$script_dirname/oracle-config.sh"
 
-set_user_profile "$script_dir"
+set_user_profile "$script_dirname"
 eval $(get-os-release -x)
 install_oracle_odbc
