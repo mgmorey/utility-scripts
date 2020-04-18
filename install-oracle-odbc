@@ -22,10 +22,11 @@ DRIVER_FILE=/etc/odbcinst.ini
 MACHINE_TYPE_RPM=$(uname -m)
 MACHINE_TYPE_ZIP=$(uname -m | sed 's/x86_64/x64/')
 
-PATHNAME_RPM="%s/oracle-instantclient%s-%s-%s.0.0.0-1.$MACHINE_TYPE_RPM.rpm\n"
-PATHNAME_ZIP="%s/instantclient-%s-linux.$MACHINE_TYPE_ZIP-%s.0.0.0dbru.zip\n"
+PREFIX_RPM="%s/oracle-instantclient%s-%s"
+PREFIX_ZIP="%s/instantclient-%s"
 
-SUFFIX_RPM="-%s.0.0.0-1.$MACHINE_TYPE_RPM.rpm\n"
+SUFFIX_RPM="%s.0.0.0-1.$MACHINE_TYPE_RPM.rpm"
+SUFFIX_ZIP="linux.$MACHINE_TYPE_ZIP-%s.0.0.0dbru.zip"
 
 abort() {
     printf "$@" >&2
@@ -53,6 +54,12 @@ CPReuse=
 EOF
 }
 
+get_archive_dirname() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf 'instantclient.%s\n' $CLIENT_VERSION
+}
+
 get_package_pathname() {
     assert [ $# -eq 3 ]
     assert [ -n "$1" ]
@@ -60,10 +67,10 @@ get_package_pathname() {
     assert [ -n "$3" ]
     case "$ID" in
 	(debian|ubuntu)
-	    printf "$PATHNAME_ZIP" "$3" "$1" "$2"
+	    printf "$PREFIX_ZIP-$SUFFIX_ZIP\n" "$3" "$1" "$2"
 	    ;;
 	(rhel|ol)
-	    printf "$PATHNAME_RPM" "$3" "$2" "$1" "$2"
+	    printf "$PREFIX_RPM-$SUFFIX_RPM\n" "$3" "$2" "$1" "$2"
 	    ;;
     esac
 }
@@ -77,7 +84,7 @@ get_package_pathnames() {
 get_package_suffix() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    printf -- "$SUFFIX_RPM" "$1"
+    printf "$SUFFIX_RPM\n" "$1"
 }
 
 get_realpath() (
@@ -96,10 +103,6 @@ get_realpath() (
 	done
     fi
 )
-
-get_archive_dirname() {
-    printf 'instantclient.%s' $CLIENT_VERSION
-}
 
 install_oracle_odbc() {
     validate_platform
@@ -132,14 +135,14 @@ install_rpm_files() {
     suffix=$(get_package_suffix "$CLIENT_VERSION")
 
     for package_pathname; do
-	if ! rpm -q $(basename ${package_pathname%$suffix}); then
+	if ! rpm -q $(basename ${package_pathname%-$suffix}); then
 	    rpm -iv $package_pathname
 	fi
     done
 }
 
 install_zip_files() (
-    dirname=$(get_archive_dirname)
+    dirname=$(get_archive_dirname "$CLIENT_VERSION")
     /bin/rm -r /tmp/$dirname
     mkdir -p /tmp/$dirname
     cd /tmp
