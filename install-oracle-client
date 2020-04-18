@@ -1,0 +1,196 @@
+#!/bin/sh -eu
+
+# install-oracle-client: install Oracle client packages
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+COMPONENTS="basic sqlplus"
+
+MACHINE_TYPE_RPM=$(uname -m)
+MACHINE_TYPE_ZIP=$(uname -m | sed 's/x86_64/x64/')
+
+PREFIX_RPM="oracle-instantclient%s-%s"
+PREFIX_ZIP="instantclient-%s"
+
+SUFFIX_RPM="%s.0.0.0-1.$MACHINE_TYPE_RPM.rpm"
+SUFFIX_ZIP="linux.$MACHINE_TYPE_ZIP-%s.0.0.0dbru.zip"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_package_pathname() {
+    assert [ $# -eq 3 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    assert [ -n "$3" ]
+    case "$ID" in
+	(debian|ubuntu)
+	    printf "%s/$PREFIX_ZIP-$SUFFIX_ZIP\n" "$3" "$1" "$2"
+	    ;;
+	(rhel|ol)
+	    printf "%s/$PREFIX_RPM-$SUFFIX_RPM\n" "$3" "$2" "$1" "$2"
+	    ;;
+    esac
+}
+
+get_package_pathnames() {
+    for component in $COMPONENTS; do
+	get_package_pathname $component "$CLIENT_VERSION" "$(pwd)"
+    done
+}
+
+get_package_prefix() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    case "$ID" in
+	(debian|ubuntu)
+	    printf "$PREFIX_ZIP\n" "$1"
+	    ;;
+	(rhel|ol)
+	    printf "$PREFIX_RPM\n" "$1"
+	    ;;
+    esac
+}
+
+get_package_suffix() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    case "$ID" in
+	(debian|ubuntu)
+	    printf "$SUFFIX_ZIP\n" "$1"
+	    ;;
+	(rhel|ol)
+	    printf "$SUFFIX_RPM\n" "$1"
+	    ;;
+    esac
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+install_oracle_client() {
+    validate_platform
+    install_platform
+}
+
+install_platform() {
+    package_pathnames=$(get_package_pathnames)
+
+    if [ -z "$package_pathnames" ]; then
+	return 0
+    fi
+
+    case "$ID" in
+	(debian|ubuntu)
+	    install_zip_files $package_pathnames
+	    ;;
+	(rhel|ol)
+	    install_rpm_files $package_pathnames
+	    ;;
+    esac
+}
+
+install_rpm_files() {
+    suffix=$(get_package_suffix "$CLIENT_VERSION")
+
+    for package_pathname; do
+	if ! rpm -q $(basename ${package_pathname%-$suffix}); then
+	    rpm -iv $package_pathname
+	fi
+    done
+}
+
+install_zip_files() (
+    dirname=$(get_package_prefix "$CLIENT_VERSION")
+    tmp_dirname=$(printf '%s\n' $dirname | tr -- '-.' '__')
+    mkdir -p /opt/oracle/$dirname
+    /bin/rm -rf /tmp/$tmp_dirname
+    cd /tmp
+
+    for package_pathname; do
+	if [ -r $package_pathname ]; then
+	    unzip $package_pathname
+	fi
+    done
+
+    /bin/cp -R $tmp_dirname/* /opt/oracle/$dirname
+    /bin/rm -r $tmp_dirname
+)
+
+validate_platform() {
+    case "$ID" in
+	(debian)
+	    case "$VERSION_ID" in
+		(10)
+		    return
+		    ;;
+	    esac
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(8.1)
+		    return
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    return
+		    ;;
+	    esac
+	    ;;
+    esac
+
+    abort_not_supported "Operating system"
+}
+
+if [ $# -gt 0 ]; then
+    abort "%s: Too many arguments\n" "$0"
+fi
+
+script_basename="$(basename "$0")"
+script_dirname="$(get_realpath "$(dirname "$0")")"
+
+. "$script_dirname/common-functions.sh"
+. "$script_dirname/oracle-config.sh"
+
+set_user_profile "$script_dirname"
+eval $(get-os-release -x)
+install_oracle_client
