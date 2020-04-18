@@ -87,6 +87,10 @@ get_package_suffix() {
     esac
 }
 
+get_packages() {
+    get-oracle-client-packages
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -106,6 +110,7 @@ get_realpath() (
 
 install_oracle_client() {
     validate_platform
+    install-packages $(get_packages)
     install_platform
 }
 
