@@ -16,9 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DATABASES=
-DIRS="$ORACLE_BASE $ORACLE_HOME"
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -80,16 +77,15 @@ EOF
 }
 
 cat_tns() {
-    assert [ $# -eq 2 ]
+    assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    assert [ -n "$2" ]
     cat <<EOF
 $1=
   (DESCRIPTION =
     (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
     (CONNECT_DATA =
       (SERVER = DEDICATED)
-      (SERVICE_NAME = $2)
+      (SERVICE_NAME = $1)
     )
   )
 EOF
@@ -113,7 +109,7 @@ create_database() {
     cat_sql_sysdba | sqlplus /nolog >>$logfile
     cat_sql_system | sqlplus /nolog >>$logfile
     printf 'Creating entry in %s\n' $(basename $tnsfile)
-    cat_tns $db_name $ORACLE_SID >>"$tnsfile"
+    cat_tns $ORACLE_SID >>"$tnsfile"
     printf 'Compressing %s\n' $(basename $logfile)
     gzip -9 $logfile || true
 }
@@ -128,14 +124,6 @@ create_databases() {
     for database; do
         create_database "$database"
     done
-}
-
-filter_db_name() {
-    cut -c 1-8
-}
-
-filter_sid() {
-    tr -cd '[:alnum:]_' | uppercase | cut -c 1-8
 }
 
 get_initfile() {
@@ -158,18 +146,6 @@ get_tnsfile() {
     printf '%s/tnsnames.ora\n' "$1"
 }
 
-get_db_name() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    printf '%s\n' "$1" | filter_db_name
-}
-
-get_system_id() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    printf '%s\n' "$1" | filter_sid
-}
-
 parse_arguments() {
     databases=
 
@@ -178,9 +154,11 @@ parse_arguments() {
     fi
 }
 
-uppercase() {
-    tr '[:lower:]' '[:upper:]'
-}
+script_basename=$(basename $0)
+script_dirname=$(realpath $(dirname $0))
+
+. $script_dirname/oracle-config.sh
+. $script_dirname/oracle-library.sh
 
 parse_arguments "$@"
-create_databases $databases
+create_databases ${databases:-$DATABASES}
