@@ -16,17 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CLIENT_VERSION=19.6
+COMPONENTS="basic odbc"
+DRIVER_FILE=/etc/odbcinst.ini
+MACHINE_TYPE_RPM=$(uname -m)
+MACHINE_TYPE_ZIP=$(uname -m | sed 's/x86_64/x64/')
 
-FORMAT='%s-%s.0.0.0-1.%s.rpm\n'
-
-INSTANTCLIENT_BASIC=oracle-instantclient${CLIENT_VERSION}-basic
-INSTANTCLIENT_ODBC=oracle-instantclient${CLIENT_VERSION}-odbc
-
-ODBC_DRIVER_DESC='Oracle ODBC driver for Oracle 19'
-ODBC_DRIVER_FILE=/etc/odbcinst.ini
-ODBC_DRIVER_NAME='Oracle 19 ODBC driver'
-ODBC_DRIVER_LIB=/usr/lib/oracle/$CLIENT_VERSION/client64/lib/libsqora.so.19.1
+RPM_FORMAT="%s/oracle-instantclient%s-%s.0.0.0-1.$MACHINE_TYPE_RPM.rpm\n"
+ZIP_FORMAT="%s/instantclient-%s-linux.${MACHINE_TYPE_ZIP}-%s.0.0.0dbru.zip\n"
 
 abort() {
     printf "$@" >&2
@@ -41,11 +37,33 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_package_files() {
-    for package in $INSTANTCLIENT_BASIC $INSTANTCLIENT_ODBC; do
-	if ! rpm -q $package >/dev/null 2>&1; then
-	    printf "$FORMAT" $package $CLIENT_VERSION "$(uname -m)"
-	fi
+cat_odbc_driver_entry() {
+	cat <<EOF
+[$DRIVER_NAME]
+Description=$DRIVER_DESC
+Driver=$DRIVER_OBJECT
+Setup=
+FileUsage=
+CPTimeout=
+CPReuse=
+
+EOF
+}
+
+get_package_filename() {
+    case "$ID" in
+	(rhel|ol)
+	    printf "$RPM_FORMAT" "$(pwd)" "$CLIENT_VERSION" "$1"
+	    ;;
+	(ubuntu)
+	    printf "$ZIP_FORMAT" "$(pwd)" "$1" "$CLIENT_VERSION"
+	    ;;
+    esac
+}
+
+get_package_filenames() {
+    for component in basic odbc; do
+	get_package_filename $component
     done
 }
 
@@ -66,6 +84,10 @@ get_realpath() (
     fi
 )
 
+get_zipped_dirname() {
+    printf 'instantclient.%s' $CLIENT_VERSION | tr '.' '_'
+}
+
 install_oracle_odbc() {
     validate_platform
     install-packages $(get-odbc-development-packages)
@@ -73,31 +95,57 @@ install_oracle_odbc() {
 }
 
 install_platform() {
-    package_files=$(get_package_files)
+    package_files=$(get_package_filenames)
 
-    if [ -n "$package_files" ]; then
-	rpm -iv $package_files
+    if [ -z "$package_files" ]; then
+	return 0
     fi
 
-    if ! grep "\[$ODBC_DRIVER_NAME\]" $ODBC_DRIVER_FILE >/dev/null 2>&1; then
-	cat <<EOF >$ODBC_DRIVER_FILE
-[$ODBC_DRIVER_NAME]
-Description=$ODBC_DRIVER_DESC
-Driver=$ODBC_DRIVER_LIB
-Setup=
-FileUsage=
-CPTimeout=
-CPReuse=
+    case "$ID" in
+	(rhel|ol)
+	    install_rpm_files $package_files
+	    ;;
+	(ubuntu)
+	    install_zip_files $package_files
+	    ;;
+    esac
 
-EOF
+    if ! grep "\[$DRIVER_NAME\]" $DRIVER_FILE >/dev/null 2>&1; then
+	cat_odbc_driver_entry >$DRIVER_FILE
     fi
 }
+
+install_rpm_files() {
+    rpm -iv $package_files
+}
+
+install_zip_files() (
+    dirname=$(get_zipped_dirname)
+    mkdir -p /opt/oracle
+    cd /opt/oracle
+
+    if [ -d $dirname ]; then
+	return 0
+    fi
+
+    for package_file in $package_files; do
+	unzip $package_file
+	/bin/mv -f $dirname $(printf '%s\n' $dirname | tr '_' '.')
+    done
+)
 
 validate_platform() {
     case "$ID" in
 	(rhel|ol)
 	    case "$VERSION_ID" in
 		(8.1)
+		    return
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
 		    return
 		    ;;
 	    esac
@@ -114,6 +162,8 @@ fi
 script_dir=$(get_realpath "$(dirname "$0")")
 
 . "$script_dir/common-functions.sh"
+. "$script_dir/oracle-config.sh"
+. "$script_dir/oracle-library.sh"
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
