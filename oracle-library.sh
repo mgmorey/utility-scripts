@@ -1,13 +1,12 @@
 # tableau-library.sh: define shell functions for common logic
 
 _get_date_iso_8601() {
-    local ts=$(date --iso-8601=seconds)
-    printf '%s\n' "${ts:0:22}${ts:23}"
+    date --iso-8601=seconds | sed 's/\([0-9][0-9]\)-:\([0-9][0-9]\)$/\1\2/'
 }
 
 _print() {
-    local level=$1; shift
-    local timestamp=$(_get_date_iso_8601)
+    level=$1; shift
+    timestamp=$(_get_date_iso_8601)
     printf '%s [%s] [%s] %s\n' "$timestamp" "$level" "$script_basename" "$*"
 }
 
