@@ -55,16 +55,16 @@ get_realpath() (
     fi
 )
 
-get_libraries() (
+get_libraries() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     find "$1" \
 	 -maxdepth 1 \
 	 -type f \
 	 -name '*.sh'
-)
+}
 
-get_scripts() (
+get_scripts() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     find "$1" \
@@ -75,7 +75,7 @@ get_scripts() (
 	 ! -name LICENSE \
 	 ! -name README \
 	 ! -name "$(basename "$0")"
-)
+}
 
 install_scripts() {
     configure_platform
