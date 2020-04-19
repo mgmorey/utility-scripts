@@ -86,6 +86,14 @@ get_scripts() {
 	 ! -name "$(basename "$0")"
 }
 
+get_symlinks() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    find "$1" \
+	 -maxdepth 1 \
+	 -type l
+}
+
 install_scripts() {
     configure_platform
     source_dir="$(get_realpath "$(pwd)")"
@@ -146,9 +154,10 @@ parse_arguments() {
 
 remove_broken_links() {
     cd "$target_dir"
+    links="$(get_symlinks .)"
 
-    for file in *; do
-	if [ -h $file -a ! -e $file ]; then
+    for file in $links; do
+	if [ ! -e $file ]; then
 	    printf "Removing broken link: %s\n" "$file"
 	    /bin/rm -f "$file"
 	fi
