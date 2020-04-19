@@ -69,8 +69,8 @@ get_libraries() {
     assert [ -n "$1" ]
     find "$1" \
 	 -maxdepth 1 \
-	 -type f \
-	 -name '*.sh'
+	 -name '*.sh' \
+	 -type f
 }
 
 get_scripts() {
@@ -78,12 +78,10 @@ get_scripts() {
     assert [ -n "$1" ]
     find "$1" \
 	 -maxdepth 1 \
-	 -type f \
+	 -name '[a-z]*' \
+	 ! -name "$(basename "$0")" \
 	 ! -name '*~' \
-	 ! -name '.*' \
-	 ! -name LICENSE \
-	 ! -name README \
-	 ! -name "$(basename "$0")"
+	 -type f
 }
 
 get_symlinks() {
