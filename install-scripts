@@ -80,14 +80,12 @@ get_scripts() (
 install_scripts() {
     configure_platform
 
-    if [ "$(basename "$(pwd)")" != utility-scripts ]; then
-	abort "%s: Please run this script from the source directory\n" "$0"
+    if [ "$(basename "$source_dir")" != utility-scripts ]; then
+	abort "%s: Please change to the source directory and try again\n" "$0"
     fi
 
-    if [ "$(get_realpath "$target_dir")" = "$(get_realpath "$HOME/bin")" ]; then
-	if [ ! -e "$target_dir" ]; then
-	    mkdir "$target_dir"
-	fi
+    if [ ! -e "$target_dir" ]; then
+	mkdir -p "$target_dir"
     fi
 
     if [ "$source_dir" != "$(pwd)" ]; then
@@ -117,11 +115,9 @@ install_scripts() {
 
 parse_arguments() {
     source_dir=$1
-    shift
 
-    if [ $# -gt 0 ]; then
-	target_dir=$1
-	shift
+    if [ $# -gt 1 ]; then
+	target_dir=$2
     else
 	target_dir="$HOME/bin"
     fi
