@@ -80,6 +80,7 @@ get_scripts() {
 	 -maxdepth 1 \
 	 -name '[a-z]*' \
 	 ! -name "$(basename "$0")" \
+	 ! -name '*.sh' \
 	 ! -name '*~' \
 	 -type f
 }
