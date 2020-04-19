@@ -90,8 +90,8 @@ usage() {
 
     cat <<-EOF >&2
 	Usage: $0 [-s SHELL] [COMMAND [COMMAND] ...]
-	       $0 -h
 	       $0 -q
+	       $0 -h
 	EOF
 }
 
