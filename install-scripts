@@ -56,14 +56,18 @@ get_realpath() (
 )
 
 get_libraries() (
-    find "$source_dir" \
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    find "$1" \
 	 -maxdepth 1 \
 	 -type f \
 	 -name '*.sh'
 )
 
 get_scripts() (
-    find "$source_dir" \
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    find "$1" \
 	 -maxdepth 1 \
 	 -type f \
 	 ! -name '*~' \
@@ -86,15 +90,22 @@ install_scripts() {
 	fi
     fi
 
+    if [ "$source_dir" != "$(pwd)" ]; then
+	cd "$source_dir"
+    fi
+
+    scripts="$(get_scripts .)"
+    libraries="$(get_libraries .)"
+
+    if [ -n "$scripts" ]; then
+	$install_exec $scripts "$target_dir"
+    fi
+
+    if [ -n "$libraries" ]; then
+	$install_noexec $libraries "$target_dir"
+    fi
+
     cd "$target_dir"
-
-    for file in $(get_libraries); do
-	$install_noexec "$file" .
-    done
-
-    for file in $(get_scripts); do
-	$install_exec "$file" .
-    done
 
     for file in *; do
 	if [ -h $file -a ! -e $file ]; then
