@@ -88,12 +88,8 @@ install_scripts() {
 	mkdir -p "$target_dir"
     fi
 
-    if [ "$source_dir" != "$(pwd)" ]; then
-	cd "$source_dir"
-    fi
-
-    scripts="$(get_scripts .)"
-    libraries="$(get_libraries .)"
+    scripts="$(get_scripts "$source_dir")"
+    libraries="$(get_libraries "$source_dir")"
 
     if [ -n "$scripts" ]; then
 	$install_exec $scripts "$target_dir"
@@ -114,10 +110,10 @@ install_scripts() {
 }
 
 parse_arguments() {
-    source_dir=$1
+    source_dir="$(get_realpath "$1")"
 
     if [ $# -gt 1 ]; then
-	target_dir=$2
+	target_dir="$2"
     else
 	target_dir="$HOME/bin"
     fi
