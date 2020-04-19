@@ -92,6 +92,19 @@ get_symlinks() {
 	 -type l
 }
 
+install_script_files() {
+    libraries="$(get_libraries "$source_dir")"
+    scripts="$(get_scripts "$source_dir")"
+
+    if [ -n "$libraries" ]; then
+	$install_noexec $libraries "$target_dir"
+    fi
+
+    if [ -n "$scripts" ]; then
+	$install_exec $scripts "$target_dir"
+    fi
+}
+
 install_scripts() {
     configure_platform
     source_dir="$(get_realpath "$(pwd)")"
@@ -104,17 +117,7 @@ install_scripts() {
 	mkdir -p "$target_dir"
     fi
 
-    scripts="$(get_scripts "$source_dir")"
-    libraries="$(get_libraries "$source_dir")"
-
-    if [ -n "$scripts" ]; then
-	$install_exec $scripts "$target_dir"
-    fi
-
-    if [ -n "$libraries" ]; then
-	$install_noexec $libraries "$target_dir"
-    fi
-
+    install_script_files
     remove_broken_links
 }
 
@@ -152,12 +155,12 @@ parse_arguments() {
 
 remove_broken_links() {
     cd "$target_dir"
-    links="$(get_symlinks .)"
+    symlinks="$(get_symlinks .)"
 
-    for file in $links; do
-	if [ ! -e $file ]; then
-	    printf "Removing broken link: %s\n" "$file"
-	    /bin/rm -f "$file"
+    for link in $symlinks; do
+	if [ ! -e $link ]; then
+	    printf "Removing broken link: %s\n" "$link"
+	    /bin/rm -f "$link"
 	fi
     done
 }
