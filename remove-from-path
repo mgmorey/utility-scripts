@@ -34,23 +34,22 @@ filter_path() {
 }
 
 remove_from_path() {
-    path=$1
-    shift
+    path="$PATH"
 
     for dir; do
-	path="$(printf "%s\n" "$path" | filter_path $dir)"
+	path="$(printf "%s\n" "$path" | filter_path "$dir")"
     done
 
     case $(basename $SHELL) in
 	(bash|fish|ksh|ksh93|rbash|zsh)
-	    printf "export %s=%s\n" PATH "$path"
+	    printf 'export %s="%s"\n' PATH "$path"
 	    ;;
 	(csh|tcsh)
-	    printf "setenv %s %s;\n" PATH "$path"
+	    printf 'setenv %s "%s";\n' PATH "$path"
 	    ;;
 	(sh)
-	    printf "%s=%s\n" PATH "$path"
-	    printf "export %s\n" PATH
+	    printf '%s="%s"\n' PATH "$path"
+	    printf 'export %s\n' PATH
 	    ;;
 	(*)
 	    abort "%s: %s: Shell not supported\n" "$0" "$SHELL"
@@ -58,4 +57,4 @@ remove_from_path() {
     esac
 }
 
-remove_from_path $PATH "$@"
+remove_from_path "$@"
