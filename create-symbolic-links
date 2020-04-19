@@ -25,7 +25,17 @@ abort() {
 
 cd "$HOME/Documents"
 mkdir -m go-w -p $DIRS
-cd "$HOME"
+cd
+
+if [ ! -d Documents/bin ]; then
+    mkdir -m go-w -p Documents
+
+    if [ -d bin ]; then
+	/bin/mv bin Documents/bin
+    else
+	mkdir -m go-w Documents/bin
+    fi
+fi
 
 for dir in $DIRS; do
     if [ -e Documents/$dir -a ! -e $dir ]; then

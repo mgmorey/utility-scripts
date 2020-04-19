@@ -25,6 +25,19 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+configure_platform() {
+    case "$(uname -s)" in
+	(CYGWIN_NT-10.0|MINGW64_NT-10.0-*)
+	    install_exec="/bin/install -m u=rwx,go=rx"
+	    install_noexec="/bin/install -m u=rw,go=r"
+	    ;;
+	(*)
+	    install_exec="ln -sf"
+	    install_noexec="ln -sf"
+	    ;;
+    esac
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -42,58 +55,66 @@ get_realpath() (
     fi
 )
 
+get_libraries() (
+    find "$source_dir" \
+	 -maxdepth 1 \
+	 -type f \
+	 -name '*.sh'
+)
+
+get_scripts() (
+    find "$source_dir" \
+	 -maxdepth 1 \
+	 -type f \
+	 ! -name '*~' \
+	 ! -name '.*' \
+	 ! -name LICENSE \
+	 ! -name README \
+	 ! -name "$(basename "$0")"
+)
+
 install_scripts() {
-    working_dir=$(pwd)
-    cd
+    configure_platform
 
-    if [ ! -d Documents/bin ]; then
-	mkdir -m go-w -p Documents
+    if [ "$(basename "$(pwd)")" != utility-scripts ]; then
+	abort "%s: Please run this script from the source directory\n" "$0"
+    fi
 
-	if [ -d bin ]; then
-	    /bin/mv bin Documents/bin
-	else
-	    mkdir -m go-w Documents/bin
+    if [ "$(get_realpath "$target_dir")" = "$(get_realpath "$HOME/bin")" ]; then
+	if [ ! -e "$target_dir" ]; then
+	    mkdir "$target_dir"
 	fi
     fi
 
-    if [ ! -e bin ]; then
-	/bin/ln -s Documents/bin bin
-    fi
+    cd "$target_dir"
 
-    for file in bin/*; do
+    for file in $(get_libraries); do
+	$install_noexec "$file" .
+    done
+
+    for file in $(get_scripts); do
+	$install_exec "$file" .
+    done
+
+    for file in *; do
 	if [ -h $file -a ! -e $file ]; then
 	    printf "Removing broken link: %s\n" "$file"
 	    /bin/rm -f "$file"
 	fi
     done
-
-    for file in "$working_dir"/*; do
-	case "$(basename "$file")" in
-	    ("$(basename "$0")")
-		:
-		;;
-	    (LICENSE|README*)
-		:
-		;;
-	    (*.sh)
-		ln -sf "$file" bin
-		;;
-	    (*)
-		if [ -x "$file" ]; then
-		    ln -sf "$file" bin
-		fi
-		;;
-	esac
-    done
 }
 
-if [ "$(basename $(pwd))" != utility-scripts ]; then
-    abort "Please change to source directory before running this script\n"
-fi
+parse_arguments() {
+    source_dir=$1
+    shift
 
-script_dir=$(get_realpath "$(dirname "$0")")
+    if [ $# -gt 0 ]; then
+	target_dir=$1
+	shift
+    else
+	target_dir="$HOME/bin"
+    fi
+}
 
-. "$script_dir/common-functions.sh"
-
-set_user_profile "$script_dir"
+parse_arguments "$(pwd)" "$@"
 install_scripts
