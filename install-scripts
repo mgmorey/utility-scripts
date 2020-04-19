@@ -164,10 +164,10 @@ remove_broken_links() {
     cd "$target_dir"
     broken_links="$(get_broken_links .)"
 
-    for link in $broken_links; do
-	printf "Removing broken link: %s\n" "$link"
-	/bin/rm -f "$link"
-    done
+    if [ -n "$broken_links" ]; then
+	printf "Removing broken link: %s\n" $broken_links
+	/bin/rm -f $broken_links
+    fi
 }
 
 usage() {
