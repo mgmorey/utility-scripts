@@ -64,7 +64,17 @@ get_realpath() (
     fi
 )
 
-get_libraries() {
+get_broken_links() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    find "$1" \
+	 -maxdepth 1 \
+	 -type l \
+	 ! -exec test -e {} \; \
+	 -print
+}
+
+get_library_files() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     find "$1" \
@@ -73,7 +83,7 @@ get_libraries() {
 	 -type f
 }
 
-get_scripts() {
+get_script_files() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     find "$1" \
@@ -85,24 +95,19 @@ get_scripts() {
 	 -type f
 }
 
-get_symlinks() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    find "$1" \
-	 -maxdepth 1 \
-	 -type l
+install_library_files() {
+    library_files="$(get_library_files "$source_dir")"
+
+    if [ -n "$library_files" ]; then
+	$install_noexec $library_files "$target_dir"
+    fi
 }
 
 install_script_files() {
-    libraries="$(get_libraries "$source_dir")"
-    scripts="$(get_scripts "$source_dir")"
+    script_files="$(get_script_files "$source_dir")"
 
-    if [ -n "$libraries" ]; then
-	$install_noexec $libraries "$target_dir"
-    fi
-
-    if [ -n "$scripts" ]; then
-	$install_exec $scripts "$target_dir"
+    if [ -n "$script_files" ]; then
+	$install_exec $script_files "$target_dir"
     fi
 }
 
@@ -118,6 +123,7 @@ install_scripts() {
 	mkdir -p "$target_dir"
     fi
 
+    install_library_files
     install_script_files
     remove_broken_links
 }
@@ -156,13 +162,11 @@ parse_arguments() {
 
 remove_broken_links() {
     cd "$target_dir"
-    symlinks="$(get_symlinks .)"
+    broken_links="$(get_broken_links .)"
 
-    for link in $symlinks; do
-	if [ ! -e $link ]; then
-	    printf "Removing broken link: %s\n" "$link"
-	    /bin/rm -f "$link"
-	fi
+    for link in $broken_links; do
+	printf "Removing broken link: %s\n" "$link"
+	/bin/rm -f "$link"
     done
 }
 
