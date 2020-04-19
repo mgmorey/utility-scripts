@@ -28,10 +28,19 @@ assert() {
 configure_platform() {
     case "$(uname -s)" in
 	(CYGWIN_NT-10.0|MINGW64_NT-10.0-*)
+	    default_mode=copy
+	    ;;
+	(*)
+	    default_mode=link
+	    ;;
+    esac
+
+    case "${mode:-$default_mode}" in
+	(copy)
 	    install_exec="/bin/install -m u=rwx,go=rx"
 	    install_noexec="/bin/install -m u=rw,go=r"
 	    ;;
-	(*)
+	(link)
 	    install_exec="ln -sf"
 	    install_noexec="ln -sf"
 	    ;;
@@ -79,6 +88,7 @@ get_scripts() {
 
 install_scripts() {
     configure_platform
+    source_dir="$(get_realpath "$(pwd)")"
 
     if [ "$(basename "$source_dir")" != utility-scripts ]; then
 	abort "%s: Please change to the source directory and try again\n" "$0"
@@ -99,6 +109,42 @@ install_scripts() {
 	$install_noexec $libraries "$target_dir"
     fi
 
+    remove_broken_links
+}
+
+parse_arguments() {
+    mode=
+
+    while getopts hcl opt; do
+	case $opt in
+	    (h)
+		usage
+		exit 0
+		;;
+	    (c)
+		mode=copy
+		;;
+	    (l)
+		mode=link
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	target_dir="$1"
+    else
+	target_dir="$HOME/bin"
+    fi
+}
+
+remove_broken_links() {
     cd "$target_dir"
 
     for file in *; do
@@ -109,15 +155,17 @@ install_scripts() {
     done
 }
 
-parse_arguments() {
-    source_dir="$(get_realpath "$1")"
-
-    if [ $# -gt 1 ]; then
-	target_dir="$2"
-    else
-	target_dir="$HOME/bin"
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
     fi
+
+    cat <<-EOF >&2
+	Usage: $0 [-c | -l] [TARGET]
+	       $0 -h
+	EOF
 }
 
-parse_arguments "$(pwd)" "$@"
+parse_arguments "$@"
 install_scripts
