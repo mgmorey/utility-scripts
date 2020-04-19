@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# remove-from-path: remove directory name from PATH parameter
+# remove-from-path: remove directories from PATH parameter
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -42,14 +42,14 @@ remove_from_path() {
 
     case $(basename $SHELL) in
 	(bash|fish|ksh|ksh93|rbash|zsh)
-	    printf 'export %s="%s"\n' PATH "$path"
+	    printf "export %s='%s'\n" PATH "$path"
 	    ;;
 	(csh|tcsh)
-	    printf 'setenv %s "%s";\n' PATH "$path"
+	    printf "setenv %s '%s';\n" PATH "$path"
 	    ;;
 	(sh)
-	    printf '%s="%s"\n' PATH "$path"
-	    printf 'export %s\n' PATH
+	    printf "%s='%s'\n" PATH "$path"
+	    printf "export %s\n" PATH
 	    ;;
 	(*)
 	    abort "%s: %s: Shell not supported\n" "$0" "$SHELL"
