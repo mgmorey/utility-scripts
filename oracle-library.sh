@@ -1,4 +1,4 @@
-# tableau-library.sh: define shell functions for common logic
+# oracle-library.sh: define shell functions for common logic
 
 _get_date_iso_8601() {
     date --iso-8601=seconds | sed 's/\([0-9][0-9]\)-:\([0-9][0-9]\)$/\1\2/'

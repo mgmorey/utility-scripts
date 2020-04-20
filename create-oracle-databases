@@ -97,21 +97,36 @@ create_database() {
     export ORACLE_SID=$(get_system_id "$1")
     db_name=$(get_db_name "$ORACLE_SID")
     initfile=$(get_initfile "$ORACLE_SID" "$ORACLE_HOME")
-    assert [ -n "$initfile" ]
     logfile=$(get_logfile "$db_name" "$HOME")
-    assert [ -n "$logfile" ]
     tnsfile=$(get_tnsfile "${TNS_ADMIN-$ORACLE_HOME/network/admin}")
-    assert [ -n "$tnsfile" ]
-    printf 'Creating and starting database %s SID %s\n' "$db_name" "$ORACLE_SID"
+
+    if [ -f "$initfile" ]; then
+        print_warn "Parameter file $initfile already exists"
+        return 0
+    fi
+
+    print_info "Creating database $db_name SID $ORACLE_SID"
     cat_init $db_name $ORACLE_HOME >$initfile
-    cat_sql_create $db_name "$ORACLE_PWD" | sqlplus /nolog | tee $logfile
-    printf 'Building data dictionary views\n'
-    cat_sql_sysdba | sqlplus /nolog >>$logfile
-    cat_sql_system | sqlplus /nolog >>$logfile
-    printf 'Creating entry in %s\n' $(basename $tnsfile)
-    cat_tns $ORACLE_SID >>"$tnsfile"
-    printf 'Compressing %s\n' $(basename $logfile)
-    gzip -9 $logfile || true
+    cat_sql_create $db_name "$ORACLE_PWD" | sqlplus /nolog | \
+        tee $logfile | filter_sqlplus
+
+    if grep "^Database created." $logfile >/dev/null 2>&1; then
+        print_info "Database $db_name created"
+        print_info "Building data dictionary views"
+        cat_sql_sysdba | sqlplus /nolog >>$logfile
+        cat_sql_system | sqlplus /nolog >>$logfile
+        print_info "Registering SID in $(basename $tnsfile)"
+        cat_tns $ORACLE_SID >>"$tnsfile"
+        print_info "Compressing $(basename $logfile)"
+        gzip -9f $logfile || true
+        status=0
+    else
+        print_error "Database $db_name creation failed"
+        print_error "Check $logfile for errors"
+        status=1
+    fi
+
+    return $status
 }
 
 create_databases() {
@@ -154,11 +169,11 @@ parse_arguments() {
     fi
 }
 
-script_basename=$(basename $0)
-script_dirname=$(realpath $(dirname $0))
+script_basename="$(basename "$0")"
+script_dirname="$(realpath "$(dirname "$0")")"
 
-. $script_dirname/oracle-config.sh
-. $script_dirname/oracle-library.sh
+. "$script_dirname/oracle-config.sh"
+. "$script_dirname/oracle-library.sh"
 
 parse_arguments "$@"
 create_databases ${databases:-$DATABASES}

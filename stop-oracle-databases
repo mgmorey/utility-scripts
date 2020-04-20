@@ -33,28 +33,6 @@ EXIT;
 EOF
 }
 
-stop_database() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    export ORACLE_SID=$(get_system_id "$1")
-    logfile=$(get_logfile "$HOME" "$ORACLE_SID")
-    assert [ -n "$logfile" ]
-    printf 'Stopping SID %s\n' "$ORACLE_SID"
-    cat_sql_shutdown | sqlplus /nolog | tee $logfile
-}
-
-stop_databases() {
-    : ${ORACLE_BASE?}
-    : ${ORACLE_HOME?}
-    : ${ORACLE_PWD?}
-    unset TWO_TASK
-    check_dirs
-
-    for database; do
-        stop_database "$database"
-    done
-}
-
 get_logfile() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
@@ -70,11 +48,44 @@ parse_arguments() {
     fi
 }
 
-script_basename=$(basename $0)
-script_dirname=$(realpath $(dirname $0))
+stop_database() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    export ORACLE_SID=$(get_system_id "$1")
+    logfile=$(get_logfile "$HOME" "$ORACLE_SID")
+    print_info "Stopping SID $ORACLE_SID"
+    cat_sql_shutdown | sqlplus /nolog | \
+        tee $logfile | filter_sqlplus
 
-. $script_dirname/oracle-config.sh
-. $script_dirname/oracle-library.sh
+    if grep "^Database dismounted." $logfile >/dev/null 2>&1; then
+        print_info "SID $ORACLE_SID stopped"
+        status=0
+    else
+        print_error "SID $ORACLE_SID shutdown failed"
+        print_error "Check $logfile for errors"
+        status=1
+    fi
+
+    return $status
+}
+
+stop_databases() {
+    : ${ORACLE_BASE?}
+    : ${ORACLE_HOME?}
+    : ${ORACLE_PWD?}
+    unset TWO_TASK
+    check_dirs
+
+    for database; do
+        stop_database "$database"
+    done
+}
+
+script_basename="$(basename "$0")"
+script_dirname="$(realpath "$(dirname "$0")")"
+
+. "$script_dirname/oracle-config.sh"
+. "$script_dirname/oracle-library.sh"
 
 parse_arguments "$@"
 stop_databases ${databases:-$DATABASES}
