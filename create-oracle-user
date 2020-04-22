@@ -37,14 +37,6 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
-check_dirs() {
-    for dir in ${ORACLE_BASE-} ${ORACLE_HOME-}; do
-	if [ ! -d $dir ]; then
-	    abort '%s: %s: No such directory\n' "$0" "$dir"
-	fi
-    done
-}
-
 cat_sql_create_user() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
@@ -81,8 +73,10 @@ create_database_user() {
     assert [ -n "$2" ]
     assert [ -n "$3" ]
     export ORACLE_SID=$(get_system_id "$1")
+    logfile=$(get_logfile "$HOME" "$ORACLE_SID")
     printf 'Creating SID %s user %s\n' "$ORACLE_SID" "$2"
-    cat_sql_create_user "$2" "$3" | sqlplus /nolog
+    cat_sql_create_user "$2" "$3" | sqlplus /nolog | \
+        tee $logfile | filter_sqlplus
 }
 
 create_user() {
@@ -101,6 +95,13 @@ create_user() {
 
 filter_sid() {
     tr -cd '[:alnum:]_' | uppercase | cut -c 1-12
+}
+
+get_logfile() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    printf '%s/create-user-%s.log\n' "$1" "$2"
 }
 
 get_system_id() {
@@ -155,11 +156,11 @@ usage() {
 	EOF
 }
 
-script_basename=$(basename $0)
-script_dirname=$(realpath $(dirname $0))
+script_basename="$(basename "$0")"
+script_dirname="$(realpath "$(dirname "$0")")"
 
-. $script_dirname/oracle-config.sh
-. $script_dirname/oracle-library.sh
+. "$script_dirname/oracle-config.sh"
+. "$script_dirname/oracle-library.sh"
 
 parse_arguments "$@"
 create_user ${databases:-$DATABASES}

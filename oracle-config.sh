@@ -1,4 +1,4 @@
-# tableau-config.sh: define shell parameters for common values
+# oracle-config.sh: define shell parameters for common values
 CLIENT_VERSION=19.6
 DATABASES=""
 DRIVER_DESC='Oracle ODBC driver for Oracle 19'
