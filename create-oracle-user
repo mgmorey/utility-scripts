@@ -112,17 +112,17 @@ get_system_id() {
 parse_arguments() {
     databases=
 
-    while getopts hp:u: opt; do
+    while getopts p:u:h opt; do
 	case $opt in
-	    (h)
-		usage
-		exit 0
-		;;
 	    (p)
 		password=$OPTARG
 		;;
 	    (u)
 		user=$OPTARG
+		;;
+	    (h)
+		usage
+		exit 0
 		;;
 	    (\?)
 		printf '%s\n' "" >&2

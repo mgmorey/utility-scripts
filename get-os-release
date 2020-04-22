@@ -221,7 +221,7 @@ parse_arguments() {
     is_shell_format=false
     vars=
 
-    while getopts Xhiknprvx opt; do
+    while getopts iknprvxXh opt; do
 	case $opt in
 	    (i)
 		queue_vars ID

@@ -267,7 +267,7 @@ parse_arguments() {
     packages=
     pattern=
 
-    while getopts hp: opt; do
+    while getopts p:h opt; do
 	case $opt in
 	    (p)
 		pattern=$OPTARG

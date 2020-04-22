@@ -47,14 +47,14 @@ get_realpath() (
 parse_arguments() {
     shell=$SHELL
 
-    while getopts hs: opt; do
+    while getopts s:h opt; do
 	case $opt in
+	    (s)
+		shell=$OPTARG
+		;;
 	    (h)
 		usage
 		exit 0
-		;;
-	    (s)
-		shell=$OPTARG
 		;;
 	    (\?)
 		printf "%s\n" "" >&2

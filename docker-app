@@ -83,7 +83,7 @@ docker_app() {
 parse_arguments() {
     tag=
 
-    while getopts hdlt: opt; do
+    while getopts dlt:h opt; do
 	case $opt in
 	    (d)
 		tag=$(get_default_tag)

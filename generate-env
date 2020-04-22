@@ -167,12 +167,8 @@ parse_arguments() {
     root_password=
     user=
 
-    while getopts hDd:H:P:p:q:r:S:stu: opt; do
+    while getopts Dd:H:P:p:q:r:S:stu:h opt; do
 	case $opt in
-	    (h)
-		usage
-		exit 0
-		;;
 	    (D)
 		qualifier=database
 		;;
@@ -230,6 +226,10 @@ parse_arguments() {
 		;;
 	    (u)
 		user="$OPTARG"
+		;;
+	    (h)
+		usage
+		exit 0
 		;;
 	    (\?)
 		printf "%s\n" "" >&2

@@ -51,17 +51,17 @@ parse_arguments() {
     is_query=false
     shell=$SHELL
 
-    while getopts hs:q opt; do
+    while getopts s:qh opt; do
 	case $opt in
-	    (h)
-		usage
-		exit 0
-		;;
 	    (s)
 		shell=$OPTARG
 		;;
 	    (q)
 		is_query=true
+		;;
+	    (h)
+		usage
+		exit 0
 		;;
 	    (\?)
 		printf "%s\n" "" >&2

@@ -131,17 +131,17 @@ install_scripts() {
 parse_arguments() {
     mode=
 
-    while getopts hcl opt; do
+    while getopts clh opt; do
 	case $opt in
-	    (h)
-		usage
-		exit 0
-		;;
 	    (c)
 		mode=copy
 		;;
 	    (l)
 		mode=link
+		;;
+	    (h)
+		usage
+		exit 0
 		;;
 	    (\?)
 		printf "%s\n" "" >&2
