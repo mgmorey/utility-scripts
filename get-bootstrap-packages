@@ -38,6 +38,7 @@ SOLARIS_PKGS="shell/bash"
 
 UBUNTU_18_PKGS="bash curl wget"
 UBUNTU_19_PKGS="bash curl wget"
+UBUNTU_20_PKGS="bash curl wget"
 
 abort() {
     printf "$@" >&2
@@ -107,6 +108,9 @@ get_bootstrap_packages() {
 			;;
 		    (19.10)
 			packages=$UBUNTU_19_PKGS
+			;;
+		    (20.04)
+			packages=$UBUNTU_20_PKGS
 			;;
 		esac
 		;;

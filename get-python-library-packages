@@ -58,6 +58,10 @@ UBUNTU_19_PKGS="libbz2-dev libffi-dev libgdbm-dev libncurses5-dev \
 libncursesw5-dev libpython3-dev libreadline-dev libsqlite3-dev \
 libssl-dev libxml2-dev libxmlsec1-dev liblzma-dev uuid-dev \
 xz-utils zlib1g-dev"
+UBUNTU_20_PKGS="libbz2-dev libffi-dev libgdbm-dev libncurses5-dev \
+libncursesw5-dev libpython3-dev libreadline-dev libsqlite3-dev \
+libssl-dev libxml2-dev libxmlsec1-dev liblzma-dev uuid-dev \
+xz-utils zlib1g-dev"
 
 abort() {
     printf "$@" >&2
@@ -151,6 +155,9 @@ get_python_library_packages() {
 			packages=$UBUNTU_18_PKGS
 			;;
 		    (19.10)
+			packages=$UBUNTU_19_PKGS
+			;;
+		    (20.04)
 			packages=$UBUNTU_19_PKGS
 			;;
 		    (*)
