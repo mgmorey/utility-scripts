@@ -16,29 +16,38 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DIRS="bin build git logs src"
+DIRS="build git logs src"
+MODE=go-w
 
 abort() {
     printf "$@" >&2
     exit 1
 }
 
-cd "$HOME/Documents"
-mkdir -m go-w -p $DIRS
-cd
+create_directories() (
+    cd "$HOME/Documents"
+    mkdir -m $MODE -p $DIRS
+)
 
-if [ ! -d Documents/bin ]; then
-    mkdir -m go-w -p Documents
+create_symbolic_links() {
+    create_directories
+    cd
 
-    if [ -d bin ]; then
-	/bin/mv bin Documents/bin
-    else
-	mkdir -m go-w Documents/bin
+    if [ ! -d Documents/bin ]; then
+        mkdir -m $MODE -p Documents
+
+        if [ -d bin ]; then
+	    /bin/mv bin Documents/bin
+        else
+	    mkdir -m $MODE Documents/bin
+        fi
     fi
-fi
 
-for dir in $DIRS; do
-    if [ -e Documents/$dir -a ! -e $dir ]; then
-	ln -s Documents/$dir $HOME/$dir
-    fi
-done
+    for dir in bin $DIRS; do
+        if [ -e Documents/$dir -a ! -e $dir ]; then
+	    ln -s Documents/$dir $HOME/$dir
+        fi
+    done
+}
+
+create_symbolic_links
