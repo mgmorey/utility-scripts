@@ -131,6 +131,9 @@ validate_platform() {
 		(19.10)
 		    true
 		    ;;
+		(20.04)
+		    true
+		    ;;
 		(*)
 		    abort_not_supported Release
 		    ;;

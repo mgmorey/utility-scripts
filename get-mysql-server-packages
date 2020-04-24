@@ -34,8 +34,9 @@ REDHAT_PKG="mariadb-server"
 
 SOLARIS_PKG="database/mysql-57"
 
-UBUNTU_18_04_PKG="mariadb-server-10.1"
-UBUNTU_19_10_PKG="mariadb-server-10.3"
+UBUNTU_18_PKG="mariadb-server-10.1"
+UBUNTU_19_PKG="mariadb-server-10.3"
+UBUNTU_20_PKG="mariadb-server-10.3"
 
 abort() {
     printf "$@" >&2
@@ -72,17 +73,20 @@ get_mysql_server_packages() {
 		(ubuntu|neon)
 		    case "$VERSION_ID" in
 			(18.04)
-			    packages="${package:-$UBUNTU_18_04_PKG}"
+			    packages="${package:-$UBUNTU_18_PKG}"
 			    ;;
 			(19.10)
-			    packages="${package:-$UBUNTU_19_10_PKG}"
+			    packages="${package:-$UBUNTU_19_PKG}"
+			    ;;
+			(20.04)
+			    packages="${package:-$UBUNTU_19_PKG}"
 			    ;;
 		    esac
 		    ;;
 		(linuxmint)
 		    case "$VERSION_ID" in
 			(19.2)
-			    packages="${package:-$UBUNTU_18_04_PKG}"
+			    packages="${package:-$UBUNTU_18_PKG}"
 			    ;;
 		    esac
 		    ;;
