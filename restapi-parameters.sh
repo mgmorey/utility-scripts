@@ -540,7 +540,6 @@ configure_linux_ubuntu_18_04() {
 
     # Set system Python interpreter
     SYSTEM_PYTHON=/usr/bin/python3.6
-    SYSTEM_PYTHON_VERSION=3.6.8
 }
 
 configure_linux_ubuntu_19_10() {
