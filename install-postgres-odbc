@@ -115,39 +115,43 @@ validate_platform() {
 	(debian)
 	    case "$VERSION_ID" in
 		(10)
-		    return
+		    true
 		    ;;
 		(*)
-		    break
+		    abort_not_supported Release
 		    ;;
 	    esac
 	    ;;
 	(rhel|ol)
 	    case "$VERSION_ID" in
 		(8.*)
-		    return
+		    true
 		    ;;
 		(*)
-		    return
+		    abort_not_supported Release
 		    ;;
 	    esac
 	    ;;
 	(ubuntu)
 	    case "$VERSION_ID" in
 		(18.04)
-		    return
+		    true
 		    ;;
 		(19.10)
-		    return
+		    true
+		    ;;
+		(20.04)
+		    true
 		    ;;
 		(*)
-		    break
+		    abort_not_supported Release
 		    ;;
 	    esac
 	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
     esac
-
-    abort_not_supported "Operating system"
 }
 
 if [ $# -gt 0 ]; then

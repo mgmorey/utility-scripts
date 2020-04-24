@@ -34,6 +34,7 @@ SOLARIS_PKGS="database/postgres"
 
 UBUNTU_18_PKGS="postgresql-client-10"
 UBUNTU_19_PKGS="postgresql-client-11"
+UBUNTU_20_PKGS="postgresql-client-12"
 
 abort() {
     printf "$@" >&2
@@ -136,11 +137,14 @@ get_postgres_client_packages() {
 		;;
 	    (ubuntu)
 		case "$VERSION_ID" in
-		    (18.*)
+		    (18.04)
 			packages=$UBUNTU_18_PKGS
 			;;
-		    (19.*)
+		    (19.10)
 			packages=$UBUNTU_19_PKGS
+			;;
+		    (20.04)
+			packages=$UBUNTU_20_PKGS
 			;;
 		    (*)
 			break
