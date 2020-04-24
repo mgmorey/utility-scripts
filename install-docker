@@ -306,6 +306,9 @@ validate_platform() {
 		    (19.10)
 			return
 			;;
+		    (20.04)
+			return
+			;;
 		    (*)
 			break
 			;;
