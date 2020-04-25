@@ -36,16 +36,16 @@ format_action() {
 format_database() {
     case "$DATABASE_DIALECT" in
 	(mssql)
-	    printf '\"%s\"\n' "$1"
+	    printf '\\"%s\\"\n' "$1"
 	    ;;
 	(mysql)
-	    printf '\`%s\`\n' "$1"
+	    printf '\\`%s\\`\n' "$1"
 	    ;;
 	(oracle)
-	    printf '\"%s\"\n' "$1"
+	    printf '\\"%s\\"\n' "$1"
 	    ;;
 	(postgresql)
-	    printf '\"%s\"\n' "$1"
+	    printf '\\"%s\\"\n' "$1"
 	    ;;
 	(*)
 	    abort "%s: Invalid SQL dialect: %s\n" "$0" "$1"
