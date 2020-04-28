@@ -1,14 +1,20 @@
 #!/bin/sh -eu
 
-DATADIR=/data/sap-hana
-JSONFILE=sap-hana.json
-
-/bin/rm -rf $DATADIR
-mkdir -p $DATADIR
-cat <<EOF >$DATADIR/$JSONFILE
+set_up_sap_hana() {
+    /bin/rm -rf $DATADIR
+    mkdir -p $DATADIR
+    cat <<EOF >$DATADIR/$JSONFILE
 {
     "master_password" : "P455w0rd"
 }
 EOF
-chmod u=rw,go= $DATADIR/$JSONFILE
-chown -R 12000:79 $DATADIR
+    chmod u=rw,go= $DATADIR/$JSONFILE
+    chown -R 12000:79 $DATADIR
+}
+
+script_basename="$(basename "$0")"
+script_dirname="$(realpath "$(dirname "$0")")"
+
+. "$script_dirname/sap-hana-config.sh"
+
+set_up_sap_hana
