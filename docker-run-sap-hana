@@ -2,20 +2,19 @@
 
 docker_run_sap_hana() {
     docker run \
+	   -p 1128-1129:1128-1129 \
 	   -p 39013:39013 \
 	   -p 39017:39017 \
 	   -p 39041-39045:39041-39045 \
-	   -p 1128-1129:1128-1129 \
 	   -p 59013-59014:59013-59014 \
 	   -v /data/sap-hana:/hana/mounts \
-	   --ulimit nofile=1048576:1048576 \
-	   --sysctl kernel.shmmax=1073741824 \
-	   --sysctl net.ipv4.ip_local_port_range='40000 60999' \
-	   --sysctl kernel.shmmni=524288 \
 	   --sysctl kernel.shmall=8388608 \
-	   store/saplabs/hanaexpress:2.00.045.00.20200121.1 \
-	   --passwords-url file:///hana/mounts/$JSONFILE \
-	   --agree-to-sap-license
+	   --sysctl kernel.shmmax=1073741824 \
+	   --sysctl kernel.shmmni=524288 \
+	   --sysctl net.ipv4.ip_local_port_range='40000 60999' \
+	   --ulimit nofile=1048576:1048576 \
+	   $IMAGE:$TAG --agree-to-sap-license \
+	   --passwords-url file:///hana/mounts/$JSONFILE
 }
 
 script_basename="$(basename "$0")"
