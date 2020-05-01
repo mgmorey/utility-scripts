@@ -18,7 +18,7 @@
 
 AMAZON_2_PKGS="%s-pip"
 
-DEBIAN_PKGS="%s-packaging %s-pip"
+DEBIAN_PKGS="%s-packaging %s-pip %s-wheel"
 
 FREEBSD_PKGS="%s-packaging %s-pip"
 
