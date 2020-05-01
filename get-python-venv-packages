@@ -106,6 +106,9 @@ get_python_venv_packages() {
 		    (19.*)
 			packages="$DEBIAN_PKGS pylint"
 			;;
+		    (20.*)
+			packages="$DEBIAN_PKGS pylint"
+			;;
 		    (*)
 			break
 			;;
