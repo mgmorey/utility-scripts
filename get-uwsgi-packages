@@ -81,13 +81,13 @@ get_uwsgi_packages() {
 		;;
 	    (ubuntu)
 		case "$VERSION_ID" in
-		    (18.*)
+		    (18.04)
 			packages=$UBUNTU_18_PKGS
 			;;
-		    (19.*)
+		    (19.10)
 			packages=$UBUNTU_19_PKGS
 			;;
-		    (20.*)
+		    (20.04)
 			packages=$UBUNTU_20_PKGS
 			;;
 		    (*)
