@@ -59,6 +59,7 @@ generate_requirements() (
 get_packages() {
     get-bootstrap-packages
     get-development-packages
+    get-python-development-packages
     get-python-library-packages
 }
 
