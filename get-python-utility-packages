@@ -71,7 +71,7 @@ get_python_utility_packages() {
 		    packages=$AMAZON_2_PKGS
 		    ;;
 		(*)
-		    break
+		    true
 		    ;;
 	    esac
 	    ;;
@@ -93,7 +93,7 @@ get_python_utility_packages() {
 		    packages=$REDHAT_8_PKGS
 		    ;;
 		(*)
-		    break
+		    true
 		    ;;
 	    esac
 	    ;;
@@ -106,7 +106,7 @@ get_python_utility_packages() {
 		    packages="$DEBIAN_PKGS pylint"
 		    ;;
 		(*)
-		    break
+		    true
 		    ;;
 	    esac
 	    ;;
