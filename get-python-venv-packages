@@ -26,7 +26,7 @@ FEDORA_PKGS="%s-venv"
 
 ILLUMOS_PKGS=":%s-venv"
 
-MACOS_HOMEBREW_PKGS=
+MACOS_HOMEBREW_PKGS=""
 
 NETBSD_PKGS="%s-venv"
 
