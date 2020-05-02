@@ -75,7 +75,7 @@ get_python_virtualenv_packages() {
 	(debian|raspbian)
 	    packages="$DEBIAN_PKGS pylint3"
 	    ;;
-	(opensuse)
+	(opensuse-*)
 	    packages=$OPENSUSE_PKGS
 	    ;;
 	(fedora)

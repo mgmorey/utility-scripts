@@ -49,7 +49,7 @@ get_crystal_library_packages() {
 		    ;;
 	    esac
 	    ;;
-	(opensuse)
+	(opensuse-*)
 	    packages=$OPENSUSE_PKGS
 	    ;;
 	(ubuntu)

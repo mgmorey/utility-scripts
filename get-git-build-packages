@@ -78,7 +78,7 @@ get_git_packages() {
 	(fedora)
 	    packages=$FEDORA_PKGS
 	    ;;
-	(opensuse)
+	(opensuse-*)
 	    packages=$OPENSUSE_PKGS
 	    ;;
 	(rhel|ol)

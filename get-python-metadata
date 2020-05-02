@@ -64,7 +64,7 @@ get_python_metadata() {
 	(fedora)
 	    data="$FEDORA_DATA"
 	    ;;
-	(opensuse)
+	(opensuse-*)
 	    data="$OPENSUSE_DATA"
 	    ;;
 	(rhel|ol|centos)

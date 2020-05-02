@@ -103,7 +103,7 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
-	(opensuse)
+	(opensuse-*)
 	    return
 	    ;;
 	(ubuntu)

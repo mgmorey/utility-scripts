@@ -54,7 +54,7 @@ get_python_flask_packages() {
 	(debian|raspbian)
 	    packages=$DEBIAN_PKGS
 	    ;;
-	(opensuse)
+	(opensuse-*)
 	    packages=$OPENSUSE_PKGS
 	    ;;
 	(fedora)

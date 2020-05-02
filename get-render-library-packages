@@ -55,7 +55,7 @@ get_emacs_build_deps() {
 	(debian|raspbian)
 	    packages=$DEBIAN_PKGS
 	    ;;
-	(opensuse)
+	(opensuse-*)
 	    packages=$OPENSUSE_PKGS
 	    ;;
 	(rhel|fedora)

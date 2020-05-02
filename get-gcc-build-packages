@@ -44,7 +44,7 @@ get_gcc_build_packages() {
 		    ;;
 	    esac
 	    ;;
-	(opensuse)
+	(opensuse-*)
 	    packages=$OPENSUSE_PKGS
 	    ;;
 	(ubuntu)

@@ -140,7 +140,7 @@ validate_platform() {
 	(debian|raspbian)
 	    return
 	    ;;
-	(opensuse)
+	(opensuse-*)
 	    return
 	    ;;
 	(rhel|fedora|centos)
