@@ -136,28 +136,26 @@ usage() {
 }
 
 validate_platform() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (debian)
-		return
-		;;
-	    (opensuse)
-		return
-		;;
-	    (rhel|fedora)
-		return
-		;;
-	    (freebsd)
-		return
-		;;
-	    (solaris)
-		return
-		;;
-	    (windows)
-		return
-		;;
-	esac
-    done
+    case "$id" in
+	(debian|raspbian)
+	    return
+	    ;;
+	(opensuse)
+	    return
+	    ;;
+	(rhel|fedora|centos)
+	    return
+	    ;;
+	(freebsd)
+	    return
+	    ;;
+	(solaris)
+	    return
+	    ;;
+	(windows)
+	    return
+	    ;;
+    esac
 
     abort_not_supported "Operating system"
 }

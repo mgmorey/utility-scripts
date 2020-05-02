@@ -48,71 +48,58 @@ assert() {
 }
 
 get_python_metadata() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (amzn)
-		case "$VERSION_ID" in
-		    (2)
-			data="$AMAZON_2_DATA"
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (debian)
-		data="$DEBIAN_DATA"
-		;;
-	    (fedora)
-		data="$FEDORA_DATA"
-		;;
-	    (opensuse)
-		data="$OPENSUSE_DATA"
-		;;
-	    (rhel|ol|centos)
-		case "$VERSION_ID" in
-		    (7|7.*)
-			data="$REDHAT_7_DATA"
-			;;
-		    (8|8.*)
-			data="$REDHAT_8_DATA"
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (freebsd)
-		case "$VERSION_ID" in
-		    (11.3-*)
-			data="$FREEBSD_11_DATA"
-			;;
-		    (12.1-*)
-			data="$FREEBSD_12_DATA"
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (macos)
-		data="$MACOS_HOMEBREW_DATA"
-		;;
-	    (netbsd)
-		data="$NETBSD_DATA"
-		;;
-	    (illumos)
-		data="$ILLUMOS_DATA"
-		;;
-	    (solaris)
-		data="$SOLARIS_DATA"
-		;;
-	esac
+    data=
 
-	if [ -n "${data-}" ]; then
-	    break
-	fi
-    done
+    case "$ID" in
+	(amzn)
+	    case "$VERSION_ID" in
+		(2)
+		    data="$AMAZON_2_DATA"
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    data="$DEBIAN_DATA"
+	    ;;
+	(fedora)
+	    data="$FEDORA_DATA"
+	    ;;
+	(opensuse)
+	    data="$OPENSUSE_DATA"
+	    ;;
+	(rhel|ol|centos)
+	    case "$VERSION_ID" in
+		(7|7.*)
+		    data="$REDHAT_7_DATA"
+		    ;;
+		(8|8.*)
+		    data="$REDHAT_8_DATA"
+		    ;;
+	    esac
+	    ;;
+	(freebsd)
+	    case "$VERSION_ID" in
+		(11.3-*)
+		    data="$FREEBSD_11_DATA"
+		    ;;
+		(12.1-*)
+		    data="$FREEBSD_12_DATA"
+		    ;;
+	    esac
+	    ;;
+	(macos)
+	    data="$MACOS_HOMEBREW_DATA"
+	    ;;
+	(netbsd)
+	    data="$NETBSD_DATA"
+	    ;;
+	(illumos)
+	    data="$ILLUMOS_DATA"
+	    ;;
+	(solaris)
+	    data="$SOLARIS_DATA"
+	    ;;
+    esac
 
     if [ -n "${data-}" ]; then
 	printf "%s %s\n" "$data"

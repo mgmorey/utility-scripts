@@ -43,20 +43,6 @@ configure_platform() {
 			;;
 		esac
 		;;
-	    (kali)
-		case "$VERSION_ID" in
-		    (2019.3)
-			package=$DEBIAN_PKG
-			;;
-		esac
-		;;
-	    (linuxmint)
-		case "$VERSION_ID" in
-		    (19.2)
-			package=$DEBIAN_PKG
-			;;
-		esac
-		;;
 	    (ubuntu)
 		case "$VERSION_ID" in
 		    (18.04)
@@ -133,20 +119,6 @@ validate_platform() {
 			return
 			;;
 		    (31)
-			return
-			;;
-		esac
-		;;
-	    (kali)
-		case "$VERSION_ID" in
-		    (2019.3)
-			return
-			;;
-		esac
-		;;
-	    (linuxmint)
-		case "$VERSION_ID" in
-		    (19.2)
 			return
 			;;
 		esac

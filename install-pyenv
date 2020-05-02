@@ -141,20 +141,6 @@ validate_platform() {
 	    (fedora)
 		return
 		;;
-	    (kali)
-		case "$VERSION_ID" in
-		    (2019.3)
-			return
-			;;
-		esac
-		;;
-	    (linuxmint)
-		case "$VERSION_ID" in
-		    (19.2)
-			return
-			;;
-		esac
-		;;
 	    (opensuse)
 		return
 		;;

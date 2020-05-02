@@ -26,7 +26,7 @@ OPENSUSE_PKGS="apache2-utils curl"
 
 REDHAT_PKGS="curl httpd-tools"
 
-SUNOS_PKGS="web/curl web/server/apache-24"
+SOLARIS_PKGS="web/curl web/server/apache-24"
 
 abort() {
     printf "$@" >&2
@@ -38,31 +38,65 @@ assert() {
 }
 
 get_http_client_packages() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    packages="$DEBIAN_PKGS"
+    packages=
+
+    case "$ID" in
+	(amzn)
+	    case "$VERSION_ID" in
+		(2)
+		    packages=$REDHAT_PKGS
 		    ;;
-		(opensuse-*)
-		    packages="$OPENSUSE_PKGS"
-		    ;;
-		(fedora)
-		    packages="$REDHAT_PKGS"
-		    ;;
-		(rhel|ol|centos)
-		    packages="$REDHAT_PKGS"
+		(*)
+		    break
 		    ;;
 	    esac
 	    ;;
-	(FreeBSD)
-	    packages="$FREEBSD_PKGS"
+	(debian|raspbian)
+	    packages=$DEBIAN_10_PKGS
 	    ;;
-	(NetBSD)
-	    packages="$NETBSD_PKGS"
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    packages=$DEBIAN_PKGS
+		    ;;
+		(19.10)
+		    packages=$DEBIAN_PKGS
+		    ;;
+		(20.04)
+		    packages=$DEBIAN_PKGS
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
 	    ;;
-	(SunOS)
-	    packages="$SUNOS_PKGS"
+	(opensuse-*)
+	    packages=$OPENSUSE_PKGS
+	    ;;
+	(fedora)
+	    packages=$REDHAT_PKGS
+	    ;;
+	(rhel|ol|centos)
+	    case "$VERSION_ID" in
+		(7|7.*)
+		    packages=$REDHAT_PKGS
+		    ;;
+		(8|8.*)
+		    packages=$REDHAT_PKGS
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(freebsd)
+	    packages=$FREEBSD_PKGS
+	    ;;
+	(netbsd)
+	    packages=$NETBSD_PKGS
+	    ;;
+	(solaris)
+	    packages=$SOLARIS_PKGS
 	    ;;
     esac
 

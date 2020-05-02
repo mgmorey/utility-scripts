@@ -97,22 +97,18 @@ get_realpath() (
 )
 
 validate_platform() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian|ubuntu|linuxmint|neon|kali)
-		    :
-	    	    ;;
-		(opensuse-*|fedora|rhel|ol|centos)
-		    :
-	    	    ;;
-		(*)
-		    abort_not_supported Distro
-		    ;;
-	    esac
+    case "$ID" in
+	(debian|raspbian|ubuntu)
+	    true
 	    ;;
-	(FreeBSD|SunOS|CYGWIN_NT-*)
-	    :
+	(opensuse-*|fedora|rhel|ol|centos)
+	    true
+	    ;;
+	(*)
+	    abort_not_supported Distro
+	    ;;
+	(freebsd|macos|windows)
+	    true
     	    ;;
 	(*)
 	    abort_not_supported "Operating system"

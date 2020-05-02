@@ -63,146 +63,106 @@ get_realpath() (
 )
 
 get_postgres_client_packages() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (amzn)
-		case "$VERSION_ID" in
-		    (2)
-			packages=$REDHAT_7_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (centos)
-		case "$VERSION_ID" in
-		    (8)
-			packages=$REDHAT_8_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (debian)
-		case "$VERSION_ID" in
-		    (10)
-			packages=$DEBIAN_10_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (fedora)
-		case "$VERSION_ID" in
-		    (31)
-			packages=$FEDORA_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (opensuse-leap)
-		case "$VERSION_ID" in
-		    (15.1)
-			packages=$OPENSUSE_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (opensuse-tumbleweed)
-		case "$VERSION_ID" in
-		    (2020????)
-			packages=$OPENSUSE_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (rhel|ol)
-		case "$VERSION_ID" in
-		    (8.*)
-			packages=$REDHAT_8_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (ubuntu)
-		case "$VERSION_ID" in
-		    (18.04)
-			packages=$UBUNTU_18_PKGS
-			;;
-		    (19.10)
-			packages=$UBUNTU_19_PKGS
-			;;
-		    (20.04)
-			packages=$UBUNTU_20_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (freebsd)
-		case "$VERSION_ID" in
-		    (11.3-*)
-			packages=$FREEBSD_PKGS
-			;;
-		    (12.1-*)
-			packages=$FREEBSD_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (illumos)
-		case "$VERSION_ID" in
-		    (2019.10)
-			packages=$ILLUMOS_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (macos)
-		case "$VERSION_ID" in
-		    (10.14.*)
-			packages=$MACOS_HOMEBREW_PKGS
-			;;
-		    (10.15.*)
-			packages=$MACOS_HOMEBREW_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (solaris)
-		case "$VERSION_ID" in
-		    (11.4)
-			packages=$SOLARIS_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	esac
+    packages=
 
-	if [ -n "${packages-}" ]; then
-	    break
-	fi
-    done
+    case "$ID" in
+	(amzn)
+	    case "$VERSION_ID" in
+		(2)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+	    esac
+	    ;;
+	(centos)
+	    case "$VERSION_ID" in
+		(8)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    case "$VERSION_ID" in
+		(10)
+		    packages=$DEBIAN_10_PKGS
+		    ;;
+	    esac
+	    ;;
+	(fedora)
+	    case "$VERSION_ID" in
+		(31)
+		    packages=$FEDORA_PKGS
+		    ;;
+	    esac
+	    ;;
+	(opensuse-leap)
+	    case "$VERSION_ID" in
+		(15.1)
+		    packages=$OPENSUSE_PKGS
+		    ;;
+	    esac
+	    ;;
+	(opensuse-tumbleweed)
+	    case "$VERSION_ID" in
+		(2020*)
+		    packages=$OPENSUSE_PKGS
+		    ;;
+	    esac
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(8.*)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    packages=$UBUNTU_18_PKGS
+		    ;;
+		(19.10)
+		    packages=$UBUNTU_19_PKGS
+		    ;;
+		(20.04)
+		    packages=$UBUNTU_20_PKGS
+		    ;;
+	    esac
+	    ;;
+	(freebsd)
+	    case "$VERSION_ID" in
+		(11.3-*)
+		    packages=$FREEBSD_PKGS
+		    ;;
+		(12.1-*)
+		    packages=$FREEBSD_PKGS
+		    ;;
+	    esac
+	    ;;
+	(illumos)
+	    case "$VERSION_ID" in
+		(2019.10)
+		    packages=$ILLUMOS_PKGS
+		    ;;
+	    esac
+	    ;;
+	(macos)
+	    case "$VERSION_ID" in
+		(10.14.*)
+		    packages=$MACOS_HOMEBREW_PKGS
+		    ;;
+		(10.15.*)
+		    packages=$MACOS_HOMEBREW_PKGS
+		    ;;
+	    esac
+	    ;;
+	(solaris)
+	    case "$VERSION_ID" in
+		(11.4)
+		    packages=$SOLARIS_PKGS
+		    ;;
+	    esac
+	    ;;
+    esac
 
     get-python-packages ${packages-}
 }

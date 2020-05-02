@@ -50,16 +50,9 @@ get_realpath() (
 
 eval $(get-os-release -x)
 
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (debian|raspbian|ubuntu|linuxmint|neon|kali)
-		su -c "apt-get install $DEBIAN_PKGS"
-		;;
-	    (*)
-		abort_not_supported Distro
-		;;
-	esac
+case "$ID" in
+    (debian|raspbian|ubuntu)
+	su -c "apt-get install $DEBIAN_PKGS"
 	;;
     (*)
 	abort_not_supported "Operating system"

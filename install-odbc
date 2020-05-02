@@ -67,7 +67,7 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
-	(debian)
+	(debian|raspbian)
 	    case "$VERSION_ID" in
 		(10)
 		    return

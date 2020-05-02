@@ -63,7 +63,7 @@ install_platform() {
 		sh $PGDG_INSTALLER
 	    fi
 	    ;;
-	(rhel|ol)
+	(rhel|ol|centos)
 	    if ! rpm -q $PGDG_PACKAGE >/dev/null 2>&1; then
 		abort "%s: %s: No such package installed\n" "$0" $PGDG_PACKAGE
 	    fi
@@ -81,36 +81,36 @@ preinstall_platform() {
 
 validate_platform() {
     case "$ID" in
-	(debian)
+	(debian|raspbian)
 	    case "$VERSION_ID" in
 		(10)
-		    return
+		    true
 		    ;;
 		(*)
-		    break
+		    abort_not_supported Release
 		    ;;
 	    esac
 	    ;;
-	(rhel|ol)
+	(rhel|ol|centos)
 	    case "$VERSION_ID" in
 		(8.*)
-		    return
+		    true
 		    ;;
 		(*)
-		    return
+		    true
 		    ;;
 	    esac
 	    ;;
 	(ubuntu)
 	    case "$VERSION_ID" in
 		(18.04)
-		    return
+		    true
 		    ;;
 		(19.10)
-		    return
+		    true
 		    ;;
 		(*)
-		    break
+		    abort_not_supported Release
 		    ;;
 	    esac
 	    ;;

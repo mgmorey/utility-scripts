@@ -75,7 +75,7 @@ install_platform() {
 		ln -sf $file /usr/local/bin
 	    done
 	    ;;
-	(rhel|ol)
+	(rhel|ol|centos)
 	    if ! rpm -q $PKG_NAME >/dev/null 2>&1; then
 		rpm -ihv $rpmpath
 	    fi
@@ -85,7 +85,7 @@ install_platform() {
 
 parse_arguments() {
     case "$ID" in
-	(rhel|ol)
+	(rhel|ol|centos)
 	    case "$VERSION_ID" in
 		(7.*)
 		    rpmfile=${PKG_NAME}-8.0.*-*.el7.x86_64.rpm
@@ -114,7 +114,7 @@ parse_arguments() {
 		    abort "%s: invalid argument" "$1"
 	    esac
 	    ;;
-	(rhel|ol)
+	(rhel|ol|centos)
 	    case "$(basename "$1")" in
 		($rpmfile)
 		    rpmpath=$1
@@ -145,14 +145,14 @@ postinstall_platform() {
 
 validate_platform() {
     case "$ID" in
-	(debian)
+	(debian|raspbian)
 	    case "$VERSION_ID" in
 		(10)
 		    return
 		    ;;
 	    esac
 	    ;;
-	(rhel|ol)
+	(rhel|ol|centos)
 	    case "$VERSION_ID" in
 		(7.*)
 		    return

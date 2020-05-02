@@ -332,27 +332,30 @@ validate_platform() {
 
     case "$ID" in
 	(centos)
-	    return
+	    true
 	    ;;
-	(debian)
-	    return
+	(debian|raspbian)
+	    true
 	    ;;
 	(fedora)
-	    return
+	    true
 	    ;;
 	(rhel|ol|centos)
 	    case "$VERSION_ID" in
 		(7|7.*)
-		    return
+		    true
 		    ;;
 		(8|8.*)
-		    return
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
 		    ;;
 	    esac
 	    ;;
 	(ubuntu)
-	    if [ "${VERSION_ID%.*}" -ge 18 ]; then
-		return
+	    if [ "${VERSION_ID%.*}" -le 18 ]; then
+		abort_not_supported Release
 	    fi
 	    ;;
     esac

@@ -54,7 +54,7 @@ install_pgadmin4() {
 
 validate_platform() {
     case "$ID" in
-	(debian)
+	(debian|raspbian)
 	    case "$VERSION_ID" in
 		(10)
 		    return
@@ -64,7 +64,7 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
-	(rhel|ol)
+	(rhel|ol|centos)
 	    case "$VERSION_ID" in
 		(8.*)
 		    return

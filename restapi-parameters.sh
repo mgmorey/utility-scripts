@@ -88,26 +88,6 @@ configure_baseline() {
 			    ;;
 		    esac
 		    ;;
-		(kali)
-		    case "$VERSION_ID" in
-			(2019.4)
-			    configure_linux_kali_2019_4
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(linuxmint)
-		    case "$VERSION_ID" in
-			(19.2)
-			    configure_linux_ubuntu_18_04
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
 		(opensuse-leap)
 		    case "$VERSION_ID" in
 			(15.1)
@@ -144,7 +124,7 @@ configure_baseline() {
 			    ;;
 		    esac
 		    ;;
-		(ubuntu|neon)
+		(ubuntu)
 		    case "$VERSION_ID" in
 			(18.04)
 			    configure_linux_ubuntu_18_04
@@ -463,14 +443,6 @@ configure_linux_fedora() {
 
 configure_linux_fedora_31() {
     configure_linux_fedora
-}
-
-configure_linux_kali_2019_4() {
-    configure_linux_debian
-
-    # Set system Python interpreter
-    SYSTEM_PYTHON=/usr/bin/python3.7
-    SYSTEM_PYTHON_VERSION=3.7.4
 }
 
 configure_linux_opensuse() {

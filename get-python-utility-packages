@@ -64,18 +64,17 @@ get_realpath() (
 )
 
 get_python_utility_packages() {
+    packages=
+
     case "$ID" in
 	(amzn)
 	    case "$VERSION_ID" in
 		(2)
 		    packages=$AMAZON_2_PKGS
 		    ;;
-		(*)
-		    true
-		    ;;
 	    esac
 	    ;;
-	(debian)
+	(debian|raspbian)
 	    packages="$DEBIAN_PKGS pylint3"
 	    ;;
 	(opensuse)
@@ -92,9 +91,6 @@ get_python_utility_packages() {
 		(8|8.*)
 		    packages=$REDHAT_8_PKGS
 		    ;;
-		(*)
-		    true
-		    ;;
 	    esac
 	    ;;
 	(ubuntu)
@@ -104,9 +100,6 @@ get_python_utility_packages() {
 		    ;;
 		(19.*)
 		    packages="$DEBIAN_PKGS pylint"
-		    ;;
-		(*)
-		    true
 		    ;;
 	    esac
 	    ;;

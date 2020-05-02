@@ -22,8 +22,6 @@ FREEBSD_PKGS="%s-sqlite3"
 
 ILLUMOS_PKGS=":%s-sqlite3"
 
-MACOS_HOMEBREW_PKGS=
-
 NETBSD_PKGS="%s-sqlite3"
 
 REDHAT_7_PKGS=":%s-sqlite3"
@@ -55,46 +53,33 @@ get_realpath() (
 )
 
 get_python_sqlite_packages() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (amzn)
-		case "$VERSION_ID" in
-		    (2)
-			packages=$AMAZON_2_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (rhel|ol|centos)
-		case "$VERSION_ID" in
-		    (7|7.*)
-			packages=$REDHAT_7_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (freebsd)
-		packages=$FREEBSD_PKGS
-		;;
-	    (illumos)
-		packages=$ILLUMOS_PKGS
-		;;
-	    (macos)
-		packages=$MACOS_HOMEBREW_PKGS
-		;;
-	    (netbsd)
-		packages=$NETBSD_PKGS
-		;;
-	esac
+    packages=
 
-	if [ -n "${packages-}" ]; then
-	    break
-	fi
-    done
+    case "$ID" in
+	(amzn)
+	    case "$VERSION_ID" in
+		(2)
+		    packages=$AMAZON_2_PKGS
+		    ;;
+	    esac
+	    ;;
+	(rhel|ol|centos)
+	    case "$VERSION_ID" in
+		(7|7.*)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+	    esac
+	    ;;
+	(freebsd)
+	    packages=$FREEBSD_PKGS
+	    ;;
+	(illumos)
+	    packages=$ILLUMOS_PKGS
+	    ;;
+	(netbsd)
+	    packages=$NETBSD_PKGS
+	    ;;
+    esac
 
     get-python-packages ${packages-}
 }

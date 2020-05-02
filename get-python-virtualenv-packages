@@ -26,8 +26,6 @@ FEDORA_PKGS="%s-virtualenv"
 
 ILLUMOS_PKGS=":%s-virtualenv"
 
-MACOS_HOMEBREW_PKGS=""
-
 NETBSD_PKGS="%s-virtualenv"
 
 OPENSUSE_PKGS="%s-virtualenv"
@@ -64,18 +62,17 @@ get_realpath() (
 )
 
 get_python_virtualenv_packages() {
+    packages=
+
     case "$ID" in
 	(amzn)
 	    case "$VERSION_ID" in
 		(2)
 		    packages=$REDHAT_7_PKGS
 		    ;;
-		(*)
-		    true
-		    ;;
 	    esac
 	    ;;
-	(debian)
+	(debian|raspbian)
 	    packages="$DEBIAN_PKGS pylint3"
 	    ;;
 	(opensuse)
@@ -92,9 +89,6 @@ get_python_virtualenv_packages() {
 		(8|8.*)
 		    packages=$REDHAT_8_PKGS
 		    ;;
-		(*)
-		    true
-		    ;;
 	    esac
 	    ;;
 	(ubuntu)
@@ -108,9 +102,6 @@ get_python_virtualenv_packages() {
 		(20.04)
 		    packages="$DEBIAN_PKGS pylint"
 		    ;;
-		(*)
-		    true
-		    ;;
 	    esac
 	    ;;
 	(freebsd)
@@ -118,9 +109,6 @@ get_python_virtualenv_packages() {
 	    ;;
 	(illumos)
 	    packages=$ILLUMOS_PKGS
-	    ;;
-	(macos)
-	    packages=$MACOS_HOMEBREW_PKGS
 	    ;;
 	(netbsd)
 	    packages=$NETBSD_PKGS

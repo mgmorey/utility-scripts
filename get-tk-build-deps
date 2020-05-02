@@ -18,8 +18,6 @@
 
 # Wiki page: https://github.com/pyenv/pyenv/wiki
 
-DARWIN_PKGS=""
-
 DEBIAN_PKGS="tk-dev"
 
 FREEBSD_PKGS="tcl86 tk86"
@@ -28,7 +26,7 @@ OPENSUSE_PKGS="tk-devel"
 
 REDHAT_PKGS="tk-devel"
 
-SUNOS_PKGS=""
+SOLARIS_PKGS=""
 
 abort() {
     printf "$@" >&2
@@ -57,35 +55,33 @@ get_realpath() (
 )
 
 get_tk_build_deps() {
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian)
-		    case "$VERSION_ID" in
-			(10)
-	    		    packages=$DEBIAN_PKGS
-			    ;;
-		    esac
-		    ;;
-		(opensuse-*)
-	    	    packages=$OPENSUSE_PKGS
-	    	    ;;
-		(rhel|ol|centos|fedora|amzn)
-	    	    packages=$REDHAT_PKGS
-	    	    ;;
-		(ubuntu|linuxmint|neon)
+    packages=
+
+    case "$ID" in
+	(debian|raspbian)
+	    case "$VERSION_ID" in
+		(10)
 	    	    packages=$DEBIAN_PKGS
 		    ;;
 	    esac
 	    ;;
-	(Darwin)
-	    packages=$DARWIN_PKGS
+	(opensuse-*)
+	    packages=$OPENSUSE_PKGS
 	    ;;
-	(FreeBSD)
+	(rhel|ol|centos|fedora|amzn)
+	    packages=$REDHAT_PKGS
+	    ;;
+	(ubuntu)
+	    packages=$DEBIAN_PKGS
+	    ;;
+	(freebsd)
 	    packages=$FREEBSD_PKGS
 	    ;;
-	(SunOS)
-	    packages=$SUNOS_PKGS
+	(illumos)
+	    packages=$SOLARIS_PKGS
+	    ;;
+	(solaris)
+	    packages=$SOLARIS_PKGS
 	    ;;
     esac
 

@@ -51,7 +51,7 @@ eval $(get-os-release -x)
 case "$kernel_name" in
     (Linux|GNU)
 	case "$ID" in
-	    (debian|raspbian|ubuntu|linuxmint|neon|kali)
+	    (debian|raspbian|ubuntu)
 	    	;;
 	    (*)
 		abort_not_supported Distro

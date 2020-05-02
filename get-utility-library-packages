@@ -48,62 +48,47 @@ assert() {
 get_emacs_build_deps() {
     packages=
 
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (amzn)
-		case "$VERSION_ID" in
-		    (2)
-			packages=$CENTOS_7_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (centos)
-		case "$VERSION_ID" in
-		    (7)
-			packages=$CENTOS_7_PKGS
-			;;
-		    (8)
-			packages=$CENTOS_8_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (debian)
-		packages=$DEBIAN_PKGS
-		;;
-	    (fedora)
-		packages=$FEDORA_PKGS
-		;;
-	    (opensuse)
-		packages=$OPENSUSE_PKGS
-		;;
-	    (rhel|ol)
-		case "$VERSION_ID" in
-		    (7.*)
-			packages=$REDHAT_7_PKGS
-			;;
-		    (8.*)
-			packages=$REDHAT_8_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (solaris)
-		packages=$SOLARIS_PKGS
-		;;
-	esac
-
-	if [ -n "${packages-}" ]; then
-	    break
-	fi
-    done
+    case "$ID" in
+	(amzn)
+	    case "$VERSION_ID" in
+		(2)
+		    packages=$CENTOS_7_PKGS
+		    ;;
+	    esac
+	    ;;
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    packages=$CENTOS_7_PKGS
+		    ;;
+		(8)
+		    packages=$CENTOS_8_PKGS
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    packages=$DEBIAN_PKGS
+	    ;;
+	(fedora)
+	    packages=$FEDORA_PKGS
+	    ;;
+	(opensuse)
+	    packages=$OPENSUSE_PKGS
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+		(8.*)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+	    esac
+	    ;;
+	(solaris)
+	    packages=$SOLARIS_PKGS
+	    ;;
+    esac
 
     if [ -n "${packages-}" ]; then
 	printf "%s\n" $packages

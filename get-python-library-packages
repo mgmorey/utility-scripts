@@ -75,127 +75,101 @@ assert() {
 get_python_library_packages() {
     packages=
 
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (amzn)
-		case "$VERSION_ID" in
-		    (2)
-			packages=$AMAZON_2_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (centos)
-		case "$VERSION_ID" in
-		    (7)
-			packages=$REDHAT_7_PKGS
-			;;
-		    (8)
-			packages=$REDHAT_8_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (debian)
-		case "$VERSION_ID" in
-		    (10)
-			packages=$DEBIAN_10_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (fedora)
-		packages=$FEDORA_PKGS
-		;;
-	    (kali)
-		case "$VERSION_ID" in
-		    (2019.3)
-			packages=$DEBIAN_10_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (linuxmint)
-		case "$VERSION_ID" in
-		    (19.2)
-			packages=$DEBIAN_10_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (opensuse)
-		packages=$OPENSUSE_PKGS
-		;;
-	    (rhel|ol)
-		case "$VERSION_ID" in
-		    (7.*)
-			packages=$REDHAT_7_PKGS
-			;;
-		    (8.*)
-			packages=$REDHAT_8_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (ubuntu|neon)
-		case "$VERSION_ID" in
-		    (18.04)
-			packages=$UBUNTU_18_PKGS
-			;;
-		    (19.10)
-			packages=$UBUNTU_19_PKGS
-			;;
-		    (20.04)
-			packages=$UBUNTU_19_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (freebsd)
-		case "$VERSION_ID" in
-		    (11.3-*)
-			packages=$FREEBSD_11_PKGS
-			;;
-		    (12.1-*)
-			packages=$FREEBSD_12_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (illumos)
-		packages=$ILLUMOS_PKGS
-		;;
-	    (macos)
-		packages=$MACOS_HOMEBREW_PKGS
-		;;
-	    (netbsd)
-		packages=$NETBSD_PKGS
-		;;
-	    (solaris)
-		packages=$SOLARIS_PKGS
-		;;
-	esac
-
-	if [ -n "${packages-}" ]; then
-	    break
-	fi
-    done
+    case "$ID" in
+	(amzn)
+	    case "$VERSION_ID" in
+		(2)
+		    packages=$AMAZON_2_PKGS
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+		(8)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    case "$VERSION_ID" in
+		(10)
+		    packages=$DEBIAN_10_PKGS
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(fedora)
+	    packages=$FEDORA_PKGS
+	    ;;
+	(opensuse)
+	    packages=$OPENSUSE_PKGS
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+		(8.*)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    packages=$UBUNTU_18_PKGS
+		    ;;
+		(19.10)
+		    packages=$UBUNTU_19_PKGS
+		    ;;
+		(20.04)
+		    packages=$UBUNTU_19_PKGS
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(freebsd)
+	    case "$VERSION_ID" in
+		(11.3-*)
+		    packages=$FREEBSD_11_PKGS
+		    ;;
+		(12.1-*)
+		    packages=$FREEBSD_12_PKGS
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(illumos)
+	    packages=$ILLUMOS_PKGS
+	    ;;
+	(macos)
+	    packages=$MACOS_HOMEBREW_PKGS
+	    ;;
+	(netbsd)
+	    packages=$NETBSD_PKGS
+	    ;;
+	(solaris)
+	    packages=$SOLARIS_PKGS
+	    ;;
+    esac
 
     if [ -n "${packages-}" ]; then
 	printf "%s\n" $packages

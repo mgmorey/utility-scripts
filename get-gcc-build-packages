@@ -36,37 +36,31 @@ assert() {
 get_gcc_build_packages() {
     packages=
 
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (debian)
-		case "$VERSION_ID" in
-		    (10)
-			packages=$DEBIAN_10_PKGS
-			;;
-		esac
-		;;
-	    (opensuse)
-		packages=$OPENSUSE_PKGS
-		;;
-	    (ubuntu)
-		case "$VERSION_ID" in
-		    (18.04)
-			packages=$UBUNTU_18_PKGS
-			;;
-		    (19.10)
-			packages=$UBUNTU_19_PKGS
-			;;
-		    (20.04)
-			packages=$UBUNTU_20_PKGS
-			;;
-		esac
-		;;
-	esac
-
-	if [ -n "${packages-}" ]; then
-	    break
-	fi
-    done
+    case "$ID" in
+	(debian|raspbian)
+	    case "$VERSION_ID" in
+		(10)
+		    packages=$DEBIAN_10_PKGS
+		    ;;
+	    esac
+	    ;;
+	(opensuse)
+	    packages=$OPENSUSE_PKGS
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    packages=$UBUNTU_18_PKGS
+		    ;;
+		(19.10)
+		    packages=$UBUNTU_19_PKGS
+		    ;;
+		(20.04)
+		    packages=$UBUNTU_20_PKGS
+		    ;;
+	    esac
+	    ;;
+    esac
 
     if [ -n "${packages-}" ]; then
 	printf "%s\n" $packages

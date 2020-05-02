@@ -234,7 +234,7 @@ validate_platform() {
 			    ;;
 		    esac
 		    ;;
-		(debian|raspbian|ubuntu|neon|linuxmint|kali)
+		(debian|raspbian|ubuntu)
 		    true
 		    ;;
 		(fedora)

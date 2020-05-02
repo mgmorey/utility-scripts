@@ -48,81 +48,75 @@ assert() {
 get_git_packages() {
     packages=
 
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (amazon)
-		case "$VERSION_ID" in
-		    (2)
-			packages=$AMAZON_2_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (centos)
-		case "$VERSION_ID" in
-		    (7)
-			packages=$REDHAT_7_PKGS
-			;;
-		    (8)
-			packages=$REDHAT_8_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (debian)
-		packages=$DEBIAN_PKGS
-		;;
-	    (fedora)
-		packages=$FEDORA_PKGS
-		;;
-	    (opensuse)
-		packages=$OPENSUSE_PKGS
-		;;
-	    (rhel|ol)
-		case "$VERSION_ID" in
-		    (7.*)
-			packages=$REDHAT_7_PKGS
-			;;
-		    (8.*)
-			packages=$REDHAT_8_PKGS
-			;;
-		esac
-		;;
-	    (freebsd)
-		case "$VERSION_ID" in
-		    (11.3-*)
-			packages=$FREEBSD_11_PKGS
-			;;
-		    (12.1-RELEASE-*)
-			packages=$FREEBSD_12_RELEASE_PKGS
-			;;
-		    (12.1-STABLE)
-			packages=$FREEBSD_12_STABLE_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (illumos)
-		packages=$ILLUMOS_PKGS
-		;;
-	    (macos)
-		packages=$MACOS_HOMEBREW_PKGS
-		;;
-	    (solaris)
-		packages=$SOLARIS_PKGS
-		;;
-	esac
-
-	if [ -n "${packages-}" ]; then
-	    break
-	fi
-    done
+    case "$ID" in
+	(amazon)
+	    case "$VERSION_ID" in
+		(2)
+		    packages=$AMAZON_2_PKGS
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+		(8)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    packages=$DEBIAN_PKGS
+	    ;;
+	(fedora)
+	    packages=$FEDORA_PKGS
+	    ;;
+	(opensuse)
+	    packages=$OPENSUSE_PKGS
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+		(8.*)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+	    esac
+	    ;;
+	(freebsd)
+	    case "$VERSION_ID" in
+		(11.3-*)
+		    packages=$FREEBSD_11_PKGS
+		    ;;
+		(12.1-RELEASE-*)
+		    packages=$FREEBSD_12_RELEASE_PKGS
+		    ;;
+		(12.1-STABLE)
+		    packages=$FREEBSD_12_STABLE_PKGS
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(illumos)
+	    packages=$ILLUMOS_PKGS
+	    ;;
+	(macos)
+	    packages=$MACOS_HOMEBREW_PKGS
+	    ;;
+	(solaris)
+	    packages=$SOLARIS_PKGS
+	    ;;
+    esac
 
     if [ -n "${packages-}" ]; then
 	printf "%s\n" $packages

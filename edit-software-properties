@@ -33,6 +33,38 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+
+edit_software_properties() {
+    if [ -z "${DISPLAY:-}" ]; then
+	abort "%s: No DISPLAY variable set\n" "$0"
+    fi
+
+    desktop_name=$(get-desktop-name)
+
+    if [ -z "${desktop_name:-}" ]; then
+	abort "%s: Desktop not specified\n" "$0"
+    fi
+
+    case "$ID" in
+	(debian|raspbian|ubuntu)
+	    case "$desktop_name" in
+		(GNOME*|*:GNOME|MATE)
+		    software-properties-gtk
+		    ;;
+		(KDE*)
+		    software-properties-kde
+		    ;;
+		(*)
+		    abort_desktop_not_supported
+		    ;;
+	    esac
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -50,40 +82,5 @@ get_realpath() (
     fi
 )
 
-if [ -z "${DISPLAY:-}" ]; then
-    abort "%s: No DISPLAY variable set\n" "$0"
-fi
-
 eval $(get-os-release -x)
-
-desktop_name=$(get-desktop-name)
-
-if [ -z "${desktop_name:-}" ]; then
-    abort "%s: Desktop not specified\n" "$0"
-fi
-
-case "$kernel_name" in
-    (Linux|GNU)
-	case "$ID" in
-	    (debian|raspbian|ubuntu|linuxmint|neon|kali)
-		case "$desktop_name" in
-		    (GNOME*|*:GNOME|MATE)
-			software-properties-gtk
-			;;
-		    (KDE*)
-			software-properties-kde
-			;;
-		    (*)
-			abort_desktop_not_supported
-			;;
-		esac
-		;;
-	    (*)
-		abort_not_supported Distro
-		;;
-	esac
-	;;
-    (*)
-	abort_not_supported "Operating system"
-	;;
-esac
+edit_software_properties

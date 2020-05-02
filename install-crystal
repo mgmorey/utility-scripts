@@ -34,24 +34,18 @@ assert() {
 configure_platform() {
     url=
 
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (debian)
-		case "$VERSION_ID" in
-		    (10)
-			url=$BASE_URL/apt/setup.sh
-			;;
-		esac
-		;;
-	    (ubuntu)
-		url=$BASE_URL/apt/setup.sh
-		;;
-	esac
-
-	if [ -n "${url-}" ]; then
-	    break
-	fi
-    done
+    case "$ID" in
+	(debian|raspbian)
+	    case "$VERSION_ID" in
+		(10)
+		    url=$BASE_URL/apt/setup.sh
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    url=$BASE_URL/apt/setup.sh
+	    ;;
+    esac
 }
 
 get_realpath() (
@@ -98,30 +92,37 @@ preinstall_crystal() {
 }
 
 validate_platform() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (debian)
-		case "$VERSION_ID" in
-		    (10)
-			return
-			;;
-		esac
-		;;
-	    (opensuse)
-		return
-		;;
-	    (ubuntu)
-		case "$VERSION_ID" in
-		    (18.04)
-			return
-			;;
-		    (19.10)
-			return
-			;;
-		esac
-		;;
-	esac
-    done
+    case "$ID" in
+	(debian|raspbian)
+	    case "$VERSION_ID" in
+		(10)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(opensuse)
+	    return
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    return
+		    ;;
+		(19.10)
+		    return
+		    ;;
+		(20.04)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+    esac
 
     abort_not_supported "Operating system"
 }

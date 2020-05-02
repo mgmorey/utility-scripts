@@ -52,99 +52,76 @@ assert() {
 get_bootstrap_packages() {
     packages=
 
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (centos)
-		case "$VERSION_ID" in
-		    (7)
-			packages=$REDHAT_7_PKGS
-			;;
-		    (8)
-			packages=$REDHAT_8_PKGS
-			;;
-		esac
-		;;
-	    (debian)
-		case "$VERSION_ID" in
-		    (10)
-			packages=$DEBIAN_10_PKGS
-			;;
-		esac
-		;;
-	    (fedora)
-		packages=$FEDORA_PKGS
-		;;
-	    (kali)
-		case "$VERSION_ID" in
-		    (2019.3)
-			packages=$DEBIAN_10_PKGS
-			;;
-		esac
-		;;
-	    (linuxmint)
-		case "$VERSION_ID" in
-		    (19.2)
-			packages=$DEBIAN_10_PKGS
-			;;
-		esac
-		;;
-	    (opensuse)
-		packages=$OPENSUSE_PKGS
-		;;
-	    (rhel|ol)
-		case "$VERSION_ID" in
-		    (7.*)
-			packages=$REDHAT_7_PKGS
-			;;
-		    (8.*)
-			packages=$REDHAT_8_PKGS
-			;;
-		esac
-		;;
-	    (ubuntu)
-		case "$VERSION_ID" in
-		    (18.04)
-			packages=$UBUNTU_18_PKGS
-			;;
-		    (19.10)
-			packages=$UBUNTU_19_PKGS
-			;;
-		    (20.04)
-			packages=$UBUNTU_20_PKGS
-			;;
-		esac
-		;;
-	    (freebsd)
-		case "$VERSION_ID" in
-		    (11.3-*)
-			packages=$FREEBSD_11_PKGS
-			;;
-		    (12.1-*)
-			packages=$FREEBSD_12_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (illumos)
-		packages=$ILLUMOS_PKGS
-		;;
-	    (macos)
-		packages=$MACOS_PKGS
-		;;
-	    (netbsd)
-		packages=$NETBSD_PKGS
-		;;
-	    (solaris)
-		packages=$SOLARIS_PKGS
-		;;
-	esac
-
-	if [ -n "${packages-}" ]; then
-	    break
-	fi
-    done
+    case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+		(8)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    case "$VERSION_ID" in
+		(10)
+		    packages=$DEBIAN_10_PKGS
+		    ;;
+	    esac
+	    ;;
+	(fedora)
+	    packages=$FEDORA_PKGS
+	    ;;
+	(opensuse)
+	    packages=$OPENSUSE_PKGS
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+		(8.*)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    packages=$UBUNTU_18_PKGS
+		    ;;
+		(19.10)
+		    packages=$UBUNTU_19_PKGS
+		    ;;
+		(20.04)
+		    packages=$UBUNTU_20_PKGS
+		    ;;
+	    esac
+	    ;;
+	(freebsd)
+	    case "$VERSION_ID" in
+		(11.3-*)
+		    packages=$FREEBSD_11_PKGS
+		    ;;
+		(12.1-*)
+		    packages=$FREEBSD_12_PKGS
+		    ;;
+	    esac
+	    ;;
+	(illumos)
+	    packages=$ILLUMOS_PKGS
+	    ;;
+	(macos)
+	    packages=$MACOS_PKGS
+	    ;;
+	(netbsd)
+	    packages=$NETBSD_PKGS
+	    ;;
+	(solaris)
+	    packages=$SOLARIS_PKGS
+	    ;;
+    esac
 
     if [ -n "${packages-}" ]; then
 	printf "%s\n" $packages

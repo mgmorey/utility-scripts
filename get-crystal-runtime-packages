@@ -22,6 +22,13 @@ zlib1g-dev"
 OPENSUSE_PKGS="gmp-devel libopenssl-devel libxml2-devel libyaml-devel \
 readline-devel zlib-devel"
 
+UBUNTU_18_PKGS="libgmp-dev libreadline-dev libssl-dev libxml2-dev libyaml-dev \
+zlib1g-dev"
+UBUNTU_19_PKGS="libgmp-dev libreadline-dev libssl-dev libxml2-dev libyaml-dev \
+zlib1g-dev"
+UBUNTU_20_PKGS="libgmp-dev libreadline-dev libssl-dev libxml2-dev libyaml-dev \
+zlib1g-dev"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -34,24 +41,31 @@ assert() {
 get_crystal_library_packages() {
     packages=
 
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (debian)
-		case "$VERSION_ID" in
-		    (10)
-			packages=$DEBIAN_10_PKGS
-			;;
-		esac
-		;;
-	    (opensuse)
-		packages=$OPENSUSE_PKGS
-		;;
-	esac
-
-	if [ -n "${packages-}" ]; then
-	    break
-	fi
-    done
+    case "$ID" in
+	(debian|raspbian)
+	    case "$VERSION_ID" in
+		(10)
+		    packages=$DEBIAN_10_PKGS
+		    ;;
+	    esac
+	    ;;
+	(opensuse)
+	    packages=$OPENSUSE_PKGS
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    packages=$UBUNTU_18_PKGS
+		    ;;
+		(19.10)
+		    packages=$UBUNTU_19_PKGS
+		    ;;
+		(20.04)
+		    packages=$UBUNTU_20_PKGS
+		    ;;
+	    esac
+	    ;;
+    esac
 
     if [ -n "${packages-}" ]; then
 	printf "%s\n" $packages

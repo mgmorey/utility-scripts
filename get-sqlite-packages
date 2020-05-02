@@ -61,41 +61,37 @@ get_realpath() (
 )
 
 get_sqlite_packages() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (debian)
-		packages=$DEBIAN_PKGS
-		;;
-	    (opensuse)
-		packages=$OPENSUSE_PKGS
-		;;
-	    (fedora)
-		packages=$FEDORA_PKGS
-		;;
-	    (rhel|ol|centos|amzn)
-		packages=$REDHAT_PKGS
-		;;
-	    (freebsd)
-		packages=$FREEBSD_PKGS
-		;;
-	    (illumos)
-		packages=$ILLUMOS_PKGS
-		;;
-	    (macos)
-		packages=$MACOS_HOMEBREW_PKGS
-		;;
-	    (netbsd)
-		packages=$NETBSD_PKGS
-		;;
-	    (solaris)
-		packages=$SOLARIS_PKGS
-		;;
-	esac
+    packages=
 
-	if [ -n "${packages-}" ]; then
-	    break
-	fi
-    done
+    case "$ID" in
+	(debian|raspbian)
+	    packages=$DEBIAN_PKGS
+	    ;;
+	(opensuse)
+	    packages=$OPENSUSE_PKGS
+	    ;;
+	(fedora)
+	    packages=$FEDORA_PKGS
+	    ;;
+	(rhel|ol|centos|amzn)
+	    packages=$REDHAT_PKGS
+	    ;;
+	(freebsd)
+	    packages=$FREEBSD_PKGS
+	    ;;
+	(illumos)
+	    packages=$ILLUMOS_PKGS
+	    ;;
+	(macos)
+	    packages=$MACOS_HOMEBREW_PKGS
+	    ;;
+	(netbsd)
+	    packages=$NETBSD_PKGS
+	    ;;
+	(solaris)
+	    packages=$SOLARIS_PKGS
+	    ;;
+    esac
 
     get-python-packages ${packages-}
 }

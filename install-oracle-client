@@ -49,7 +49,7 @@ get_package_pathname() {
 	(debian|ubuntu)
 	    printf "%s/$PREFIX_ZIP-$SUFFIX_ZIP\n" "$3" "$1" "$2"
 	    ;;
-	(rhel|ol)
+	(rhel|ol|centos)
 	    printf "%s/$PREFIX_RPM-$SUFFIX_RPM\n" "$3" "$2" "$1" "$2"
 	    ;;
     esac
@@ -68,7 +68,7 @@ get_package_prefix() {
 	(debian|ubuntu)
 	    printf "$PREFIX_ZIP\n" "$1"
 	    ;;
-	(rhel|ol)
+	(rhel|ol|centos)
 	    printf "$PREFIX_RPM\n" "$1"
 	    ;;
     esac
@@ -81,7 +81,7 @@ get_package_suffix() {
 	(debian|ubuntu)
 	    printf "$SUFFIX_ZIP\n" "$1"
 	    ;;
-	(rhel|ol)
+	(rhel|ol|centos)
 	    printf "$SUFFIX_RPM\n" "$1"
 	    ;;
     esac
@@ -125,7 +125,7 @@ install_platform() {
 	(debian|ubuntu)
 	    install_zip_files $package_pathnames
 	    ;;
-	(rhel|ol)
+	(rhel|ol|centos)
 	    install_rpm_files $package_pathnames
 	    ;;
     esac
@@ -160,14 +160,14 @@ install_zip_files() (
 
 validate_platform() {
     case "$ID" in
-	(debian)
+	(debian|raspbian)
 	    case "$VERSION_ID" in
 		(10)
 		    return
 		    ;;
 	    esac
 	    ;;
-	(rhel|ol)
+	(rhel|ol|centos)
 	    case "$VERSION_ID" in
 		(8.1)
 		    return

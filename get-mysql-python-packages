@@ -46,69 +46,44 @@ assert() {
 get_mysql_python_packages() {
     packages=
 
-    case "$kernel_name" in
-	(Linux|GNU)
-	    case "$ID" in
-		(debian|raspbian)
-		    case "$VERSION_ID" in
-			(10)
-			    packages=$DEBIAN_PKGS
-			    ;;
-		    esac
-		    ;;
-		(ubuntu|neon)
-		    case "$VERSION_ID" in
-			(18.04)
-			    packages=$UBUNTU_PKGS
-			    ;;
-			(19.10)
-			    packages=$UBUNTU_PKGS
-			    ;;
-		    esac
-		    ;;
-		(linuxmint)
-		    case "$VERSION_ID" in
-			(19.2)
-			    packages=$UBUNTU_PKGS
-			    ;;
-		    esac
-		    ;;
-		(kali)
-		    case "$VERSION_ID" in
-			(2019.3)
-			    packages=$DEBIAN_PKGS
-			    ;;
-		    esac
-		    ;;
-		(fedora)
-		    packages=$FEDORA_PKGS
-		    ;;
-		(opensuse-*)
-		    packages=$OPENSUSE_PKGS
-		    ;;
-		(rhel|ol|centos)
-		    packages=
+    case "$ID" in
+	(debian|raspbian)
+	    case "$VERSION_ID" in
+		(10)
+		    packages=$DEBIAN_PKGS
 		    ;;
 	    esac
 	    ;;
-	(Darwin)
-	    packages=
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    packages=$UBUNTU_PKGS
+		    ;;
+		(19.10)
+		    packages=$UBUNTU_PKGS
+		    ;;
+		(20.04)
+		    packages=$UBUNTU_PKGS
+		    ;;
+	    esac
 	    ;;
-	(FreeBSD)
+	(fedora)
+	    packages=$FEDORA_PKGS
+	    ;;
+	(opensuse-*)
+	    packages=$OPENSUSE_PKGS
+	    ;;
+	(freebsd)
 	    packages=$FREEBSD_PKGS
 	    ;;
-	(NetBSD)
+	(illumos)
+	    packages=$ILLUMOS_PKGS
+	    ;;
+	(netbsd)
 	    packages=$NETBSD_PKGS
 	    ;;
-	(SunOS)
-	    case "$ID" in
-		(illumos)
-		    packages=$ILLUMOS_PKGS
-		    ;;
-		(solaris)
-		    packages=$SOLARIS_PKG
-		    ;;
-	    esac
+	(solaris)
+	    packages=$SOLARIS_PKG
 	    ;;
     esac
 

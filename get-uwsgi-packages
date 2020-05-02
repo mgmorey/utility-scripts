@@ -64,74 +64,61 @@ get_realpath() (
 )
 
 get_uwsgi_packages() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (amzn)
-		case "$VERSION_ID" in
-		    (2)
-			packages=$REDHAT_7_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (debian)
-		packages=$DEBIAN_10_PKGS
-		;;
-	    (ubuntu)
-		case "$VERSION_ID" in
-		    (18.04)
-			packages=$UBUNTU_18_PKGS
-			;;
-		    (19.10)
-			packages=$UBUNTU_19_PKGS
-			;;
-		    (20.04)
-			packages=$UBUNTU_20_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (opensuse-*)
-		packages=$OPENSUSE_PKGS
-		;;
-	    (fedora)
-		packages=$FEDORA_PKGS
-		;;
-	    (rhel|ol|centos)
-		case "$VERSION_ID" in
-		    (7|7.*)
-			packages=$REDHAT_7_PKGS
-			;;
-		    (8|8.*)
-			packages=$REDHAT_8_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (freebsd)
-		packages=$FREEBSD_PKGS
-		;;
-	    (macos)
-		packages=$MACOS_HOMEBREW_PKGS
-		;;
-	    (netbsd)
-		packages=$NETBSD_PKGS
-		;;
-	    (solaris)
-		packages=$SOLARIS_PKGS
-		;;
-	esac
+    packages=
 
-	if [ -n "${packages-}" ]; then
-	    break
-	fi
-    done
+    case "$ID" in
+	(amzn)
+	    case "$VERSION_ID" in
+		(2)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    packages=$DEBIAN_10_PKGS
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    packages=$UBUNTU_18_PKGS
+		    ;;
+		(19.10)
+		    packages=$UBUNTU_19_PKGS
+		    ;;
+		(20.04)
+		    packages=$UBUNTU_20_PKGS
+		    ;;
+	    esac
+	    ;;
+	(opensuse-*)
+	    packages=$OPENSUSE_PKGS
+	    ;;
+	(fedora)
+	    packages=$FEDORA_PKGS
+	    ;;
+	(rhel|ol|centos)
+	    case "$VERSION_ID" in
+		(7|7.*)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+		(8|8.*)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+	    esac
+	    ;;
+	(freebsd)
+	    packages=$FREEBSD_PKGS
+	    ;;
+	(macos)
+	    packages=$MACOS_HOMEBREW_PKGS
+	    ;;
+	(netbsd)
+	    packages=$NETBSD_PKGS
+	    ;;
+	(solaris)
+	    packages=$SOLARIS_PKGS
+	    ;;
+    esac
 
     get-python-packages ${packages-}
 }

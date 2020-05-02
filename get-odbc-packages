@@ -22,6 +22,7 @@ REDHAT_8_PKGS="unixODBC"
 
 UBUNTU_18_PKGS="unixodbc unixodbc-bin"
 UBUNTU_19_PKGS="unixodbc unixodbc-bin"
+UBUNTU_20_PKGS="unixodbc unixodbc-bin"
 
 abort() {
     printf "$@" >&2
@@ -35,63 +36,48 @@ assert() {
 get_odbc_packages() {
     packages=
 
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (centos)
-		case "$VERSION_ID" in
-		    (7)
-			packages=$REDHAT_7_PKGS
-			;;
-		    (8)
-			packages=$REDHAT_8_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (debian)
-		case "$VERSION_ID" in
-		    (10)
-			packages=$DEBIAN_10_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (rhel|ol)
-		case "$VERSION_ID" in
-		    (7.*)
-			packages=$REDHAT_7_PKGS
-			;;
-		    (8.*)
-			packages=$REDHAT_8_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (ubuntu)
-		case "$VERSION_ID" in
-		    (18.04)
-			packages=$UBUNTU_18_PKGS
-			;;
-		    (19.10)
-			packages=$UBUNTU_19_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	esac
-
-	if [ -n "${packages-}" ]; then
-	    break
-	fi
-    done
+    case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+		(8)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    case "$VERSION_ID" in
+		(10)
+		    packages=$DEBIAN_10_PKGS
+		    ;;
+	    esac
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+		(8.*)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    packages=$UBUNTU_18_PKGS
+		    ;;
+		(19.10)
+		    packages=$UBUNTU_19_PKGS
+		    ;;
+		(20.04)
+		    packages=$UBUNTU_20_PKGS
+		    ;;
+	    esac
+	    ;;
+    esac
 
     if [ -n "${packages-}" ]; then
 	printf "%s\n" $packages

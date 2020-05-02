@@ -107,22 +107,6 @@ install_homebrew() {
 		install_linuxbrew
 		break
 		;;
-	    (kali)
-		case "$VERSION_ID" in
-		    (2019.3)
-			install_linuxbrew
-			break
-			;;
-		esac
-		;;
-	    (linuxmint)
-		case "$VERSION_ID" in
-		    (19.2)
-			install_linuxbrew
-			break
-			;;
-		esac
-		;;
 	    (opensuse)
 		install_linuxbrew
 		break
@@ -198,20 +182,6 @@ validate_platform() {
 		;;
 	    (fedora)
 		return
-		;;
-	    (kali)
-		case "$VERSION_ID" in
-		    (2019.3)
-			return
-			;;
-		esac
-		;;
-	    (linuxmint)
-		case "$VERSION_ID" in
-		    (19.2)
-			return
-			;;
-		esac
 		;;
 	    (opensuse)
 		return
