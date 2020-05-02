@@ -33,7 +33,7 @@ NETBSD_PKGS="%s-venv"
 OPENSUSE_PKGS=""
 
 REDHAT_7_PKGS=":%s-venv"
-REDHAT_8_PKGS="%s-venv"
+REDHAT_8_PKGS=""
 
 SOLARIS_PKGS="library/python/venv-%s"
 
@@ -64,77 +64,71 @@ get_realpath() (
 )
 
 get_python_venv_packages() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (amzn)
-		case "$VERSION_ID" in
-		    (2)
-			packages=$REDHAT_7_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (debian)
-		packages="$DEBIAN_PKGS pylint3"
-		;;
-	    (opensuse)
-		packages=$OPENSUSE_PKGS
-		;;
-	    (fedora)
-		packages=$FEDORA_PKGS
-		;;
-	    (rhel|ol|centos)
-		case "$VERSION_ID" in
-		    (7|7.*)
-			packages=$REDHAT_7_PKGS
-			;;
-		    (8|8.*)
-			packages=$REDHAT_8_PKGS
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (ubuntu)
-		case "$VERSION_ID" in
-		    (18.04)
-			packages="$DEBIAN_PKGS pylint3"
-			;;
-		    (19.10)
-			packages="$DEBIAN_PKGS pylint"
-			;;
-		    (20.04)
-			packages="$DEBIAN_PKGS pylint"
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (freebsd)
-		packages=$FREEBSD_PKGS
-		;;
-	    (illumos)
-		packages=$ILLUMOS_PKGS
-		;;
-	    (macos)
-		packages=$MACOS_HOMEBREW_PKGS
-		;;
-	    (netbsd)
-		packages=$NETBSD_PKGS
-		;;
-	    (solaris)
-		packages=$SOLARIS_PKGS
-		;;
-	esac
-
-	if [ -n "${packages-}" ]; then
-	    break
-	fi
-    done
+    case "$ID" in
+	(amzn)
+	    case "$VERSION_ID" in
+		(2)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(debian)
+	    packages="$DEBIAN_PKGS pylint3"
+	    ;;
+	(opensuse)
+	    packages=$OPENSUSE_PKGS
+	    ;;
+	(fedora)
+	    packages=$FEDORA_PKGS
+	    ;;
+	(rhel|ol|centos)
+	    case "$VERSION_ID" in
+		(7|7.*)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+		(8|8.*)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    packages="$DEBIAN_PKGS pylint3"
+		    ;;
+		(19.10)
+		    packages="$DEBIAN_PKGS pylint"
+		    ;;
+		(20.04)
+		    packages="$DEBIAN_PKGS pylint"
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(freebsd)
+	    packages=$FREEBSD_PKGS
+	    ;;
+	(illumos)
+	    packages=$ILLUMOS_PKGS
+	    ;;
+	(macos)
+	    packages=$MACOS_HOMEBREW_PKGS
+	    ;;
+	(netbsd)
+	    packages=$NETBSD_PKGS
+	    ;;
+	(solaris)
+	    packages=$SOLARIS_PKGS
+	    ;;
+    esac
 
     get-python-packages ${packages-}
 }
