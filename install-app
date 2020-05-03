@@ -276,7 +276,7 @@ preinstall_app() {
     path="$(get_profile_path "$home" "$script_dir")"
     script="\"$script_dir/run-app\" -d \"$(pwd)\" -h \"$home\" -p \"$path\""
 
-    for command in "${PYTHON_COMMAND_LINT-}" "${PYTHON_COMMAND_TEST-}"; do
+    for command in "${PYTHON_LINT-}" "${PYTHON_TEST-}"; do
 	if [ -n "$command" ]; then
 	    run_unpriv /bin/sh -c "$script $command"
 	fi
