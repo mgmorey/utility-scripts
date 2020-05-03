@@ -20,8 +20,6 @@ AMAZON_2_PKGS="%s-venv"
 
 DEBIAN_PKGS="%s-venv"
 
-FREEBSD_PKGS="%s-venv"
-
 FEDORA_PKGS="%s-venv"
 
 NETBSD_PKGS="%s-venv"
@@ -96,9 +94,6 @@ get_python_venv_packages() {
 		    packages="$DEBIAN_PKGS pylint"
 		    ;;
 	    esac
-	    ;;
-	(freebsd)
-	    packages=$FREEBSD_PKGS
 	    ;;
 	(netbsd)
 	    packages=$NETBSD_PKGS
