@@ -379,18 +379,12 @@ configure_gnu() {
 configure_linux_centos_7() {
     configure_linux_redhat
 
-    # Set system Python interpreter
-    SYSTEM_PYTHON=/usr/pkg/bin/python3.7
-
-    # Set uWSGI prefix directory
-    UWSGI_PREFIX=/usr/pkg
-
-    # Set uWSGI binary file
-    UWSGI_BINARY_NAME=uwsgi-3.7
+    # Set uWSGI binary/plugin directories
+    UWSGI_BINARY_DIR=/usr/local/bin
 
     # Set other uWSGI parameters
     UWSGI_HAS_PLUGIN=false
-    UWSGI_ORIGIN=pkgsrc
+    UWSGI_ORIGIN=pypi
 }
 
 configure_linux_centos_8() {
@@ -399,7 +393,7 @@ configure_linux_centos_8() {
     # Set uWSGI binary/plugin directories
     UWSGI_BINARY_DIR=/usr/local/bin
 
-    # Set uWSGI parameters
+    # Set other uWSGI parameters
     UWSGI_HAS_PLUGIN=false
     UWSGI_ORIGIN=pypi
 }
@@ -482,18 +476,12 @@ configure_linux_redhat() {
 configure_linux_redhat_7() {
     configure_linux_redhat
 
-    # Set system Python interpreter
-    SYSTEM_PYTHON=/usr/pkg/bin/python3.7
-
-    # Set uWSGI prefix directory
-    UWSGI_PREFIX=/usr/pkg
-
-    # Set uWSGI binary file
-    UWSGI_BINARY_NAME=uwsgi-3.7
+    # Set uWSGI binary/plugin directories
+    UWSGI_BINARY_DIR=/usr/local/bin
 
     # Set other uWSGI parameters
     UWSGI_HAS_PLUGIN=false
-    UWSGI_ORIGIN=pkgsrc
+    UWSGI_ORIGIN=pypi
 }
 
 configure_linux_redhat_8() {
