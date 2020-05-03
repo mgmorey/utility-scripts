@@ -24,7 +24,7 @@ ILLUMOS_PKGS=":%s-sqlite3"
 
 NETBSD_PKGS="%s-sqlite3"
 
-REDHAT_7_PKGS=":%s-sqlite3"
+REDHAT_7_PKGS="%s-sqlite3"
 
 abort() {
     printf "$@" >&2
