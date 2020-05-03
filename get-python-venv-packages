@@ -24,8 +24,6 @@ FEDORA_PKGS="%s-venv"
 
 NETBSD_PKGS="%s-venv"
 
-REDHAT_7_PKGS=":%s-venv"
-
 SOLARIS_PKGS="library/python/venv-%s"
 
 abort() {
@@ -58,36 +56,22 @@ get_python_venv_packages() {
     packages=
 
     case "$ID" in
-	(amzn)
-	    case "$VERSION_ID" in
-		(2)
-		    packages=$REDHAT_7_PKGS
-		    ;;
-	    esac
-	    ;;
 	(debian|raspbian)
-	    packages="$DEBIAN_PKGS pylint3"
+	    packages="$DEBIAN_PKGS"
 	    ;;
 	(fedora)
 	    packages=$FEDORA_PKGS
 	    ;;
-	(rhel|ol|centos)
-	    case "$VERSION_ID" in
-		(7|7.*)
-		    packages=$REDHAT_7_PKGS
-		    ;;
-	    esac
-	    ;;
 	(ubuntu)
 	    case "$VERSION_ID" in
 		(18.04)
-		    packages="$DEBIAN_PKGS pylint3"
+		    packages="$DEBIAN_PKGS"
 		    ;;
 		(19.10)
-		    packages="$DEBIAN_PKGS pylint"
+		    packages="$DEBIAN_PKGS"
 		    ;;
 		(20.04)
-		    packages="$DEBIAN_PKGS pylint"
+		    packages="$DEBIAN_PKGS"
 		    ;;
 	    esac
 	    ;;
