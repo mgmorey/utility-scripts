@@ -57,9 +57,6 @@ configure_baseline() {
 	    case "$ID" in
 		(centos)
 		    case "$VERSION_ID" in
-			(7)
-			    configure_linux_centos_7
-			    ;;
 			(8)
 			    configure_linux_centos_8
 			    ;;
@@ -113,9 +110,6 @@ configure_baseline() {
 		    ;;
 		(rhel|ol)
 		    case "$VERSION_ID" in
-			(7.[78])
-			    configure_linux_redhat_7
-			    ;;
 			(8.[01])
 			    configure_linux_redhat_8
 			    ;;
@@ -376,17 +370,6 @@ configure_gnu() {
     PS_FORMAT=pid,ppid,user,tt,lstart,command
 }
 
-configure_linux_centos_7() {
-    configure_linux_redhat
-
-    # Set uWSGI binary/plugin directories
-    UWSGI_BINARY_DIR=/usr/local/bin
-
-    # Set other uWSGI parameters
-    UWSGI_HAS_PLUGIN=false
-    UWSGI_ORIGIN=pypi
-}
-
 configure_linux_centos_8() {
     configure_linux_redhat
 
@@ -471,17 +454,6 @@ configure_linux_redhat() {
     # Set application group and user accounts
     APP_GID=nobody
     APP_UID=nobody
-}
-
-configure_linux_redhat_7() {
-    configure_linux_redhat
-
-    # Set uWSGI binary/plugin directories
-    UWSGI_BINARY_DIR=/usr/local/bin
-
-    # Set other uWSGI parameters
-    UWSGI_HAS_PLUGIN=false
-    UWSGI_ORIGIN=pypi
 }
 
 configure_linux_redhat_8() {
