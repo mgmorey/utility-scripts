@@ -200,13 +200,16 @@ install_uwsgi_from_package() (
     fi
 
     case "$UWSGI_ORIGIN" in
-	(distro|pkgsrc)
+	(distro|pkgsrc|pypi)
 	    packages=$(get_packages_in $CATEGORIES | sort -u)
 
 	    if [ -n "$packages" ]; then
 		install-packages $packages
 	    fi
 	    ;;
+    esac
+
+    case "$UWSGI_ORIGIN" in
 	(pypi)
 	    install_via_pip "$(get_pip_command)" uwsgi
 	    ;;
