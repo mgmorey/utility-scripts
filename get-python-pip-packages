@@ -16,17 +16,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-AMAZON_2_PKGS="%s-pip"
+AMAZON_2_PKGS="%s-pip %s-wheel"
 
 DEBIAN_PKGS="%s-packaging %s-pip %s-wheel"
 
-FREEBSD_PKGS="%s-packaging %s-pip"
+FREEBSD_PKGS="%s-packaging %s-pip %s-wheel"
 
-FEDORA_PKGS="%s-packaging %s-pip"
+FEDORA_PKGS="%s-packaging %s-pip %s-wheel"
 
 ILLUMOS_PKGS=":%s-packaging :%s-pip :%s-wheel"
 
-NETBSD_PKGS="%s-packaging %s-pip"
+NETBSD_PKGS="%s-packaging %s-pip %s-wheel"
 
 OPENSUSE_PKGS="%s-packaging %s-pip %s-wheel"
 
