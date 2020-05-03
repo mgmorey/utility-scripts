@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-AMAZON_2_PKGS="%s-venv"
-
 DEBIAN_PKGS="%s-venv"
 
 FEDORA_PKGS="%s-venv"
