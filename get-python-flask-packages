@@ -28,7 +28,7 @@ NETBSD_PKGS="%s-flask %s-flask-restful %s-flask-sqlalchemy"
 
 OPENSUSE_PKGS="%s-Flask %s-Flask-RESTful %s-Flask-SQLAlchemy"
 
-REDHAT_7_PKGS=":%s-flask :%s-flask-restful :%s-flask-sqlalchemy"
+REDHAT_7_PKGS="%s-flask %s-flask-restful %s-flask-sqlalchemy"
 REDHAT_8_PKGS="%s-flask"
 
 abort() {
