@@ -33,7 +33,7 @@ NETBSD_PKGS="%s-packaging %s-pip"
 OPENSUSE_PKGS="%s-packaging %s-pip %s-wheel"
 
 REDHAT_7_PKGS=":%s-packaging :%s-pip"
-REDHAT_8_PKGS="%s-pip"
+REDHAT_8_PKGS="%s-pip %s-wheel"
 
 SOLARIS_PKGS="library/python/pip-%s"
 
