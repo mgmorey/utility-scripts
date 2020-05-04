@@ -22,8 +22,6 @@ FEDORA_PKGS="%s-venv"
 
 NETBSD_PKGS="%s-venv"
 
-SOLARIS_PKGS="library/python/venv-%s"
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -75,9 +73,6 @@ get_python_venv_packages() {
 	    ;;
 	(netbsd)
 	    packages=$NETBSD_PKGS
-	    ;;
-	(solaris)
-	    packages=$SOLARIS_PKGS
 	    ;;
     esac
 
