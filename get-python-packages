@@ -35,7 +35,7 @@ get_python_packages() {
 
     for package in "$@"; do
 	case $package in
-	    (*%s*)
+	    (*%s*|*%.[1-9]s*)
 		printf "$package\n" $package_modifier
 		;;
 	    (*)
