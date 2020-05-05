@@ -187,7 +187,7 @@ configure_baseline() {
 	    case $ID in
 		(illumos)
 		    case "$VERSION_ID" in
-			(2019.10)
+			(2019.10|2020.04)
 			    configure_unix_illumos
 			    ;;
 			(*)
