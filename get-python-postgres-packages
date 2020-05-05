@@ -125,7 +125,7 @@ get_python_postgres_packages() {
 	    ;;
 	(illumos)
 	    case "$VERSION_ID" in
-		(2019.10)
+		(2019.10|2020.04)
 		    packages=$ILLUMOS_PKGS
 		    ;;
 	    esac

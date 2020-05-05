@@ -57,7 +57,7 @@ validate_platform() {
 	(debian|raspbian)
 	    case "$VERSION_ID" in
 		(10)
-		    :
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -67,10 +67,10 @@ validate_platform() {
 	(ubuntu)
 	    case "$VERSION_ID" in
 		(18.04)
-		    :
+		    true
 		    ;;
 		(19.10)
-		    :
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -80,7 +80,7 @@ validate_platform() {
 	(opensuse-leap)
 	    case "$VERSION_ID" in
 		(15.1)
-		    :
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -90,7 +90,7 @@ validate_platform() {
 	(opensuse-tumbleweed)
 	    case "$VERSION_ID" in
 		(2019*)
-		    :
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -100,7 +100,7 @@ validate_platform() {
 	(fedora)
 	    case "$VERSION_ID" in
 		(31)
-		    :
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -110,10 +110,10 @@ validate_platform() {
 	(rhel|ol)
 	    case "$VERSION_ID" in
 		(7.[78])
-		    :
+		    true
 		    ;;
 		(8.[12])
-		    :
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -123,7 +123,7 @@ validate_platform() {
 	(centos)
 	    case "$VERSION_ID" in
 		(7)
-		    :
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -133,10 +133,10 @@ validate_platform() {
 	(freebsd)
 	    case "$VERSION_ID" in
 		(11.3-*)
-		    :
+		    true
 		    ;;
 		(12.1-*)
-		    :
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -145,8 +145,8 @@ validate_platform() {
 	    ;;
 	(illumos)
 	    case "$VERSION_ID" in
-		(2019.10)
-		    :
+		(2019.10|2020.04)
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -156,10 +156,10 @@ validate_platform() {
 	(macos)
 	    case "$VERSION_ID" in
 		(10.14.*)
-		    :
+		    true
 		    ;;
 		(10.15.*)
-		    :
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -167,7 +167,7 @@ validate_platform() {
 	    esac
 	    ;;
 	(netbsd)
-	    :
+	    true
 	    ;;
 	(*)
 	    abort_not_supported "Operating system"
