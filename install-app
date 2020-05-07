@@ -161,7 +161,7 @@ install_app() {
 
 	install_file 644 Pipfile $APP_DIR/Pipfile
 	install_file 600 app.ini $APP_DIR/app.ini
-	install_app_files 644 app $APP_DIR
+	install_app_files 644 $APP_MODULE $APP_DIR
 	install_virtualenv $APP_DIR/${VENV_DIRECTORY-venv}
 	generate_service_ini $APP_CONFIG "$APP_VARS"
 	create_dirs $APP_VARDIR $APP_LOGDIR $APP_RUNDIR
