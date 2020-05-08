@@ -16,8 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-APP_ENV_VARS="DATABASE_DIALECT DATABASE_HOST DATABASE_PASSWORD DATABASE_PORT \
-DATABASE_SCHEMA DATABASE_USER FLASK_APP FLASK_ENV"
+APP_ENV_VARS="DATABASE_DIALECT DATABASE_FILENAME DATABASE_HOST \
+DATABASE_INSTANCE DATABASE_PASSWORD DATABASE_PORT DATABASE_USER"
+
+FLASK_ENV_VARS="FLASK_APP FLASK_ENV"
+
 ENV_VERBOSE=false
 
 : ${LANG:=en_US.UTF-8}
@@ -31,6 +34,15 @@ abort() {
 
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+export_parameters() {
+    for var; do
+	# Export nonempty parameters only
+	if [ -n "${var-}" ]; then
+	    export $var
+	fi
+    done
 }
 
 get_realpath() (
@@ -95,6 +107,12 @@ run_in_virtualenv() {
     done
 
     shift $(($OPTIND - 1))
+
+    if [ -z "${FLASK_APP-}" -a -n "${APP_MODULE-}" ]; then
+	FLASK_APP=$APP_MODULE
+    fi
+
+    export_parameters $FLASK_ENV_VARS
     pipenv=$(get_command pipenv || true)
 
     if [ -z "$pipenv" ]; then
@@ -114,13 +132,6 @@ run_via_pip() {
     pip_install_files=$PIP_INSTALL_ALL
     refresh_via_pip ${VENV_DIRECTORY-venv}
 
-    # Export nonempty parameters only
-    for var in $APP_ENV_VARS; do
-	if [ -n "${var-}" ]; then
-	    export $var
-	fi
-    done
-
     if [ -r .env ]; then
 	if [ "${VENV_VERBOSE-false}" = true ]; then
 	    printf "%s\n" "Loading .env environment variables" >&2
@@ -129,6 +140,7 @@ run_via_pip() {
 	. ./.env
     fi
 
+    export_parameters $APP_ENV_VARS
     eval "$@"
 }
 
