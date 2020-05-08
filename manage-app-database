@@ -34,23 +34,29 @@ format_action() {
 }
 
 format_database() {
-    case "$DATABASE_DIALECT" in
+    case "${1:-sqlite}" in
 	(mssql)
-	    printf '\\"%s\\"\n' "$1"
+	    printf '\\"%s\\"\n' "$2"
 	    ;;
 	(mysql)
-	    printf '\\`%s\\`\n' "$1"
+	    printf '\\`%s\\`\n' "$2"
 	    ;;
 	(oracle)
-	    printf '\\"%s\\"\n' "$1"
+	    printf '\\"%s\\"\n' "$2"
 	    ;;
 	(postgresql)
-	    printf '\\"%s\\"\n' "$1"
+	    printf '\\"%s\\"\n' "$2"
 	    ;;
 	(*)
 	    abort "%s: Invalid SQL dialect: %s\n" "$0" "$1"
 	    ;;
     esac
+}
+
+get_command() {
+    printf '%s %s;\n' \
+	   "$(format_action $action)" \
+	   "$(format_database $1 $2)"
 }
 
 get_realpath() (
@@ -72,7 +78,16 @@ get_realpath() (
 
 manage_app_database() {
     eval $(get-configuration app.ini)
-    run-sql -c "$(format_action $action) $(format_database $DATABASE_INSTANCE);"
+
+    if [ "${DATABASE_DIALECT-}" = sqlite ]; then
+	return 0
+    fi
+
+    if [ -z "${DATABASE_INSTANCE-}" ]; then
+	return 0
+    fi
+
+    run-sql -c "$(get_command $DATABASE_DIALECT $DATABASE_INSTANCE)"
 }
 
 parse_arguments() {
