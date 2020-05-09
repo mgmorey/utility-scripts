@@ -179,6 +179,13 @@ install_zip_files() (
 
 validate_platform() {
     case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(8)
+		    return
+		    ;;
+	    esac
+	    ;;
 	(debian|raspbian)
 	    case "$VERSION_ID" in
 		(10)
@@ -186,9 +193,9 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
-	(rhel|ol|centos)
+	(rhel|ol)
 	    case "$VERSION_ID" in
-		(8.1)
+		(8.*)
 		    return
 		    ;;
 	    esac
