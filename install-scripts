@@ -88,7 +88,8 @@ get_script_files() {
     assert [ -n "$1" ]
     find "$1" \
 	 -maxdepth 1 \
-	 -name '[a-z]*' \
+	 ! -name LICENSE \
+	 ! -name README \
 	 ! -name "$(basename "$0")" \
 	 ! -name '*.sh' \
 	 ! -name '*~' \
