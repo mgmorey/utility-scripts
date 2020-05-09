@@ -91,7 +91,7 @@ get_script_files() {
 	 ! -name LICENSE \
 	 ! -name README \
 	 ! -name "$(basename "$0")" \
-	 ! -name '*.sh' \
+	 ! -name '*.*' \
 	 ! -name '*~' \
 	 -type f
 }
