@@ -63,9 +63,16 @@ get_python_sqlite_packages() {
 		    ;;
 	    esac
 	    ;;
-	(rhel|ol|centos)
+	(centos)
 	    case "$VERSION_ID" in
-		(7|7.*)
+		(7)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+	    esac
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(7.*)
 		    packages=$REDHAT_7_PKGS
 		    ;;
 	    esac

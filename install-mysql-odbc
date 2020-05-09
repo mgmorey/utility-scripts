@@ -85,7 +85,17 @@ install_platform() {
 
 parse_arguments() {
     case "$ID" in
-	(rhel|ol|centos)
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    rpmfile=${PKG_NAME}-8.0.*-*.el7.x86_64.rpm
+		    ;;
+		(8)
+		    rpmfile=${PKG_NAME}-8.0.*-*.el8.x86_64.rpm
+		    ;;
+	    esac
+	    ;;
+	(rhel|ol)
 	    case "$VERSION_ID" in
 		(7.*)
 		    rpmfile=${PKG_NAME}-8.0.*-*.el7.x86_64.rpm
@@ -145,6 +155,16 @@ postinstall_platform() {
 
 validate_platform() {
     case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    return
+		    ;;
+		(8)
+		    return
+		    ;;
+	    esac
+	    ;;
 	(debian|raspbian)
 	    case "$VERSION_ID" in
 		(10)
@@ -152,7 +172,7 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
-	(rhel|ol|centos)
+	(rhel|ol)
 	    case "$VERSION_ID" in
 		(7.*)
 		    return
@@ -175,9 +195,10 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
     esac
-
-    abort_not_supported "Operating system"
 }
 
 if [ $# -lt 1 ]; then

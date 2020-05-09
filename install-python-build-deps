@@ -41,6 +41,9 @@ configure_platform() {
 		    (10)
 			package=$DEBIAN_PKG
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (ubuntu)
@@ -50,6 +53,12 @@ configure_platform() {
 			;;
 		    (19.10)
 			package=$DEBIAN_PKG
+			;;
+		    (20.04)
+			package=$DEBIAN_PKG
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;
@@ -97,6 +106,9 @@ validate_platform() {
 		    (2)
 			return
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (centos)
@@ -104,12 +116,18 @@ validate_platform() {
 		    (7)
 			return
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (debian)
 		case "$VERSION_ID" in
 		    (10)
 			return
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;
@@ -120,6 +138,12 @@ validate_platform() {
 			;;
 		    (31)
 			return
+			;;
+		    (32)
+			return
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;
@@ -134,6 +158,9 @@ validate_platform() {
 		    (8.*)
 			return
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (ubuntu)
@@ -143,6 +170,12 @@ validate_platform() {
 			;;
 		    (19.10)
 			return
+			;;
+		    (20.04)
+			return
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;
@@ -154,12 +187,21 @@ validate_platform() {
 		    (12.1-*)
 			return
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (illumos)
 		case "$VERSION_ID" in
 		    (2019.*)
 			return
+			;;
+		    (2020.*)
+			return
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;
@@ -171,12 +213,18 @@ validate_platform() {
 		    (8.1)
 			return
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (solaris)
 		case "$VERSION_ID" in
 		    (11.4)
 			return
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;

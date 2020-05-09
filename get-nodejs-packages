@@ -64,11 +64,11 @@ get_nodejs_packages() {
 	    (debian)
 		packages=$DEBIAN_PKGS
 		;;
-	    (opensuse)
-		packages=$OPENSUSE_PKGS
-		;;
 	    (fedora)
 		packages=$FEDORA_PKGS
+		;;
+	    (opensuse)
+		packages=$OPENSUSE_PKGS
 		;;
 	    (rhel|ol|centos)
 		packages=$REDHAT_PKGS

@@ -72,21 +72,31 @@ get_python_virtualenv_packages() {
 		    ;;
 	    esac
 	    ;;
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+		(8)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+	    esac
+	    ;;
 	(debian|raspbian)
 	    packages="$DEBIAN_PKGS"
-	    ;;
-	(opensuse-*)
-	    packages=$OPENSUSE_PKGS
 	    ;;
 	(fedora)
 	    packages=$FEDORA_PKGS
 	    ;;
-	(rhel|ol|centos)
+	(opensuse-*)
+	    packages=$OPENSUSE_PKGS
+	    ;;
+	(rhel|ol)
 	    case "$VERSION_ID" in
-		(7|7.*)
+		(7.*)
 		    packages=$REDHAT_7_PKGS
 		    ;;
-		(8|8.*)
+		(8.*)
 		    packages=$REDHAT_8_PKGS
 		    ;;
 	    esac

@@ -44,6 +44,9 @@ configure_platform() {
 		    (8)
 			install-epel
 			;;
+		    (*)
+			break
+			;;
 		esac
 		break
 		;;
@@ -61,16 +64,6 @@ configure_platform() {
 		;;
 	    (rhel|ol)
 		is_pattern_supported=true
-
-		# case "$VERSION_ID" in
-		#     (7.*)
-		# 	install-epel
-		# 	;;
-		#     (8.*)
-		# 	install-epel
-		# 	;;
-		# esac
-
 		break
 		;;
 	    (solaris)
@@ -311,6 +304,9 @@ validate_platform() {
 		    (8)
 			return
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (debian)
@@ -329,6 +325,9 @@ validate_platform() {
 			;;
 		    (8.*)
 			return
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;

@@ -173,7 +173,7 @@ get_os_version_id() {
 		(ubuntu)
 		    printf "%s\n" "$VERSION" | awk '{print $1}'
 		    ;;
-		(fedora|rhel|ol|centos)
+		(rhel|ol|centos|fedora)
 		    get-redhat-version /etc/redhat-release
 		    ;;
 	    esac

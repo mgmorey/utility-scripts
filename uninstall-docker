@@ -124,7 +124,7 @@ validate_platform() {
 		(debian|raspbian|ubuntu)
 		    :
 		    ;;
-		(opensuse-*|fedora|rhel|ol|centos)
+		(opensuse-*|rhel|ol|centos|fedora)
 		    :
 		    ;;
 		(*)

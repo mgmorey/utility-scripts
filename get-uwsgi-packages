@@ -66,8 +66,28 @@ get_uwsgi_packages() {
     packages=
 
     case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(8)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+	    esac
+	    ;;
 	(debian|raspbian)
 	    packages=$DEBIAN_10_PKGS
+	    ;;
+	(fedora)
+	    packages=$FEDORA_PKGS
+	    ;;
+	(opensuse-*)
+	    packages=$OPENSUSE_PKGS
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(8.*)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+	    esac
 	    ;;
 	(ubuntu)
 	    case "$VERSION_ID" in
@@ -79,19 +99,6 @@ get_uwsgi_packages() {
 		    ;;
 		(20.04)
 		    packages=$UBUNTU_20_PKGS
-		    ;;
-	    esac
-	    ;;
-	(opensuse-*)
-	    packages=$OPENSUSE_PKGS
-	    ;;
-	(fedora)
-	    packages=$FEDORA_PKGS
-	    ;;
-	(rhel|ol|centos)
-	    case "$VERSION_ID" in
-		(8|8.*)
-		    packages=$REDHAT_8_PKGS
 		    ;;
 	    esac
 	    ;;

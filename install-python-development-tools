@@ -79,12 +79,31 @@ validate_platform() {
 		    (2)
 			return
                         ;;
+		    (*)
+			break
+                        ;;
+                esac
+		;;
+	    (centos)
+                case "$VERSION_ID" in
+		    (7)
+			return
+                        ;;
+		    (8)
+			return
+			;;
+		    (*)
+			break
+			;;
                 esac
 		;;
 	    (debian)
                 case "$VERSION_ID" in
 		    (10)
 			return
+                        ;;
+		    (*)
+			break
                         ;;
                 esac
 	    	;;
@@ -94,13 +113,16 @@ validate_platform() {
 	    (opensuse)
 		return
 	    	;;
-	    (rhel|ol|centos)
+	    (rhel|ol)
                 case "$VERSION_ID" in
-		    (7|7.*)
+		    (7.*)
 			return
                         ;;
-		    (8|8.*)
+		    (8.*)
 			return
+			;;
+		    (*)
+			break
 			;;
                 esac
 		;;
@@ -111,6 +133,12 @@ validate_platform() {
                         ;;
 		    (19.*)
 			return
+			;;
+		    (20.*)
+			return
+			;;
+		    (*)
+			break
 			;;
                 esac
 	    	;;

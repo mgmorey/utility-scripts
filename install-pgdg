@@ -81,6 +81,16 @@ preinstall_platform() {
 
 validate_platform() {
     case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(8)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
 	(debian|raspbian)
 	    case "$VERSION_ID" in
 		(10)
@@ -91,13 +101,13 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
-	(rhel|ol|centos)
+	(rhel|ol)
 	    case "$VERSION_ID" in
 		(8.*)
 		    true
 		    ;;
 		(*)
-		    true
+		    abort_not_supported Release
 		    ;;
 	    esac
 	    ;;
@@ -114,9 +124,10 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
     esac
-
-    abort_not_supported "Operating system"
 }
 
 if [ $# -gt 0 ]; then

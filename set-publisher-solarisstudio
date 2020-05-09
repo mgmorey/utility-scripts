@@ -69,7 +69,7 @@ validate_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (illumos)
-		abort_not_supported "Operating system"
+		break
     		;;
 	    (solaris)
 		return

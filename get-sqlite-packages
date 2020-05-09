@@ -67,11 +67,11 @@ get_sqlite_packages() {
 	(debian|raspbian)
 	    packages=$DEBIAN_PKGS
 	    ;;
-	(opensuse-*)
-	    packages=$OPENSUSE_PKGS
-	    ;;
 	(fedora)
 	    packages=$FEDORA_PKGS
+	    ;;
+	(opensuse-*)
+	    packages=$OPENSUSE_PKGS
 	    ;;
 	(rhel|ol|centos|amzn)
 	    packages=$REDHAT_PKGS

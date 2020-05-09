@@ -102,9 +102,10 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
     esac
-
-    abort_not_supported "Operating system"
 }
 
 if [ $# -gt 0 ]; then

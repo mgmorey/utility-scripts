@@ -93,12 +93,18 @@ install_homebrew() {
 			install_linuxbrew
 			break
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (debian)
 		case "$VERSION_ID" in
 		    (10)
 			install_linuxbrew
+			break
+			;;
+		    (*)
 			break
 			;;
 		esac
@@ -121,6 +127,9 @@ install_homebrew() {
 			install_linuxbrew
 			break
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (ubuntu)
@@ -131,6 +140,13 @@ install_homebrew() {
 			;;
 		    (19.10)
 			run_unpriv brew
+			break
+			;;
+		    (20.04)
+			run_unpriv brew
+			break
+			;;
+		    (*)
 			break
 			;;
 		esac
@@ -171,12 +187,18 @@ validate_platform() {
 		    (8)
 			return
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (debian)
 		case "$VERSION_ID" in
 		    (10)
 			return
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;
@@ -194,6 +216,9 @@ validate_platform() {
 		    (8.*)
 			return
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (ubuntu)
@@ -203,6 +228,12 @@ validate_platform() {
 			;;
 		    (19.10)
 			return
+			;;
+		    (20.04)
+			return
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;

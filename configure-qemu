@@ -101,11 +101,8 @@ validate_platform() {
 	(debian|raspbian|ubuntu)
 	    true
 	    ;;
-	(opensuse-*|fedora|rhel|ol|centos)
+	(opensuse-*|rhel|ol|centos|fedora)
 	    true
-	    ;;
-	(*)
-	    abort_not_supported Distro
 	    ;;
 	(freebsd|macos|windows)
 	    true

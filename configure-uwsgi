@@ -95,10 +95,10 @@ validate_platform() {
 	(Linux|GNU)
 	    case "$ID" in
 		(debian|raspbian|ubuntu)
-		    :
+		    true
 	    	    ;;
-		(opensuse-*|fedora|rhel|ol|centos)
-		    :
+		(opensuse-*|rhel|ol|centos|fedora)
+		    true
 	    	    ;;
 		(*)
 		    abort_not_supported Distro
@@ -106,7 +106,7 @@ validate_platform() {
 	    esac
 	    ;;
 	(FreeBSD|SunOS|CYGWIN_NT-*)
-	    :
+	    true
     	    ;;
 	(*)
 	    abort_not_supported "Operating system"

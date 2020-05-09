@@ -70,8 +70,15 @@ get_python_pip_packages() {
 		(2)
 		    packages=$AMAZON_2_PKGS
 		    ;;
-		(*)
-		    break
+	    esac
+	    ;;
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+		(8)
+		    packages=$REDHAT_8_PKGS
 		    ;;
 	    esac
 	    ;;
@@ -84,16 +91,13 @@ get_python_pip_packages() {
 	(fedora)
 	    packages=$FEDORA_PKGS
 	    ;;
-	(rhel|ol|centos)
+	(rhel|ol)
 	    case "$VERSION_ID" in
-		(7|7.*)
+		(7.*)
 		    packages=$REDHAT_7_PKGS
 		    ;;
-		(8|8.*)
+		(8.*)
 		    packages=$REDHAT_8_PKGS
-		    ;;
-		(*)
-		    break
 		    ;;
 	    esac
 	    ;;
@@ -107,9 +111,6 @@ get_python_pip_packages() {
 		    ;;
 		(20.04)
 		    packages="$DEBIAN_PKGS"
-		    ;;
-		(*)
-		    break
 		    ;;
 	    esac
 	    ;;

@@ -107,29 +107,30 @@ get_realpath() (
 validate_platform() {
     case "$ID" in
 	(centos)
-	    return
+	    true
 	    ;;
 	(debian|raspbian)
-	    return
+	    true
 	    ;;
 	(fedora)
-	    return
+	    true
 	    ;;
 	(ol)
-	    return
+	    true
 	    ;;
 	(opensuse-*)
-	    return
+	    true
 	    ;;
 	(rhel)
-	    return
+	    true
 	    ;;
 	(ubuntu)
-	    return
+	    true
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
 	    ;;
     esac
-
-    abort_not_supported "Operating system"
 }
 
 if [ $# -gt 0 ]; then

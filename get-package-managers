@@ -38,6 +38,19 @@ get_package_managers() {
 			;;
 		esac
 		;;
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			managers="/usr/bin/yum"
+			;;
+		    (8)
+			managers="/usr/bin/dnf"
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
 	    (debian)
 		managers="/usr/bin/apt-get"
 		;;
@@ -47,12 +60,12 @@ get_package_managers() {
 	    (opensuse)
 		managers="/usr/bin/zypper"
 		;;
-	    (rhel|ol|centos)
+	    (rhel|ol)
 		case "$VERSION_ID" in
-		    (7|7.*)
+		    (7.*)
 			managers="/usr/bin/yum"
 			;;
-		    (8|8.*)
+		    (8.*)
 			managers="/usr/bin/dnf"
 			;;
 		    (*)

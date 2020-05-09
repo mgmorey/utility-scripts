@@ -58,6 +58,16 @@ get_python_metadata() {
 		    ;;
 	    esac
 	    ;;
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    data="$REDHAT_7_DATA"
+		    ;;
+		(8)
+		    data="$REDHAT_8_DATA"
+		    ;;
+	    esac
+	    ;;
 	(debian|raspbian)
 	    data="$DEBIAN_DATA"
 	    ;;
@@ -67,12 +77,12 @@ get_python_metadata() {
 	(opensuse-*)
 	    data="$OPENSUSE_DATA"
 	    ;;
-	(rhel|ol|centos)
+	(rhel|ol)
 	    case "$VERSION_ID" in
-		(7|7.*)
+		(7.*)
 		    data="$REDHAT_7_DATA"
 		    ;;
-		(8|8.*)
+		(8.*)
 		    data="$REDHAT_8_DATA"
 		    ;;
 	    esac

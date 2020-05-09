@@ -60,7 +60,7 @@ add_repositories() {
 		add-apt-repository "$repo"
 		break
 		;;
-	    (fedora|rhel|ol|centos)
+	    (rhel|ol|centos|fedora)
 		repo_id=docker-ce-stable/$(uname -m)
 		data=$($manager repolist | get_repository_data $repo_id)
 
@@ -175,7 +175,7 @@ get_docker_repo() {
 	    (debian)
 		repo="deb [arch=$arch] $1 $(get_codename) stable"
 		;;
-	    (fedora|rhel|ol|centos)
+	    (rhel|ol|centos|fedora)
 		repo="$DOCKER_BASE_URL/linux/centos/docker-ce.repo"
 		;;
 	esac
@@ -332,7 +332,17 @@ validate_platform() {
 
     case "$ID" in
 	(centos)
-	    true
+	    case "$VERSION_ID" in
+		(7)
+		    true
+		    ;;
+		(8)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
 	    ;;
 	(debian|raspbian)
 	    true
@@ -340,12 +350,12 @@ validate_platform() {
 	(fedora)
 	    true
 	    ;;
-	(rhel|ol|centos)
+	(rhel|ol)
 	    case "$VERSION_ID" in
-		(7|7.*)
+		(7.*)
 		    true
 		    ;;
-		(8|8.*)
+		(8.*)
 		    true
 		    ;;
 		(*)
@@ -358,9 +368,10 @@ validate_platform() {
 		abort_not_supported Release
 	    fi
 	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
     esac
-
-    abort_not_supported "Operating system"
 }
 
 if [ $# -gt 0 ]; then

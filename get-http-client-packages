@@ -51,8 +51,40 @@ get_http_client_packages() {
 		    ;;
 	    esac
 	    ;;
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    packages=$REDHAT_PKGS
+		    ;;
+		(8)
+		    packages=$REDHAT_PKGS
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
 	(debian|raspbian)
 	    packages=$DEBIAN_10_PKGS
+	    ;;
+	(fedora)
+	    packages=$REDHAT_PKGS
+	    ;;
+	(opensuse-*)
+	    packages=$OPENSUSE_PKGS
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    packages=$REDHAT_PKGS
+		    ;;
+		(8.*)
+		    packages=$REDHAT_PKGS
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
 	    ;;
 	(ubuntu)
 	    case "$VERSION_ID" in
@@ -64,25 +96,6 @@ get_http_client_packages() {
 		    ;;
 		(20.04)
 		    packages=$DEBIAN_PKGS
-		    ;;
-		(*)
-		    break
-		    ;;
-	    esac
-	    ;;
-	(opensuse-*)
-	    packages=$OPENSUSE_PKGS
-	    ;;
-	(fedora)
-	    packages=$REDHAT_PKGS
-	    ;;
-	(rhel|ol|centos)
-	    case "$VERSION_ID" in
-		(7|7.*)
-		    packages=$REDHAT_PKGS
-		    ;;
-		(8|8.*)
-		    packages=$REDHAT_PKGS
 		    ;;
 		(*)
 		    break

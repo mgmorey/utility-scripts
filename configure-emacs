@@ -422,11 +422,21 @@ validate_platform() {
 	(debian|raspbian)
 	    return
 	    ;;
+	(fedora)
+	    return
+	    ;;
 	(opensuse-*)
 	    return
 	    ;;
-	(rhel|fedora|centos)
-	    return
+	(rhel|centos)
+            case "$VERSION_ID" in
+                (8)
+		    return
+		    ;;
+                (*)
+		    abort_not_supported Release
+		    ;;
+            esac
 	    ;;
 	(freebsd)
 	    return
@@ -440,9 +450,10 @@ validate_platform() {
 	(windows)
 	    return
 	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
     esac
-
-    abort_not_supported "Operating system"
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
