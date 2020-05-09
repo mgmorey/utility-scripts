@@ -21,7 +21,7 @@ This project has been tested on the following platforms:
 +-----------+---------------+-------------------------------+
 | GNU/Linux | Raspbian      | 10 (armhf)                    |
 +-----------+---------------+-------------------------------+
-| GNU/Linux | Red Hat       | Enterprise Linux 8.1 (x86_64) |
+| GNU/Linux | Red Hat       | Enterprise Linux 8.2 (x86_64) |
 +-----------+---------------+-------------------------------+
 | GNU/Linux | Ubuntu        | 18.04 LTS (amd64)             |
 +-----------+---------------+-------------------------------+
