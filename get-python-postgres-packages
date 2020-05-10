@@ -90,6 +90,9 @@ get_python_postgres_packages() {
 		(31)
 		    packages=$FEDORA_PKGS
 		    ;;
+		(32)
+		    packages=$FEDORA_PKGS
+		    ;;
 	    esac
 	    ;;
 	(opensuse-leap)
