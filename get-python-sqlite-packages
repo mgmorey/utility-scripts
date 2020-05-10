@@ -16,15 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-AMAZON_2_PKGS="%s-sqlite3"
-
 FREEBSD_PKGS="%s-sqlite3"
 
 ILLUMOS_PKGS=":%s-sqlite3"
 
 NETBSD_PKGS="%s-sqlite3"
-
-REDHAT_7_PKGS="%s-sqlite3"
 
 abort() {
     printf "$@" >&2
@@ -56,27 +52,6 @@ get_python_sqlite_packages() {
     packages=
 
     case "$ID" in
-	(amzn)
-	    case "$VERSION_ID" in
-		(2)
-		    packages=$AMAZON_2_PKGS
-		    ;;
-	    esac
-	    ;;
-	(centos)
-	    case "$VERSION_ID" in
-		(7)
-		    packages=$REDHAT_7_PKGS
-		    ;;
-	    esac
-	    ;;
-	(rhel|ol)
-	    case "$VERSION_ID" in
-		(7.*)
-		    packages=$REDHAT_7_PKGS
-		    ;;
-	    esac
-	    ;;
 	(freebsd)
 	    packages=$FREEBSD_PKGS
 	    ;;
