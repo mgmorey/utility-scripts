@@ -317,7 +317,7 @@ print_parameters() {
 		printf 'setenv %s "%s";\n' "$var" "$value"
 		;;
 	    (fish)
-		printf 'set -x %s "%s"\n' "$var" "$value"
+		printf 'set -x %s "%s";\n' "$var" "$value"
 		;;
 	    (*)
 		printf '%s="%s"\n' "$var" "$value"
