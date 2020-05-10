@@ -34,6 +34,10 @@ REDHAT_8_PKGS="libpq-devel %s-psycopg2"
 
 SOLARIS_PKGS="database/postgres"
 
+UBUNTU_18_PKGS="libpq-dev %s-psycopg2"
+UBUNTU_19_PKGS="libpq-dev %s-psycopg2"
+UBUNTU_20_PKGS="libpq-dev %s-psycopg2"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -110,6 +114,19 @@ get_python_postgres_packages() {
 	    case "$VERSION_ID" in
 		(8.*)
 		    packages=$REDHAT_8_PKGS
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    packages=$UBUNTU_18_PKGS
+		    ;;
+		(19.10)
+		    packages=$UBUNTU_19_PKGS
+		    ;;
+		(20.04)
+		    packages=$UBUNTU_20_PKGS
 		    ;;
 	    esac
 	    ;;
