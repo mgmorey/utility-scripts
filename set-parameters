@@ -55,7 +55,7 @@ configure_platform() {
 }
 
 get_homebrew_binary() (
-    for dir in ~/.linuxbrew $BREW_DIR /usr/local; do
+    for dir in $HOME/.linuxbrew $BREW_DIR /usr/local; do
 	if [ -x $dir/bin/brew ]; then
 	    printf "%s\n" "$dir/bin/brew"
 	fi
@@ -161,7 +161,7 @@ include_homebrew_keg_directories() {
 	return
     fi
 
-    for pkg in $(~/bin/brew-list-keg-only 2>/dev/null || true); do
+    for pkg in $($HOME/bin/brew-list-keg-only 2>/dev/null || true); do
 	if [ -d $prefix/$pkg/include ]; then
 	    CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
 	fi
@@ -202,8 +202,8 @@ include_macos_directories() {
 
     # set PATH so it includes user's private Python 3 bin if it exists
     for version in 3.8 3.7 3.6; do
-	if [ -d "~/Library/Python/$version/bin" ] ; then
-	    PATH="~/Library/Python/$version/bin${PATH:+:$PATH}"
+	if [ -d "$HOME/Library/Python/$version/bin" ] ; then
+	    PATH="$HOME/Library/Python/$version/bin${PATH:+:$PATH}"
 	    break
 	fi
     done
@@ -238,28 +238,28 @@ include_platform_directories() {
 }
 
 include_profile_directories() {
-    INFOPATH="$(remove_directory "~/info" "${INFOPATH-}")"
-    MANPATH="$(remove_directory "~/man" "${MANPATH-}")"
-    PATH="$(remove_directory "~/bin" "${PATH-}")"
+    INFOPATH="$(remove_directory "$HOME/info" "${INFOPATH-}")"
+    MANPATH="$(remove_directory "$HOME/man" "${MANPATH-}")"
+    PATH="$(remove_directory "$HOME/bin" "${PATH-}")"
 
     for dir in $PROFILE_BINDIRS; do
-	PATH="$(remove_directory "~/$dir" "${PATH-}")"
+	PATH="$(remove_directory "$HOME/$dir" "${PATH-}")"
     done
 
     # add user info directory to INFOPATH (if it exists)
-    if ! is_included "~/info" "${PATH-}"; then
-	INFOPATH="~/info${INFOPATH:+:$INFOPATH}"
+    if ! is_included "$HOME/info" "${PATH-}"; then
+	INFOPATH="$HOME/info${INFOPATH:+:$INFOPATH}"
     fi
 
     # add user man directory to MANPATH (if it exists)
-    if ! is_included "~/man" "${PATH-}"; then
-	MANPATH="~/man${MANPATH:+:$MANPATH}"
+    if ! is_included "$HOME/man" "${PATH-}"; then
+	MANPATH="$HOME/man${MANPATH:+:$MANPATH}"
     fi
 
     # add user binary directories to PATH (if they exist)
     for dir in $PROFILE_BINDIRS; do
-	if ! is_included "~/$dir" "${PATH-}"; then
-	    PATH="~/$dir${PATH:+:$PATH}"
+	if ! is_included "$HOME/$dir" "${PATH-}"; then
+	    PATH="$HOME/$dir${PATH:+:$PATH}"
 	fi
     done
 }
@@ -309,12 +309,15 @@ print_parameters() {
 	    continue
 	fi
 
-	case $(basename $shell) in
-	    (bash|fish|ksh|ksh93|rbash|zsh)
+	case "$(basename $shell)" in
+	    (*bash|ksh*|zsh)
 		printf 'export %s="%s"\n' "$var" "$value"
 		;;
 	    (csh|tcsh)
 		printf 'setenv %s "%s";\n' "$var" "$value"
+		;;
+	    (fish)
+		printf 'set -x %s "%s"\n' "$var" "$value"
 		;;
 	    (*)
 		printf '%s="%s"\n' "$var" "$value"
@@ -357,10 +360,13 @@ usage() {
 
 validate_arguments() {
     case $(basename $shell) in
-	(bash|fish|ksh|ksh93|rbash|zsh)
+	(*bash|ksh*|zsh)
 	    true
 	    ;;
 	(csh|tcsh)
+	    true
+	    ;;
+	(fish)
 	    true
 	    ;;
 	(sh)

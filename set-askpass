@@ -84,13 +84,16 @@ set_askpass() {
 		var=$(printf "%s\n" ${command}_askpass | to_upper)
 
 		case $(basename $shell) in
-		    (bash|fish|ksh|ksh93|rbash|zsh)
+		    (*bash|ksh*|zsh)
 			printf 'export %s="%s"\n' "$var" "$askpass_helper"
 			;;
 		    (csh|tcsh)
 			printf 'setenv %s "%s";\n' "$var" "$askpass_helper"
 			;;
-		    (sh)
+		    (fish)
+			printf 'set -x %s "%s"\n' "$var" "$askpass_helper"
+			;;
+		    (*)
 			printf '%s="%s"\n' "$var" "$askpass_helper"
 			printf 'export %s\n' "$var"
 			;;
@@ -120,10 +123,13 @@ usage() {
 
 validate_arguments() {
     case $(basename $shell) in
-	(bash|fish|ksh|ksh93|rbash|zsh)
+	(*bash|ksh*|zsh)
 	    true
 	    ;;
 	(csh|tcsh)
+	    true
+	    ;;
+	(fish)
 	    true
 	    ;;
 	(sh)
