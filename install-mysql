@@ -99,10 +99,10 @@ validate_platform() {
 	    ;;
 	(opensuse-tumbleweed)
 	    case "$VERSION_ID" in
-		(2019????)
+		(2019*)
 		    true
 		    ;;
-		(2020????)
+		(2020*)
 		    true
 		    ;;
 		(*)
@@ -112,10 +112,10 @@ validate_platform() {
 	    ;;
 	(rhel|ol)
 	    case "$VERSION_ID" in
-		(7.[78])
+		(7.*)
 		    true
 		    ;;
-		(8.[12])
+		(8.*)
 		    true
 		    ;;
 		(*)
@@ -125,13 +125,13 @@ validate_platform() {
 	    ;;
 	(ubuntu)
 	    case "$VERSION_ID" in
-		(18.04)
+		(18.*)
 		    true
 		    ;;
-		(19.10)
+		(19.*)
 		    true
 		    ;;
-		(20.04)
+		(20.*)
 		    true
 		    ;;
 		(*)
@@ -154,7 +154,10 @@ validate_platform() {
 	    ;;
 	(illumos)
 	    case "$VERSION_ID" in
-		(2019.10|2020.04)
+		(2019.10)
+		    true
+		    ;;
+		(2020.04)
 		    true
 		    ;;
 		(*)

@@ -54,6 +54,16 @@ install_nodejs() {
 
 validate_platform() {
     case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
 	(debian|raspbian)
 	    case "$VERSION_ID" in
 		(10)
@@ -64,12 +74,9 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
-	(ubuntu)
+	(fedora)
 	    case "$VERSION_ID" in
-		(18.04)
-		    true
-		    ;;
-		(19.10)
+		(32)
 		    true
 		    ;;
 		(*)
@@ -97,22 +104,12 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
-	(fedora)
-	    case "$VERSION_ID" in
-		(32)
-		    true
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
 	(rhel|ol)
 	    case "$VERSION_ID" in
-		(7.[78])
+		(7.*)
 		    true
 		    ;;
-		(8.[12])
+		(8.*)
 		    true
 		    ;;
 		(*)
@@ -120,9 +117,15 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
-	(centos)
+	(ubuntu)
 	    case "$VERSION_ID" in
-		(7)
+		(18.*)
+		    true
+		    ;;
+		(19.*)
+		    true
+		    ;;
+		(20.*)
 		    true
 		    ;;
 		(*)
@@ -145,7 +148,10 @@ validate_platform() {
 	    ;;
 	(illumos)
 	    case "$VERSION_ID" in
-		(2019.10|2020.04)
+		(2019.10)
+		    true
+		    ;;
+		(2020.04)
 		    true
 		    ;;
 		(*)

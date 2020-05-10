@@ -97,10 +97,10 @@ configure_baseline() {
 		    ;;
 		(opensuse-tumbleweed)
 		    case "$VERSION_ID" in
-			(2019????)
+			(2019*)
 			    configure_linux_opensuse_tw
 			    ;;
-			(2020????)
+			(2020*)
 			    configure_linux_opensuse_tw
 			    ;;
 			(*)
@@ -187,7 +187,10 @@ configure_baseline() {
 	    case $ID in
 		(illumos)
 		    case "$VERSION_ID" in
-			(2019.10|2020.04)
+			(2019.10)
+			    configure_unix_illumos
+			    ;;
+			(2020.04)
 			    configure_unix_illumos
 			    ;;
 			(*)
