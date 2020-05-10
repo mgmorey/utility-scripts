@@ -116,7 +116,7 @@ get_uwsgi_packages() {
 	    ;;
     esac
 
-    get-python-packages ${packages-}
+    format-python-packages ${packages-}
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
