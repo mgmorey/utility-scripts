@@ -77,8 +77,8 @@ configure_baseline() {
 		    ;;
 		(fedora)
 		    case "$VERSION_ID" in
-			(31)
-			    configure_linux_fedora_31
+			(32)
+			    configure_linux_fedora_32
 			    ;;
 			(*)
 			    abort_not_supported Release
@@ -418,7 +418,7 @@ configure_linux_fedora() {
     UWSGI_PLUGIN_DIR=/usr/lib64/uwsgi
 }
 
-configure_linux_fedora_31() {
+configure_linux_fedora_32() {
     configure_linux_fedora
 }
 

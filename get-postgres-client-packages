@@ -89,9 +89,6 @@ get_postgres_client_packages() {
 	    ;;
 	(fedora)
 	    case "$VERSION_ID" in
-		(31)
-		    packages=$FEDORA_PKGS
-		    ;;
 		(32)
 		    packages=$FEDORA_PKGS
 		    ;;

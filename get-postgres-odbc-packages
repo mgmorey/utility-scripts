@@ -72,7 +72,7 @@ get_postgres_odbc_packages() {
 	    ;;
 	(fedora)
 	    case "$VERSION_ID" in
-		(31)
+		(32)
 		    packages=$FEDORA_PKGS
 		    ;;
 	    esac

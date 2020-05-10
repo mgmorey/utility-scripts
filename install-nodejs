@@ -99,7 +99,7 @@ validate_platform() {
 	    ;;
 	(fedora)
 	    case "$VERSION_ID" in
-		(31)
+		(32)
 		    true
 		    ;;
 		(*)
