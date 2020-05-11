@@ -28,7 +28,7 @@ ILLUMOS_PKGS="database/postgres-11/developer"
 
 MACOS_HOMEBREW_PKGS="libpq"
 
-OPENSUSE_PKGS=
+OPENSUSE_PKGS="postgresql-devel %s-psycopg2"
 
 REDHAT_8_PKGS="libpq-devel %s-psycopg2"
 
