@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-AMAZON_2_PKGS="libpq-devel %s-psycopg2"
+AMAZON_2_PKGS="libpq-devel postgresql-devel %s-psycopg2"
 
 DEBIAN_PKGS="libpq-dev %s-psycopg2"
 
@@ -30,7 +30,8 @@ MACOS_HOMEBREW_PKGS="libpq"
 
 OPENSUSE_PKGS="postgresql-devel %s-psycopg2"
 
-REDHAT_8_PKGS="libpq-devel %s-psycopg2"
+REDHAT_7_PKGS="postgresql-devel %s-psycopg2"
+REDHAT_8_PKGS="libpq-devel postgresql-devel %s-psycopg2"
 
 SOLARIS_PKGS="database/postgres"
 
@@ -77,6 +78,9 @@ get_python_postgres_packages() {
 	    ;;
 	(centos)
 	    case "$VERSION_ID" in
+		(7)
+		    packages=$REDHAT_7_PKGS
+		    ;;
 		(8)
 		    packages=$REDHAT_8_PKGS
 		    ;;
@@ -112,6 +116,9 @@ get_python_postgres_packages() {
 	    ;;
 	(rhel|ol)
 	    case "$VERSION_ID" in
+		(7.*)
+		    packages=$REDHAT_7_PKGS
+		    ;;
 		(8.*)
 		    packages=$REDHAT_8_PKGS
 		    ;;
