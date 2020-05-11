@@ -82,9 +82,6 @@ get_mysql_python_packages() {
 	(netbsd)
 	    packages=$NETBSD_PKGS
 	    ;;
-	(solaris)
-	    packages=$SOLARIS_PKG
-	    ;;
     esac
 
     format-python-packages ${packages-}
