@@ -1,7 +1,7 @@
-#!/bin/sh -eu
+#!/bin/sh
 
-# install-postgres: install PostgreSQL database packages
-# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+# install-postgresql-odbc: install PostgreSQL ODBC packages
+# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,6 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+NAME_ANSI="PostgreSQL ANSI"
+NAME_UNICODE="PostgreSQL Unicode"
+
+OBJECT_ANSI=psqlodbca.so
+OBJECT_UNICODE=psqlodbcw.so
+
+ODBC_INIFILE=/etc/odbcinst.ini
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -27,6 +35,22 @@ abort_not_supported() {
 
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+configure_platform() {
+    case "$ID" in
+	(debian|ubuntu)
+	    libdir=/usr/lib/x86_64-linux-gnu/odbc
+	    ;;
+	(rhel|ol)
+	    libdir=/usr/lib64
+	    ;;
+    esac
+}
+
+get_packages() {
+    (get-odbc-development-packages
+     get-postgresql-odbc-packages) | sort -u
 }
 
 get_realpath() (
@@ -46,27 +70,48 @@ get_realpath() (
     fi
 )
 
-install_postgres() {
+install_odbc_driver() {
+    if egrep '^[PostgreSQL .+]$' $ODBC_INIFILE >/dev/null 2>&1; then
+	return 0
+    fi
+
+    cat >>$ODBC_INIFILE <<EOF
+[$2]
+Driver=$1
+
+EOF
+}
+
+install_postgresql_odbc() {
     validate_platform
-    packages=$(get-postgres-packages "$@")
-    install-packages $packages
+    configure_platform
+    if install-pgdg; then
+	install-packages $(get_packages)
+	postinstall_platform
+    fi
+}
+
+postinstall_platform() {
+    case "$ID" in
+	(debian|ubuntu)
+	    if [ -d $libdir ]; then
+		for file in $libdir/*.so; do
+		    ln -sf $file /usr/local/lib
+		done
+	    fi
+	    ;;
+	(rhel|ol)
+	    for encoding in ANSI UNICODE; do
+		eval name="\$NAME_$encoding"
+		eval object="\$OBJECT_$encoding"
+		install_odbc_driver $libdir/$object "$name"
+	    done
+	    ;;
+    esac
 }
 
 validate_platform() {
     case "$ID" in
-	(centos)
-	    case "$VERSION_ID" in
-		(7)
-		    true
-		    ;;
-		(8)
-		    true
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
 	(debian|raspbian)
 	    case "$VERSION_ID" in
 		(10)
@@ -77,44 +122,8 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
-	(fedora)
-	    case "$VERSION_ID" in
-		(32)
-		    true
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(opensuse-leap)
-	    case "$VERSION_ID" in
-		(15.1)
-		    true
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(opensuse-tumbleweed)
-	    case "$VERSION_ID" in
-		(2019*)
-		    true
-		    ;;
-		(2020*)
-		    true
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
 	(rhel|ol)
 	    case "$VERSION_ID" in
-		(7.*)
-		    true
-		    ;;
 		(8.*)
 		    true
 		    ;;
@@ -125,65 +134,13 @@ validate_platform() {
 	    ;;
 	(ubuntu)
 	    case "$VERSION_ID" in
-		(18.*)
+		(18.04)
 		    true
 		    ;;
-		(19.*)
+		(19.10)
 		    true
 		    ;;
-		(20.*)
-		    true
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(freebsd)
-	    case "$VERSION_ID" in
-		(11.3-*)
-		    true
-		    ;;
-		(12.1-*)
-		    true
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(illumos)
-	    case "$VERSION_ID" in
-		(2019.10)
-		    true
-		    ;;
-		(2020.04)
-		    true
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(macos)
-	    case "$VERSION_ID" in
-		(10.14.*)
-		    true
-		    ;;
-		(10.15.*)
-		    true
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(netbsd)
-	    true
-	    ;;
-	(solaris)
-	    case "$VERSION_ID" in
-		(11.4)
+		(20.04)
 		    true
 		    ;;
 		(*)
@@ -197,10 +154,14 @@ validate_platform() {
     esac
 }
 
+if [ $# -gt 0 ]; then
+    abort "%s: Too many arguments\n" "$0"
+fi
+
 script_dir=$(get_realpath "$(dirname "$0")")
 
 . "$script_dir/common-functions.sh"
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-install_postgres "$@"
+install_postgresql_odbc

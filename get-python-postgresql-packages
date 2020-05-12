@@ -1,7 +1,7 @@
 #!/bin/sh -eu
 
-# get-postgres-odbc-packages: get PostgreSQL ODBC package names
-# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+# get-python-postgresql-packages: get list of Python PostgreSQL package names
+# Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,15 +16,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_10_PKGS="odbc-postgresql"
+AMAZON_2_PKGS="libpq-devel postgresql-devel %s-psycopg2"
 
-FEDORA_PKGS="postgresql-odbc"
+DEBIAN_PKGS="libpq-dev %s-psycopg2"
 
-REDHAT_8_PKGS="postgresql-odbc"
+FEDORA_PKGS="libpq-devel %s-psycopg2"
 
-UBUNTU_18_PKGS="odbc-postgresql"
-UBUNTU_19_PKGS="odbc-postgresql"
-UBUNTU_20_PKGS="odbc-postgresql"
+FREEBSD_PKGS="%s-psycopg2"
+
+ILLUMOS_PKGS="database/postgres-11/developer"
+
+MACOS_HOMEBREW_PKGS="libpq"
+
+OPENSUSE_PKGS="postgresql-devel %s-psycopg2"
+
+REDHAT_7_PKGS="postgresql-devel %s-psycopg2"
+REDHAT_8_PKGS="libpq-devel postgresql-devel %s-psycopg2"
+
+SOLARIS_PKGS="database/postgres"
+
+UBUNTU_18_PKGS="libpq-dev %s-psycopg2"
+UBUNTU_19_PKGS="libpq-dev %s-psycopg2"
+UBUNTU_20_PKGS="libpq-dev %s-psycopg2"
 
 abort() {
     printf "$@" >&2
@@ -52,12 +65,22 @@ get_realpath() (
     fi
 )
 
-get_postgres_odbc_packages() {
+get_python_postgresql_packages() {
     packages=
 
     case "$ID" in
+	(amzn)
+	    case "$VERSION_ID" in
+		(2)
+		    packages=$AMAZON_2_PKGS
+		    ;;
+	    esac
+	    ;;
 	(centos)
 	    case "$VERSION_ID" in
+		(7)
+		    packages=$REDHAT_7_PKGS
+		    ;;
 		(8)
 		    packages=$REDHAT_8_PKGS
 		    ;;
@@ -66,7 +89,7 @@ get_postgres_odbc_packages() {
 	(debian|raspbian)
 	    case "$VERSION_ID" in
 		(10)
-		    packages=$DEBIAN_10_PKGS
+		    packages=$DEBIAN_PKGS
 		    ;;
 	    esac
 	    ;;
@@ -77,8 +100,25 @@ get_postgres_odbc_packages() {
 		    ;;
 	    esac
 	    ;;
+	(opensuse-leap)
+	    case "$VERSION_ID" in
+		(15.1)
+		    packages=$OPENSUSE_PKGS
+		    ;;
+	    esac
+	    ;;
+	(opensuse-tumbleweed)
+	    case "$VERSION_ID" in
+		(2020*)
+		    packages=$OPENSUSE_PKGS
+		    ;;
+	    esac
+	    ;;
 	(rhel|ol)
 	    case "$VERSION_ID" in
+		(7.*)
+		    packages=$REDHAT_7_PKGS
+		    ;;
 		(8.*)
 		    packages=$REDHAT_8_PKGS
 		    ;;
@@ -97,6 +137,43 @@ get_postgres_odbc_packages() {
 		    ;;
 	    esac
 	    ;;
+	(freebsd)
+	    case "$VERSION_ID" in
+		(11.3-*)
+		    packages=$FREEBSD_PKGS
+		    ;;
+		(12.1-*)
+		    packages=$FREEBSD_PKGS
+		    ;;
+	    esac
+	    ;;
+	(illumos)
+	    case "$VERSION_ID" in
+		(2019.10)
+		    packages=$ILLUMOS_PKGS
+		    ;;
+		(2020.04)
+		    packages=$ILLUMOS_PKGS
+		    ;;
+	    esac
+	    ;;
+	(macos)
+	    case "$VERSION_ID" in
+		(10.14.*)
+		    packages=$MACOS_HOMEBREW_PKGS
+		    ;;
+		(10.15.*)
+		    packages=$MACOS_HOMEBREW_PKGS
+		    ;;
+	    esac
+	    ;;
+	(solaris)
+	    case "$VERSION_ID" in
+		(11.4)
+		    packages=$SOLARIS_PKGS
+		    ;;
+	    esac
+	    ;;
     esac
 
     format-python-packages ${packages-}
@@ -108,4 +185,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-get_postgres_odbc_packages
+get_python_postgresql_packages
