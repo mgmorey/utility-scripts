@@ -20,7 +20,7 @@ DEBIAN_PKGS="%s-sqlalchemy"
 
 FEDORA_PKGS="%s-sqlalchemy"
 
-FREEBSD_PKGS="%%s-sqlalchemy12"
+FREEBSD_PKGS="%s-sqlalchemy12"
 
 ILLUMOS_PKGS=":%s-sqlalchemy"
 
