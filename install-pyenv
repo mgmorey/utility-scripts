@@ -107,7 +107,7 @@ install_dependencies() {
     pattern="$(get-development-pattern)"
     install-packages ${pattern:+-p "$pattern" }$packages
 
-    if [ -n "${package:-}" ]; then
+    if [ -n "${package:-}" -a "$(id -u)" -eq 0 ]; then
 	install-build-deps "$@" $package || true
     fi
 }
