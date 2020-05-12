@@ -24,7 +24,7 @@ openssl-devel python3-devel readline-devel sqlite-devel xz-devel zlib-devel"
 DEBIAN_10_PKGS="libbz2-dev libffi-dev libgdbm-dev libncurses5-dev \
 libncursesw5-dev libpcre3-dev libpython3-dev libreadline-dev \
 libsqlite3-dev libssl-dev libxml2-dev libxmlsec1-dev \
-liblzma-dev uuid-dev xz-utils zlib1g-dev"
+liblzma-dev python3-dev uuid-dev xz-utils zlib1g-dev"
 
 FEDORA_PKGS="bzip2-devel gdbm-devel libffi-devel libuuid-devel ncurses-devel \
 openssl-devel python3-devel readline-devel sqlite-devel xz-devel zlib-devel"
@@ -55,15 +55,15 @@ library/readline system/header"
 UBUNTU_18_PKGS="libbz2-dev libffi-dev libgdbm-dev libncurses5-dev \
 libncursesw5-dev libpcre3-dev libpython3-dev libreadline-dev \
 libsqlite3-dev libssl-dev libxml2-dev libxmlsec1-dev \
-liblzma-dev uuid-dev xz-utils zlib1g-dev"
+liblzma-dev python3-dev uuid-dev xz-utils zlib1g-dev"
 UBUNTU_19_PKGS="libbz2-dev libffi-dev libgdbm-dev libncurses5-dev \
 libncursesw5-dev libpcre3-dev libpython3-dev libreadline-dev \
 libsqlite3-dev libssl-dev libxml2-dev libxmlsec1-dev \
-liblzma-dev uuid-dev xz-utils zlib1g-dev"
+liblzma-dev python3-dev uuid-dev xz-utils zlib1g-dev"
 UBUNTU_20_PKGS="libbz2-dev libffi-dev libgdbm-dev libncurses5-dev \
 libncursesw5-dev libpcre3-dev libpython3-dev libreadline-dev \
 libsqlite3-dev libssl-dev libxml2-dev libxmlsec1-dev \
-liblzma-dev uuid-dev xz-utils zlib1g-dev"
+liblzma-dev python3-dev uuid-dev xz-utils zlib1g-dev"
 
 abort() {
     printf "$@" >&2
