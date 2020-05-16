@@ -18,20 +18,22 @@
 
 PYTHON_VERSIONS="3.8 3.7 3.6 3.5 3"
 
-get_python_binary() {
+get_python_interpreter() (
     for version in $PYTHON_VERSIONS; do
-        if which python$version /dev/null 2>&1; then
-            printf '%s\n' $python$version
+	python=$(which python$version 2>/dev/null || true)
+
+        if [ -n "$python" ]; then
+            printf '%s\n' "$python"
             break
         fi
     done
-}
+)
 
 run_python() {
-    python=$(get_python_binary)
+    python="$(get_python_interpreter)"
 
     if [ -n "$python" ]; then
-        $python "$@"
+        "$python" "$@"
     fi
 }
 
