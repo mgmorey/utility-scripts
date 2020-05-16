@@ -33,24 +33,6 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-create_git_directory() {
-    cd
-
-    if [ ! -d Documents/git ]; then
-	mkdir -p Documents
-
-	if [ -d git ]; then
-	    /bin/mv git Documents/git
-	else
-	    mkdir Documents/git
-	fi
-    fi
-
-    if [ ! -e git ]; then
-	/bin/ln -s Documents/git git
-    fi
-}
-
 get_diff_command() {
     diff=
 
@@ -109,7 +91,8 @@ get_user_name() {
 }
 
 install_startup_files() {
-    create_git_directory
+    cd
+    mkdir -p git
     cd git
 
     if [ ! -d $PROJECT_NAME ]; then
