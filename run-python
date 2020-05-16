@@ -18,11 +18,18 @@
 
 PYTHON_VERSIONS="3.8 3.7 3.6 3.5 3"
 
+abort_python_missing() {
+    printf 'No working Python 3 interpreter was found.\n' >&2
+    printf 'The following commands were tried:\n' >&2
+    printf 'python%s\n' $PYTHON_VERSIONS >&2
+    exit 1
+}
+
 get_python_interpreter() (
     for version in $PYTHON_VERSIONS; do
 	python=$(which python$version 2>/dev/null || true)
 
-        if [ -n "$python" ]; then
+        if $python --version >/dev/null 2>&1; then
             printf '%s\n' "$python"
             break
         fi
@@ -34,6 +41,8 @@ run_python() {
 
     if [ -n "$python" ]; then
         "$python" "$@"
+    else
+	abort_python_missing
     fi
 }
 
