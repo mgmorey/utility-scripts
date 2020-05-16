@@ -114,7 +114,7 @@ install_dependencies() {
 
 install_pyenv() {
     url=$BASE_URL/pyenv-installer/raw/master/bin/pyenv-installer
-    curl -L $url | bash
+    curl "$@" -L $url | bash
 }
 
 validate_platform() {
@@ -219,6 +219,9 @@ validate_platform() {
 		    (8.1)
 			return
 			;;
+		    (8.2)
+			return
+			;;
 		    (*)
 			break
 			;;
@@ -259,8 +262,8 @@ configure_platform
 
 if [ "$(id -u)" -eq 0 ]; then
     install_dependencies
-    run_unpriv "$0"
+    run_unpriv "/bin/sh -eu $0 $*"
 else
     install_dependencies
-    install_pyenv
+    install_pyenv "$@"
 fi

@@ -55,7 +55,7 @@ get_realpath() (
 )
 
 docker_app() {
-    eval $("$script_dir/get-configuration" app.ini)
+    eval $("$script_dir/run-python" "$script_dir/get-configuration" app.ini)
     image=$(get_default_remote_image)
     opts=$(get_default_run_options)
 

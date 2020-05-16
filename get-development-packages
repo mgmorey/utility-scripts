@@ -38,6 +38,8 @@ FREEBSD_12_RELEASE_PKGS="autoconf automake gcc libtool gmake pkgconf"
 FREEBSD_12_STABLE_PKGS="autoconf automake gcc libtool gmake \
 os-generic-userland-devtools pkgconf"
 
+NETBSD_PKGS="autoconf automake gcc9 gmake libtool pkgconf"
+
 SOLARIS_PKGS="developer/build/autoconf developer/build/automake \
 developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
 developer/developerstudio-126/cc developer/developerstudio-126/library/c-libs \
@@ -115,6 +117,19 @@ get_development_packages() {
 			;;
 		esac
 		;;
+	    (netbsd)
+		case "$VERSION_ID" in
+		    (8.1)
+			packages=$NETBSD_PKGS
+			;;
+		    (8.2)
+			packages=$NETBSD_PKGS
+			;;
+		    (*)
+			break
+			;;
+                esac
+                ;;
 	    (illumos)
 		packages=$ILLUMOS_PKGS
 		;;

@@ -25,9 +25,13 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_packages() {
+    get-development-packages
+    get-python-library-packages
+}
+
 get_python_build_packages() {
-    (get-development-packages
-     get-python-library-packages) | sort -u
+    get_packages | sort -u
 }
 
 get_realpath() (

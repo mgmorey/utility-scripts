@@ -28,6 +28,8 @@ ILLUMOS_PKGS="database/postgres-11/developer"
 
 MACOS_HOMEBREW_PKGS="libpq"
 
+NETBSD_PKGS="libpqxx %s-psycopg2"
+
 OPENSUSE_PKGS="postgresql-devel %s-psycopg2"
 
 REDHAT_7_PKGS="postgresql-devel %.7s-psycopg2"
@@ -164,6 +166,16 @@ get_python_postgresql_packages() {
 		    ;;
 		(10.15.*)
 		    packages=$MACOS_HOMEBREW_PKGS
+		    ;;
+	    esac
+	    ;;
+	(netbsd)
+	    case "$VERSION_ID" in
+		(8.1)
+		    packages=$NETBSD_PKGS
+		    ;;
+		(8.2)
+		    packages=$NETBSD_PKGS
 		    ;;
 	    esac
 	    ;;
