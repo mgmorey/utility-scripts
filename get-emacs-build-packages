@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-emacs-build-deps: get list of Emacs build dependencies
+# get-emacs-build-packages: get list of Emacs build dependencies
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_emacs_build_deps() {
+get_emacs_build_packages() {
     get_packages_in $CATEGORIES | sort -u
 }
 
@@ -61,4 +61,4 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-get_emacs_build_deps
+get_emacs_build_packages
