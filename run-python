@@ -17,80 +17,23 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 PYTHON_VERSIONS="3.8 3.7 3.6 3.5 3"
+PYTHON_VERSIONS=2
 
 abort_python_missing() {
-    printf 'No working Python 3 interpreter was found.\n' >&2
+    printf 'No working Python interpreter was found.\n' >&2
     printf 'The following commands were tried:\n' >&2
     printf 'python%s\n' $PYTHON_VERSIONS >&2
     exit 1
 }
 
-get_python_interpreter() (
-    for version in $PYTHON_VERSIONS; do
-	python=$(which python$version 2>/dev/null || true)
-
-        if $python --version >/dev/null 2>&1; then
-            printf '%s\n' "$python"
-            break
-        fi
-    done
-)
-
-parse_arguments() {
-    is_interpreter=false
-    is_version=false
-
-    while getopts ivh opt; do
-	case $opt in
-	    (i)
-		is_interpreter=true
-		;;
-	    (v)
-		is_version=true
-		;;
-	    (h)
-		usage
-		exit 0
-		;;
-	    (\?)
-		printf "%s\n" "" >&2
-		usage
-		exit 2
-		;;
-	esac
-    done
-
-    shift $(($OPTIND - 1))
-    arguments="$@"
-}
-
 run_python() {
-    python="$(get_python_interpreter)"
+    python="$(get-python-interpreter -q $PYTHON_VERSIONS || true)"
 
     if [ -n "$python" ]; then
-	if [ "$is_interpreter" = true ]; then
-	    printf '%s\n' "$python"
-	elif [ "$is_version" = true ]; then
-	    "$python" --version | awk '{print $2}'
-	else
-            "$python" $arguments
-	fi
+        "$python" "$@"
     else
 	abort_python_missing
     fi
 }
 
-usage() {
-    if [ $# -gt 0 ]; then
-	printf "$@" >&2
-	printf "%s\n" "" >&2
-    fi
-
-    cat <<-EOF >&2
-	Usage: $0 [-i | -v]
-	       $0 -h
-	EOF
-}
-
-parse_arguments "$@"
-run_python
+run_python "$@"
