@@ -1,0 +1,101 @@
+#!/bin/sh -eu
+
+# run-python: run Python 3 script
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+PYTHON_VERSIONS="3.8 3.7 3.6 3.5 3"
+
+abort_python_missing() {
+    printf 'No working Python interpreter was found.\n' >&2
+    printf 'The following commands were tried:\n' >&2
+    printf 'python%s\n' $versions >&2
+    exit 1
+}
+
+get_python_interpreter() (
+    for version in $versions; do
+	python=$(which python$version 2>/dev/null || true)
+
+        if $python --version >/dev/null 2>&1; then
+            printf '%s\n' "$python"
+            break
+        fi
+    done
+)
+
+parse_arguments() {
+    is_quiet=false
+    is_version=false
+
+    while getopts qvh opt; do
+	case $opt in
+	    (q)
+		is_quiet=true
+		;;
+	    (v)
+		is_version=true
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -ge 1 ]; then
+        versions="$@"
+    else
+        versions="$PYTHON_VERSIONS"
+    fi
+}
+
+get_python() {
+    python="$(get_python_interpreter)"
+
+    if [ -n "$python" ]; then
+	if [ "$is_version" = true ]; then
+	    "$python" --version | awk '{print $2}'
+	else
+	    printf '%s\n' "$python"
+	fi
+    elif [ "$is_quiet" = false ]; then
+	abort_python_missing
+    else
+	exit 1
+    fi
+}
+
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
+    fi
+
+    cat <<-EOF >&2
+	Usage: $0 [-q] [-v]
+	       $0 -h
+	EOF
+}
+
+parse_arguments "$@"
+get_python
