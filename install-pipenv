@@ -43,25 +43,17 @@ get_realpath() (
 )
 
 install_dependencies() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (windows)
-		return 0
-		;;
-	esac
-    done
+    case "$ID" in
+	(windows)
+	    return 0
+	    ;;
+    esac
 
     install-packages $(get-python-pip-packages)
 }
 
 install_pipenv() {
-    pip=$(get-python-command pip)
-
-    if [ "$pip" != false ]; then
-	$pip install --upgrade --user pip pipenv
-    else
-	abort "$0: No pip in path"
-    fi
+    run-python -m pip install --upgrade --user pip pipenv
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
