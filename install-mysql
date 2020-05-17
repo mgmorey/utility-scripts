@@ -179,7 +179,20 @@ validate_platform() {
 	    esac
 	    ;;
 	(netbsd)
-	    true
+	    case "$VERSION_ID" in
+		(8.1)
+		    true
+		    ;;
+		(8.2)
+		    true
+		    ;;
+		(9.0)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
 	    ;;
 	(solaris)
 	    case "$VERSION_ID" in

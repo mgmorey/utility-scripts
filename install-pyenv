@@ -222,6 +222,9 @@ validate_platform() {
 		    (8.2)
 			return
 			;;
+		    (9.0)
+			return
+			;;
 		    (*)
 			break
 			;;

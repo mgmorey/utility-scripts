@@ -176,6 +176,12 @@ configure_baseline() {
 		(8.1)
 		    configure_unix_netbsd
 		    ;;
+		(8.2)
+		    configure_unix_netbsd
+		    ;;
+		(9.0)
+		    configure_unix_netbsd
+		    ;;
 		(*)
 		    abort_not_supported Release
 		    ;;

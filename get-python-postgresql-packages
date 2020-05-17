@@ -177,6 +177,9 @@ get_python_postgresql_packages() {
 		(8.2)
 		    packages=$NETBSD_PKGS
 		    ;;
+		(9.0)
+		    packages=$NETBSD_PKGS
+		    ;;
 	    esac
 	    ;;
 	(solaris)

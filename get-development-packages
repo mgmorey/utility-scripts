@@ -38,7 +38,7 @@ FREEBSD_12_RELEASE_PKGS="autoconf automake gcc libtool gmake pkgconf"
 FREEBSD_12_STABLE_PKGS="autoconf automake gcc libtool gmake \
 os-generic-userland-devtools pkgconf"
 
-NETBSD_PKGS="autoconf automake gcc9 gmake libtool pkgconf"
+NETBSD_PKGS="autoconf automake gmake libtool pkgconf"
 
 SOLARIS_PKGS="developer/build/autoconf developer/build/automake \
 developer/build/gnu-make developer/build/libtool developer/build/pkg-config \
@@ -123,6 +123,9 @@ get_development_packages() {
 			packages=$NETBSD_PKGS
 			;;
 		    (8.2)
+			packages=$NETBSD_PKGS
+			;;
+		    (9.0)
 			packages=$NETBSD_PKGS
 			;;
 		    (*)
