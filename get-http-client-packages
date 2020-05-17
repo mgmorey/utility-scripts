@@ -65,7 +65,7 @@ get_http_client_packages() {
 	    esac
 	    ;;
 	(debian|raspbian)
-	    packages=$DEBIAN_10_PKGS
+	    packages=$DEBIAN_PKGS
 	    ;;
 	(fedora)
 	    packages=$REDHAT_PKGS
