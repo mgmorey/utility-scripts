@@ -321,11 +321,8 @@ get_python_version() (
 
 get_sort_command() {
     case "${kernel_name=$(uname -s)}" in
-	(NetBSD)
-	    printf "%s\n" "sort -r"
-	    ;;
-	(SunOS)
-	    printf "%s\n" "gsort -Vr"
+	(NetBSD|SunOS)
+	    printf "%s\n" "sort -nrt."
 	    ;;
 	(*)
 	    printf "%s\n" "sort -Vr"
