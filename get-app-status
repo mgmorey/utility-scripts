@@ -101,9 +101,11 @@ if [ "$(id -u)" -eq 0 ]; then
     abort "%s: Must be run as a non-privileged user\n" "$0"
 fi
 
-. utility-functions.sh
-. restapi-functions.sh
-. restapi-parameters.sh
+script_dir=$(get_realpath "$(dirname "$0")")
+
+. "$script_dir/utility-functions.sh"
+. "$script_dir/restapi-functions.sh"
+. "$script_dir/restapi-parameters.sh"
 
 configure_all
 print_status $(get_app_status)
