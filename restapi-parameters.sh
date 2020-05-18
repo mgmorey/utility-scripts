@@ -173,13 +173,10 @@ configure_baseline() {
 	    configure_unix_bsd
 
 	    case "$VERSION_ID" in
-		(8.1)
+		(8.*)
 		    configure_unix_netbsd
 		    ;;
-		(8.2)
-		    configure_unix_netbsd
-		    ;;
-		(9.0)
+		(9.*)
 		    configure_unix_netbsd
 		    ;;
 		(*)

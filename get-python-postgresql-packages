@@ -171,13 +171,10 @@ get_python_postgresql_packages() {
 	    ;;
 	(netbsd)
 	    case "$VERSION_ID" in
-		(8.1)
+		(8.*)
 		    packages=$NETBSD_PKGS
 		    ;;
-		(8.2)
-		    packages=$NETBSD_PKGS
-		    ;;
-		(9.0)
+		(9.*)
 		    packages=$NETBSD_PKGS
 		    ;;
 	    esac

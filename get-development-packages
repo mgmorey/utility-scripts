@@ -117,15 +117,18 @@ get_development_packages() {
 			;;
 		esac
 		;;
+	    (illumos)
+		packages=$ILLUMOS_PKGS
+		;;
+	    (macos)
+		packages=$MACOS_HOMEBREW_PKGS
+		;;
 	    (netbsd)
 		case "$VERSION_ID" in
-		    (8.1)
+		    (8.*)
 			packages=$NETBSD_PKGS
 			;;
-		    (8.2)
-			packages=$NETBSD_PKGS
-			;;
-		    (9.0)
+		    (9.*)
 			packages=$NETBSD_PKGS
 			;;
 		    (*)
@@ -133,12 +136,6 @@ get_development_packages() {
 			;;
                 esac
                 ;;
-	    (illumos)
-		packages=$ILLUMOS_PKGS
-		;;
-	    (macos)
-		packages=$MACOS_HOMEBREW_PKGS
-		;;
 	    (solaris)
 		packages=$SOLARIS_PKGS
 		;;

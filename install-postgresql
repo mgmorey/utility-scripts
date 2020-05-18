@@ -180,13 +180,10 @@ validate_platform() {
 	    ;;
 	(netbsd)
 	    case "$VERSION_ID" in
-		(8.1)
+		(8.*)
 		    true
 		    ;;
-		(8.2)
-		    true
-		    ;;
-		(9.0)
+		(9.*)
 		    true
 		    ;;
 		(*)
