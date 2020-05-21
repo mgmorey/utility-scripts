@@ -31,6 +31,23 @@ docker_run_sap_hana() {
     	   --passwords-url file:///hana/mounts/$JSON_FILE
 }
 
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+    	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
 parse_arguments() {
     if [ $# -gt 0 ]; then
         user_opts="$@"
@@ -52,7 +69,7 @@ set_options() {
 }
 
 script_basename="$(basename "$0")"
-script_dirname="$(realpath "$(dirname "$0")")"
+script_dirname="$(get_realpath "$(dirname "$0")")"
 
 . "$script_dirname/sap-hana-config.sh"
 
