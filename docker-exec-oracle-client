@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-ENV_FILE=$HOME/.env
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -31,10 +29,15 @@ if [ $# -lt 1 ]; then
     abort "%s: Not enough arguments\n" "$0"
 elif [ $# -gt 1 ]; then
     abort "%s: Too many arguments\n" "$0"
-elif [ ! -r $ENV_FILE ]; then
-    abort "%s: %s: No such environment file\n" "$0" $ENV_FILE
 fi
 
-. $ENV_FILE
+script_basename="$(basename "$0")"
+script_dirname="$(realpath "$(dirname "$0")")"
+
+. "$script_dirname/oracle-config.sh"
+
+if [ -r $ENV_FILE ]; then
+    . $ENV_FILE
+fi
 
 docker exec -it $1 sqlplus "system/$DATABASE_PASSWORD@//localhost:1521/ORCLCDB"
