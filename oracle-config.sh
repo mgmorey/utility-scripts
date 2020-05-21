@@ -3,6 +3,7 @@ CLIENT_VERSION=19.6
 DRIVER_DESC='Oracle ODBC driver for Oracle 19'
 DRIVER_NAME='Oracle 19 ODBC driver'
 DRIVER_OBJECT=/usr/lib/oracle/$CLIENT_VERSION/client64/lib/libsqora.so.19.1
+ENV_FILE=$HOME/.env
 IMAGE_NAME=oracle/database
 IMAGE_TAG=19.3.0-se2
 PORTS="1521 5500"
