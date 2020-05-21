@@ -63,7 +63,11 @@ set_options() {
         port_opts="${port_opts:+$port_opts }-p $port:$port"
     done
 
-    vol_opts="-v $DATADIR:/hana/mounts"
+    vol_opts="${vol_opts:+$vol_opts }-v $DATADIR:/hana/mounts"
+
+    if [ -d $HOME/sap-hana/scripts ]; then
+	vol_opts="${vol_opts:+$vol_opts }-v $HOME/sap-hana/scripts:/usr/sap/HXE/home/bin"
+    fi
 
     opts="${port_opts:+$port_opts }${vol_opts:+$vol_opts }$user_opts"
 }
@@ -73,7 +77,9 @@ script_dirname="$(get_realpath "$(dirname "$0")")"
 
 . "$script_dirname/sap-hana-config.sh"
 
-if [ -r $ENV_FILE ]; then
+if [ ! -f $DATADIR/$JSON_FILE ]; then
+    abort "%s: %s: No such JSON file\n" "$0" "$DATADIR/$JSON_FILE"
+elif [ -r $ENV_FILE ]; then
     . $ENV_FILE
 fi
 
