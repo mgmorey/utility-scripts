@@ -16,14 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-ENV_FILE=$HOME/.env
-
-IMAGE_NAME=oracle/database
-IMAGE_TAG=19.3.0-se2
-
 NAMES="startup setup"
-PORTS="1521 5500"
-
 SCRIPTS=/opt/oracle/scripts
 
 abort() {
@@ -68,11 +61,14 @@ set_options() {
     opts="$env_opts ${port_opts:+$port_opts }${vol_opts:+$vol_opts }$user_opts"
 }
 
-if [ ! -r $ENV_FILE ]; then
-    abort "%s: %s: No such environment file\n" "$0" $ENV_FILE
-fi
+script_basename="$(basename "$0")"
+script_dirname="$(realpath "$(dirname "$0")")"
 
-. $ENV_FILE
+. "$script_dirname/oracle-config.sh"
+
+if [ -r $ENV_FILE ]; then
+    . $ENV_FILE
+fi
 
 parse_arguments "$@"
 docker_run_oracle_server
