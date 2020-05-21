@@ -34,10 +34,10 @@ fi
 script_basename="$(basename "$0")"
 script_dirname="$(realpath "$(dirname "$0")")"
 
-. "$script_dirname/oracle-config.sh"
+. "$script_dirname/sap-hana-config.sh"
 
 if [ -r $ENV_FILE ]; then
     . $ENV_FILE
 fi
 
-docker exec -it $1 hdbsql -i 90 -d SYSTEMDB -u SYSTEM -p $DATABASE_PASSWORD
+docker exec -it $1 /usr/sap/HXE/HDB90/exe/hdbsql -i 90 -d SYSTEMDB -u SYSTEM -p $DATABASE_PASSWORD
