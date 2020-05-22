@@ -116,9 +116,14 @@ install_scripts() {
     configure_platform
     source_dir="$(get_realpath "$(pwd)")"
 
-    if [ "$(basename "$source_dir")" != utility-scripts ]; then
-	abort "%s: Please change to the source directory and try again\n" "$0"
-    fi
+    case "$(basename "$source_dir")" in
+	(scripts|*-scripts)
+	    true
+	    ;;
+	(*)
+	    abort "%s: Please change to the source directory and try again\n" "$0"
+	    ;;
+    esac
 
     if [ ! -e "$target_dir" ]; then
 	mkdir -p "$target_dir"
