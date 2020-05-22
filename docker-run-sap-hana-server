@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CONTAINER_DIRS="/hana/mounts /mnt/data /mnt/scripts"
+CONTAINER_DIRS="/hana/mounts /mnt/data /mnt/scripts /mnt/sql"
 
 abort() {
     printf "$@" >&2
@@ -42,6 +42,9 @@ get_host_dir() {
 	    ;;
 	(/mnt/scripts)
 	    printf '%s\n' $HOME/git/mgmorey/utility-scripts
+	    ;;
+	(/mnt/sql)
+	    printf '%s\n' $HOME/sap-hana/sql
 	    ;;
     esac
 }
