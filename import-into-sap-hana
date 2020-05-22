@@ -26,6 +26,11 @@ assert() {
 }
 
 generate_control_file() {
+    assert [ $# -eq 4 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    assert [ -n "$3" ]
+    assert [ -n "$4" ]
     ctrlfile=$3.ctl
     printf 'Creating file %s\n' "$1/$2/$4" >&2
 
@@ -43,7 +48,7 @@ IMPORT DATA INTO TABLE "$2"."$3"
        FROM '$4'
        RECORD DELIMITED BY '\n'
        FIELD DELIMITED BY '$fs' OPTIONALLY ENCLOSED BY '"'
-       ERROR LOG '$workdir/import.err'
+       ERROR LOG '$datadir/import.err'
 EOF
     printf "IMPORT FROM '$1/$2/$ctrlfile';\n"
 }
@@ -70,6 +75,9 @@ get_realpath() (
 )
 
 import_database() (
+    assert [ $# -eq 4 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
     cd $2
 
     for file in $(get_data_files); do
@@ -95,7 +103,7 @@ import_into_sap_hana() (
 
     for database; do
 	if [ -d $database ]; then
-	    import_database $workdir $database
+	    import_database $datadir $database
 	fi
     done
 )
