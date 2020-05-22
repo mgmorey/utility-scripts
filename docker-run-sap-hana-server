@@ -38,10 +38,10 @@ get_host_dir() {
 	    printf '%s\n' $DATADIR
 	    ;;
 	(/mnt/data)
-	    printf '%s\n' $HOME/data
+	    printf '%s\n' $HOME/git/tableau/docker-sap-hana/ee2/data
 	    ;;
 	(/mnt/scripts)
-	    printf '%s\n' $HOME/git/mgmorey/utility-scripts
+	    printf '%s\n' $HOME/git/tableau/docker-sap-hana/ee2/scripts
 	    ;;
 	(/mnt/sql)
 	    printf '%s\n' $HOME/sap-hana/sql
@@ -50,8 +50,9 @@ get_host_dir() {
 }
 
 get_image_options() {
-    printf '%s\n' --agree-to-sap-license
-    printf '%s\n' --passwords-url file:///hana/mounts/$JSON_FILE
+    printf '%s\n' \
+	   --agree-to-sap-license \
+	   --passwords-url file:///hana/mounts/$JSON_FILE
 }
 
 get_realpath() (
