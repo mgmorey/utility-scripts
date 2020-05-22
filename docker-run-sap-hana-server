@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+CONTAINER_DIRS="/hana/mounts /mnt/data /mnt/scripts"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -27,8 +29,26 @@ assert() {
 
 docker_run_sap_hana() {
     set_options
-    docker run $opts $IMAGE_NAME:$IMAGE_TAG --agree-to-sap-license \
-    	   --passwords-url file:///hana/mounts/$JSON_FILE
+    docker run $opts $IMAGE_NAME:$IMAGE_TAG $(get_image_options)
+}
+
+get_host_dir() {
+    case "$1" in
+	(/hana/mounts)
+	    printf '%s\n' $DATADIR
+	    ;;
+	(/mnt/data)
+	    printf '%s\n' $HOME/data
+	    ;;
+	(/mnt/scripts)
+	    printf '%s\n' $HOME/git/mgmorey/utility-scripts
+	    ;;
+    esac
+}
+
+get_image_options() {
+    printf '%s\n' --agree-to-sap-license
+    printf '%s\n' --passwords-url file:///hana/mounts/$JSON_FILE
 }
 
 get_realpath() (
@@ -58,16 +78,19 @@ parse_arguments() {
 
 set_options() {
     port_opts=
+    vol_opts=
 
     for port in $PORTS; do
         port_opts="${port_opts:+$port_opts }-p $port:$port"
     done
 
-    vol_opts="${vol_opts:+$vol_opts }-v $DATADIR:/hana/mounts"
+    for container_dir in $CONTAINER_DIRS; do
+	host_dir=$(get_host_dir $container_dir)
 
-    if [ -d $HOME/sap-hana/scripts ]; then
-	vol_opts="${vol_opts:+$vol_opts }-v $HOME/sap-hana/scripts:/usr/sap/HXE/home/bin"
-    fi
+	if [ -d "$host_dir" ]; then
+	    vol_opts="${vol_opts:+$vol_opts }-v $host_dir:$container_dir"
+	fi
+    done
 
     opts="${port_opts:+$port_opts }${vol_opts:+$vol_opts }$user_opts"
 }
