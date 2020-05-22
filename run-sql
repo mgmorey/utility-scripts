@@ -53,6 +53,9 @@ get_cli_command() {
 	(postgresql)
 	    get_cli_postgresql
 	    ;;
+	(sap-hana)
+	    get_cli_sap_hana
+	    ;;
 	(sqlite)
 	    get_cli_sqlite
 	    ;;
@@ -102,6 +105,19 @@ get_cli_postgresql() {
     if [ -n "${command-}" ]; then
 	printf "%s\n" --command="\"$command\""
     fi
+}
+
+get_cli_sap_hana() {
+    host=${DATABASE_HOST:-${SAP_HANA_HOST-}}
+    port=${DATABASE_PORT:-${SAP_HANA_PORT-}}
+    username=${DATABASE_USER:-${SAP_HANA_USER:-SYSTEM}}
+    password=${DATABASE_PASSWORD:-${SAP_HANA_PASSWORD-}}
+    instance=${DATABASE_INSTANCE:-${SAP_HANA_INSTANCE:-SYSTEMDB}}
+    printf "%s\n" hdbsql -i 90 \
+	   ${host:+-n $host${port:+:$port}} \
+	   -d $instance \
+	   -u $username \
+           -p $password
 }
 
 get_cli_sqlite() {
