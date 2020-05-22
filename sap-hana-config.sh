@@ -1,4 +1,5 @@
 # sap-hana-config.sh: define shell parameters for common values
+DATABASES="TEST_SPECIAL TestV1"
 DATADIR=/data/sap-hana
 ENV_FILE=$HOME/.env
 IMAGE_NAME=store/saplabs/hanaexpress
