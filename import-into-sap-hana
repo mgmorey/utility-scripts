@@ -1,0 +1,155 @@
+#!/bin/sh -eu
+
+# import-into-sap-hana: import data into SAP HANA server
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+generate_control_file() {
+    ctrlfile=$3.ctl
+    printf 'Creating file %s\n' "$1/$2/$4" >&2
+
+    case $4 in
+	(*.csv)
+	    fs=','
+	    ;;
+	(*.data)
+	    fs='\t'
+	    ;;
+    esac
+
+    cat <<EOF >$ctrlfile
+IMPORT DATA INTO TABLE "$2"."$3"
+       FROM '$4'
+       RECORD DELIMITED BY '\n'
+       FIELD DELIMITED BY '$fs' OPTIONALLY ENCLOSED BY '"'
+       ERROR LOG '$workdir/import.err'
+EOF
+    printf "IMPORT FROM '$1/$2/$ctrlfile';\n"
+}
+
+get_data_files() {
+    find . -maxdepth 1 '(' -name '*.csv' -o -name '*.data' ')' -type f
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+    	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+import_database() (
+    cd $2
+
+    for file in $(get_data_files); do
+	case $file in
+	    (*.csv)
+		root=${file%.csv}
+		;;
+	    (*.data)
+		root=${file%TabDel.data}
+		;;
+	esac
+
+	generate_control_file $1 $2 ${root#./} ${file#./}
+    done
+)
+
+import_into_sap_hana() (
+    workdir=$(pwd)
+
+    if [ "$datadir" != "$workdir" ]; then
+	cd $datadir
+    fi
+
+    for database; do
+	if [ -d $database ]; then
+	    import_database $workdir $database
+	fi
+    done
+)
+
+parse_arguments() {
+    datadir=$(pwd)
+
+    while getopts d:h opt; do
+	case $opt in
+	    (d)
+		datadir=$OPTARG
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	databases="$@"
+    else
+	databases=$DATABASES
+    fi
+}
+
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
+    fi
+
+    cat <<-EOF >&2
+	Usage: $0 [-s SHELL] [COMMAND [COMMAND] ...]
+	       $0 -q
+	       $0 -h
+	EOF
+}
+
+script_basename="$(basename "$0")"
+script_dirname="$(get_realpath "$(dirname "$0")")"
+
+. "$script_dirname/sap-hana-config.sh"
+
+if [ -r $ENV_FILE ]; then
+    . $ENV_FILE
+fi
+
+parse_arguments "$@"
+import_into_sap_hana $databases
