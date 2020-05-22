@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+ENV_FILE=.env
 SQL_DIRS="scripts sql"
 
 abort() {
@@ -145,6 +146,16 @@ get_user_name() {
     printf "%s\n" "${SUDO_USER-${USER-${USERNAME-${LOGNAME-}}}}"
 }
 
+has_env_file() {
+    if [ "$1" = / ]; then
+	return 0
+    elif [ -r "$1/$ENV_FILE" ]; then
+	return 0
+    else
+	return 1
+    fi
+}
+
 parse_argument() {
     script=
 
@@ -250,21 +261,23 @@ usage() {
 
 env_dir=$(pwd)
 
-until [ "$env_dir" = / -o -r "$env_dir/.env" ]; do
+until $(has_env_file "$env_dir"); do
     env_dir="$(dirname $env_dir)"
 done
 
-if [ -r "$env_dir/.env" ]; then
-    env_file="$env_dir/.env"
-elif [ -r "$HOME/.env" ]; then
-    env_file="$HOME/.env"
+if [ "$env_dir" = / ]; then
+    env_dir=$HOME
+fi
+
+if [ -r "$env_dir/$ENV_FILE" ]; then
+    env_file="$env_dir/$ENV_FILE"
 else
     env_file=
 fi
 
 if [ -n "$env_file" ]; then
     if [ "${VENV_VERBOSE-false}" = true ]; then
-	printf "%s\n" "Loading .env environment variables" >&2
+	printf "%s\n" "Loading $ENV_FILE environment variables" >&2
     fi
 
     . "$env_file"
