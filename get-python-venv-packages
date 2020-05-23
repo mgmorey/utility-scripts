@@ -18,8 +18,6 @@
 
 DEBIAN_PKGS="%s-venv"
 
-NETBSD_8_PKGS="%s-venv"
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -70,15 +68,6 @@ get_python_venv_packages() {
 		    ;;
 	    esac
 	    ;;
-	(netbsd)
-	    case "$VERSION_ID" in
-		(8.1)
-	            packages=$NETBSD_8_PKGS
-	            ;;
-		(8.2)
-	            packages=$NETBSD_8_PKGS
-	            ;;
-            esac
     esac
 
     format-python-packages ${packages-}
