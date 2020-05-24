@@ -262,7 +262,7 @@ configure_platform
 
 if [ "$(id -u)" -eq 0 ]; then
     install_dependencies
-    run_unpriv "/bin/sh -eu $0 $*"
+    run_unpriv $0
 else
     install_dependencies
     install_pyenv "$@"
