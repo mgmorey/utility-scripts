@@ -44,7 +44,7 @@ get_host_dir() {
 	    printf '%s\n' $HOME/git/tableau/docker-sap-hana/ee2/scripts
 	    ;;
 	(/mnt/sql)
-	    printf '%s\n' $HOME/sap-hana/sql
+	    printf '%s\n' $HOME/git/tableau/docker-sap-hana/ee2/sql
 	    ;;
     esac
 }
