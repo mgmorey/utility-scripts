@@ -116,9 +116,9 @@ get_cli_sap_hana() {
     instance=${DATABASE_INSTANCE:-${SAP_HANA_INSTANCE:-SYSTEMDB}}
     printf "%s\n" hdbsql -i 90 \
 	   ${host:+-n $host${port:+:$port}} \
-	   -d $instance \
-	   -u $username \
-           -p $password
+	   ${instance:+-d $instance} \
+	   ${username:+-u $username} \
+           ${password:+-p $password}
 }
 
 get_cli_sqlite() {
