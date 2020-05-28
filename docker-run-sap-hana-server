@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CONTAINER_DIRS="/hana/mounts /mnt/data /mnt/scripts /mnt/sql"
+CONTAINER_DIRS="/mnt/data /mnt/scripts /mnt/sql"
 
 abort() {
     printf "$@" >&2
@@ -29,14 +29,11 @@ assert() {
 
 docker_run_sap_hana() {
     set_options
-    docker run $opts $IMAGE_NAME:$IMAGE_TAG $(get_image_options)
+    docker run $opts $IMAGE_NAME:$IMAGE_TAG
 }
 
 get_host_dir() {
     case "$1" in
-	(/hana/mounts)
-	    printf '%s\n' $DATADIR
-	    ;;
 	(/mnt/data)
 	    printf '%s\n' $HOME/git/tableau/docker-sap-hana/ee2/data
 	    ;;
@@ -47,12 +44,6 @@ get_host_dir() {
 	    printf '%s\n' $HOME/git/tableau/docker-sap-hana/ee2/sql
 	    ;;
     esac
-}
-
-get_image_options() {
-    printf '%s\n' \
-	   --agree-to-sap-license \
-	   --passwords-url file:///hana/mounts/$JSON_FILE
 }
 
 get_realpath() (
@@ -104,9 +95,7 @@ script_dirname="$(get_realpath "$(dirname "$0")")"
 
 . "$script_dirname/sap-hana-config.sh"
 
-if [ ! -f $DATADIR/$JSON_FILE ]; then
-    abort "%s: %s: No such JSON file\n" "$0" "$DATADIR/$JSON_FILE"
-elif [ -r $ENV_FILE ]; then
+if [ -r $ENV_FILE ]; then
     . $ENV_FILE
 fi
 
