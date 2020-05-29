@@ -1,0 +1,114 @@
+#!/bin/sh -eux
+
+BASE_URL=artifactory.prod.tableautools.com:6555/dataservices
+
+DATABASES="mssql mysql oracle postgres"
+
+MSSQL_VERSIONS="2012 2017 2019"
+MYSQL_VERSIONS="5.6 5.7 8.0"
+ORACLE_VERSIONS="12 18 19"
+POSTGRES_VERSIONS="9.4 11 12"
+SAP_HANA_VERSIONS="ee2"
+
+TAG="$(date +%Y%m%d%H%M)"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+get_versions() {
+    case $database in
+        (mssql)
+            versions_default=MSSQL_VERSIONS
+            ;;
+        (mysql)
+            versions_default=MYSQL_VERSIONS
+            ;;
+        (oracle)
+            versions_default=ORACLE_VERSIONS
+            ;;
+        (postgres)
+            versions_default=POSTGRES_VERSIONS
+            ;;
+        (sap-hana)
+            versions_default=SAP_HANA_VERSIONS
+            ;;
+        (*)
+            abort '%s: %s: DBMS not recognized\n' "$0" "$database"
+            ;;
+    esac
+
+    printf '%s\n' "$versions_default"
+}
+
+parse_arguments() {
+    build=true
+    buildonly=false
+    databases=
+    tag=
+    versions=
+
+    while getopts blnt:v:h opt; do
+	case $opt in
+	    (b)
+                build=true
+		buildonly=true
+		;;
+	    (l)
+		tag=latest
+		;;
+	    (n)
+		build=false
+		buildonly=false
+		;;
+	    (t)
+		tag="$OPTARG"
+		;;
+	    (v)
+		versions="$OPTARG"
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+    databases="$@"
+}
+
+publish_docker_images() {
+    for database; do
+        for version in ${versions:-$(get_versions)}; do
+            publish_image $database $version
+        done
+    done
+}
+
+publish_image() (
+    image=tableau-${1}-${2%.0}
+    repo_image=$BASE_URL/$image:${tag:-$TAG}
+
+    if [ -d docker-${1}/$2 ]; then
+        cd docker-${1}/$2
+
+        if [ "$build" = true ]; then
+            docker build -t $image .
+        fi
+
+        if [ "$buildonly" = false ]; then
+            docker tag $image $repo_image
+            docker push $repo_image
+        fi
+    fi
+)
+
+parse_arguments "$@"
+publish_docker_images ${databases:-$DATABASES}
