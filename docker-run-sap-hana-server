@@ -29,7 +29,7 @@ assert() {
 
 docker_run_sap_hana() {
     set_options
-    docker run $opts $IMAGE_NAME:$IMAGE_TAG
+    docker run $opts $IMAGE_NAME:$IMAGE_TAG $(get_image_options)
 }
 
 get_host_dir() {
@@ -44,6 +44,12 @@ get_host_dir() {
 	    printf '%s\n' $HOME/git/tableau/docker-sap-hana/ee2/sql
 	    ;;
     esac
+}
+
+get_image_options() {
+    printf '%s\n' \
+	   --agree-to-sap-license \
+	   --master-password $SAP_HANA_PASSWORD
 }
 
 get_realpath() (
