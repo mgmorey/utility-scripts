@@ -16,12 +16,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DRIVER=bridge
-GATEWAY=172.16.0.1
 SUBNET=172.16.0.0/16
 
+get_gw() {
+    net=$(get_net $1)
+    octet=$(get_octets $net 4)
+    printf '%s.%s\n' $(get_octets $net 1,2,3) $((octet + 1))
+}
+
+get_net() {
+    printf '%s\n' $1 | cut -d/ -f 1
+}
+
+get_octets() {
+    printf '%s\n' $1 | cut -d. -f ${2:-1,2,3,4}
+}
+
+subnet=${1:-$SUBNET}
 docker network create \
-       --driver $DRIVER \
-       --gateway $GATEWAY \
-       --subnet $SUBNET \
-       ${1:-alternate}
+       --subnet $subnet \
+       --gateway $(get_gw $subnet) \
+       ${2:-alternate}
