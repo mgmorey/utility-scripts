@@ -58,6 +58,8 @@ pipenv_lock() {
     pipenv=$(get_command pipenv || true)
 
     if [ -n "$pipenv" ]; then
+	# Lock dependencies (including development dependencies) and
+	# generate Pipfile.lock
 	$pipenv lock
 	generate_requirements $pipenv "$@"
     fi

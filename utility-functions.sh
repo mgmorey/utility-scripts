@@ -239,7 +239,7 @@ generate_requirements() (
     assert [ -n "$1" ]
     pipenv=$1
     shift
-    create_tmpfile
+    pipenv_version=$($pipenv --version | awk '{print $3}')
 
     for file; do
 	case "$file" in
@@ -247,7 +247,17 @@ generate_requirements() (
 		options=--dev
 		;;
 	    (dev-requirements.txt)
-		options=--dev-only
+		case "$pipenv_version" in
+		    (2020.*.*)
+			options=--dev-only
+			;;
+		    (2018.*.*)
+			options=--dev
+			;;
+		    (*)
+			options=--dev
+			;;
+		esac
 		;;
 	    (requirements.txt)
 		options=
@@ -257,6 +267,7 @@ generate_requirements() (
 	esac
 
 	printf "Generating %s\n" "$file"
+	create_tmpfile
 	options="${options:+$options }--requirements"
 
 	if $pipenv lock $options >$tmpfile; then
