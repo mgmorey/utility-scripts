@@ -152,10 +152,10 @@ run_via_pipenv() {
 	    python=$(find_python)
 	    $pipenv --python $python
 	else
-	    $pipenv $PIPENV_OPTS
+	    $pipenv
 	fi
 
-	$pipenv sync -d
+	$pipenv sync --dev
     fi
 
     if [ "${PIPENV_ACTIVE:-0}" -gt 0 ]; then

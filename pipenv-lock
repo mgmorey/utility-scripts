@@ -16,53 +16,65 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export LANG=${LANG:-en_US.UTF-8}
-export LC_ALL=${LC_ALL:-en_US.UTF-8}
+: ${LANG:=en_US.UTF-8}
+: ${LC_ALL:=en_US.UTF-8}
+export LANG LC_ALL
 
 abort() {
     printf "$@" >&2
     exit 1
 }
 
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+parse_arguments() {
+    if [ $# -gt 0 ]; then
+	files="$@"
+    else
+	files="*requirements.txt"
+    fi
+}
+
 pipenv_lock() {
-    $pipenv lock
+    pipenv=$(get_command pipenv || true)
 
-    for file; do
-	case $file in
-	    (requirements-dev*.txt)
-		opts=-d
-		;;
-	    (requirements.txt)
-		opts=
-		;;
-	    (*)
-		abort "%s: Invalid filename\n" "$file"
-	esac
-
-	printf "Generating %s\n" "$file"
-	if $pipenv lock $opts -r >$tmpfile; then
-	    /bin/mv -f $tmpfile "$file"
-	    chgrp $(id -g) "$file"
-	    chmod a+r "$file"
-	else
-	    abort "Unable to update %s\n" "$file"
-	fi
-    done
+    if [ -n "$pipenv" ]; then
+	$pipenv lock
+	generate_requirements $pipenv "$@"
+    fi
 }
 
 if [ "$(id -u)" -eq 0 ]; then
-    abort "%s\n" "Must be run as a non-privileged user"
+    abort "%s: Must be run as a non-privileged user\n" "$0"
 fi
 
-tmpfile=$(mktemp)
-trap "/bin/rm -f $tmpfile" EXIT INT QUIT TERM
-
-pipenv=$(which pipenv 2>/dev/null || true)
-
-if [ -n "$pipenv" ]; then
-    if [ $# -gt 0 ]; then
-	pipenv_lock "$@"
-    else
-	pipenv_lock requirements*.txt
-    fi
+if [ -n "${VIRTUAL_ENV:-}" ]; then
+    abort "%s: Must not be run within a virtual environment\n" "$0"
 fi
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+. "$script_dir/common-functions.sh"
+. "$script_dir/utility-functions.sh"
+
+parse_arguments "$@"
+pipenv_lock $files

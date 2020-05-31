@@ -29,33 +29,6 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-generate_requirements() (
-    assert [ $# -ge 1 ]
-    assert [ -n "$1" ]
-    pipenv=$1
-    shift
-    create_tmpfile
-
-    for file; do
-	if [ "$file" = "$PIP_INSTALL_DEV" ]; then
-		pipenv_opts=-dr
-	else
-		pipenv_opts=-r
-	fi
-
-	printf "Generating %s\n" $file
-
-	if $pipenv lock $pipenv_opts >$tmpfile; then
-	    /bin/mv -f $tmpfile $file
-	else
-	    abort "%s: Unable to update %s\n" "$0" "$file"
-	fi
-    done
-
-    chgrp $(id -g) "$@"
-    chmod a+r "$@"
-)
-
 get_packages() {
     get-bootstrap-packages
     get-development-packages
@@ -155,7 +128,7 @@ refresh_virtualenv() (
 
 		if refresh_via_pipenv $pipenv; then
 		    if generate_requirements $pipenv $PIP_INSTALL_ALL; then
-			if $pipenv sync -d; then
+			if $pipenv sync --dev; then
 			    return 0
 			fi
 		    fi

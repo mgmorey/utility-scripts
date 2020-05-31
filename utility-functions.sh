@@ -216,6 +216,41 @@ find_user_python_installed() (
     return 1
 )
 
+generate_requirements() (
+    assert [ $# -ge 1 ]
+    assert [ -n "$1" ]
+    pipenv=$1
+    shift
+    create_tmpfile
+
+    for file; do
+	case "$file" in
+	    (all-requirements.txt)
+		opts=--dev
+		;;
+	    (dev-requirements.txt)
+		opts=--dev-only
+		;;
+	    (requirements.txt)
+		opts=
+		;;
+	    (*)
+		abort "%s: %s: Invalid filename\n" "$0" "$file"
+	esac
+
+	printf "Generating %s\n" "$file"
+
+	if $pipenv lock ${opts:+$opts }--requirements >$tmpfile; then
+	    /bin/mv -f $tmpfile "$file"
+	else
+	    abort "%s: Unable to update %s\n" "$0" "$file"
+	fi
+    done
+
+    chgrp $(id -g) "$@"
+    chmod a+r "$@"
+)
+
 get_command() (
     assert [ $# -ge 1 ]
 
