@@ -108,6 +108,24 @@ create_virtualenv() (
     abort "%s: No virtualenv utility found\n" "$0"
 )
 
+create_virtualenv_via_pipenv() (
+    assert [ $# -ge 1 ]
+    assert [ -n "$1" ]
+    pipenv=$1
+
+    if upgrade_via_pip pip pipenv; then
+	if [ -n "${BASH-}" -o -n "${ZSH_VERSION-}" ] ; then
+	    hash -r
+	fi
+    fi
+
+    if pyenv --version >/dev/null 2>&1; then
+	$pipenv --python "$(find_python)"
+    else
+	$pipenv --three
+    fi
+)
+
 find_python() (
     python=$(find_system_python | awk '{print $1}')
     python=$(find_user_python "$python")

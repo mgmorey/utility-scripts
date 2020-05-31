@@ -96,24 +96,16 @@ parse_arguments() {
 refresh_via_pipenv() {
     assert [ $# -ge 1 ]
     assert [ -n "$1" ]
+    pipenv=$1
+    shift
 
-    if ! $1 --venv >/dev/null 2>&1; then
-	if upgrade_via_pip pip pipenv; then
-	    if [ -n "${BASH:-}" -o -n "${ZSH_VERSION:-}" ] ; then
-		hash -r
-	    fi
-	fi
-
-	if pyenv --version >/dev/null 2>&1; then
-	    $1 --python "$(find_python)"
-	else
-	    $1 --three
-	fi
+    if ! $pipenv --venv >/dev/null 2>&1; then
+	create_virtualenv_via_pipenv $pipenv
     fi
 
     # Lock dependencies (including development dependencies) and
     # generate Pipfile.lock
-    $1 lock -d
+    $pipenv lock --dev
 }
 
 refresh_virtualenv() (
