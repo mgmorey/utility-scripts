@@ -294,6 +294,11 @@ get_realpath() (
 include_prefix() {
     assert [ $# -ge 1 -a $# -le 2 ]
     assert [ -n "$1" ]
+
+    if [ ! -d "$1" ]; then
+	return 0
+    fi
+
     incdir="$1/include"
     libdir="$1/lib${2+/$2}"
     incdirs="${incdirs+$incdirs }$incdir"
@@ -399,7 +404,7 @@ usage() {
 }
 
 validate_platform() {
-    case "$id" in
+    case "$ID" in
 	(debian|raspbian)
 	    return
 	    ;;
