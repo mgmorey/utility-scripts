@@ -244,21 +244,22 @@ generate_requirements() (
     for file; do
 	case "$file" in
 	    (all-requirements.txt)
-		opts=--dev
+		options=--dev
 		;;
 	    (dev-requirements.txt)
-		opts=--dev-only
+		options=--dev-only
 		;;
 	    (requirements.txt)
-		opts=
+		options=
 		;;
 	    (*)
 		abort "%s: %s: Invalid filename\n" "$0" "$file"
 	esac
 
 	printf "Generating %s\n" "$file"
+	options="${options:+$options }--requirements"
 
-	if $pipenv lock ${opts:+$opts }--requirements >$tmpfile; then
+	if $pipenv lock $options >$tmpfile; then
 	    /bin/mv -f $tmpfile "$file"
 	else
 	    abort "%s: Unable to update %s\n" "$0" "$file"
