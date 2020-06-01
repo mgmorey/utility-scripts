@@ -35,23 +35,33 @@ get_octets() {
 }
 
 get_options() {
-    if [ -n "${driver-}" ]; then
-	printf '%s\n' --driver=$driver
-    elif [ -n "${interface-}" ]; then
+    if [ -n "${interface-}" ]; then
+	if [ "$macvlan" = true ]; then
+	    driver=macvlan
+	else
+	    driver=ipvlan
+	fi
+
+	if [ "$dhcp" = true ]; then
+	    ipam_driver=dhcp
+	    ipam_opt=dhcp_interface=$interface
+	else
+	    ipam_driver=default
+	    ipam_opt=
+	fi
+
 	printf '%s\n' \
-	       --ipam-driver=dhcp \
-	       --ipam-opt=dhcp_interface=$interface \
+	       --driver=$driver \
+	       --ipam-driver=$ipam_driver \
+	       ${ipam_opt:+--ipam-opt=$ipam_opt} \
 	       --opt=parent=$interface
-    else
-	printf '%s\n' \
-	       --ipam-driver=default
     fi
 
-    if [ -n "${subnet-}" ]; then
-	printf '%s\n' --subnet=$subnet
+    if [ -n "${net-}" ]; then
+	printf '%s\n' --subnet=$net
 
 	if [ "$first" = true ]; then
-	    printf '%s\n' --gateway=$(get_gw $subnet)
+	    printf '%s\n' --gateway=$(get_gw $net)
 	elif [ -n "${gateway-}" ]; then
 	    printf '%s\n' --gateway=$gateway
 	fi
@@ -59,16 +69,17 @@ get_options() {
 }
 
 parse_arguments() {
-    driver=
+    dhcp=false
     first=false
     gateway=
     interface=
-    subnet=
+    macvlan=false
+    net=
 
-    while getopts d:fg:i:s:h opt; do
+    while getopts dfg:i:mn:h opt; do
 	case $opt in
 	    (d)
-		driver=$OPTARG
+		dhcp=true
 		;;
 	    (f)
 		first=true
@@ -79,8 +90,11 @@ parse_arguments() {
 	    (i)
 		interface=$OPTARG
 		;;
-	    (s)
-		subnet=$OPTARG
+	    (m)
+		macvlan=true
+		;;
+	    (n)
+		net=$OPTARG
 		;;
 	    (h)
 		usage
@@ -105,9 +119,7 @@ usage() {
     fi
 
     cat <<-EOF >&2
-	Usage: $0 [-f] -s SUBNET [NETWORK]
-	       $0 -i INTERFACE [NETWORK]
-	       $0 -d DRIVER [NETWORK]
+	Usage: $0 [-d] [-f] [-g GATEWAY] [-m] [-n SUBNET] [NETWORK]
 	       $0 -h
 	EOF
 }
