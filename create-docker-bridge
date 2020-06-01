@@ -16,7 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-SUBNET=172.16.0.0/16
+create_docker_bridge() {
+    docker network create $(get_options) $network
+}
 
 get_gw() {
     net=$(get_net $1)
@@ -32,8 +34,62 @@ get_octets() {
     printf '%s\n' $1 | cut -d. -f ${2:-1,2,3,4}
 }
 
-subnet=${1:-$SUBNET}
-docker network create \
-       --subnet $subnet \
-       --gateway $(get_gw $subnet) \
-       ${2:-alternate}
+get_options() {
+    if [ -n "${subnet-}" ]; then
+	printf '%s\n' \
+	       --subnet=$subnet \
+	       --gateway=$(get_gw $subnet)
+    elif [ -n "${interface-}" ]; then
+	printf '%s\n' \
+	       --ipam-driver=dhcp \
+	       --ipam-opt=dhcp_interface=$interface \
+	       --opt=parent=$interface
+    else
+	printf '%s\n' \
+	       --ipam-driver=default
+    fi
+}
+
+parse_arguments() {
+    interface=
+    subnet=
+
+    while getopts ds:h opt; do
+	case $opt in
+	    (i)
+		interface=$OPTARG
+		;;
+	    (s)
+		subnet=$OPTARG
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+    network=${1:-alternate}
+}
+
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
+    fi
+
+    cat <<-EOF >&2
+	Usage: $0 [-i INTERFACE] [NETWORK]
+	       $0 [-s SUBNET] [NETWORK]
+	       $0 -h
+	EOF
+}
+
+parse_arguments "$@"
+create_docker_bridge
