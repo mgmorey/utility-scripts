@@ -73,7 +73,6 @@ parse_arguments() {
     first=false
     gateway=
     interface=
-    macvlan=false
     net=
 
     while getopts dfg:i:mn:h opt; do
@@ -89,9 +88,6 @@ parse_arguments() {
 		;;
 	    (i)
 		interface=$OPTARG
-		;;
-	    (m)
-		macvlan=true
 		;;
 	    (n)
 		net=$OPTARG
@@ -110,6 +106,20 @@ parse_arguments() {
 
     shift $(($OPTIND - 1))
     network=${1:-alternate}
+
+    case "$network" in
+	(ipvlan[0-9])
+	    macvlan=false
+	    ;;
+	(macvlan[0-9])
+	    macvlan=true
+	    ;;
+	(*)
+	    printf "%s: %s: Invalid network name\n" "$0" "$network" >&2
+	    usage
+	    exit 2
+	    ;;
+    esac
 }
 
 usage() {
@@ -119,10 +129,15 @@ usage() {
     fi
 
     cat <<-EOF >&2
-	Usage: $0 [-d] [-f] [-g GATEWAY] [-m] [-n SUBNET] [NETWORK]
+	Usage: $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] ipvlanN
+	       $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] macvlanN
 	       $0 -h
 	EOF
 }
+
+if [ $# -lt 1 ]; then
+    abort "%s: Not enough arguments\n" "$0"
+fi
 
 parse_arguments "$@"
 create_docker_bridge
