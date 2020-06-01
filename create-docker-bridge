@@ -36,12 +36,12 @@ get_octets() {
 
 get_options() {
     if [ -n "${subnet-}" ]; then
-	printf '%s\n' \
-	       --subnet=$subnet
+	printf '%s\n' --subnet=$subnet
 
 	if [ "$first" = true ]; then
-	    printf '%s\n' \
-		   --gateway=$(get_gw $subnet)
+	    printf '%s\n' --gateway=$(get_gw $subnet)
+	elif [ -n "${gateway-}" ]; then
+	    printf '%s\n' --gateway=$gateway
 	fi
     elif [ -n "${interface-}" ]; then
 	printf '%s\n' \
@@ -56,13 +56,17 @@ get_options() {
 
 parse_arguments() {
     first=false
+    gateway=
     interface=
     subnet=
 
-    while getopts fis:h opt; do
+    while getopts fgis:h opt; do
 	case $opt in
 	    (f)
 		first=true
+		;;
+	    (g)
+		gateway=$OPTARG
 		;;
 	    (i)
 		interface=$OPTARG
