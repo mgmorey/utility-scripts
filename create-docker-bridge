@@ -37,8 +37,12 @@ get_octets() {
 get_options() {
     if [ -n "${subnet-}" ]; then
 	printf '%s\n' \
-	       --subnet=$subnet \
-	       --gateway=$(get_gw $subnet)
+	       --subnet=$subnet
+
+	if [ "$first" = true ]; then
+	    printf '%s\n' \
+		   --gateway=$(get_gw $subnet)
+	fi
     elif [ -n "${interface-}" ]; then
 	printf '%s\n' \
 	       --ipam-driver=dhcp \
@@ -51,11 +55,15 @@ get_options() {
 }
 
 parse_arguments() {
+    first=false
     interface=
     subnet=
 
-    while getopts ds:h opt; do
+    while getopts fis:h opt; do
 	case $opt in
+	    (f)
+		first=true
+		;;
 	    (i)
 		interface=$OPTARG
 		;;
@@ -85,8 +93,8 @@ usage() {
     fi
 
     cat <<-EOF >&2
-	Usage: $0 [-i INTERFACE] [NETWORK]
-	       $0 [-s SUBNET] [NETWORK]
+	Usage: $0 [-f] -s SUBNET [NETWORK]
+	       $0 -i INTERFACE [NETWORK]
 	       $0 -h
 	EOF
 }
