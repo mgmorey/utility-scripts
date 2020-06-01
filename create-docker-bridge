@@ -21,9 +21,9 @@ create_docker_bridge() {
 }
 
 get_gw() {
-    net=$(get_net $1)
-    octet=$(get_octets $net 4)
-    printf '%s.%s\n' $(get_octets $net 1,2,3) $((octet + 1))
+    subnet=$(get_net $1)
+    octet=$(get_octets $subnet 4)
+    printf '%s.%s\n' $(get_octets $subnet 1,2,3) $((octet + 1))
 }
 
 get_net() {
@@ -35,33 +35,24 @@ get_octets() {
 }
 
 get_options() {
-    if [ -n "${interface-}" ]; then
-	if [ "$macvlan" = true ]; then
-	    driver=macvlan
-	else
-	    driver=ipvlan
-	fi
-
-	if [ "$dhcp" = true ]; then
-	    ipam_driver=dhcp
-	    ipam_opt=dhcp_interface=$interface
-	else
-	    ipam_driver=default
-	    ipam_opt=
-	fi
-
-	printf '%s\n' \
-	       --driver=$driver \
-	       --ipam-driver=$ipam_driver \
-	       ${ipam_opt:+--ipam-opt=$ipam_opt} \
-	       --opt=parent=$interface
+    if [ "$dhcp" = true ]; then
+	ipam_driver=dhcp
+	ipam_opt=dhcp_interface=${interface:-eth0}
+    else
+	ipam_driver=
+	ipam_opt=
     fi
 
+    printf '%s\n' --driver=$driver \
+	   ${ipam_driver:+--ipam-driver=$ipam_driver} \
+	   ${ipam_opt:+--ipam-opt=$ipam_opt} \
+	   --opt=parent=${interface:-eth0}
+
     if [ -n "${net-}" ]; then
-	printf '%s\n' --subnet=$net
+	printf '%s\n' --subnet=$subnet
 
 	if [ "$first" = true ]; then
-	    printf '%s\n' --gateway=$(get_gw $net)
+	    printf '%s\n' --gateway=$(get_gw $subnet)
 	elif [ -n "${gateway-}" ]; then
 	    printf '%s\n' --gateway=$gateway
 	fi
@@ -73,7 +64,7 @@ parse_arguments() {
     first=false
     gateway=
     interface=
-    net=
+    subnet=
 
     while getopts dfg:i:mn:h opt; do
 	case $opt in
@@ -90,7 +81,7 @@ parse_arguments() {
 		interface=$OPTARG
 		;;
 	    (n)
-		net=$OPTARG
+		subnet=$OPTARG
 		;;
 	    (h)
 		usage
@@ -105,14 +96,17 @@ parse_arguments() {
     done
 
     shift $(($OPTIND - 1))
-    network=${1:-alternate}
+    network=$1
 
     case "$network" in
+	(bridge[0-9])
+	    driver=bridge
+	    ;;
 	(ipvlan[0-9])
-	    macvlan=false
+	    driver=ipvlan
 	    ;;
 	(macvlan[0-9])
-	    macvlan=true
+	    driver=macvlan
 	    ;;
 	(*)
 	    printf "%s: %s: Invalid network name\n" "$0" "$network" >&2
@@ -129,7 +123,8 @@ usage() {
     fi
 
     cat <<-EOF >&2
-	Usage: $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] ipvlanN
+	Usage: $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] bridgeN
+	       $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] ipvlanN
 	       $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] macvlanN
 	       $0 -h
 	EOF
