@@ -20,7 +20,8 @@ cd
 /bin/rm -rf \
 	.cache/pip \
 	.cache/pipenv \
+	.local/bin/easy_install* \
 	.local/bin/pip* \
-	.local/bin/virtualenv \
+	.local/bin/virtualenv* \
 	.local/lib/python* \
 	.local/virtualenvs/*
