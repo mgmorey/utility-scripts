@@ -35,14 +35,8 @@ get_octets() {
 }
 
 get_options() {
-    if [ -n "${subnet-}" ]; then
-	printf '%s\n' --subnet=$subnet
-
-	if [ "$first" = true ]; then
-	    printf '%s\n' --gateway=$(get_gw $subnet)
-	elif [ -n "${gateway-}" ]; then
-	    printf '%s\n' --gateway=$gateway
-	fi
+    if [ -n "${driver-}" ]; then
+	printf '%s\n' --driver=$driver
     elif [ -n "${interface-}" ]; then
 	printf '%s\n' \
 	       --ipam-driver=dhcp \
@@ -52,16 +46,30 @@ get_options() {
 	printf '%s\n' \
 	       --ipam-driver=default
     fi
+
+    if [ -n "${subnet-}" ]; then
+	printf '%s\n' --subnet=$subnet
+
+	if [ "$first" = true ]; then
+	    printf '%s\n' --gateway=$(get_gw $subnet)
+	elif [ -n "${gateway-}" ]; then
+	    printf '%s\n' --gateway=$gateway
+	fi
+    fi
 }
 
 parse_arguments() {
+    driver=
     first=false
     gateway=
     interface=
     subnet=
 
-    while getopts fgis:h opt; do
+    while getopts d:fg:i:s:h opt; do
 	case $opt in
+	    (d)
+		driver=$OPTARG
+		;;
 	    (f)
 		first=true
 		;;
@@ -99,6 +107,7 @@ usage() {
     cat <<-EOF >&2
 	Usage: $0 [-f] -s SUBNET [NETWORK]
 	       $0 -i INTERFACE [NETWORK]
+	       $0 -d DRIVER [NETWORK]
 	       $0 -h
 	EOF
 }
