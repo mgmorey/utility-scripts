@@ -37,7 +37,7 @@ get_octets() {
 get_options() {
     if [ "$dhcp" = true ]; then
 	ipam_driver=dhcp
-	ipam_opt=dhcp_interface=${interface:-eth0}
+	ipam_opt=${parent:+dhcp_interface=$parent}
     else
 	ipam_driver=
 	ipam_opt=
@@ -46,7 +46,7 @@ get_options() {
     printf '%s\n' --driver=$driver \
 	   ${ipam_driver:+--ipam-driver=$ipam_driver} \
 	   ${ipam_opt:+--ipam-opt=$ipam_opt} \
-	   --opt=parent=${interface:-eth0}
+	   ${parent:+--opt=parent=$parent}
 
     if [ -n "${net-}" ]; then
 	printf '%s\n' --subnet=$subnet
@@ -63,10 +63,10 @@ parse_arguments() {
     dhcp=false
     first=false
     gateway=
-    interface=
     subnet=
+    parent=
 
-    while getopts dfg:i:mn:h opt; do
+    while getopts dfg:n:p:h opt; do
 	case $opt in
 	    (d)
 		dhcp=true
@@ -77,11 +77,11 @@ parse_arguments() {
 	    (g)
 		gateway=$OPTARG
 		;;
-	    (i)
-		interface=$OPTARG
-		;;
 	    (n)
 		subnet=$OPTARG
+		;;
+	    (p)
+		parent=$OPTARG
 		;;
 	    (h)
 		usage
@@ -123,9 +123,9 @@ usage() {
     fi
 
     cat <<-EOF >&2
-	Usage: $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] bridgeN
-	       $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] ipvlanN
-	       $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] macvlanN
+	Usage: $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] [-p PARENT] bridgeN
+	       $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] [-p PARENT] ipvlanN
+	       $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] [-p PARENT] macvlanN
 	       $0 -h
 	EOF
 }
