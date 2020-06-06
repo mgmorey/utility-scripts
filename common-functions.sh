@@ -45,11 +45,12 @@ get_home_directory() {
 	(Darwin)
 	    printf "/Users/%s\n" "$1"
 	    ;;
-	(*BSD)
-	    awk -F: '$1 == "'"$1"'" {print $6}' /etc/passwd
-	    ;;
 	(*)
-	    getent passwd "$1" | awk -F: '{print $6}'
+	    if which getent >/dev/null 2>&1; then
+		getent passwd "$1" | awk -F: '{print $6}'
+	    elif [ -r /etc/passwd ]; then
+		awk -F: '$1 == "'"$1"'" {print $6}' /etc/passwd
+	    fi
 	    ;;
     esac
 }
@@ -173,10 +174,10 @@ run_unpriv() (
 )
 
 set_user_profile() {
-    user=$(get_user_name)
-    home="$(get_home_directory $user)"
+    user="$(get_user_name)"
+    home="$(get_home_directory "$user")"
 
-    if [ "$HOME" != "$home" ]; then
+    if [ -n "$home" -a "$HOME" != "$home" ]; then
 	if [ "${ENV_VERBOSE-false}" = true ]; then
 	    printf "Changing HOME from: %s\n" "$HOME" >&2
 	    printf "Changing HOME to: %s\n" "$home" >&2
@@ -187,7 +188,7 @@ set_user_profile() {
 
     shell="$(get_shell $user)"
 
-    if [ "$SHELL" != "$shell" ]; then
+    if [ -n "$shell" -a "$SHELL" != "$shell" ]; then
 	if [ "${ENV_VERBOSE-false}" = true ]; then
 	    printf "Changing SHELL from: %s\n" "$SHELL" >&2
 	    printf "Changing SHELL to: %s\n" "$shell" >&2
@@ -196,9 +197,11 @@ set_user_profile() {
 	export SHELL="$shell"
     fi
 
-    if [ -x "$HOME/bin/set-parameters" ]; then
-	eval "$($HOME/bin/set-parameters -s /bin/sh)"
-    else
-	export PATH="$(get_profile_path "$home" "$1")"
+    if [ -n "${HOME-}" ]; then
+	if [ -x "$HOME/bin/set-parameters" ]; then
+	    eval "$($HOME/bin/set-parameters -s /bin/sh)"
+	else
+	    export PATH="$(get_profile_path "$home" "$1")"
+	fi
     fi
 }
