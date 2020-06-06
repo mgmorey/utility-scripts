@@ -446,7 +446,6 @@ configure_linux_opensuse_lp_15() {
 
     # Set system Python interpreter
     SYSTEM_PYTHON=/usr/bin/python3.6
-    SYSTEM_PYTHON_VERSION=3.6.5
 }
 
 configure_linux_opensuse_tw() {
