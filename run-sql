@@ -118,7 +118,7 @@ get_cli_sap_hana() {
 	   ${host:+-n $host${port:+:$port}} \
 	   ${instance:+-d $instance} \
 	   ${username:+-u $username} \
-           ${password:+-p $password}
+	   ${password:+-p $password}
 }
 
 get_cli_sqlite() {
