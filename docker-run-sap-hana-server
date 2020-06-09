@@ -57,7 +57,7 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
@@ -71,9 +71,9 @@ get_realpath() (
 
 parse_arguments() {
     if [ $# -gt 0 ]; then
-        user_opts="$@"
+	user_opts="$@"
     else
-        user_opts="-d"
+	user_opts="-d"
     fi
 }
 
@@ -82,7 +82,7 @@ set_options() {
     vol_opts=
 
     for port in $PORTS; do
-        port_opts="${port_opts:+$port_opts }-p $port:$port"
+	port_opts="${port_opts:+$port_opts }-p $port:$port"
     done
 
     for container_dir in $CONTAINER_DIRS; do

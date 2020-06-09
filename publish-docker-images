@@ -19,24 +19,24 @@ abort() {
 
 get_versions() {
     case $database in
-        (mssql)
-            versions_default=MSSQL_VERSIONS
-            ;;
-        (mysql)
-            versions_default=MYSQL_VERSIONS
-            ;;
-        (oracle)
-            versions_default=ORACLE_VERSIONS
-            ;;
-        (postgres)
-            versions_default=POSTGRES_VERSIONS
-            ;;
-        (sap-hana)
-            versions_default=SAP_HANA_VERSIONS
-            ;;
-        (*)
-            abort '%s: %s: DBMS not recognized\n' "$0" "$database"
-            ;;
+	(mssql)
+	    versions_default=MSSQL_VERSIONS
+	    ;;
+	(mysql)
+	    versions_default=MYSQL_VERSIONS
+	    ;;
+	(oracle)
+	    versions_default=ORACLE_VERSIONS
+	    ;;
+	(postgres)
+	    versions_default=POSTGRES_VERSIONS
+	    ;;
+	(sap-hana)
+	    versions_default=SAP_HANA_VERSIONS
+	    ;;
+	(*)
+	    abort '%s: %s: DBMS not recognized\n' "$0" "$database"
+	    ;;
     esac
 
     printf '%s\n' "$versions_default"
@@ -52,7 +52,7 @@ parse_arguments() {
     while getopts blnt:v:h opt; do
 	case $opt in
 	    (b)
-                build=true
+		build=true
 		buildonly=true
 		;;
 	    (l)
@@ -86,9 +86,9 @@ parse_arguments() {
 
 publish_docker_images() {
     for database; do
-        for version in ${versions:-$(get_versions)}; do
-            publish_image $database $version
-        done
+	for version in ${versions:-$(get_versions)}; do
+	    publish_image $database $version
+	done
     done
 }
 
@@ -97,16 +97,16 @@ publish_image() (
     repo_image=$BASE_URL/$image:${tag:-$TAG}
 
     if [ -d docker-${1}/$2 ]; then
-        cd docker-${1}/$2
+	cd docker-${1}/$2
 
-        if [ "$build" = true ]; then
-            docker build -t $image .
-        fi
+	if [ "$build" = true ]; then
+	    docker build -t $image .
+	fi
 
-        if [ "$buildonly" = false ]; then
-            docker tag $image $repo_image
-            docker push $repo_image
-        fi
+	if [ "$buildonly" = false ]; then
+	    docker tag $image $repo_image
+	    docker push $repo_image
+	fi
     fi
 )
 
