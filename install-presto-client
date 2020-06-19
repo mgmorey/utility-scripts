@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# install-presto-client: install Presto client packages
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+BASE_URL=https://repo1.maven.org/maven2/io/prestosql/presto-cli
+PRESTO_VERSION=336
+
+JAR_FILE=presto-cli-$PRESTO_VERSION-executable.jar
+PREFIX=/usr/local
+
+install_presto_client() (
+    cd /tmp
+    curl --output $JAR_FILE $BASE_URL/$PRESTO_VERSION/$JAR_FILE
+    mv -f $JAR_FILE $PREFIX/bin/presto
+    chmod a+x $PREFIX/bin/presto
+)
+
+if [ $# -gt 0 ]; then
+    abort "%s: Too many arguments\n" "$0"
+fi
+
+install_presto_client
