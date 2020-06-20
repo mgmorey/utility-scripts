@@ -22,7 +22,7 @@ DEBIAN_PKGS="%s-packaging %s-pip %s-setuptools %s-wheel"
 
 FREEBSD_PKGS="%s-packaging %s-pip %s-wheel"
 
-FEDORA_PKGS="%s-packaging %s-pip %s-wheel"
+FEDORA_PKGS="%s-packaging %s-pip %s-setuptools %s-wheel"
 
 ILLUMOS_PKGS=":%s-packaging :%s-pip :%s-wheel"
 
