@@ -20,7 +20,7 @@ AMAZON_2_PKGS="%s-pip %s-wheel"
 
 DEBIAN_PKGS="%s-packaging %s-pip %s-setuptools %s-wheel"
 
-FREEBSD_PKGS="%s-packaging %s-pip %s-wheel"
+FREEBSD_PKGS="%s-packaging %s-pip %s-setuptools %s-wheel"
 
 FEDORA_PKGS="%s-packaging %s-pip %s-setuptools %s-wheel"
 
