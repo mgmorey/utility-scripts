@@ -93,8 +93,11 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
-	(rhel|ol)
+	(rhel)
 	    case "$VERSION_ID" in
+		(7.*)
+		    true
+		    ;;
 		(8.*)
 		    true
 		    ;;
