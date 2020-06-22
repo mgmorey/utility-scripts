@@ -18,6 +18,7 @@
 
 BASE_URL=https://repo1.maven.org/maven2/io/prestosql/presto-server-rpm
 PRESTO_VERSION=336
+PYTHON_VERSION=3
 
 PKG_NAME=presto-server-rpm
 RPM_FILE=presto-server-rpm-$PRESTO_VERSION.rpm
@@ -65,7 +66,7 @@ install_platform() {
 
 install_presto_server() (
     validate_platform
-    install-packages java-11-openjdk-devel python2
+    install-packages java-11-openjdk-devel python$PYTHON_VERSION
     install_platform
 
 )
