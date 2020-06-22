@@ -70,17 +70,6 @@ install_presto_server() (
 
 )
 
-install_python_symlink() {
-    if ! which python >/dev/null 2>&1; then
-    	for version in 3 2; do
-    	    if which python$version >/dev/null 2>&1; then
-    		ln -s "$(which python$version)" /usr/bin/python
-    		break
-    	    fi
-    	done
-    fi
-}
-
 install_rpm_files() {
     if ! rpm -q $PKG_NAME >/dev/null 2>&1; then
 	cd /tmp
@@ -93,17 +82,10 @@ validate_platform() {
     case "$ID" in
 	(centos)
 	    case "$VERSION_ID" in
-		(8)
+		(7)
 		    true
 		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(opensuse-leap)
-	    case "$VERSION_ID" in
-		(15.*)
+		(8)
 		    true
 		    ;;
 		(*)
