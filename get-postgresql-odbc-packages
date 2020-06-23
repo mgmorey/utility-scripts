@@ -56,8 +56,18 @@ get_postgresql_odbc_packages() {
     packages=
 
     case "$ID" in
+	(amzn)
+	    case "$VERSION_ID" in
+		(2)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+	    esac
+	    ;;
 	(centos)
 	    case "$VERSION_ID" in
+		(7)
+		    packages=$REDHAT_8_PKGS
+		    ;;
 		(8)
 		    packages=$REDHAT_8_PKGS
 		    ;;
