@@ -16,6 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+CATEGORIES="postgresql-client postgresql-contrib postgresql-devel \
+postgresql-server python-postgresql"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -31,7 +34,7 @@ get_postgresql_packages() {
 
 get_packages_in() {
     for category; do
-	get-postgresql-$category-packages
+	get-$category-packages
     done
 }
 
@@ -58,10 +61,25 @@ parse_arguments() {
     for arg; do
 	case $arg in
 	    (all)
-		categories="client"
+		categories=
 		;;
 	    (client)
-		categories="${categories+$categories client}"
+		categories="${categories+$categories postgresql-client}"
+		;;
+	    (contrib)
+		categories="${categories+$categories postgresql-contrib}"
+		;;
+	    (devel)
+		categories="${categories+$categories postgresql-devel}"
+		;;
+	    (odbc)
+		categories="${categories+$categories postgresql-odbc}"
+		;;
+	    (python)
+		categories="${categories+$categories python-postgresql}"
+		;;
+	    (server)
+		categories="${categories+$categories postgresql-server}"
 		;;
 	    (*)
 		abort "%s: %s -- invalid argument\n" "$0" "$arg"
@@ -69,7 +87,7 @@ parse_arguments() {
     done
 
     if [ -z "$categories" ]; then
-	categories="client python server"
+	categories=$CATEGORIES
     fi
 }
 
