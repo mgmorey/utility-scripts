@@ -1,0 +1,183 @@
+#!/bin/sh -eu
+
+# get-postgresql-server-packages: get PostgreSQL server package names
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+DEBIAN_10_PKGS="postgresql-11"
+
+FEDORA_PKGS="postgresql-server"
+
+FREEBSD_PKGS="postgresql11"
+
+ILLUMOS_PKGS="database/postgres-11"
+
+MACOS_HOMEBREW_PKGS="postgresql-server"
+
+OPENSUSE_PKGS="postgresql-server"
+
+REDHAT_7_PKGS="postgresql-server"
+REDHAT_8_PKGS="postgresql-server"
+
+SOLARIS_PKGS="database/postgres"
+
+UBUNTU_18_PKGS="postgresql-10"
+UBUNTU_19_PKGS="postgresql-11"
+UBUNTU_20_PKGS="postgresql-12"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+get_postgresql_server_packages() {
+    packages=
+
+    case "$ID" in
+	(amzn)
+	    case "$VERSION_ID" in
+		(2)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+	    esac
+	    ;;
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+		(8)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    case "$VERSION_ID" in
+		(10)
+		    packages=$DEBIAN_10_PKGS
+		    ;;
+	    esac
+	    ;;
+	(fedora)
+	    case "$VERSION_ID" in
+		(32)
+		    packages=$FEDORA_PKGS
+		    ;;
+	    esac
+	    ;;
+	(opensuse-leap)
+	    case "$VERSION_ID" in
+		(15.1)
+		    packages=$OPENSUSE_PKGS
+		    ;;
+	    esac
+	    ;;
+	(opensuse-tumbleweed)
+	    case "$VERSION_ID" in
+		(2020*)
+		    packages=$OPENSUSE_PKGS
+		    ;;
+	    esac
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(8.*)
+		    packages=$REDHAT_8_PKGS
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    packages=$UBUNTU_18_PKGS
+		    ;;
+		(19.10)
+		    packages=$UBUNTU_19_PKGS
+		    ;;
+		(20.04)
+		    packages=$UBUNTU_20_PKGS
+		    ;;
+	    esac
+	    ;;
+	(freebsd)
+	    case "$VERSION_ID" in
+		(11.3-*)
+		    packages=$FREEBSD_PKGS
+		    ;;
+		(12.1-*)
+		    packages=$FREEBSD_PKGS
+		    ;;
+	    esac
+	    ;;
+	(illumos)
+	    case "$VERSION_ID" in
+		(2019.10)
+		    packages=$ILLUMOS_PKGS
+		    ;;
+		(2020.04)
+		    packages=$ILLUMOS_PKGS
+		    ;;
+	    esac
+	    ;;
+	(macos)
+	    case "$VERSION_ID" in
+		(10.14.*)
+		    packages=$MACOS_HOMEBREW_PKGS
+		    ;;
+		(10.15.*)
+		    packages=$MACOS_HOMEBREW_PKGS
+		    ;;
+	    esac
+	    ;;
+	(solaris)
+	    case "$VERSION_ID" in
+		(11.4)
+		    packages=$SOLARIS_PKGS
+		    ;;
+	    esac
+	    ;;
+    esac
+
+    format-python-packages ${packages-}
+}
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+. "$script_dir/common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+get_postgresql_server_packages
