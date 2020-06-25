@@ -20,6 +20,7 @@ DEBIAN_10_PKGS="odbc-postgresql"
 
 FEDORA_PKGS="postgresql-odbc"
 
+REDHAT_7_PKGS="postgresql-odbc"
 REDHAT_8_PKGS="postgresql-odbc"
 
 UBUNTU_18_PKGS="odbc-postgresql"
@@ -66,7 +67,7 @@ get_postgresql_odbc_packages() {
 	(centos)
 	    case "$VERSION_ID" in
 		(7)
-		    packages=$REDHAT_8_PKGS
+		    packages=$REDHAT_7_PKGS
 		    ;;
 		(8)
 		    packages=$REDHAT_8_PKGS
