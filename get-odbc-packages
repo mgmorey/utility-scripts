@@ -18,6 +18,7 @@
 
 DEBIAN_10_PKGS="unixodbc unixodbc-bin"
 
+REDHAT_7_PKGS="unixODBC"
 REDHAT_8_PKGS="unixODBC"
 
 UBUNTU_18_PKGS="unixodbc unixodbc-bin"
@@ -37,6 +38,13 @@ get_odbc_packages() {
     packages=
 
     case "$ID" in
+	(amzn)
+	    case "$VERSION_ID" in
+		(2)
+		    packages=$REDHAT_7_PKGS
+		    ;;
+	    esac
+	    ;;
 	(centos)
 	    case "$VERSION_ID" in
 		(7)
