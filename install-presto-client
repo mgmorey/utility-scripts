@@ -20,13 +20,21 @@ BASE_URL=https://repo1.maven.org/maven2/io/prestosql/presto-cli
 PRESTO_VERSION=336
 
 JAR_FILE=presto-cli-$PRESTO_VERSION-executable.jar
-PREFIX=/usr/local
+LOCAL_PREFIX=/usr/local
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
 
 install_presto_client() (
-    cd /tmp
-    curl --output $JAR_FILE $BASE_URL/$PRESTO_VERSION/$JAR_FILE
-    mv -f $JAR_FILE $PREFIX/bin/presto
-    chmod a+x $PREFIX/bin/presto
+    curl --output /tmp/$JAR_FILE $BASE_URL/$PRESTO_VERSION/$JAR_FILE
+
+    for prefix in $LOCAL_PREFIX $HOME; do
+	if mv -f /tmp/$JAR_FILE $prefix/bin/presto 2>/dev/null; then
+	    chmod a+x $prefix/bin/presto
+	fi
+    done
 )
 
 if [ $# -gt 0 ]; then
