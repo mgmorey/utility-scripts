@@ -2,12 +2,13 @@
 
 BASE_URL=artifactory.prod.tableautools.com:6555/dataservices
 
-DATABASES="mssql mysql oracle postgres"
+DATABASES="mssql mysql oracle postgres presto sap-hana"
 
-MSSQL_VERSIONS="2012 2017 2019"
+MSSQL_VERSIONS="2017 2019"
 MYSQL_VERSIONS="5.6 5.7 8.0"
 ORACLE_VERSIONS="12 18 19"
 POSTGRES_VERSIONS="9.4 11 12"
+PRESTO_VERSIONS="336"
 SAP_HANA_VERSIONS="ee2"
 
 TAG="$(date +%Y%m%d%H%M)"
@@ -20,19 +21,22 @@ abort() {
 get_versions() {
     case $database in
 	(mssql)
-	    versions_default=MSSQL_VERSIONS
+	    versions_default=$MSSQL_VERSIONS
 	    ;;
 	(mysql)
-	    versions_default=MYSQL_VERSIONS
+	    versions_default=$MYSQL_VERSIONS
 	    ;;
 	(oracle)
-	    versions_default=ORACLE_VERSIONS
+	    versions_default=$ORACLE_VERSIONS
 	    ;;
 	(postgres)
-	    versions_default=POSTGRES_VERSIONS
+	    versions_default=$POSTGRES_VERSIONS
+	    ;;
+	(presto)
+	    versions_default=$PRESTO_VERSIONS
 	    ;;
 	(sap-hana)
-	    versions_default=SAP_HANA_VERSIONS
+	    versions_default=$SAP_HANA_VERSIONS
 	    ;;
 	(*)
 	    abort '%s: %s: DBMS not recognized\n' "$0" "$database"
