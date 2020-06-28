@@ -24,7 +24,7 @@ FREEBSD_PKGS="postgresql11"
 
 ILLUMOS_PKGS="database/postgres-11"
 
-MACOS_HOMEBREW_PKGS="postgresql-server"
+MACOS_HOMEBREW_PKGS="postgresql"
 
 OPENSUSE_PKGS="postgresql-server"
 
