@@ -182,11 +182,11 @@ include_homebrew_keg_directories() {
 	    PATH="$prefix/$pkg/bin${PATH:+:$PATH}"
 	fi
 
-	pkgdir=$prefix/$pkg/lib/pkgconfig
-
-	if is_to_be_included $pkgdir "${PKG_CONFIG_PATH-}"; then
-	    PKG_CONFIG_PATH="$pkgdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-	fi
+	for pkgdir in $prefix/$pkg/lib/pkgconfig /usr/share/pkgconfig; do
+	    if is_to_be_included $pkgdir "${PKG_CONFIG_PATH-}"; then
+		PKG_CONFIG_PATH="$pkgdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+	    fi
+	done
     done
 
 }
