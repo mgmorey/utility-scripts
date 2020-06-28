@@ -105,7 +105,7 @@ install_presto_server() {
 }
 
 install_package() {
-    if rpm -q $RPM_PACKAGE >/dev/null 2>&1; then
+    if rpm -q $RPM_PKG >/dev/null 2>&1; then
 	return
     fi
 
