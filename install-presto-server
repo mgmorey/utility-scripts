@@ -16,12 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-BASE_URL=https://repo1.maven.org/maven2/io/prestosql/presto-server-rpm
+BASE_URL=https://repo1.maven.org/maven2/io/prestosql
 PRESTO_VERSION=336
-PYTHON_VERSION=3
 
-PKG_NAME=presto-server-rpm
-RPM_FILE=presto-server-rpm-$PRESTO_VERSION.rpm
+MACOS_HOMEBREW_PKGS=prestosql
+OPENSUSE_PKGS=java-11-openjdk-devel
+REDHAT_PKGS=java-11-openjdk-devel
+
+RPM_PKG=presto-server-rpm
+TAR_PKG=presto-server
 
 abort() {
     printf "$@" >&2
@@ -53,30 +56,73 @@ get_realpath() (
     fi
 )
 
+get_presto_rpm_file() {
+    printf '%s\n' $RPM_PKG-$PRESTO_VERSION.rpm
+}
+
+get_presto_rpm_url() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf '%s\n' $BASE_URL/$RPM_PKG/$PRESTO_VERSION/$1
+}
+
+get_presto_tar_file() {
+    printf '%s\n' $TAR_PKG-$PRESTO_VERSION.tar.gz
+}
+
+get_presto_tar_url() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf '%s\n' $BASE_URL/$TAR_PKG/$PRESTO_VERSION/$1
+}
+
 install_platform() {
+    cd /tmp
+
     case "$ID" in
 	(rhel|ol|centos)
-	    install_rpm_files
+	    install-packages $REDHAT_PKGS
+	    install_package
 	    ;;
 	(opensuse-leap)
-	    install_rpm_files
+	    install-packages $OPENSUSE_PKGS
+	    install_package
+	    ;;
+	(macos)
+	    install-packages $MACOS_HOMEBREW_PKGS
+	    ;;
+	(*)
+	    if which java >/dev/null; then
+		install_tarball
+	    fi
 	    ;;
     esac
 }
 
-install_presto_server() (
+install_presto_server() {
     validate_platform
-    install-packages java-11-openjdk-devel python$PYTHON_VERSION
     install_platform
+}
 
-)
-
-install_rpm_files() {
-    if ! rpm -q $PKG_NAME >/dev/null 2>&1; then
-	cd /tmp
-	curl --output $RPM_FILE $BASE_URL/$PRESTO_VERSION/$RPM_FILE
-	rpm -ihv $RPM_FILE
+install_package() {
+    if rpm -q $RPM_PACKAGE >/dev/null 2>&1; then
+	return
     fi
+
+    rpm_file=$(get_presto_rpm_file)
+    rpm_url=$(get_presto_rpm_url $rpm_file)
+    curl --output $rpm_file $rpm_url
+    rpm -ihv $rpm_file
+    rm $rpm_file
+}
+
+install_tarball() {
+    tar_file=$(get_presto_tar_file)
+    tar_url=$(get_presto_tar_url $tar_file)
+    curl --output $tar_file $tar_url
+    tar xvf $tar_file
+    mv ${tar_file%.tar.gz} /usr/local/opt
+    rm $tar_file
 }
 
 validate_platform() {
@@ -100,6 +146,19 @@ validate_platform() {
 		    true
 		    ;;
 		(8.*)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(macos)
+	    case "$VERSION_ID" in
+		(10.14.*)
+		    true
+		    ;;
+		(10.15.*)
 		    true
 		    ;;
 		(*)
