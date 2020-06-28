@@ -24,8 +24,6 @@ FREEBSD_PKGS="postgresql11-contrib"
 
 ILLUMOS_PKGS="database/postgres-11"
 
-MACOS_HOMEBREW_PKGS=
-
 REDHAT_7_PKGS="postgresql-contrib"
 REDHAT_8_PKGS="postgresql-contrib"
 
@@ -131,16 +129,6 @@ get_postgresql_contrib_packages() {
 		    ;;
 		(2020.04)
 		    packages=$ILLUMOS_PKGS
-		    ;;
-	    esac
-	    ;;
-	(macos)
-	    case "$VERSION_ID" in
-		(10.14.*)
-		    packages=$MACOS_HOMEBREW_PKGS
-		    ;;
-		(10.15.*)
-		    packages=$MACOS_HOMEBREW_PKGS
 		    ;;
 	    esac
 	    ;;
