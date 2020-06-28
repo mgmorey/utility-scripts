@@ -1,4 +1,4 @@
-#!/bin/sh -eux
+#!/bin/sh -eu
 
 BASE_URL=artifactory.prod.tableautools.com:6555/dataservices
 
