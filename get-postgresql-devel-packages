@@ -31,8 +31,6 @@ OPENSUSE_PKGS=
 REDHAT_7_PKGS="postgresql-devel"
 REDHAT_8_PKGS="postgresql-devel"
 
-SOLARIS_PKGS=
-
 UBUNTU_18_PKGS="postgresql-devel-10"
 UBUNTU_19_PKGS="postgresql-devel-11"
 UBUNTU_20_PKGS="postgresql-devel-12"
@@ -159,13 +157,6 @@ get_postgresql_devel_packages() {
 		    ;;
 		(10.15.*)
 		    packages=$MACOS_HOMEBREW_PKGS
-		    ;;
-	    esac
-	    ;;
-	(solaris)
-	    case "$VERSION_ID" in
-		(11.4)
-		    packages=$SOLARIS_PKGS
 		    ;;
 	    esac
 	    ;;
