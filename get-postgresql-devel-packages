@@ -26,8 +26,6 @@ ILLUMOS_PKGS="database/postgres-11"
 
 MACOS_HOMEBREW_PKGS=
 
-OPENSUSE_PKGS=
-
 REDHAT_7_PKGS="postgresql-devel"
 REDHAT_8_PKGS="postgresql-devel"
 
@@ -93,20 +91,6 @@ get_postgresql_devel_packages() {
 	    case "$VERSION_ID" in
 		(32)
 		    packages=$FEDORA_PKGS
-		    ;;
-	    esac
-	    ;;
-	(opensuse-leap)
-	    case "$VERSION_ID" in
-		(15.1)
-		    packages=$OPENSUSE_PKGS
-		    ;;
-	    esac
-	    ;;
-	(opensuse-tumbleweed)
-	    case "$VERSION_ID" in
-		(2020*)
-		    packages=$OPENSUSE_PKGS
 		    ;;
 	    esac
 	    ;;
