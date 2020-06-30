@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# uninstall-mysql: uninstall MySQL database packages
+# uninstall-mysql: uninstall MySQL packages
 # Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
