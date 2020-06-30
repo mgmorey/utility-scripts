@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# clean-virtualenvs: remove Python 3 virtual environments
+# clean-virtualenvs: remove Python virtual environments
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
