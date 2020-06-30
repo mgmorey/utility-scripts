@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-pgadmin4-packages: get list of pgadmin4 packages
+# get-pgadmin4-packages: get list of pgAdmin4 packages
 # Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
