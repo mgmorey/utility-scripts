@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-mysql-packages: get list of mysql packages
+# get-mysql-packages: get list of MySQL packages
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
