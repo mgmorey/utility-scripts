@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # pylint: disable=bad-continuation,invalid-name,missing-docstring
 
-# get-odbc-driver-info: print installed ODBC driver details
+# get-odbc-drivers: describe installed ODBC drivers
 # Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
