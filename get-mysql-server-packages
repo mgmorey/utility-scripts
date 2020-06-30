@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-mysql-server-packages: get MySQL database server package names
+# get-mysql-server-packages: get MySQL server package names
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
