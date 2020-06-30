@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-python-development-tools: install Python 3 development tools
+# install-virtualenv: install Python 3 virtualenv
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
