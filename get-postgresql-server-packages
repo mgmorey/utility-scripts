@@ -100,7 +100,7 @@ get_postgresql_server_packages() {
 	    ;;
 	(opensuse-leap)
 	    case "$VERSION_ID" in
-		(15.1)
+		(15.[12])
 		    packages=$OPENSUSE_PKGS
 		    ;;
 	    esac

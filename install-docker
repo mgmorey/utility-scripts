@@ -246,7 +246,7 @@ validate_platform() {
 	    ;;
 	(opensuse-leap)
 	    case "$VERSION_ID" in
-		(15.1)
+		(15.[12])
 		    true
 		    ;;
 		(*)

@@ -13,7 +13,9 @@ This project has been tested on the following platforms:
 +-----------+---------------+-------------------------------+
 | GNU/Linux | Fedora        | 32 (x86_64)                   |
 +-----------+---------------+-------------------------------+
-| GNU/Linux | openSUSE      | Leap 15.1 (aarch64, x86_64)   |
+| GNU/Linux | openSUSE      | Leap 15.1 (x86_64)            |
++-----------+---------------+-------------------------------+
+| GNU/Linux | openSUSE      | Leap 15.2 (x86_64)            |
 +-----------+---------------+-------------------------------+
 | GNU/Linux | openSUSE      | Tumbleweed 20200604 (x86_64)  |
 +-----------+---------------+-------------------------------+
@@ -43,3 +45,16 @@ This project has been tested on the following platforms:
 +-----------+---------------+-------------------------------+
 | Unix      | OpenIndiana   | Hipster 2019.10 (x86_64)      |
 +-----------+---------------+-------------------------------+
+
+The various OS ports have been tested on the following processors:
+
++=========+====================================+=========+=========+
+| CPU ISA | CPU Vendor and Microarchitecture   | 32 bit  | 64 bit  |
++---------+------------------------------------+---------+---------+
+| ARMv8-A | ARM Cortex-A53                     | armhf   | aarch64 |
++---------+------------------------------------+---------+---------+
+| x86-64  | Intel Silvermont, Kaby Lake,       | N/A     | amd64/  |
+|         | and Coffee Lake                    |         | x86_64  |
++---------+------------------------------------+---------+---------+
+| z/Arch  | IBM z900 via Hercules emulator     | N/A     | s390x   |
++---------+------------------------------------+---------+---------+

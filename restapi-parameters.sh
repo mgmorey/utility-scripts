@@ -87,7 +87,7 @@ configure_baseline() {
 		    ;;
 		(opensuse-leap)
 		    case "$VERSION_ID" in
-			(15.1)
+			(15.[12])
 			    configure_linux_opensuse_lp_15
 			    ;;
 			(*)
