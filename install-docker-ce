@@ -1,7 +1,7 @@
 #!/bin/sh -eu
 
 # install-docker-ce: install Docker Community Edition
-# Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
+# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,13 +41,6 @@ add_gpg_key() {
 	esac
     done
 }
-
-get_package_manager_basename() {
-    manager_pathname=$(get-package-managers | awk 'NR == 1 {print $0}')
-    manager_basename=$(basename $manager_pathname)
-    printf "%s\n" $manager_basename
-}
-
 
 add_repositories() {
     assert [ $# -eq 1 ]
@@ -191,6 +184,13 @@ get_docker_url() {
     printf "%s\n" "$DOCKER_BASE_URL/linux/$ID"
 }
 
+get_package_manager_basename() {
+    manager_pathname=$(get-package-managers | awk 'NR == 1 {print $0}')
+    manager_basename=$(basename $manager_pathname)
+    printf "%s\n" $manager_basename
+}
+
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -258,7 +258,8 @@ install_docker_ce() {
 	configure_daemon_group $selected_packages
 
 	if install-packages $selected_packages; then
-	    postinstall_docker $selected_packages
+	    postinstall_docker
+	    restart_docker
 	else
 	    return $?
 	fi
@@ -296,6 +297,24 @@ preinstall_docker() {
 }
 
 postinstall_docker() {
+    mkdir -p /etc/docker /etc/systemd/system/docker.service.d
+    cat <<EOF >/etc/docker/daemon.json
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true"
+  ]
+}
+EOF
+    postinstall_platform
+}
+
+postinstall_platform() {
     case "$ID" in
 	(rhel|ol|centos)
 	    systemctl stop firewalld
@@ -314,6 +333,11 @@ remove_native_docker_packages() {
     if ! uninstall-packages "$@"; then
 	exit $?
     fi
+}
+
+restart_docker() {
+    systemctl daemon-reload
+    systemctl restart docker
 }
 
 validate_platform() {
