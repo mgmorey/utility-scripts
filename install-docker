@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-docker: install Docker packages
+# install-docker: install Docker OS-level virtualization system
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
