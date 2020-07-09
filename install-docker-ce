@@ -190,7 +190,6 @@ get_package_manager_basename() {
     printf "%s\n" $manager_basename
 }
 
-
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -288,14 +287,6 @@ modify_user() (
     fi
 )
 
-preinstall_docker() {
-    docker_url=$(get_docker_url)
-    install_dependencies
-    add_gpg_key "$docker_url"
-    add_repositories "$docker_url"
-    enable_additional_repositories
-}
-
 postinstall_docker() {
     mkdir -p /etc/docker /etc/systemd/system/docker.service.d
     cat <<EOF >/etc/docker/daemon.json
@@ -327,6 +318,14 @@ postinstall_platform() {
 	    semanage permissive -a container_runtime_t
 	    ;;
     esac
+}
+
+preinstall_docker() {
+    docker_url=$(get_docker_url)
+    install_dependencies
+    add_gpg_key "$docker_url"
+    add_repositories "$docker_url"
+    enable_additional_repositories
 }
 
 remove_native_docker_packages() {
