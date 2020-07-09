@@ -1,0 +1,239 @@
+#!/bin/sh -eu
+
+# install-kubernetes: install Kubernetes container orchestration system
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+GOOGLE_BASE_URL=https://packages.cloud.google.com
+KUBERNETES_BASE_URL=https://apt.kubernetes.io
+MODULE=br_netfilter
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
+
+add_gpg_key() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		curl -fsSL $1 | apt-key add - >/dev/null 2>&1
+		break
+		;;
+	esac
+    done
+}
+
+add_repositories() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    repo="$(get_kubernetes_repo $1)"
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		add-apt-repository "$repo"
+		break
+		;;
+	esac
+    done
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+configure_network() {
+    lsmod | if ! grep $MODULE >/dev/null; then
+	abort "%s: %s module not present\n" "$0" "$MODULE"
+    fi
+
+    if [ ! -d /etc/sysctl.d/k8s.conf ]; then
+	cat <<EOF >/etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+	sysctl --system
+    fi
+}
+
+configure_platform() {
+    manager=$(get_package_manager_basename)
+    packages=$(get-kubernetes-packages)
+}
+
+get_google_url() {
+    printf "%s\n" "$GOOGLE_BASE_URL/apt/doc/apt-key.gpg"
+}
+
+get_kubernetes_repo() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    repo=
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		repo="deb $1 kubernetes-xenial main"
+		;;
+	esac
+
+	if [ -n "${repo-}" ]; then
+	    printf "%s\n" "$repo"
+	    break
+	fi
+    done
+}
+
+get_kubernetes_url() {
+    printf "%s\n" "$KUBERNETES_BASE_URL/"
+}
+
+get_package_manager_basename() {
+    manager_pathname=$(get-package-managers | awk 'NR == 1 {print $0}')
+    manager_basename=$(basename $manager_pathname)
+    printf "%s\n" $manager_basename
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+install_dependencies() {
+    dependencies=$(get-kubernetes-dependencies)
+
+    if [ -n "$dependencies" ]; then
+	install-packages $dependencies
+    fi
+}
+
+install_kubernetes() {
+    validate_platform
+    configure_network
+    configure_platform
+    preinstall_kubernetes
+    install-packages $packages
+    postinstall_platform
+    restart_kubernetes
+}
+
+install_platform() {
+    true
+}
+
+parse_arguments() {
+    role=
+
+    for arg; do
+	case $arg in
+	    (control)
+		role=$arg
+		;;
+	    (worker)
+		role=$arg
+		;;
+	    (*)
+		abort "%s: %s -- invalid argument\n" "$0" "$arg"
+	esac
+    done
+
+    if [ -z "$role" ]; then
+	role=worker
+    fi
+}
+
+postinstall_platform() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		apt-mark hold $packages
+		break
+		;;
+	esac
+    done
+}
+
+preinstall_kubernetes() {
+    google_url=$(get_google_url)
+    kubernetes_url=$(get_kubernetes_url)
+    install_dependencies
+    add_gpg_key "$google_url"
+    add_repositories "$kubernetes_url"
+}
+
+restart_kubernetes() {
+    systemctl daemon-reload
+    systemctl restart kubelet
+}
+
+validate_platform() {
+    case "$ID" in
+	(debian|raspbian)
+	    case "$VERSION_ID" in
+		(10)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    true
+		    ;;
+		(20.04)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
+
+script_dir=$(get_realpath "$(dirname "$0")")
+
+. "$script_dir/common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+parse_arguments "$@"
+install_kubernetes
