@@ -29,18 +29,24 @@ abort_not_supported() {
     abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
 }
 
-add_gpg_key() {
+add_debian_apt_key() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
+    curl -fsSL $1 | apt-key add - >/dev/null 2>&1
+}
 
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (debian)
-		curl -fsSL $1 | apt-key add - >/dev/null 2>&1
-		break
-		;;
-	esac
-    done
+add_debian_repositories() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    google_url=$(get_google_url)
+    add_debian_apt_key "$google_url"
+    add-apt-repository "$1"
+}
+
+add_redhat_repositories() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    true
 }
 
 add_repositories() {
@@ -51,7 +57,11 @@ add_repositories() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
-		add-apt-repository "$repo"
+		add_debian_repositories "$repo"
+		break
+		;;
+	    (rhel|ol|centos|fedora)
+		add_redhat_repositories "$repo"
 		break
 		;;
 	esac
@@ -85,6 +95,14 @@ get_google_url() {
     printf "%s\n" "$GOOGLE_BASE_URL/apt/doc/apt-key.gpg"
 }
 
+get_kubernetes_debian_repo() {
+    printf 'deb %s kubernetes-xenial main\n' "$1"
+}
+
+get_kubernetes_redhat_repo() {
+    true
+}
+
 get_kubernetes_repo() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
@@ -93,7 +111,10 @@ get_kubernetes_repo() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
-		repo="deb $1 kubernetes-xenial main"
+		repo=$(get_kubernetes_debian_repo $1)
+		;;
+	    (rhel|ol|centos|fedora)
+		repo=$(get_kubernetes_redhat_repo $1)
 		;;
 	esac
 
@@ -186,10 +207,8 @@ postinstall_platform() {
 }
 
 preinstall_kubernetes() {
-    google_url=$(get_google_url)
-    kubernetes_url=$(get_kubernetes_url)
     install_dependencies
-    add_gpg_key "$google_url"
+    kubernetes_url=$(get_kubernetes_url)
     add_repositories "$kubernetes_url"
 }
 
