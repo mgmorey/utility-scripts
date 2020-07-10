@@ -44,9 +44,16 @@ add_debian_repositories() {
 }
 
 add_redhat_repositories() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    true
+    cat <<EOF >/etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+exclude=kubelet kubeadm kubectl
+EOF
 }
 
 add_repositories() {
@@ -89,6 +96,11 @@ EOF
 configure_platform() {
     manager=$(get_package_manager_basename)
     packages=$(get-kubernetes-packages)
+}
+
+disable_selinux() {
+    setenforce 0
+    sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 }
 
 get_google_url() {
@@ -165,13 +177,24 @@ install_kubernetes() {
     configure_network
     configure_platform
     preinstall_kubernetes
-    install-packages $packages
+    install_platform_packages $packages
     postinstall_platform
     restart_kubernetes
 }
 
-install_platform() {
-    true
+install_platform_packages() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		$manager install -y "$@"
+		break
+		;;
+	    (rhel|ol|centos|fedora)
+		$manager install -y "$@" --disableexcludes=kubernetes
+		break
+		;;
+	esac
+    done
 }
 
 parse_arguments() {
@@ -202,6 +225,11 @@ postinstall_platform() {
 		apt-mark hold $packages
 		break
 		;;
+	    (rhel|ol|centos|fedora)
+		disable_selinux
+		systemctl enable --now kubelet
+		break
+		;;
 	esac
     done
 }
@@ -219,9 +247,32 @@ restart_kubernetes() {
 
 validate_platform() {
     case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    true
+		    ;;
+		(8)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
 	(debian|raspbian)
 	    case "$VERSION_ID" in
 		(10)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(8.*)
 		    true
 		    ;;
 		(*)
