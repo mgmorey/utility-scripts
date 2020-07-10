@@ -38,8 +38,7 @@ add_debian_apt_key() {
 add_debian_repositories() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    google_url=$(get_google_url)
-    add_debian_apt_key "$google_url"
+    add_debian_apt_key $(get_google_url)
     add-apt-repository "$1"
 }
 
