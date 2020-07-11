@@ -418,7 +418,7 @@ usage() {
 }
 
 validate_platform() {
-    case "$id" in
+    case "$ID" in
 	(debian|raspbian)
 	    return
 	    ;;
