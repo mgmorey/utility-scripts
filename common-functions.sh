@@ -13,6 +13,15 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
 create_tmpfile() {
     tmpfile=$(mktemp)
     assert [ -n "${tmpfile}" ]
@@ -203,5 +212,14 @@ set_user_profile() {
 	else
 	    export PATH="$(get_profile_path "$home" "$1")"
 	fi
+    fi
+}
+
+validate_username() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    if [ "$(id -nu)" != $1 ]; then
+	abort "%s: Please try again as %s\n" "$0" "$1"
     fi
 }
