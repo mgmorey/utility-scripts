@@ -172,6 +172,7 @@ install_dependencies() {
 }
 
 install_kubernetes() {
+    validate_username root
     validate_platform
     configure_network
     configure_platform
@@ -296,6 +297,10 @@ validate_platform() {
 	    abort_not_supported "Operating system"
 	    ;;
     esac
+
+    if ! docker info >/dev/null 2>&1; then
+	abort "%s: Docker not installed\n" "$0"
+    fi
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
