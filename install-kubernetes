@@ -162,11 +162,11 @@ install_platform_packages() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
-		$manager install -y "$@"
+		install-packages "$@"
 		break
 		;;
 	    (rhel|ol|centos|fedora)
-		$manager install -y "$@" --disableexcludes=kubernetes
+		install-packages -o "--disableexcludes=kubernetes" "$@"
 		break
 		;;
 	esac
