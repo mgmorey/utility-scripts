@@ -55,6 +55,10 @@ get_package_install_options() {
 		esac
 		;;
 	    (debian)
+		if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+		    options="${options+$options }-y"
+		fi
+
 		options="${options+$options }--no-install-recommends"
 		;;
 	    (fedora)
