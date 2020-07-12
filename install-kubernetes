@@ -244,6 +244,9 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
+	(fedora)
+	    true
+	    ;;
 	(rhel|ol)
 	    case "$VERSION_ID" in
 		(8.*)
