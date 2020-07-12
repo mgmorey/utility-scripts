@@ -127,17 +127,7 @@ install_packages() {
     validate_platform
     configure_platform
     package_managers=$(get-package-managers)
-    install_options=$(get-package-install-options)
-
-    if [ -n "${general_options-}" ]; then
-	install_options="${install_options+$install_options }$general_options"
-    fi
-
-    if [ $# -eq 0 ]; then
-	return
-    fi
-
-    parse_arguments "$@"
+    install_options=$(get-package-install-options $general_options)
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -262,7 +252,6 @@ move_pattern_to_packages() {
 
 parse_arguments() {
     general_options=
-    packages=
     pattern=
 
     while getopts o:p:h opt; do
@@ -363,4 +352,5 @@ script_dir=$(get_realpath "$(dirname "$0")")
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-install_packages "$@"
+parse_arguments "$@"
+install_packages
