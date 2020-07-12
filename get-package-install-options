@@ -68,6 +68,10 @@ get_package_install_options() {
 		options="${options+$options }--no-recommends"
 		;;
 	    (rhel|ol)
+		if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+		    options="${options+$options }-y"
+		fi
+
 		case "$VERSION_ID" in
 		    (8.*)
 			options="${options+$options }--nobest"
