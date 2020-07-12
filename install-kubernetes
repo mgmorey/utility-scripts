@@ -36,7 +36,6 @@ add_debian_apt_key() {
 }
 
 add_debian_repositories() {
-    add_debian_repositories
     add_debian_apt_key $(get_google_apt_key_url)
     add-apt-repository "$(get_kubernetes_debian_repo $(get_kubernetes_url))"
 }
@@ -109,7 +108,7 @@ get_google_yum_url() {
 get_kubernetes_debian_repo() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    printf 'deb %s kubernetes-xenial main\n' "$1"
+    printf 'deb %s kubernetes-%s main\n' "$1" "$(lsb_release -cs)"
 }
 
 get_kubernetes_url() {
