@@ -36,38 +36,34 @@ add_debian_apt_key() {
 }
 
 add_debian_repositories() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    add_debian_apt_key $(get_google_url)
-    add-apt-repository "$1"
+    add_debian_repositories
+    add_debian_apt_key $(get_google_apt_key_url)
+    add-apt-repository "$(get_kubernetes_debian_repo $(get_kubernetes_url))"
 }
 
 add_redhat_repositories() {
+    base_url=$(get_google_yum_url)
     cat <<EOF >/etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
-baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+baseurl=$base_url/repos/kubernetes-el7-\$basearch
 enabled=1
 gpgcheck=1
 repo_gpgcheck=1
-gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+gpgkey=$base_url/doc/yum-key.gpg $base_url/doc/rpm-package-key.gpg
 exclude=kubelet kubeadm kubectl
 EOF
 }
 
 add_repositories() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    repo="$(get_kubernetes_repo $1)"
-
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
-		add_debian_repositories "$repo"
+		add_debian_repositories
 		break
 		;;
 	    (rhel|ol|centos|fedora)
-		add_redhat_repositories "$repo"
+		add_redhat_repositories
 		break
 		;;
 	esac
@@ -102,38 +98,18 @@ disable_selinux() {
     sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 }
 
-get_google_url() {
+get_google_apt_key_url() {
     printf "%s\n" "$GOOGLE_BASE_URL/apt/doc/apt-key.gpg"
 }
 
+get_google_yum_url() {
+    printf "%s\n" "$GOOGLE_BASE_URL/yum"
+}
+
 get_kubernetes_debian_repo() {
-    printf 'deb %s kubernetes-xenial main\n' "$1"
-}
-
-get_kubernetes_redhat_repo() {
-    true
-}
-
-get_kubernetes_repo() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    repo=
-
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (debian)
-		repo=$(get_kubernetes_debian_repo $1)
-		;;
-	    (rhel|ol|centos|fedora)
-		repo=$(get_kubernetes_redhat_repo $1)
-		;;
-	esac
-
-	if [ -n "${repo-}" ]; then
-	    printf "%s\n" "$repo"
-	    break
-	fi
-    done
+    printf 'deb %s kubernetes-xenial main\n' "$1"
 }
 
 get_kubernetes_url() {
@@ -236,8 +212,7 @@ postinstall_platform() {
 
 preinstall_kubernetes() {
     install_dependencies
-    kubernetes_url=$(get_kubernetes_url)
-    add_repositories "$kubernetes_url"
+    add_repositories
 }
 
 restart_kubernetes() {
