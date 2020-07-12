@@ -129,6 +129,10 @@ install_packages() {
     package_managers=$(get-package-managers)
     install_options=$(get-package-install-options)
 
+    if [ -n "${general_options-}" ]; then
+	install_options="${install_options+$install_options }$general_options"
+    fi
+
     if [ $# -eq 0 ]; then
 	return
     fi
@@ -257,11 +261,15 @@ move_pattern_to_packages() {
 }
 
 parse_arguments() {
+    general_options=
     packages=
     pattern=
 
-    while getopts p:h opt; do
+    while getopts o:p:h opt; do
 	case $opt in
+	    (o)
+		general_options=$OPTARG
+		;;
 	    (p)
 		pattern=$OPTARG
 		;;
@@ -288,7 +296,7 @@ usage() {
     fi
 
     cat <<-EOF >&2
-	Usage: $0: [-p PATTERN]
+	Usage: $0: [-o OPTIONS] [-p PATTERN] PACKAGE [PACKAGE ...]
 	       $0: -h
 	EOF
 }
