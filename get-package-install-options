@@ -83,6 +83,10 @@ get_package_install_options() {
 	fi
     done
 
+    if [ $# -gt 0 ]; then
+	options="$@"
+    fi
+
     if [ -n "${options-}" ]; then
 	printf "%s\n" $options
     fi
@@ -108,4 +112,4 @@ get_realpath() (
 script_dir=$(get_realpath "$(dirname "$0")")
 
 eval $("$script_dir/get-os-release" -x)
-get_package_install_options
+get_package_install_options "$@"
