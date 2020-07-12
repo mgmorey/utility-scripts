@@ -62,6 +62,10 @@ get_package_install_options() {
 		options="${options:+$options }--no-install-recommends"
 		;;
 	    (fedora)
+		if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+		    options="${options:+$options }-y"
+		fi
+
 		options="${options:+$options }--allowerasing"
 		;;
 	    (opensuse)
