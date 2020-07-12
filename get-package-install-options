@@ -33,7 +33,7 @@ get_package_install_options() {
 	    (amzn)
 		case "$VERSION_ID" in
 		    (2)
-			options="${options+$options }"
+			options="${options:+$options }"
 			;;
 		    (*)
 			break
@@ -42,12 +42,12 @@ get_package_install_options() {
 		;;
 	    (centos)
 		if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
-		    options="${options+$options }-y"
+		    options="${options:+$options }-y"
 		fi
 
 		case "$VERSION_ID" in
 		    (8)
-			options="${options+$options }--nobest"
+			options="${options:+$options }--nobest"
 			;;
 		    (*)
 			break
@@ -56,25 +56,25 @@ get_package_install_options() {
 		;;
 	    (debian)
 		if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
-		    options="${options+$options }-y"
+		    options="${options:+$options }-y"
 		fi
 
-		options="${options+$options }--no-install-recommends"
+		options="${options:+$options }--no-install-recommends"
 		;;
 	    (fedora)
-		options="${options+$options }--allowerasing"
+		options="${options:+$options }--allowerasing"
 		;;
 	    (opensuse)
-		options="${options+$options }--no-recommends"
+		options="${options:+$options }--no-recommends"
 		;;
 	    (rhel|ol)
 		if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
-		    options="${options+$options }-y"
+		    options="${options:+$options }-y"
 		fi
 
 		case "$VERSION_ID" in
 		    (8.*)
-			options="${options+$options }--nobest"
+			options="${options:+$options }--nobest"
 			;;
 		    (*)
 			break
@@ -82,7 +82,7 @@ get_package_install_options() {
 		esac
 		;;
 	    (solaris)
-		options="${options+$options }--accept"
+		options="${options:+$options }--accept"
 		;;
 	esac
 
@@ -92,11 +92,11 @@ get_package_install_options() {
     done
 
     if [ $# -gt 0 ]; then
-	options="$@"
+	options="${options:+$options }$@"
     fi
 
     if [ -n "${options-}" ]; then
-	printf "%s\n" $options
+	printf "%s\n" "$options"
     fi
 }
 

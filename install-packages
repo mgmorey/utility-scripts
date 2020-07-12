@@ -83,10 +83,7 @@ get_manager() {
 }
 
 get_options() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    assert [ $1 -ge 1 -a -$1 -le 2 ]
-    printf "%s\n" $install_options | awk 'NR == '"$1"' {print $0}'
+    printf "%s\n" "$install_options"
 }
 
 get_packages() {
@@ -167,9 +164,10 @@ install_packages_from_args() (
     index=1
 
     while [ $index -le 2 ]; do
-	install_packages_using "$(get_manager $index)" \
-			       "$(get_options $index)" \
-			       $(get_packages $index)
+	install_packages_using \
+	    "$(get_manager $index)" \
+	    "$install_options" \
+	    $(get_packages $index)
 	index=$((index + 1))
     done
 )
