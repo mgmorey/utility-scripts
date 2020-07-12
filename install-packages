@@ -224,29 +224,29 @@ install_pattern_using() (
 
     manager=$1
     options=$2
-    shift 2
-
-    install=$(get-pattern-install-command $manager)
+    pattern=$3
 
     case "$(basename $manager)" in
 	(dnf|yum)
-	    if $manager groupinfo $1 >/dev/null 2>&1; then
+	    if $manager groupinfo $pattern >/dev/null 2>&1; then
 		return
 	    fi
 	    ;;
 	(zypper)
-	    if $manager -nq info -t pattern $1 >/dev/null 2>&1; then
+	    if $manager -nq info -t pattern $pattern >/dev/null 2>&1; then
 		return
 	    fi
 	    ;;
     esac
 
+    install=$(get-pattern-install-command $manager)
+
     case "$(basename $manager)" in
 	(brew)
-	    run_unpriv /bin/sh -c "$manager $install $options \"$1\""
+	    run_unpriv /bin/sh -c "$manager $install $options \"$pattern\""
 	    ;;
 	(*)
-	    $manager $install $options "$1"
+	    $manager $install $options "$pattern"
 	    ;;
     esac
 )
