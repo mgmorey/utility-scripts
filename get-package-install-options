@@ -33,7 +33,7 @@ get_package_install_options() {
 	    (amzn)
 		case "$VERSION_ID" in
 		    (2)
-			options=""
+			options="${options+$options }"
 			;;
 		    (*)
 			break
@@ -41,9 +41,13 @@ get_package_install_options() {
 		esac
 		;;
 	    (centos)
+		if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+		    options="${options+$options }-y"
+		fi
+
 		case "$VERSION_ID" in
 		    (8)
-			options="--nobest"
+			options="${options+$options }--nobest"
 			;;
 		    (*)
 			break
@@ -51,18 +55,18 @@ get_package_install_options() {
 		esac
 		;;
 	    (debian)
-		options="--no-install-recommends"
+		options="${options+$options }--no-install-recommends"
 		;;
 	    (fedora)
-		options="--allowerasing"
+		options="${options+$options }--allowerasing"
 		;;
 	    (opensuse)
-		options="--no-recommends"
+		options="${options+$options }--no-recommends"
 		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
 		    (8.*)
-			options="--nobest"
+			options="${options+$options }--nobest"
 			;;
 		    (*)
 			break
@@ -70,7 +74,7 @@ get_package_install_options() {
 		esac
 		;;
 	    (solaris)
-		options="--accept"
+		options="${options+$options }--accept"
 		;;
 	esac
 
