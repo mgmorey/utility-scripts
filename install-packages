@@ -79,14 +79,14 @@ get_manager() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     assert [ $1 -ge 1 -a -$1 -le 2 ]
-    printf "%s\n" $managers | awk 'NR == '"$1"' {print $0}'
+    printf "%s\n" $package_managers | awk 'NR == '"$1"' {print $0}'
 }
 
 get_options() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     assert [ $1 -ge 1 -a -$1 -le 2 ]
-    printf "%s\n" $options | awk 'NR == '"$1"' {print $0}'
+    printf "%s\n" $install_options | awk 'NR == '"$1"' {print $0}'
 }
 
 get_packages() {
@@ -126,8 +126,8 @@ get_realpath() (
 install_packages() {
     validate_platform
     configure_platform
-    managers=$(get-package-managers)
-    options=$(get-package-install-options)
+    package_managers=$(get-package-managers)
+    install_options=$(get-package-install-options)
 
     if [ $# -eq 0 ]; then
 	return
@@ -156,7 +156,7 @@ install_packages() {
 	return
     fi
 
-    install-package-managers $managers
+    install-package-managers $package_managers
 
     if [ "$is_pattern_supported" = true ]; then
 	install_pattern_from_args || true
@@ -210,7 +210,7 @@ install_pattern_from_args() (
 	return
     fi
 
-    install_pattern_using "$(get_manager 1)" "$options" "$pattern"
+    install_pattern_using "$(get_manager 1)" "$install_options" "$pattern"
 )
 
 install_pattern_using() (
