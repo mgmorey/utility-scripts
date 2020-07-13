@@ -117,6 +117,7 @@ uninstall_group() {
     fi
 }
 
+validate_platform() {
     case "$ID" in
 	(centos)
 	    case "$VERSION_ID" in
