@@ -90,6 +90,25 @@ EOF
 configure_platform() {
     manager=$(get_package_manager_basename)
     packages=$(get-kubernetes-packages)
+
+    case "$ID" in
+	(debian|raspbian)
+	    codename=xenial
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    codename=xenial
+		    ;;
+		(20.04)
+		    codename=xenial
+		    ;;
+		(*)
+		    codename=$(lsb_release -cs)
+		    ;;
+	    esac
+	    ;;
+    esac
 }
 
 disable_selinux() {
@@ -108,7 +127,7 @@ get_google_yum_url() {
 get_kubernetes_debian_repo() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    printf 'deb %s kubernetes-%s main\n' "$1" "$(lsb_release -cs)"
+    printf 'deb %s kubernetes-%s main\n' "$1" "$codename"
 }
 
 get_kubernetes_url() {
