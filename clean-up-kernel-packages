@@ -62,29 +62,9 @@ get_kernel_file() {
     printf '%s\n' "$1" | sed 's/kdump\.img$/.img/'
 }
 
-get_installed_packages() {
-    case "$ID" in
-	(centos)
-	    rpm -qa
-	    ;;
-	(debian|ubuntu)
-	    get-installed-packages
-	    ;;
-	(fedora)
-	    rpm -qa
-	    ;;
-	(opensuse-*)
-	    rpm -qa
-	    ;;
-	(rhel|ol)
-	    rpm -qa
-	    ;;
-    esac
-}
-
 get_packages() {
     kernel_release=$(uname -r | sed 's/-default$//')
-    get_installed_packages | egrep "$KERNEL_REGEX" | grep -v $kernel_release
+    get-installed-packages -f | egrep "$KERNEL_REGEX" | grep -v $kernel_release
 }
 
 get_realpath() (
