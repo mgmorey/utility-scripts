@@ -48,7 +48,7 @@ clean_up_kernel_packages() {
     packages=$(get_packages || true)
 
     if [ -n "$packages" ]; then
-	uninstall-packages $packages
+	"$script_dir/uninstall-packages" $packages
     fi
 }
 
@@ -64,7 +64,9 @@ get_kernel_file() {
 
 get_packages() {
     kernel_release=$(uname -r | sed 's/-default$//')
-    get-installed-packages -f | egrep "$KERNEL_REGEX" | grep -v $kernel_release
+    "$script_dir/get-installed-packages" -f | \
+	egrep "$KERNEL_REGEX" | \
+	grep -v $kernel_release
 }
 
 get_realpath() (
