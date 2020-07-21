@@ -168,13 +168,13 @@ get_os_version_id() {
 	(Linux|GNU)
 	    case "$ID" in
 		(debian|raspbian)
-		    cat /etc/debian_version
+		    cat $FILE_DEBIAN_VERSION
 		    ;;
 		(ubuntu)
 		    printf "%s\n" "$VERSION" | awk '{print $1}'
 		    ;;
 		(rhel|ol|centos|fedora)
-		    get-redhat-version /etc/redhat-release
+		    "$script_dir/get-redhat-version" $FILE_REDHAT_RELEASE
 		    ;;
 	    esac
 	    ;;
@@ -301,6 +301,8 @@ usage() {
 	       $0: -h
 	EOF
 }
+
+script_dir=$(get_realpath "$(dirname "$0")")
 
 parse_arguments "$@"
 collect_data
