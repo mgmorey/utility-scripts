@@ -68,8 +68,12 @@ get_packages_using() {
 	(brew)
 	    run_unpriv /bin/sh -c "$1 list -1"
 	    ;;
-	(dnf)
-	    rpm --queryformat "%{NAME}\n" -qa
+	(dnf|yum|zypper)
+	    if [ $is_full = true ]; then
+		rpm -qa
+	    else
+		rpm --queryformat "%{NAME}\n" -qa
+	    fi
 	    ;;
 	(pkg)
 	    case "$ID" in
@@ -86,12 +90,6 @@ get_packages_using() {
 	    ;;
 	(pkgutil)
 	    $1 --list | awk '{print $1}'
-	    ;;
-	(yum)
-	    rpm --queryformat "%{NAME}\n" -qa
-	    ;;
-	(zypper)
-	    rpm --queryformat "%{NAME}\n" -qa
 	    ;;
     esac
 }
@@ -113,9 +111,45 @@ get_realpath() (
     fi
 )
 
+parse_arguments() {
+    is_full=false
+    shell=$SHELL
+
+    while getopts fh opt; do
+	case $opt in
+	    (f)
+		is_full=true
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+}
+
 prefix_lines() {
     assert [ $# -eq 1 ]
     awk -v prefix=$1 "$PREFIX_AWK"
+}
+
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
+    fi
+
+    cat <<-EOF >&2
+	Usage: $0 -f
+	       $0 -h
+	EOF
 }
 
 script_dir=$(get_realpath "$(dirname "$0")")
@@ -123,4 +157,5 @@ script_dir=$(get_realpath "$(dirname "$0")")
 . "$script_dir/common-functions.sh"
 
 eval $("$script_dir/get-os-release" -x)
+parse_arguments "$@"
 get_installed_packages
