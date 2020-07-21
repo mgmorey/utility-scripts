@@ -119,9 +119,6 @@ fi
 
 script_dir=$(get_realpath "$(dirname "$0")")
 
-. "$script_dir/common-functions.sh"
-
-set_user_profile "$script_dir"
-eval $(get-os-release -X)
+eval $("$script_dir/get-os-release" -X)
 clean_up_kernel_packages
 clean_up_kernel_dumps
