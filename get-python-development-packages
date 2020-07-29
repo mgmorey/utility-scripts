@@ -27,8 +27,7 @@ assert() {
 
 get_python_devel_packages() {
     (get-python-pip-packages
-     get-python-venv-packages
-     get-python-virtualenv-packages) | sort -u
+     get-python-venv-packages) | sort -u
 }
 
 get_realpath() (
