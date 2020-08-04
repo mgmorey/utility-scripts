@@ -53,8 +53,12 @@ script_dirname="$(get_realpath "$(dirname "$0")")"
 
 . "$script_dirname/oracle-config.sh"
 
-if [ -r $ENV_FILE ]; then
-    . $ENV_FILE
+if [ -r $HOME/.env-oracle ]; then
+    . $HOME/.env-oracle
+fi
+
+if [ -r $HOME/${ENV_FILE-.env} ]; then
+    . $HOME/${ENV_FILE-.env}
 fi
 
 docker exec -it $1 sqlplus "system/$DATABASE_PASSWORD@//localhost:1521/ORCLCDB"

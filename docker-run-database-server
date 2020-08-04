@@ -82,7 +82,9 @@ parse_arguments() {
     fi
 }
 
-. ./.env
+if [ -r $HOME/${ENV_FILE-.env} ]; then
+    . $HOME/${ENV_FILE-.env}
+fi
 
 parse_arguments "$@"
 docker_run_database_server

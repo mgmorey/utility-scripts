@@ -53,8 +53,12 @@ script_dirname="$(get_realpath "$(dirname "$0")")"
 
 . "$script_dirname/sap-hana-config.sh"
 
-if [ -r $ENV_FILE ]; then
-    . $ENV_FILE
+if [ -r $HOME/.env-sap-hana ]; then
+    . $HOME/.env-sap-hana
+fi
+
+if [ -r $HOME/${ENV_FILE-.env} ]; then
+    . $HOME/${ENV_FILE-.env}
 fi
 
 docker exec -it $1 /usr/sap/HXE/HDB90/exe/hdbsql -i 90 \

@@ -35,13 +35,13 @@ docker_run_sap_hana() {
 get_host_dir() {
     case "$1" in
 	(/mnt/data)
-	    printf '%s\n' $HOME/git/tableau/docker-sap-hana/ee2/data
+	    printf '%s\n' data
 	    ;;
 	(/mnt/scripts)
-	    printf '%s\n' $HOME/git/tableau/docker-sap-hana/ee2/scripts
+	    printf '%s\n' scripts
 	    ;;
 	(/mnt/sql)
-	    printf '%s\n' $HOME/git/tableau/docker-sap-hana/ee2/sql
+	    printf '%s\n' sql
 	    ;;
     esac
 }
@@ -101,8 +101,12 @@ script_dirname="$(get_realpath "$(dirname "$0")")"
 
 . "$script_dirname/sap-hana-config.sh"
 
-if [ -r $ENV_FILE ]; then
-    . $ENV_FILE
+if [ -r $HOME/.env-sap-hana ]; then
+    . $HOME/.env-sap-hana
+fi
+
+if [ -r $HOME/${ENV_FILE-.env} ]; then
+    . $HOME/${ENV_FILE-.env}
 fi
 
 parse_arguments "$@"

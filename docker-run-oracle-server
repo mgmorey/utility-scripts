@@ -59,9 +59,14 @@ parse_arguments() {
 }
 
 set_options() {
-    env_opts="-e ORACLE_PWD=$DATABASE_PASSWORD"
+    env_opts=
     port_opts=
     vol_opts=
+
+    for var in ORACLE_PWD; do
+	eval value=\${$var-}
+	env_opts="${env_opts:+$env_opts }-e $var=$value"
+    done
 
     for port in $PORTS; do
         port_opts="${port_opts:+$port_opts }-p $port:$port"
@@ -83,8 +88,12 @@ script_dirname="$(get_realpath "$(dirname "$0")")"
 
 . "$script_dirname/oracle-config.sh"
 
-if [ -r $ENV_FILE ]; then
-    . $ENV_FILE
+if [ -r $HOME/.env-oracle ]; then
+    . $HOME/.env-oracle
+fi
+
+if [ -r $HOME/${ENV_FILE-.env} ]; then
+    . $HOME/${ENV_FILE-.env}
 fi
 
 parse_arguments "$@"

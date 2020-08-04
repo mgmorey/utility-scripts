@@ -83,7 +83,9 @@ if [ ! -r $ENV_FILE ]; then
     abort "%s: %s: No such environment file\n" "$0" $ENV_FILE
 fi
 
-. $ENV_FILE
+if [ -r $HOME/${ENV_FILE-.env} ]; then
+    . $HOME/${ENV_FILE-.env}
+fi
 
 parse_arguments "$@"
 docker_run_database_client
