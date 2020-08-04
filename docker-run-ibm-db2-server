@@ -35,10 +35,10 @@ docker_run_sap_hana() {
 get_host_dir() {
     case "$1" in
 	(/mnt/data)
-	    printf '%s\n' data
+	    printf '%s\n' "$PWD/data"
 	    ;;
 	(/mnt/scripts)
-	    printf '%s\n' scripts
+	    printf '%s\n' "$PWD/scripts"
 	    ;;
     esac
 }
