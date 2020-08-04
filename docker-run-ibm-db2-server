@@ -1,0 +1,114 @@
+#!/bin/sh -eu
+
+# docker-run-ibm-db2-server: run IBM Db2 server in container
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+CONTAINER_DIRS="/mnt/data /mnt/scripts"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+docker_run_sap_hana() {
+    set_options
+    docker run $opts $IMAGE_NAME:$IMAGE_TAG $(get_image_options)
+}
+
+get_host_dir() {
+    case "$1" in
+	(/mnt/data)
+	    printf '%s\n' data
+	    ;;
+	(/mnt/scripts)
+	    printf '%s\n' scripts
+	    ;;
+    esac
+}
+
+get_image_options() {
+    printf '%s\n' ''
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+parse_arguments() {
+    if [ $# -gt 0 ]; then
+	user_opts="$@"
+    else
+	user_opts="-d"
+    fi
+}
+
+set_options() {
+    env_opts=
+    port_opts=
+    vol_opts=
+
+    for var in DB2INST1_PASSWORD DBNAME LICENSE; do
+	eval value=\${$var-}
+	env_opts="${env_opts:+$env_opts }-e $var=$value"
+    done
+
+    for port in $PORTS; do
+	port_opts="${port_opts:+$port_opts }-p $port:$port"
+    done
+
+    for container_dir in $CONTAINER_DIRS; do
+	host_dir=$(get_host_dir $container_dir)
+
+	if [ -d "$host_dir" ]; then
+	    vol_opts="${vol_opts:+$vol_opts }-v $host_dir:$container_dir"
+	fi
+    done
+
+    opts="$env_opts ${port_opts:+$port_opts }${vol_opts:+$vol_opts }$user_opts"
+}
+
+script_basename="$(basename "$0")"
+script_dirname="$(get_realpath "$(dirname "$0")")"
+
+. "$script_dirname/ibm-db2-config.sh"
+
+if [ -r $HOME/.env-ibm-db2 ]; then
+    . $HOME/.env-ibm-db2
+fi
+
+if [ -r $HOME/${ENV_FILE-.env} ]; then
+    . $HOME/${ENV_FILE-.env}
+fi
+
+parse_arguments "$@"
+docker_run_sap_hana
