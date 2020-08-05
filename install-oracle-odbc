@@ -59,6 +59,7 @@ get_package_pathname() {
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     assert [ -n "$3" ]
+
     case "$ID" in
 	(debian|ubuntu)
 	    printf "%s/$PREFIX_ZIP-$SUFFIX_ZIP\n" "$3" "$1" "$2"
@@ -78,6 +79,7 @@ get_package_pathnames() {
 get_package_prefix() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
+
     case "$ID" in
 	(debian|ubuntu)
 	    printf "$PREFIX_ZIP\n" "$1"
@@ -91,6 +93,7 @@ get_package_prefix() {
 get_package_suffix() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
+
     case "$ID" in
 	(debian|ubuntu)
 	    printf "$SUFFIX_ZIP\n" "$1"
