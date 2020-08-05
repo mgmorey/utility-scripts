@@ -2,8 +2,9 @@
 
 BASE_URL=artifactory.prod.tableautools.com:6555/dataservices
 
-DATABASES="mssql mysql oracle postgres presto sap-hana"
+DATABASES="ibm-db2 mssql mysql oracle postgres presto sap-hana"
 
+IBM_DB2_VERSIONS="11.5.4.0"
 MSSQL_VERSIONS="2017 2019"
 MYSQL_VERSIONS="5.6 5.7 8.0"
 ORACLE_VERSIONS="12 18 19"
@@ -20,6 +21,9 @@ abort() {
 
 get_versions() {
     case $database in
+	(ibm-db2)
+	    versions_default=$IBM_DB2_VERSIONS
+	    ;;
 	(mssql)
 	    versions_default=$MSSQL_VERSIONS
 	    ;;
