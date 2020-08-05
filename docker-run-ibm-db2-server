@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CONTAINER_DIRS="/mnt/data /mnt/scripts"
+CONTAINER_DIRS="/mnt/data /mnt/downloads /mnt/scripts"
 
 abort() {
     printf "$@" >&2
@@ -36,6 +36,9 @@ get_host_dir() {
     case "$1" in
 	(/mnt/data)
 	    printf '%s\n' "$PWD/data"
+	    ;;
+	(/mnt/downloads)
+	    printf '%s\n' "$PWD/downloads"
 	    ;;
 	(/mnt/scripts)
 	    printf '%s\n' "$PWD/scripts"
