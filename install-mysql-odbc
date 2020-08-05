@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -eu
 
 # install-mysql-odbc: install MySQL ODBC packages
 # Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
