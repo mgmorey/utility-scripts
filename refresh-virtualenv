@@ -154,14 +154,22 @@ if [ -n "${VIRTUAL_ENV:-}" ]; then
     abort "%s: Must not be run within a virtual environment\n" "$0"
 fi
 
-script_dir=$(get_realpath "$(dirname "$0")")
+script_dir=$(dirname "$0")
 
-. "$script_dir/common-functions.sh"
-. "$script_dir/utility-functions.sh"
+if [ "$script_dir" != . ]; then
+    script_dir=$(get_realpath "$script_dir")
+else
+    script_dir=
+fi
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+. "${script_prefix}utility-functions.sh"
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-eval $(run-python "$script_dir/get-configuration" app.ini)
+eval $(run-python "${script_prefix}get-configuration" app.ini)
 parse_arguments "$@"
 
 if [ "$(id -u)" -eq 0 ]; then

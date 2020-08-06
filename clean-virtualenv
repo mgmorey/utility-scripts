@@ -62,9 +62,17 @@ if [ $# -gt 0 ]; then
     abort "%s: Too many arguments\n" "$0"
 fi
 
-script_dir=$(get_realpath "$(dirname "$0")")
+script_dir=$(dirname "$0")
 
-. "$script_dir/utility-functions.sh"
+if [ "$script_dir" != . ]; then
+    script_dir=$(get_realpath "$script_dir")
+else
+    script_dir=
+fi
 
-eval $("$script_dir/run-python" "$script_dir/get-configuration" app.ini)
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}utility-functions.sh"
+
+eval $("${script_prefix}run-python" "${script_prefix}get-configuration" app.ini)
 clean_virtualenv
