@@ -29,7 +29,7 @@ assert() {
 
 docker_run_sap_hana() {
     set_options
-    docker run $opts $image
+    docker run $opts --privileged=true $image
 }
 
 get_host_dir() {
