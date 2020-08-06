@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env run-python
 
 # test-python-version: test Python interpreter version string
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>

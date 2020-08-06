@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env run-python
 # pylint: disable=bad-continuation,invalid-name,missing-docstring
 
 # get-odbc-drivers: describe installed ODBC drivers
