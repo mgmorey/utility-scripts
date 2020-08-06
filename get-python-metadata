@@ -144,7 +144,7 @@ else
     script_dir=
 fi
 
-script_prefix=${script_dir:+${script_prefix}}
+script_prefix=${script_dir:+$script_dir/}
 
 eval $("${script_prefix}get-os-release" -x)
 get_python_metadata
