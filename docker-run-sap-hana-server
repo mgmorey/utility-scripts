@@ -29,7 +29,7 @@ assert() {
 
 docker_run_sap_hana() {
     set_options
-    docker run $opts $IMAGE_NAME:$IMAGE_TAG $(get_image_options)
+    docker run $opts $image $(get_image_options)
 }
 
 get_host_dir() {
@@ -95,6 +95,12 @@ set_options() {
 
     opts="${port_opts:+$port_opts }${vol_opts:+$vol_opts }$user_opts"
 }
+
+if [ $# -lt 1 ]; then
+    abort "%s: Not enough arguments\n" "$0"
+elif [ $# -gt 1 ]; then
+    abort "%s: Too many arguments\n" "$0"
+fi
 
 script_dir=$(dirname "$0")
 
