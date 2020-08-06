@@ -1,4 +1,5 @@
 #!/usr/bin/env run-python
+# -*- Mode: Python -*-
 # pylint: disable=c-extension-no-member,global-statement,invalid-name
 # pylint: disable=missing-docstring,no-name-in-module
 
