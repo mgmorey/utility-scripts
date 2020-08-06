@@ -169,7 +169,7 @@ script_prefix=${script_dir:+$script_dir/}
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-eval $(run-python "${script_prefix}get-configuration" app.ini)
+eval $("${script_prefix}get-configuration" app.ini)
 parse_arguments "$@"
 
 if [ "$(id -u)" -eq 0 ]; then

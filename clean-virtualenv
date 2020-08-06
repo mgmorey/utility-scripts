@@ -74,5 +74,5 @@ script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}utility-functions.sh"
 
-eval $("${script_prefix}run-python" "${script_prefix}get-configuration" app.ini)
+eval $("${script_prefix}get-configuration" app.ini)
 clean_virtualenv

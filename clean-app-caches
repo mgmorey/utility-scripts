@@ -68,5 +68,5 @@ fi
 
 script_prefix=${script_dir:+$script_dir/}
 
-eval $("${script_prefix}run-python" "${script_prefix}get-configuration" app.ini)
+eval $("${script_prefix}get-configuration" app.ini)
 /bin/rm -rf $(find_caches)

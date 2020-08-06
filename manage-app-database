@@ -73,7 +73,7 @@ get_realpath() (
 )
 
 manage_app_database() {
-    eval $(run-python "${script_prefix}get-configuration" app.ini)
+    eval $("${script_prefix}get-configuration" app.ini)
 
     if [ "${DATABASE_DIALECT-}" = sqlite ]; then
 	return 0
