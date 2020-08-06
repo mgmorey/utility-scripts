@@ -70,7 +70,7 @@ parse_arguments() {
 
 set_askpass() {
     validate_arguments
-    askpass_helper=$("$script_dir/get-askpass" | awk '! /^#/')
+    askpass_helper=$("${script_prefix}get-askpass" | awk '! /^#/')
 
     if [ -z "$askpass_helper" ]; then
 	exit 0
@@ -151,7 +151,15 @@ validate_arguments() {
     done
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
+script_dir=$(dirname "$0")
+
+if [ "$script_dir" != . ]; then
+    script_dir=$(get_realpath "$script_dir")
+else
+    script_dir=
+fi
+
+script_prefix=${script_dir:+$script_dir/}
 
 parse_arguments "$@"
 set_askpass

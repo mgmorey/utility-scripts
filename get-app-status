@@ -101,11 +101,19 @@ if [ "$(id -u)" -eq 0 ]; then
     abort "%s: Must be run as a non-privileged user\n" "$0"
 fi
 
-script_dir=$(get_realpath "$(dirname "$0")")
+script_dir=$(dirname "$0")
 
-. "$script_dir/utility-functions.sh"
-. "$script_dir/restapi-functions.sh"
-. "$script_dir/restapi-parameters.sh"
+if [ "$script_dir" != . ]; then
+    script_dir=$(get_realpath "$script_dir")
+else
+    script_dir=
+fi
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}utility-functions.sh"
+. "${script_prefix}restapi-functions.sh"
+. "${script_prefix}restapi-parameters.sh"
 
 configure_all
 print_status $(get_app_status)

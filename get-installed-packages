@@ -44,7 +44,7 @@ assert() {
 }
 
 get_installed_packages() {
-    managers=$("$script_dir/get-package-managers")
+    managers=$("${script_prefix}get-package-managers")
     prefix=
 
     for manager in $managers; do
@@ -152,10 +152,18 @@ usage() {
 	EOF
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
+script_dir=$(dirname "$0")
 
-. "$script_dir/common-functions.sh"
+if [ "$script_dir" != . ]; then
+    script_dir=$(get_realpath "$script_dir")
+else
+    script_dir=
+fi
 
-eval $("$script_dir/get-os-release" -x)
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+
+eval $("${script_prefix}get-os-release" -x)
 parse_arguments "$@"
 get_installed_packages

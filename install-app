@@ -277,7 +277,7 @@ parse_arguments() {
 preinstall_app() {
     home="$(get_home_directory "$(get_user_name)")"
     path="$(get_profile_path "$home" "$script_dir")"
-    script="\"$script_dir/run-app\" -d \"$(pwd)\" -h \"$home\" -p \"$path\""
+    script="\"${script_prefix}run-app\" -d \"$(pwd)\" -h \"$home\" -p \"$path\""
 
     for command in "${PYTHON_LINT-}" "${PYTHON_TEST-}"; do
 	if [ -n "$command" ]; then
@@ -321,12 +321,20 @@ usage() {
 	EOF
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
+script_dir=$(dirname "$0")
 
-. "$script_dir/common-functions.sh"
-. "$script_dir/utility-functions.sh"
-. "$script_dir/restapi-functions.sh"
-. "$script_dir/restapi-parameters.sh"
+if [ "$script_dir" != . ]; then
+    script_dir=$(get_realpath "$script_dir")
+else
+    script_dir=
+fi
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+. "${script_prefix}utility-functions.sh"
+. "${script_prefix}restapi-functions.sh"
+. "${script_prefix}restapi-parameters.sh"
 
 set_user_profile "$script_dir"
 parse_arguments "$@"

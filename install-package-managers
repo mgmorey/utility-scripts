@@ -71,7 +71,7 @@ install_package_manager() {
     package_manager="$(get_package_manager $1)"
 
     if [ -n "$package_manager" ]; then
-	"$script_dir/$package_manager"
+	"${script_prefix}$package_manager"
     else
 	abort "Unable to find installer for %s\n" "$1"
     fi
@@ -85,7 +85,15 @@ install_package_managers() {
     done
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
+script_dir=$(dirname "$0")
 
-eval $("$script_dir/get-os-release" -x)
+if [ "$script_dir" != . ]; then
+    script_dir=$(get_realpath "$script_dir")
+else
+    script_dir=
+fi
+
+script_prefix=${script_dir:+$script_dir/}
+
+eval $("${script_prefix}get-os-release" -x)
 install_package_managers "$@"

@@ -73,7 +73,7 @@ get_realpath() (
 )
 
 manage_app_database() {
-    eval $(run-python "$script_dir/get-configuration" app.ini)
+    eval $(run-python "${script_prefix}get-configuration" app.ini)
 
     if [ "${DATABASE_DIALECT-}" = sqlite ]; then
 	return 0
@@ -125,9 +125,17 @@ elif [ $# -gt 1 ]; then
     abort "%s: Too many arguments\n" "$0"
 fi
 
-script_dir=$(get_realpath "$(dirname "$0")")
+script_dir=$(dirname "$0")
 
-. "$script_dir/common-functions.sh"
+if [ "$script_dir" != . ]; then
+    script_dir=$(get_realpath "$script_dir")
+else
+    script_dir=
+fi
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
 
 set_user_profile "$script_dir"
 env_dir=$(pwd)
