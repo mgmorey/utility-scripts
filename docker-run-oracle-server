@@ -83,10 +83,17 @@ set_options() {
     opts="$env_opts ${port_opts:+$port_opts }${vol_opts:+$vol_opts }$user_opts"
 }
 
-script_basename="$(basename "$0")"
-script_dirname="$(get_realpath "$(dirname "$0")")"
+script_dir=$(dirname "$0")
 
-. "$script_dirname/oracle-config.sh"
+if [ "$script_dir" != . ]; then
+    script_dir=$(get_realpath "$script_dir")
+else
+    script_dir=
+fi
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}oracle-config.sh"
 
 if [ -r $HOME/.env-oracle ]; then
     . $HOME/.env-oracle
