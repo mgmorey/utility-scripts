@@ -64,7 +64,7 @@ get_realpath() (
 
 run_in_virtualenv() {
     eval $(get-os-release -x)
-    eval $(run-python "$script_dir/get-configuration" app.ini)
+    eval $(run-python "${script_prefix}get-configuration" app.ini)
 
     while getopts d:h:p: opt; do
 	case $opt in
@@ -165,10 +165,18 @@ if [ "$(id -u)" -eq 0 ]; then
     abort "%s: Must be run as a non-privileged user\n" "$0"
 fi
 
-script_dir=$(get_realpath "$(dirname "$0")")
+script_dir=$(dirname "$0")
 
-. "$script_dir/common-functions.sh"
-. "$script_dir/utility-functions.sh"
+if [ "$script_dir" != . ]; then
+    script_dir=$(get_realpath "$script_dir")
+else
+    script_dir=
+fi
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+. "${script_prefix}utility-functions.sh"
 
 set_user_profile "$script_dir"
 run_in_virtualenv "$@"

@@ -334,7 +334,7 @@ remove_directory() {
 }
 
 set_askpass_parameters() {
-    "$script_dir/set-askpass" -s $shell || true
+    "${script_prefix}set-askpass" -s $shell || true
 }
 
 set_profile_parameters() {
@@ -378,9 +378,17 @@ validate_arguments() {
     esac
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
+script_dir=$(dirname "$0")
 
-eval $("$script_dir/get-os-release" -x)
+if [ "$script_dir" != . ]; then
+    script_dir=$(get_realpath "$script_dir")
+else
+    script_dir=
+fi
+
+script_prefix=${script_dir:+$script_dir/}
+
+eval $("${script_prefix}get-os-release" -x)
 
 parse_arguments "$@"
 set_askpass_parameters
