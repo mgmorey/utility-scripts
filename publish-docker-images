@@ -19,6 +19,61 @@ abort() {
     exit 1
 }
 
+build_image() {
+    docker $(get_build_command $image)
+}
+
+create_builder() {
+    case $1 in
+	(tableau-ibm-db2-*)
+	    if [ "${DOCKER_CLI_EXPERIMENTAL-}" = enabled ]; then
+		builder=$(get_insecure_builder)
+
+		if [ "$builder" != insecure-builder ]; then
+		    docker $(get_buildx_create_command) \
+			   "$(get_buildkitd_flags)"
+		fi
+	    fi
+	    ;;
+    esac
+}
+
+get_build_command() {
+    case $1 in
+	(tableau-ibm-db2-*)
+	    if [ "${DOCKER_CLI_EXPERIMENTAL-}" = enabled ]; then
+		get_buildx_build_command $1
+	    else
+		printf '%s\n' "build -t $1 ."
+	    fi
+	    ;;
+	(tableau-*)
+	    printf '%s\n' "build -t $1 ."
+	    ;;
+    esac
+}
+
+get_buildkitd_flags() {
+    printf '%s\n' "--allow-insecure-entitlement security.insecure"
+}
+
+get_buildx_build_command() {
+    printf '%s\n' buildx build --allow security.insecure --load -t $1 .
+}
+
+get_buildx_create_command() {
+    printf '%s\n' buildx create --use --name insecure-builder --buildkitd-flags
+}
+
+get_buildx_ls_command() {
+    printf '%s\n' "buildx ls"
+}
+
+get_insecure_builder() {
+    docker $(get_buildx_ls_command) | \
+	awk 'NR > 1 && $1 == "insecure-builder" { print $1 }'
+}
+
 get_versions() {
     case $database in
 	(ibm-db2)
@@ -51,24 +106,24 @@ get_versions() {
 }
 
 parse_arguments() {
-    build=true
-    buildonly=false
     databases=
+    no_build=true
+    only_build=false
     tag=
     versions=
 
     while getopts blnt:v:h opt; do
 	case $opt in
 	    (b)
-		build=true
-		buildonly=true
+		no_build=false
+		only_build=true
 		;;
 	    (l)
 		tag=latest
 		;;
 	    (n)
-		build=false
-		buildonly=false
+		no_build=true
+		only_build=false
 		;;
 	    (t)
 		tag="$OPTARG"
@@ -107,11 +162,12 @@ publish_image() (
     if [ -d docker-${1}/$2 ]; then
 	cd docker-${1}/$2
 
-	if [ "$build" = true ]; then
-	    docker build -t $image .
+	if [ "$no_build" = false ]; then
+	    create_builder $image
+	    build_image $image
 	fi
 
-	if [ "$buildonly" = false ]; then
+	if [ "$only_build" = false ]; then
 	    docker tag $image $repo_image
 	    docker push $repo_image
 	fi
