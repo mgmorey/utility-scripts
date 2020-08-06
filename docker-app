@@ -55,7 +55,7 @@ get_realpath() (
 )
 
 docker_app() {
-    eval $("$script_dir/run-python" "$script_dir/get-configuration" app.ini)
+    eval $("${script_prefix}run-python" "${script_prefix}get-configuration" app.ini)
     image=$(get_default_remote_image)
     opts=$(get_default_run_options)
 
@@ -130,9 +130,17 @@ Usage: $0 [-t TAG] pull
 EOF
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
+script_dir=$(dirname "$0")
 
-. "$script_dir/common-functions.sh"
+if [ "$script_dir" != . ]; then
+    script_dir=$(get_realpath "$script_dir")
+else
+    script_dir=
+fi
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
 
 parse_arguments "$@"
 docker_app
