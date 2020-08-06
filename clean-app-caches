@@ -26,9 +26,15 @@ assert() {
 }
 
 find_caches() {
-    find . -type d \( -name "$VENV_DIRECTORY" -prune -o \
+    find . \
+	 -type d \
+	 \( \
+	 -name .local -prune -o \
+	 -name .venv -prune -o \
+	 -name venv -prune -o \
 	 -name .pytest_cache -print -o \
-	 -name __pycache__ -print \)
+	 -name __pycache__ -print \
+	 \)
 }
 
 get_realpath() (
