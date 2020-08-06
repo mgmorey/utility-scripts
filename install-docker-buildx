@@ -1,0 +1,10 @@
+#!/bin/sh -eu
+
+BUILDX_URL=git://github.com/docker/buildx
+PLUGIN_DIR=$HOME/.docker/cli-plugins
+
+export DOCKER_BUILDKIT=1
+
+mkdir -p $PLUGIN_DIR
+docker build --platform=local -o . $BUILDX_URL
+/bin/mv -f buildx $PLUGIN_DIR/docker-buildx
