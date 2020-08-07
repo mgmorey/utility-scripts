@@ -45,9 +45,7 @@ get_install_command() {
 
 if [ $# -eq 0 ]; then
     abort "%s: Not enough arguments\n" "$0"
-fi
-
-if [ $# -gt 1 ]; then
+elif [ $# -gt 1 ]; then
     abort "%s: Too many arguments\n" "$0"
 fi
 
