@@ -46,11 +46,9 @@ get_uninstall_command() {
     fi
 }
 
-if [ $# -eq 0 ]; then
+if [ $# -lt 1 ]; then
     abort "%s: Not enough arguments\n" "$0"
-fi
-
-if [ $# -gt 1 ]; then
+elif [ $# -gt 1 ]; then
     abort "%s: Too many arguments\n" "$0"
 fi
 
