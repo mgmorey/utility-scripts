@@ -59,15 +59,16 @@ print_status() (
     printf "Service %s is %s\n" "$APP_NAME" "$status"
 )
 
-script_dir=$(dirname "$0")
+case "$0" in
+    (*/*)
+	script_dir=$(dirname "$0")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
 
-if [ "$script_dir" != . ]; then
-    script_dir=$(get_realpath "$script_dir")
-else
-    script_dir=
-fi
-
-script_prefix=${script_dir:+$script_dir/}
+script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 
 . "${script_prefix}common-functions.sh"
 . "${script_prefix}utility-functions.sh"
