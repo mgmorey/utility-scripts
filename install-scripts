@@ -37,8 +37,8 @@ configure_platform() {
 
     case "${mode:-$default_mode}" in
 	(copy)
-	    install_exec="/bin/install -m u=rwx,go=rx"
-	    install_noexec="/bin/install -m u=rw,go=r"
+	    install_exec="install -m u=rwx,go=rx"
+	    install_noexec="install -m u=rw,go=r"
 	    ;;
 	(link)
 	    install_exec="ln -sf"
@@ -90,6 +90,7 @@ get_script_files() {
 	 -maxdepth 1 \
 	 ! -name LICENSE \
 	 ! -name README \
+	 ! -name install-root-scripts \
 	 ! -name "$(basename "$0")" \
 	 ! -name '*.*' \
 	 ! -name '*~' \
