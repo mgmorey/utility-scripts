@@ -1,4 +1,4 @@
-#!/usr/bin/env run-python
+#!/usr/local/bin/run-python
 # -*- Mode: Python -*-
 # pylint: disable=bad-continuation,invalid-name,missing-docstring
 

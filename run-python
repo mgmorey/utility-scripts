@@ -25,8 +25,12 @@ abort_python_missing() {
     exit 1
 }
 
+get_python_interpreter() {
+    /usr/local/bin/get-python-interpreter -q $PYTHON_VERSIONS
+}
+
 run_python() {
-    python="$(get-python-interpreter -q $PYTHON_VERSIONS || true)"
+    python="$(get_python_interpreter || true)"
 
     if [ -n "$python" ]; then
         "$python" "$@"

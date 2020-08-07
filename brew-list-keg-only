@@ -1,4 +1,4 @@
-#!/usr/bin/env run-python
+#!/usr/local/bin/run-python
 # -*- Mode: Python -*-
 
 # brew-list-keg-only: print list of HomeBrew packages which are "keg-only"
