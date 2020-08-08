@@ -27,6 +27,17 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_install_command() {
+    case "$ID" in
+	(illumos)
+	    which install
+	    ;;
+	(*)
+	    which install
+	    ;;
+    esac
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -58,18 +69,29 @@ get_script_files() {
 }
 
 install_files() {
-    if [ -n "$files" ]; then
-	case "$ID" in
-	    (illumos)
-		for file in $files; do
-		    install -f "$target_dir" -m $FILEMODE -s $file
-		done
-		;;
-	    (*)
-		install -m $FILEMODE $files "$target_dir"
-		;;
-	esac
+    if [ -z "$files" ]; then
+	return
     fi
+
+    install=$(get_install_command)
+
+    case "$ID" in
+	(illumos)
+	    case "$install" in
+		(/usr/gnu/bin/install)
+		    $install -m $FILEMODE $files "$target_dir"
+		    ;;
+		(/usr/sbin/install)
+		    for file in $files; do
+			$install -f "$target_dir" -m $FILEMODE -s $file
+		    done
+		    ;;
+	    esac
+	    ;;
+	(*)
+	    $install -m $FILEMODE $files "$target_dir"
+	    ;;
+    esac
 }
 
 install_script_files() {
@@ -110,6 +132,6 @@ esac
 
 script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 
-eval $("$script_dir/get-os-release" -X)
+eval $("${script_prefix}get-os-release" -X)
 parse_arguments "$@"
 install_root_scripts
