@@ -16,6 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+FILEMODE_EXEC=u=rwx,go=rx
+FILEMODE_NOEXEC=u=rw,go=r
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -32,17 +35,6 @@ configure_platform() {
 	    ;;
 	(*)
 	    default_mode=link
-	    ;;
-    esac
-
-    case "${mode:-$default_mode}" in
-	(copy)
-	    install_exec="install -m u=rwx,go=rx"
-	    install_noexec="install -m u=rw,go=r"
-	    ;;
-	(link)
-	    install_exec="ln -sf"
-	    install_noexec="ln -sf"
 	    ;;
     esac
 }
@@ -97,20 +89,38 @@ get_script_files() {
 	 -type f
 }
 
-install_library_files() {
-    library_files="$(get_library_files "$source_dir")"
-
-    if [ -n "$library_files" ]; then
-	$install_noexec $library_files "$target_dir"
+install_files() {
+    if [ -n "$files" ]; then
+	case "${mode:-$default_mode}" in
+	    (copy)
+		case "$ID" in
+		    (illumos)
+			for file in $files; do
+			    install -f "$target_dir" -m $filemode -s $file
+			done
+			;;
+		    (*)
+			install -m $filemode $files "$target_dir"
+			;;
+		esac
+		;;
+	    (link)
+		ln -sf $files "$target_dir"
+		;;
+	esac
     fi
 }
 
-install_script_files() {
-    script_files="$(get_script_files "$source_dir")"
+install_library_files() {
+    filemode=$FILEMODE_NOEXEC
+    files="$(get_library_files "$source_dir")"
+    install_files
+}
 
-    if [ -n "$script_files" ]; then
-	$install_exec $script_files "$target_dir"
-    fi
+install_script_files() {
+    filemode=$FILEMODE_EXEC
+    files="$(get_script_files "$source_dir")"
+    install_files
 }
 
 install_scripts() {
@@ -160,6 +170,10 @@ parse_arguments() {
 
     shift $(($OPTIND - 1))
 
+    if [ $# -gt 1 ]; then
+	abort "%s: Too many arguments\n" "$0"
+    fi
+
     if [ $# -gt 0 ]; then
 	target_dir="$1"
     else
@@ -189,5 +203,17 @@ usage() {
 	EOF
 }
 
+case "$0" in
+    (*/*)
+	script_dir=$(dirname "$0")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
+
+eval $("$script_dir/get-os-release" -X)
 parse_arguments "$@"
 install_scripts

@@ -16,8 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-INSTALL_EXEC="install -m u=rwx,go=rx"
-INSTALL_NOEXEC="install -m u=rw,go=r"
+FILEMODE=u=rwx,go=rx
 
 abort() {
     printf "$@" >&2
@@ -58,15 +57,28 @@ get_script_files() {
 	 -type f
 }
 
-install_script_files() {
-    script_files="$(get_script_files "$source_dir")"
-
-    if [ -n "$script_files" ]; then
-	$INSTALL_EXEC $script_files "$target_dir"
+install_files() {
+    if [ -n "$files" ]; then
+	case "$ID" in
+	    (illumos)
+		for file in $files; do
+		    install -f "$target_dir" -m $filemode -s $file
+		done
+		;;
+	    (*)
+		install -m $filemode $files "$target_dir"
+		;;
+	esac
     fi
 }
 
-install_scripts() {
+install_script_files() {
+    filemode=$FILEMODE
+    files="$(get_script_files "$source_dir")"
+    install_files
+}
+
+install_root_scripts() {
     source_dir="$(get_realpath "$(pwd)")"
 
     if [ ! -e "$target_dir" ]; then
@@ -77,6 +89,10 @@ install_scripts() {
 }
 
 parse_arguments() {
+    if [ $# -gt 1 ]; then
+	abort "%s: Too many arguments\n" "$0"
+    fi
+
     if [ $# -gt 0 ]; then
 	target_dir="$1"
     else
@@ -84,9 +100,17 @@ parse_arguments() {
     fi
 }
 
-if [ $# -gt 1 ]; then
-    abort "%s: Too many arguments\n" "$0"
-fi
+case "$0" in
+    (*/*)
+	script_dir=$(dirname "$0")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
 
+script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
+
+eval $("$script_dir/get-os-release" -X)
 parse_arguments "$@"
-install_scripts
+install_root_scripts
