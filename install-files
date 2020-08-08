@@ -73,17 +73,17 @@ install_files() {
 		(illumos)
 		    case "$install" in
 			(/usr/gnu/bin/install)
-			    $install ${mode+-m $mode }$files "$target_dir"
+			    $install ${mode:+-m $mode }$files "$target_dir"
 			    ;;
 			(/usr/sbin/install)
 			    for file in $files; do
-				$install -f "$target_dir" -m ${mode+-m $mode }-s $file
+				$install -f "$target_dir" -m ${mode:+-m $mode }-s $file
 			    done
 			    ;;
 		    esac
 		    ;;
 		(*)
-		    $install ${mode+-m $mode }$files "$target_dir"
+		    $install ${mode:+-m $mode }$files "$target_dir"
 		    ;;
 	    esac
 	    ;;
@@ -94,6 +94,7 @@ install_files() {
 }
 
 parse_arguments() {
+    method=install
     mode=
 
     while getopts M:m:h opt; do
@@ -108,9 +109,6 @@ parse_arguments() {
 			;;
 		    (symlink)
 			method="$OPTARG"
-			;;
-		    (*)
-			usage "$OPTARG: Invalid argument"
 			;;
 		esac
 		;;
