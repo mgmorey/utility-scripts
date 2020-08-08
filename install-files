@@ -73,22 +73,19 @@ install_files() {
 		(illumos)
 		    case "$install" in
 			(/usr/gnu/bin/install)
-			    $install ${filemode+-m $filemode }$files "$target_dir"
+			    $install ${mode+-m $mode }$files "$target_dir"
 			    ;;
 			(/usr/sbin/install)
 			    for file in $files; do
-				$install -f "$target_dir" -m ${filemode+-m $filemode }-s $file
+				$install -f "$target_dir" -m ${mode+-m $mode }-s $file
 			    done
 			    ;;
 		    esac
 		    ;;
 		(*)
-		    $install ${filemode+-m $filemode }$files "$target_dir"
+		    $install ${mode+-m $mode }$files "$target_dir"
 		    ;;
 	    esac
-	    ;;
-	(link)
-	    ln -f $files "$target_dir"
 	    ;;
 	(symlink)
 	    ln -sf $files "$target_dir"
@@ -97,7 +94,7 @@ install_files() {
 }
 
 parse_arguments() {
-    filemode=
+    mode=
 
     while getopts M:m:h opt; do
 	case $opt in
@@ -118,7 +115,7 @@ parse_arguments() {
 		esac
 		;;
 	    (m)
-		filemode=$OPTARG
+		mode=$OPTARG
 		;;
 	    (h)
 		usage
@@ -155,7 +152,7 @@ usage() {
     fi
 
     cat <<-EOF >&2
-	Usage: $0 [-M METHOD] [-m FILEMODE] TARGET FILE [FILE [...]]
+	Usage: $0 [-M METHOD] [-m MODE] TARGET FILE [FILE [...]]
 	       $0 -h
 	EOF
 }
