@@ -62,18 +62,17 @@ install_files() {
 	case "$ID" in
 	    (illumos)
 		for file in $files; do
-		    install -f "$target_dir" -m $filemode -s $file
+		    install -f "$target_dir" -m $FILEMODE -s $file
 		done
 		;;
 	    (*)
-		install -m $filemode $files "$target_dir"
+		install -m $FILEMODE $files "$target_dir"
 		;;
 	esac
     fi
 }
 
 install_script_files() {
-    filemode=$FILEMODE
     files="$(get_script_files "$source_dir")"
     install_files
 }
