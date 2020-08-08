@@ -138,7 +138,7 @@ get_user_home() {
 }
 
 get_user_name() {
-    printf "%s\n" "${SUDO_USER-${USER-${USERNAME-${LOGNAME-}}}}"
+    printf "%s\n" "${SUDO_USER-${USER-${USERNAME-${LOGNAME-$(id -nu)}}}}"
 }
 
 get_user_shell() {
@@ -151,9 +151,6 @@ get_user_shell() {
 	    ;;
 	(Darwin)
 	    printf "%s\n" /bin/bash
-	    ;;
-	(*BSD)
-	    awk -F: '$1 == "'$1'" {print $7}' /etc/passwd
 	    ;;
 	(*)
 	    get_entity_field passwd $1 7
