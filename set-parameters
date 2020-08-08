@@ -159,7 +159,7 @@ include_homebrew_keg_directories() {
 	return
     fi
 
-    for pkg in $("${SCRIPT_PREFIX}brew-list-keg-only" 2>/dev/null || true); do
+    for pkg in $("${script_prefix}brew-list-keg-only" 2>/dev/null || true); do
 	if [ -d $prefix/$pkg/include ]; then
 	    CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
 	fi
