@@ -16,8 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-FILEMODE_EXEC=u=rwx,go=rx
-FILEMODE_NOEXEC=u=rw,go=r
+METHOD=symlink
+MODE_EXEC=u=rwx,go=rx
+MODE_NOEXEC=u=rw,go=r
 
 abort() {
     printf "$@" >&2
@@ -29,12 +30,16 @@ assert() {
 }
 
 configure_platform() {
+    if [ -n "$method" ]; then
+	return
+    fi
+
     case "$(uname -s)" in
 	(CYGWIN_NT-10.0|MINGW64_NT-10.0-*)
-	    default_method=install
+	    method=install
 	    ;;
 	(*)
-	    default_method=link
+	    method=$METHOD
 	    ;;
     esac
 }
@@ -101,51 +106,17 @@ get_script_files() {
 }
 
 install_files() {
-    if [ -z "$files" ]; then
-	return
-    fi
-
-    case "${method:-$default_method}" in
-	(copy)
-	    cp -f $files "$target_dir"
-	    ;;
-	(install)
-	    install=$(get_install_command)
-
-	    case "$ID" in
-		(illumos)
-		    case "$install" in
-			(/usr/gnu/bin/install)
-			    $install -m $filemode $files "$target_dir"
-			    ;;
-			(/usr/sbin/install)
-			    for file in $files; do
-				$install -f "$target_dir" -m $filemode -s $file
-			    done
-			    ;;
-		    esac
-		    ;;
-		(*)
-		    $install -m $filemode $files "$target_dir"
-		    ;;
-	    esac
-	    ;;
-	(link)
-	    ln -sf $files "$target_dir"
-	    ;;
-    esac
+    xargs "${script_prefix}install-files" -M $method -m $mode "$target_dir"
 }
 
 install_library_files() {
-    filemode=$FILEMODE_NOEXEC
-    files=$(get_library_files "$source_dir")
-    install_files
+    mode=$MODE_NOEXEC
+    get_library_files "$source_dir" | install_files
 }
 
 install_script_files() {
-    filemode=$FILEMODE_EXEC
-    files=$(get_script_files "$source_dir")
-    install_files
+    mode=$MODE_EXEC
+    get_script_files "$source_dir" | install_files
 }
 
 install_scripts() {
@@ -170,7 +141,7 @@ install_scripts() {
 parse_arguments() {
     method=
 
-    while getopts cilh opt; do
+    while getopts cish opt; do
 	case $opt in
 	    (c)
 		method=copy
@@ -178,8 +149,8 @@ parse_arguments() {
 	    (i)
 		method=install
 		;;
-	    (l)
-		method=link
+	    (s)
+		method=symlink
 		;;
 	    (h)
 		usage
@@ -223,7 +194,7 @@ usage() {
     fi
 
     cat <<-EOF >&2
-	Usage: $0 [-c | -l] [TARGET]
+	Usage: $0 [-c | -i | -s] [TARGET]
 	       $0 -h
 	EOF
 }

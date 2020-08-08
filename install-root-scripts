@@ -1,7 +1,7 @@
 #!/bin/sh -eu
 
 # install-root-scripts: install root scripts to /usr/local/bin
-# Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-FILEMODE=u=rwx,go=rx
+METHOD=install
+MODE=u=rwx,go=rx
 
 abort() {
     printf "$@" >&2
@@ -69,34 +70,11 @@ get_script_files() {
 }
 
 install_files() {
-    if [ -z "$files" ]; then
-	return
-    fi
-
-    install=$(get_install_command)
-
-    case "$ID" in
-	(illumos)
-	    case "$install" in
-		(/usr/gnu/bin/install)
-		    $install -m $FILEMODE $files "$target_dir"
-		    ;;
-		(/usr/sbin/install)
-		    for file in $files; do
-			$install -f "$target_dir" -m $FILEMODE -s $file
-		    done
-		    ;;
-	    esac
-	    ;;
-	(*)
-	    $install -m $FILEMODE $files "$target_dir"
-	    ;;
-    esac
+    xargs "${script_prefix}install-files" -M $METHOD -m $MODE "$target_dir"
 }
 
 install_script_files() {
-    files=$(get_script_files "$source_dir")
-    install_files
+    get_script_files "$source_dir" | install_files
 }
 
 install_root_scripts() {
@@ -111,7 +89,6 @@ install_root_scripts() {
 	    ;;
     esac
 
-    mkdir -p "$target_dir"
     install_script_files
 }
 
