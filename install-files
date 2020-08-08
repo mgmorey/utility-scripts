@@ -1,0 +1,176 @@
+#!/bin/sh -eux
+
+# install-files: install files
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_install_command() {
+    case "$ID" in
+	(illumos)
+	    which install
+	    ;;
+	(*)
+	    which install
+	    ;;
+    esac
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+install_files() {
+    if [ -d "$target_dir" ]; then
+	true
+    elif [ -e "$target_dir" ]; then
+	abort "%s: %s: Not a directory\n" "$0" "$target_dir"
+    elif ! mkdir -p "$target_dir"; then
+	abort "%s: %s: Cannot create directory\n" "$0" "$target_dir"
+    fi
+
+    case "$method" in
+	(copy)
+	    cp -f $files "$target_dir"
+	    ;;
+	(install)
+	    install=$(get_install_command)
+
+	    case "$ID" in
+		(illumos)
+		    case "$install" in
+			(/usr/gnu/bin/install)
+			    $install ${filemode+-m $filemode }$files "$target_dir"
+			    ;;
+			(/usr/sbin/install)
+			    for file in $files; do
+				$install -f "$target_dir" -m ${filemode+-m $filemode }-s $file
+			    done
+			    ;;
+		    esac
+		    ;;
+		(*)
+		    $install ${filemode+-m $filemode }$files "$target_dir"
+		    ;;
+	    esac
+	    ;;
+	(link)
+	    ln -f $files "$target_dir"
+	    ;;
+	(symlink)
+	    ln -sf $files "$target_dir"
+	    ;;
+    esac
+}
+
+parse_arguments() {
+    filemode=
+
+    while getopts M:m:h opt; do
+	case $opt in
+	    (M)
+		case "$OPTARG" in
+		    (copy)
+			method="$OPTARG"
+			;;
+		    (install)
+			method="$OPTARG"
+			;;
+		    (symlink)
+			method="$OPTARG"
+			;;
+		    (*)
+			usage "$OPTARG: Invalid argument"
+			;;
+		esac
+		;;
+	    (m)
+		filemode=$OPTARG
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		printf "%s\n" "" >&2
+		usage
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -lt 1 ]; then
+	abort "%s: Not enough arguments\n" "$0"
+    fi
+
+    target_dir="$1"
+    shift
+
+    if [ $# -lt 1 ]; then
+	abort "%s: Not enough arguments\n" "$0"
+    fi
+
+    files="$@"
+}
+
+usage() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+	printf "%s\n" "" >&2
+    fi
+
+    cat <<-EOF >&2
+	Usage: $0 [-M METHOD] [-m FILEMODE] TARGET FILE [FILE [...]]
+	       $0 -h
+	EOF
+}
+
+case "$0" in
+    (*/*)
+	script_dir=$(dirname "$0")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
+
+eval $("${script_prefix}get-os-release" -x)
+parse_arguments "$@"
+install_files
