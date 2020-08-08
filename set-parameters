@@ -18,10 +18,8 @@
 
 ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
 
-BREW_DIR=/home/linuxbrew/.linuxbrew
-LOCAL_DIR=/usr/local
-
-PKG_DIRS="$(ls -d /usr/pkg /opt/pkg /opt/local $BREW_DIR 2>/dev/null || true)"
+LINUXBREW_DIRS="$(ls -d /home/linuxbrew/.linuxbrew 2>/dev/null || true)"
+PKGSRC_DIRS="$(ls -d /usr/pkg /opt/pkg /opt/local 2>/dev/null || true)"
 SOLARIS_DIRS="$(ls -d /opt/csw /opt/*studio* 2>/dev/null || true)"
 SYSTEM_DIRS="/usr /usr/gnu"
 
@@ -55,7 +53,7 @@ configure_platform() {
 }
 
 get_homebrew_binary() (
-    for dir in $HOME/.linuxbrew $BREW_DIR /usr/local; do
+    for dir in $HOME/.linuxbrew $LINUXBREW_DIRS /usr/local; do
 	if [ -x $dir/bin/brew ]; then
 	    printf "%s\n" "$dir/bin/brew"
 	fi
@@ -119,7 +117,7 @@ include_common_directories() {
 
     # add common prefix directories to paths (if they exist)
 
-    dirs="$SYSTEM_DIRS $SOLARIS_DIRS $PKG_DIRS $LOCAL_DIR"
+    dirs="$SYSTEM_DIRS $SOLARIS_DIRS $PKGSRC_DIRS $LINUXBREW_DIRS /usr/local"
 
     for dir in $dirs; do
 	case "$dir" in
@@ -161,7 +159,7 @@ include_homebrew_keg_directories() {
 	return
     fi
 
-    for pkg in $($HOME/bin/brew-list-keg-only 2>/dev/null || true); do
+    for pkg in $("${SCRIPT_PREFIX}brew-list-keg-only" 2>/dev/null || true); do
 	if [ -d $prefix/$pkg/include ]; then
 	    CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
 	fi
