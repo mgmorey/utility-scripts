@@ -1,4 +1,4 @@
-#!/usr/local/bin/run-python
+#!/usr/bin/env run-python
 # -*- Mode: Python -*-
 
 # get-configuration: print application configuration parameters

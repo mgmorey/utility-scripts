@@ -1,4 +1,4 @@
-#!/usr/local/bin/run-python
+#!/usr/bin/env run-python
 # -*- Mode: Python -*-
 
 # test-python-version: test Python interpreter version string
