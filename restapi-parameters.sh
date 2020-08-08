@@ -629,23 +629,26 @@ get_brew_cellar() {
 }
 
 get_service_processes() {
-    ps_uwsgi $(get_service_users) | awk_uwsgi $(get_uwsgi_binary_path)
+    ps_uwsgi $(get_service_users $APP_UID) | awk_uwsgi $(get_uwsgi_binary_path)
 }
 
 get_service_users() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
     case "$kernel_name" in
 	(Linux)
 	    case "$ID" in
 		(opensuse-*)
-		    printf "%s\n" $APP_UID,root
+		    printf "%s\n" $1,root
 		    ;;
 		(*)
-		    printf "%s\n" $APP_UID
+		    printf "%s\n" $1
 		    ;;
 	    esac
 	    ;;
 	(*)
-	    printf "%s\n" $APP_UID
+	    printf "%s\n" $1
 	    ;;
     esac
 }
@@ -750,12 +753,15 @@ print_app_processes() {
 }
 
 ps_uwsgi() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
     case "$kernel_name" in
 	(CYGWIN_NT-*)
 	    ps -ef
 	    ;;
 	(*)
-	    ps -U "$1" -o $PS_FORMAT
+	    ps -U $1 -o $PS_FORMAT 2>/dev/null || true
 	    ;;
     esac
 }
