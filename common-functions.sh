@@ -44,22 +44,39 @@ get_bin_directory() (
     done
 )
 
+get_entity() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+
+    if which getent >/dev/null 2>&1; then
+	getent $1 $2
+    elif [ -r /etc/$1 ]; then
+	cat /etc/$1 | grep "^$2:"
+    fi
+}
+
+get_entity_field() {
+    assert [ $# -eq 3 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    assert [ -n "$3" ]
+    get_entity $1 $2 | cut -d: -f $3
+}
+
 get_home_directory() {
     assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
 
     case "${kernel_name=$(uname -s)}" in
 	(MINGW64_NT-*)
-	    printf "/c/Users/%s\n" "$1"
+	    printf "/c/Users/%s\n" $1
 	    ;;
 	(Darwin)
-	    printf "/Users/%s\n" "$1"
+	    printf "/Users/%s\n" $1
 	    ;;
 	(*)
-	    if which getent >/dev/null 2>&1; then
-		getent passwd "$1" | awk -F: '{print $6}'
-	    elif [ -r /etc/passwd ]; then
-		awk -F: '$1 == "'"$1"'" {print $6}' /etc/passwd
-	    fi
+	    get_entity_field passwd $1 6
 	    ;;
     esac
 }
@@ -78,6 +95,7 @@ get_profile_path() (
 
 get_shell() {
     assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
 
     case "${kernel_name=$(uname -s)}" in
 	(MINGW64_NT-*)
@@ -87,10 +105,10 @@ get_shell() {
 	    printf "%s\n" /bin/bash
 	    ;;
 	(*BSD)
-	    awk -F: '$1 == "'"$1"'" {print $7}' /etc/passwd
+	    awk -F: '$1 == "'$1'" {print $7}' /etc/passwd
 	    ;;
 	(*)
-	    getent passwd "$1" | awk -F: '{print $7}'
+	    get_entity_field passwd $1 7
 	    ;;
     esac
 }
@@ -210,7 +228,7 @@ set_user_profile() {
 	if [ -x "$HOME/bin/set-parameters" ]; then
 	    eval "$($HOME/bin/set-parameters -s /bin/sh)"
 	else
-	    export PATH="$(get_profile_path "$home" "$1")"
+	    export PATH=$(get_profile_path "$home" "$1")
 	fi
     fi
 }
