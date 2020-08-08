@@ -64,23 +64,6 @@ get_entity_field() {
     get_entity $1 $2 | cut -d: -f $3
 }
 
-get_home_directory() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-
-    case "${kernel_name=$(uname -s)}" in
-	(MINGW64_NT-*)
-	    printf "/c/Users/%s\n" $1
-	    ;;
-	(Darwin)
-	    printf "/Users/%s\n" $1
-	    ;;
-	(*)
-	    get_entity_field passwd $1 6
-	    ;;
-    esac
-}
-
 get_profile_path() (
     path=$PATH
 
@@ -92,26 +75,6 @@ get_profile_path() (
 
     printf "%s\n" "$path"
 )
-
-get_shell() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-
-    case "${kernel_name=$(uname -s)}" in
-	(MINGW64_NT-*)
-	    printf "%s\n" /bin/bash
-	    ;;
-	(Darwin)
-	    printf "%s\n" /bin/bash
-	    ;;
-	(*BSD)
-	    awk -F: '$1 == "'$1'" {print $7}' /etc/passwd
-	    ;;
-	(*)
-	    get_entity_field passwd $1 7
-	    ;;
-    esac
-}
 
 get_setpriv_command() (
     version="$(setpriv --version 2>/dev/null)"
@@ -157,8 +120,45 @@ get_su_command() (
     printf "%s\n" su
 )
 
+get_user_home() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "${kernel_name=$(uname -s)}" in
+	(MINGW64_NT-*)
+	    printf "/c/Users/%s\n" $1
+	    ;;
+	(Darwin)
+	    printf "/Users/%s\n" $1
+	    ;;
+	(*)
+	    get_entity_field passwd $1 6
+	    ;;
+    esac
+}
+
 get_user_name() {
     printf "%s\n" "${SUDO_USER-${USER-${USERNAME-${LOGNAME-}}}}"
+}
+
+get_user_shell() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "${kernel_name=$(uname -s)}" in
+	(MINGW64_NT-*)
+	    printf "%s\n" /bin/bash
+	    ;;
+	(Darwin)
+	    printf "%s\n" /bin/bash
+	    ;;
+	(*BSD)
+	    awk -F: '$1 == "'$1'" {print $7}' /etc/passwd
+	    ;;
+	(*)
+	    get_entity_field passwd $1 7
+	    ;;
+    esac
 }
 
 is_included() {
@@ -202,7 +202,7 @@ run_unpriv() (
 
 set_user_profile() {
     user="$(get_user_name)"
-    home="$(get_home_directory "$user")"
+    home="$(get_user_home "$user")"
 
     if [ -n "$home" -a "$HOME" != "$home" ]; then
 	if [ "${ENV_VERBOSE-false}" = true ]; then
@@ -213,7 +213,7 @@ set_user_profile() {
 	export HOME="$home"
     fi
 
-    shell="$(get_shell $user)"
+    shell="$(get_user_shell $user)"
 
     if [ -n "$shell" -a "$SHELL" != "$shell" ]; then
 	if [ "${ENV_VERBOSE-false}" = true ]; then
