@@ -31,10 +31,21 @@ assert() {
 configure_platform() {
     case "$(uname -s)" in
 	(CYGWIN_NT-10.0|MINGW64_NT-10.0-*)
-	    default_mode=copy
+	    default_method=install
 	    ;;
 	(*)
-	    default_mode=link
+	    default_method=link
+	    ;;
+    esac
+}
+
+get_install_command() {
+    case "$ID" in
+	(illumos)
+	    which install
+	    ;;
+	(*)
+	    which install
 	    ;;
     esac
 }
@@ -90,25 +101,39 @@ get_script_files() {
 }
 
 install_files() {
-    if [ -n "$files" ]; then
-	case "${mode:-$default_mode}" in
-	    (copy)
-		case "$ID" in
-		    (illumos)
-			for file in $files; do
-			    install -f "$target_dir" -m $filemode -s $file
-			done
-			;;
-		    (*)
-			install -m $filemode $files "$target_dir"
-			;;
-		esac
-		;;
-	    (link)
-		ln -sf $files "$target_dir"
-		;;
-	esac
+    if [ -z "$files" ]; then
+	return
     fi
+
+    case "${method:-$default_method}" in
+	(copy)
+	    cp -f $files "$target_dir"
+	    ;;
+	(install)
+	    install=$(get_install_command)
+
+	    case "$ID" in
+		(illumos)
+		    case "$install" in
+			(/usr/gnu/bin/install)
+			    $install -m $filemode $files "$target_dir"
+			    ;;
+			(/usr/sbin/install)
+			    for file in $files; do
+				$install -f "$target_dir" -m $filemode -s $file
+			    done
+			    ;;
+		    esac
+		    ;;
+		(*)
+		    $install -m $filemode $files "$target_dir"
+		    ;;
+	    esac
+	    ;;
+	(link)
+	    ln -sf $files "$target_dir"
+	    ;;
+    esac
 }
 
 install_library_files() {
@@ -146,15 +171,18 @@ install_scripts() {
 }
 
 parse_arguments() {
-    mode=
+    method=
 
-    while getopts clh opt; do
+    while getopts cilh opt; do
 	case $opt in
 	    (c)
-		mode=copy
+		method=copy
+		;;
+	    (i)
+		method=install
 		;;
 	    (l)
-		mode=link
+		method=link
 		;;
 	    (h)
 		usage
@@ -214,6 +242,6 @@ esac
 
 script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 
-eval $("$script_dir/get-os-release" -X)
+eval $("${script_prefix}get-os-release" -X)
 parse_arguments "$@"
 install_scripts
