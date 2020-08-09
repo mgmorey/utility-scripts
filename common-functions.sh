@@ -35,7 +35,7 @@ get_bin_directory() (
     dir="$1"
 
     while [ "$(dirname "$dir")" != / ]; do
-	dir="$(dirname "$dir")"
+	dir=$(dirname "$dir")
 
 	if [ -d "$dir/bin" ]; then
 	    printf "$dir/bin"
@@ -77,7 +77,7 @@ get_profile_path() (
 )
 
 get_setpriv_command() (
-    version="$(setpriv --version 2>/dev/null)"
+    version=$(setpriv --version 2>/dev/null)
 
     case "${version##* }" in
 	('')
@@ -103,8 +103,8 @@ get_setpriv_command() (
 get_setpriv_options() (
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    regid="$(id -g $1)"
-    reuid="$(id -u $1)"
+    regid=$(id -g $1)
+    reuid=$(id -u $1)
     printf -- "%s\n" "--init-groups --reset-env --reuid $reuid --regid $regid"
 )
 
@@ -174,7 +174,7 @@ run_unpriv() (
     assert [ $# -ge 1 ]
 
     if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
-	command="$(get_su_command $SUDO_USER)"
+	command=$(get_su_command $SUDO_USER)
 
 	case "$command" in
 	    (setpriv)
@@ -198,8 +198,8 @@ run_unpriv() (
 )
 
 set_user_profile() {
-    user="$(get_user_name)"
-    home="$(get_user_home "$user")"
+    user=$(get_user_name)
+    home=$(get_user_home "$user")
 
     if [ -n "$home" -a "$HOME" != "$home" ]; then
 	if [ "${ENV_VERBOSE-false}" = true ]; then
@@ -210,7 +210,7 @@ set_user_profile() {
 	export HOME="$home"
     fi
 
-    shell="$(get_user_shell $user)"
+    shell=$(get_user_shell $user)
 
     if [ -n "$shell" -a "$SHELL" != "$shell" ]; then
 	if [ "${ENV_VERBOSE-false}" = true ]; then
