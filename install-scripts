@@ -165,7 +165,7 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -gt 1 ]; then
-	abort "%s: Too many arguments\n" "$0"
+	usage_error "%s: Too many arguments\n" "$0"
     fi
 
     if [ $# -gt 0 ]; then

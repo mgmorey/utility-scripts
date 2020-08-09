@@ -198,6 +198,11 @@ modify_user() (
     fi
 )
 
+usage_error() {
+    printf "$@" >&2
+    exit 2
+}
+
 validate_platform() {
     arch=$(get_architecture)
 
@@ -323,7 +328,7 @@ validate_platform() {
 }
 
 if [ $# -gt 0 ]; then
-    abort "%s: Too many arguments\n" "$0"
+    usage_error "%s: Too many arguments\n" "$0"
 fi
 
 script_dir=$(get_realpath "$(dirname "$0")")

@@ -41,10 +41,6 @@ abort_not_supported() {
     abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
 }
 
-abort_too_many_arguments() {
-    usage_error "%s: Too many arguments\n" "$0"
-}
-
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }

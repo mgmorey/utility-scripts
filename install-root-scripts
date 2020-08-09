@@ -94,7 +94,7 @@ install_root_scripts() {
 
 parse_arguments() {
     if [ $# -gt 1 ]; then
-	abort "%s: Too many arguments\n" "$0"
+	usage_error "%s: Too many arguments\n" "$0"
     fi
 
     if [ $# -gt 0 ]; then
@@ -102,6 +102,11 @@ parse_arguments() {
     else
 	target_dir=/usr/local/bin
     fi
+}
+
+usage_error() {
+    printf "$@" >&2
+    exit 2
 }
 
 case "$0" in

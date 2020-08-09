@@ -217,6 +217,11 @@ update_redhat_kernel_packages() {
     printf "Please reboot the machine with the new kernel (if updated).\n"
 }
 
+usage_error() {
+    printf "$@" >&2
+    exit 2
+}
+
 validate_platform() {
     case "$kernel_name" in
 	(Linux)
@@ -292,7 +297,7 @@ validate_platform() {
 }
 
 if [ $# -gt 0 ]; then
-    abort "%s: Too many arguments\n" "$0"
+    usage_error "%s: Too many arguments\n" "$0"
 fi
 
 script_dir=$(get_realpath "$(dirname "$0")")

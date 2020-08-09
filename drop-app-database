@@ -46,8 +46,13 @@ get_realpath() (
     fi
 )
 
+usage_error() {
+    printf "$@" >&2
+    exit 2
+}
+
 if [ $# -gt 0 ]; then
-    abort "%s: Too many arguments\n" "$0"
+    usage_error "%s: Too many arguments\n" "$0"
 fi
 
 script_dir=$(get_realpath "$(dirname "$0")")

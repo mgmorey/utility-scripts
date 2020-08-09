@@ -144,6 +144,11 @@ install_pkgsrc() {
     esac
 }
 
+usage_error() {
+    printf "$@" >&2
+    exit 2
+}
+
 verify_checksum() {
     if which shasum >/dev/null 2>&1; then
 	eval printf "%s\n" "$boot_sha $boot_tar" | shasum || true
@@ -160,7 +165,7 @@ verify_signature() {
 }
 
 if [ $# -gt 1 ]; then
-    abort "%s: Too many arguments\n" "$0"
+    usage_error "%s: Too many arguments\n" "$0"
 fi
 
 script_dir=$(get_realpath "$(dirname "$0")")

@@ -37,8 +37,13 @@ install_presto_client() (
     done
 )
 
+usage_error() {
+    printf "$@" >&2
+    exit 2
+}
+
 if [ $# -gt 0 ]; then
-    abort "%s: Too many arguments\n" "$0"
+    usage_error "%s: Too many arguments\n" "$0"
 fi
 
 install_presto_client

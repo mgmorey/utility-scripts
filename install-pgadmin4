@@ -52,6 +52,11 @@ install_pgadmin4() {
     fi
 }
 
+usage_error() {
+    printf "$@" >&2
+    exit 2
+}
+
 validate_platform() {
     case "$ID" in
 	(centos)
@@ -107,7 +112,7 @@ validate_platform() {
 }
 
 if [ $# -gt 0 ]; then
-    abort "%s: Too many arguments\n" "$0"
+    usage_error "%s: Too many arguments\n" "$0"
 fi
 
 script_dir=$(get_realpath "$(dirname "$0")")

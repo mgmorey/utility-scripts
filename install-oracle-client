@@ -158,6 +158,11 @@ install_zip_files() (
     /bin/rm -r $tmp_dirname
 )
 
+usage_error() {
+    printf "$@" >&2
+    exit 2
+}
+
 validate_platform() {
     case "$ID" in
 	(centos)
@@ -213,7 +218,7 @@ validate_platform() {
 }
 
 if [ $# -gt 0 ]; then
-    abort "%s: Too many arguments\n" "$0"
+    usage_error "%s: Too many arguments\n" "$0"
 fi
 
 script_basename="$(basename "$0")"

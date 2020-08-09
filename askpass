@@ -21,10 +21,6 @@ abort() {
     exit 1
 }
 
-abort_too_many_arguments() {
-    usage_error "%s: Too many arguments\n" "$0"
-}
-
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
@@ -71,7 +67,7 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $is_query = true -a $# -gt 0 ]; then
-	abort_too_many_arguments "$@"
+	usage_error "%s: Too many arguments\n" "$0"
     elif [ $# -gt 0 ]; then
 	commands="$*"
     else
