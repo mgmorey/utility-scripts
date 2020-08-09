@@ -1,0 +1,126 @@
+#!/bin/sh -eu
+
+# get-askpass-package: get name of askpass helper package
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_askpass_package() {
+    desktop_name=$("${script_prefix}get-desktop-name")
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (debian)
+		case "$desktop_name" in
+		    (GNOME|GNOME*|*:GNOME|LXDE|X-Cinnamon|'')
+			package=ssh-askpass-gnome
+			;;
+		    (KDE*)
+			package=ksshaskpass
+			;;
+		esac
+		;;
+	    (opensuse)
+		case "$desktop_name" in
+		    (GNOME|GNOME*|*:GNOME|'')
+			package=openssh-askpass-gnome
+			;;
+		    (KDE*)
+			package=ksshaskpass5
+			;;
+		esac
+		;;
+	    (rhel|fedora)
+		case "$desktop_name" in
+		    (GNOME|GNOME*|*:GNOME|'')
+			package=openssh-askpass
+			;;
+		    (KDE*)
+			package=ksshaskpass
+			;;
+		esac
+		;;
+	    (freebsd)
+		case "$desktop_name" in
+		    (GNOME|GNOME*|MATE|'')
+			package=gnome-ssh-askpass
+			;;
+		    (KDE*)
+			package=ksshaskpass
+			;;
+		esac
+		;;
+	    (macos)
+		break
+		;;
+	    (netbsd)
+		break
+		;;
+	    (solaris)
+		break
+		;;
+	    (windows)
+		break
+		;;
+	esac
+
+	if [ -n "${package-}" ]; then
+	    break
+	fi
+    done
+
+    if [ -n "${package-}" ]; then
+	printf "%s\n" $package
+    fi
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+case "$0" in
+    (*/*)
+	script_dir=$(dirname "$0")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
+
+eval $("${script_prefix}get-os-release" -x)
+get_askpass_package
