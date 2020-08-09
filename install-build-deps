@@ -58,7 +58,7 @@ validate_platform() {
 	(Linux|GNU)
 	    case "$ID" in
 		(debian|raspbian|ubuntu)
-		    :
+		    true
 		    ;;
 		(*)
 		    exit 1

@@ -41,44 +41,16 @@ configure_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
-		case "$desktop_name" in
-		    (GNOME|GNOME*|*:GNOME|LXDE|X-Cinnamon|'')
-			package=ssh-askpass-gnome
-			;;
-		    (KDE*)
-			package=ksshaskpass
-			;;
-		esac
+		break
 		;;
 	    (opensuse)
-		case "$desktop_name" in
-		    (GNOME|GNOME*|*:GNOME|'')
-			package=openssh-askpass-gnome
-			;;
-		    (KDE*)
-			package=ksshaskpass5
-			;;
-		esac
+		break
 		;;
 	    (rhel|fedora)
-		case "$desktop_name" in
-		    (GNOME|GNOME*|*:GNOME|'')
-			package=openssh-askpass
-			;;
-		    (KDE*)
-			package=ksshaskpass
-			;;
-		esac
+		break
 		;;
 	    (freebsd)
-		case "$desktop_name" in
-		    (GNOME|GNOME*|MATE|'')
-			package=gnome-ssh-askpass
-			;;
-		    (KDE*)
-			package=ksshaskpass
-			;;
-		esac
+		break
 		;;
 	    (macos)
 		break
@@ -102,7 +74,7 @@ configure_platform() {
 		;;
 	esac
 
-	if [ -n "${package-${helper-}}" ]; then
+	if [ -n "${helper-}" ]; then
 	    break
 	fi
     done
@@ -110,6 +82,7 @@ configure_platform() {
 
 get_askpass() {
     configure_platform
+    package=$("${script_prefix}get-askpass-package")
 
     if [ -z "${helper:-}" -a -n "${package-}" ]; then
 	helper=$(get_filenames $package 2>/dev/null | get_helper)
@@ -125,7 +98,7 @@ get_askpass() {
 }
 
 get_filenames() {
-    get-package-filenames $1
+    "${script_prefix}get-package-filenames" $1
 }
 
 get_helper() {
@@ -161,5 +134,4 @@ esac
 script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 
 eval $("${script_prefix}get-os-release" -x)
-
 get_askpass
