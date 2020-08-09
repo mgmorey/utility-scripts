@@ -131,9 +131,18 @@ get_python_virtualenv_packages() {
     format-python-packages ${packages-}
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
+case "$0" in
+    (*/*)
+	script_dir=$(dirname "$0")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
 
-. "$script_dir/common-functions.sh"
+script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
+
+. "${script_prefix}common-functions.sh"
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
