@@ -71,6 +71,9 @@ get_script_files() {
 
 get_target_dir() {
     case "$ID" in
+	(opensuse-*)
+	    printf "%s\n" /usr/sbin
+	    ;;
 	(rhel|ol|centos)
 	    printf "%s\n" /usr/sbin
 	    ;;
