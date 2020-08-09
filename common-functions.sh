@@ -44,7 +44,7 @@ get_bin_directory() (
     done
 )
 
-get_entity() {
+get_entry() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
     assert [ -n "$2" ]
@@ -56,12 +56,12 @@ get_entity() {
     fi
 }
 
-get_entity_field() {
+get_field() {
     assert [ $# -eq 3 ]
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     assert [ -n "$3" ]
-    get_entity $1 $2 | cut -d: -f $3
+    get_entry $1 $2 | cut -d: -f $3
 }
 
 get_profile_path() (
@@ -132,7 +132,7 @@ get_user_home() {
 	    printf "/Users/%s\n" $1
 	    ;;
 	(*)
-	    get_entity_field passwd $1 6
+	    get_field passwd $1 6
 	    ;;
     esac
 }
@@ -153,7 +153,7 @@ get_user_shell() {
 	    printf "%s\n" /bin/bash
 	    ;;
 	(*)
-	    get_entity_field passwd $1 7
+	    get_field passwd $1 7
 	    ;;
     esac
 }
