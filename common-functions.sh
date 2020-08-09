@@ -210,7 +210,7 @@ set_user_profile() {
 	export HOME="$home"
     fi
 
-    shell=$(get_user_shell $user)
+    shell=$(get_user_shell "$user")
 
     if [ -n "$shell" -a "$SHELL" != "$shell" ]; then
 	if [ "${ENV_VERBOSE-false}" = true ]; then
