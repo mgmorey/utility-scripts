@@ -121,6 +121,11 @@ Usage: $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] [-p PARENT] bridgeN
 EOF
 }
 
+usage_error() {
+    printf "$@" >&2
+    exit 2
+}
+
 if [ $# -lt 1 ]; then
     usage_error "%s: Not enough arguments\n" "$0"
 fi
