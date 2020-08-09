@@ -75,6 +75,10 @@ configure_platform() {
     done
 }
 
+get_install_options() {
+    "${script_prefix}get-package-install-options" ${1-}
+}
+
 get_manager() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
@@ -123,8 +127,8 @@ get_realpath() (
 install_packages() {
     validate_platform
     configure_platform
-    package_managers=$(get-package-managers)
-    install_options=$(get-package-install-options $general_options)
+    install_options=$(get_install_options $general_options)
+    package_managers=$("${script_prefix}get-package-managers")
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -140,14 +144,14 @@ install_packages() {
     done
 
     if [ -n "$packages" ]; then
-	packages="$(get-uninstalled-packages $packages)"
+	packages="$("${script_prefix}get-uninstalled-packages" $packages)"
     fi
 
     if [ -z "$packages" -a -z "$pattern" ]; then
 	return
     fi
 
-    install-package-managers $package_managers
+    "${script_prefix}install-package-managers" $package_managers
 
     if [ "$is_pattern_supported" = true ]; then
 	install_pattern_from_args || true
@@ -185,7 +189,7 @@ install_packages_using() (
     options=$2
     shift 2
 
-    install=$(get-install-command $manager)
+    install=$("${script_prefix}get-install-command" $manager)
 
     case "$(basename $manager)" in
 	(brew)
@@ -231,7 +235,7 @@ install_pattern_using() (
 	    ;;
     esac
 
-    install=$(get-pattern-install-command $manager)
+    install=$("${script_prefix}get-pattern-install-command" $manager)
 
     case "$(basename $manager)" in
 	(brew)
@@ -244,7 +248,7 @@ install_pattern_using() (
 )
 
 move_pattern_to_packages() {
-    packages="$pattern${packages:+ $packages}"
+    packages="${pattern:+$pattern }$packages"
     pattern=
 }
 
@@ -360,7 +364,6 @@ script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 
 . "${script_prefix}common-functions.sh"
 
-set_user_profile "$script_dir"
-eval $(get-os-release -x)
+eval $("${script_prefix}get-os-release" -x)
 parse_arguments "$@"
 install_packages
