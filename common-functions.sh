@@ -32,7 +32,7 @@ create_tmpfile() {
 get_bin_directory() (
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    dir=$1
+    dir="$1"
 
     while [ "$(dirname "$dir")" != / ]; do
 	dir="$(dirname "$dir")"
@@ -50,7 +50,7 @@ get_entry() {
     assert [ -n "$2" ]
 
     if which getent >/dev/null 2>&1; then
-	getent $1 $2
+	getent $1 "$2"
     elif [ -r /etc/$1 ]; then
 	cat /etc/$1 | grep "^$2:"
     fi
@@ -61,7 +61,7 @@ get_field() {
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     assert [ -n "$3" ]
-    get_entry $1 $2 | cut -d: -f $3
+    get_entry $1 "$2" | cut -d: -f $3
 }
 
 get_profile_path() (
@@ -161,7 +161,7 @@ get_user_shell() {
 is_included() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
-    printf "%s\n" "$2" | egrep '(^|:)'$1'(:|$)' >/dev/null
+    printf "%s\n" "$2" | egrep '(^|:)'"$1"'(:|$)' >/dev/null
 }
 
 is_to_be_included() {
