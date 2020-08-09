@@ -106,16 +106,26 @@ get_script_files() {
 }
 
 install_files() {
-    xargs "${script_prefix}install-files" -M $method -m $mode "$target_dir"
+    xargs "${script_prefix}install-files" -M $method ${mode:+-m $mode }"$target_dir"
 }
 
 install_library_files() {
-    mode=$MODE_NOEXEC
+    if [ $method = install ]; then
+	mode=$MODE_NOEXEC
+    else
+	mode=
+    fi
+
     get_library_files "$source_dir" | install_files
 }
 
 install_script_files() {
-    mode=$MODE_EXEC
+    if [ $method = install ]; then
+	mode=$MODE_EXEC
+    else
+	mode=
+    fi
+
     get_script_files "$source_dir" | install_files
 }
 
