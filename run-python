@@ -26,7 +26,7 @@ abort_python_missing() {
 }
 
 get_python_interpreter() {
-    /usr/local/bin/get-python-interpreter -q $PYTHON_VERSIONS
+    get-python-interpreter -q $PYTHON_VERSIONS
 }
 
 run_python() {

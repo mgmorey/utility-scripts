@@ -69,6 +69,17 @@ get_script_files() {
 	 -type f
 }
 
+get_target_dir() {
+    case "$ID" in
+	(rhel|ol|centos)
+	    printf "%s\n" /usr/sbin
+	    ;;
+	(*)
+	    printf "%s\n" /usr/local/bin
+	    ;;
+    esac
+}
+
 install_files() {
     xargs "${script_prefix}install-files" -M $METHOD -m $MODE "$target_dir"
 }
@@ -100,7 +111,7 @@ parse_arguments() {
     if [ $# -gt 0 ]; then
 	target_dir="$1"
     else
-	target_dir=/usr/local/bin
+	target_dir=$(get_target_dir)
     fi
 }
 
