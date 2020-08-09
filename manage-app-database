@@ -97,7 +97,7 @@ parse_arguments() {
 	    true
 	    ;;
 	(*)
-	    usage "%s: Invalid action: %s\n" "$0" "$1"
+	    usage_error "%s: Invalid action: %s\n" "$0" "$1"
 	    ;;
     esac
 }
@@ -107,16 +107,21 @@ to_upper() {
 }
 
 usage() {
+    cat <<EOF >&2
+Usage: $0: create
+       $0: drop
+       $0: -h
+EOF
+}
+
+usage_error() {
     if [ $# -gt 0 ]; then
 	printf "$@" >&2
-	printf "%s\n" "" >&2
     fi
 
-    cat <<-EOF >&2
-	Usage: $0: create
-	       $0: drop
-	       $0: -h
-	EOF
+    printf "%s\n" '' >&2
+    usage
+    exit 2
 }
 
 if [ $# -lt 1 ]; then

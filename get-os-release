@@ -35,13 +35,11 @@ assert() {
 }
 
 abort_conflicting_option() {
-    usage "%s: Conflicting option -- %s\n" "$0" "$1"
-    exit 2
+    usage_error "%s: conflicting option -- %s\n" "$0" "$1"
 }
 
 abort_too_many_arguments() {
-    usage "%s: Too many arguments -- %s\n" "$0" "$*"
-    exit 2
+    usage_error "%s: Too many arguments\n" "$0"
 }
 
 collect_data() {
@@ -253,9 +251,7 @@ parse_arguments() {
 		exit 0
 		;;
 	    (\?)
-		printf "%s\n" "" >&2
-		usage
-		exit 2
+		usage_error
 		;;
 	esac
     done
@@ -289,17 +285,22 @@ to_lower() {
 }
 
 usage() {
+    cat <<-EOF >&2
+Usage: $0: [-i] [-k] [-n] [-p] [-r] [-v]
+       $0: -x
+       $0: -X
+       $0: -h
+EOF
+}
+
+usage_error() {
     if [ $# -gt 0 ]; then
 	printf "$@" >&2
-	printf "%s\n" "" >&2
     fi
 
-    cat <<-EOF >&2
-	Usage: $0: [-i] [-k] [-n] [-p] [-r] [-v]
-	       $0: -x
-	       $0: -X
-	       $0: -h
-	EOF
+    printf "%s\n" '' >&2
+    usage
+    exit 2
 }
 
 case "$0" in

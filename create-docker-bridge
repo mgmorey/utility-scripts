@@ -88,9 +88,7 @@ parse_arguments() {
 		exit 0
 		;;
 	    (\?)
-		printf "%s\n" "" >&2
-		usage
-		exit 2
+		usage_error
 		;;
 	esac
     done
@@ -109,29 +107,22 @@ parse_arguments() {
 	    driver=macvlan
 	    ;;
 	(*)
-	    printf "%s: %s: Invalid network name\n" "$0" "$network" >&2
-	    usage
-	    exit 2
+	    usage_error "%s: %s: Invalid network name\n" "$0" "$network" >&2
 	    ;;
     esac
 }
 
 usage() {
-    if [ $# -gt 0 ]; then
-	printf "$@" >&2
-	printf "%s\n" "" >&2
-    fi
-
-    cat <<-EOF >&2
-	Usage: $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] [-p PARENT] bridgeN
-	       $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] [-p PARENT] ipvlanN
-	       $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] [-p PARENT] macvlanN
-	       $0 -h
-	EOF
+    cat <<EOF >&2
+Usage: $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] [-p PARENT] bridgeN
+       $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] [-p PARENT] ipvlanN
+       $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] [-p PARENT] macvlanN
+       $0 -h
+EOF
 }
 
 if [ $# -lt 1 ]; then
-    abort "%s: Not enough arguments\n" "$0"
+    usage_error "%s: Not enough arguments\n" "$0"
 fi
 
 parse_arguments "$@"

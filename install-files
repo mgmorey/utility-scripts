@@ -120,9 +120,7 @@ parse_arguments() {
 		exit 0
 		;;
 	    (\?)
-		printf "%s\n" "" >&2
-		usage
-		exit 2
+		usage_error
 		;;
 	esac
     done
@@ -130,29 +128,36 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -lt 1 ]; then
-	abort "%s: Not enough arguments\n" "$0"
+	usage_error "%s: Not enough arguments\n" "$0"
+    elif [ -n "$mode" -a "$method" != install ]; then
+	usage_error "%s: %s: Invalid option for method %s\n" "$0" "$mode" "$method"
     fi
 
     target_dir="$1"
     shift
 
     if [ $# -lt 1 ]; then
-	abort "%s: Not enough arguments\n" "$0"
+	usage_error "%s: Not enough arguments\n" "$0"
     fi
 
     files="$@"
 }
 
 usage() {
+    cat <<EOF >&2
+Usage: $0 [-M METHOD] [-m MODE] TARGET FILE [FILE [...]]
+       $0 -h
+EOF
+}
+
+usage_error() {
     if [ $# -gt 0 ]; then
 	printf "$@" >&2
-	printf "%s\n" "" >&2
     fi
 
-    cat <<-EOF >&2
-	Usage: $0 [-M METHOD] [-m MODE] TARGET FILE [FILE [...]]
-	       $0 -h
-	EOF
+    printf "%s\n" '' >&2
+    usage
+    exit 2
 }
 
 case "$0" in

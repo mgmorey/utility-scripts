@@ -83,9 +83,7 @@ parse_arguments() {
 		exit 0
 		;;
 	    (\?)
-		printf "%s\n" "" >&2
-		usage
-		exit 2
+		usage_error
 		;;
 	esac
     done
@@ -139,15 +137,20 @@ refresh_virtualenv() (
 )
 
 usage() {
+    cat <<EOF >&2
+Usage: $0: [-d <DIR>] [-p <PYPI>] [-v <VENV>]
+       $0: -h
+EOF
+}
+
+usage_error() {
     if [ $# -gt 0 ]; then
 	printf "$@" >&2
-	printf "%s\n" "" >&2
     fi
 
-    cat <<-EOF >&2
-	Usage: $0: [-d <DIR>] [-p <PYPI>] [-v <VENV>]
-	       $0: -h
-	EOF
+    printf "%s\n" '' >&2
+    usage
+    exit 2
 }
 
 if [ -n "${VIRTUAL_ENV:-}" ]; then

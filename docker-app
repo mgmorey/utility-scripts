@@ -74,8 +74,7 @@ docker_app() {
 	    docker run $opts $image${tag:+:$tag}
 	    ;;
 	(*)
-	    usage "%s: invalid argument -- %s\n" "$0" "$1"
-	    exit 1
+	    usage_error "%s: invalid argument -- %s\n" "$0" "$1"
 	    ;;
     esac
 }
@@ -99,9 +98,7 @@ parse_arguments() {
 		exit 0
 		;;
 	    (\?)
-		printf "%s\n" "" >&2
-		usage
-		exit 2
+		usage_error
 		;;
 	esac
     done
@@ -109,25 +106,30 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -lt 1 ]; then
-	usage "%s: Not enough arguments\n" "$0"
+	usage_error "%s: Not enough arguments\n" "$0"
     elif [ $# -gt 1 ]; then
-	usage "%s: Too many arguments\n" "$0"
+	usage_error "%s: Too many arguments\n" "$0"
     fi
 
     action="$1"
 }
 
 usage() {
-    if [ $# -gt 0 ]; then
-	printf "$@" >&2
-	printf "%s\n" "" >&2
-    fi
-
     cat <<EOF >&2
 Usage: $0 [-t TAG] pull
        $0 [-t TAG] push
        $0 [-t TAG] tag
 EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf "%s\n" '' >&2
+    usage
+    exit 2
 }
 
 case "$0" in

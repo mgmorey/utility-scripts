@@ -29,18 +29,15 @@ abort() {
 }
 
 abort_invalid_prefix() {
-    usage "%s: invalid prefix -- %s\n" "$0" "$*"
-    exit 2
+    usage_error "%s: invalid prefix -- %s\n" "$0" "$*"
 }
 
 abort_invalid_toolkit() {
-    usage "%s: invalid toolkit -- %s\n" "$0" "$*"
-    exit 2
+    usage_error "%s: invalid toolkit -- %s\n" "$0" "$*"
 }
 
 abort_invalid_version() {
-    usage "%s: invalid version -- %s\n" "$0" "$*"
-    exit 2
+    usage_error "%s: invalid version -- %s\n" "$0" "$*"
 }
 
 abort_not_supported() {
@@ -48,8 +45,7 @@ abort_not_supported() {
 }
 
 abort_too_many_arguments() {
-    usage "%s: Too many arguments -- %s\n" "$0" "$*"
-    exit 2
+    usage_error "%s: Too many arguments\n" "$0"
 }
 
 assert() {
@@ -391,9 +387,7 @@ parse_arguments() {
 		exit 0
 		;;
 	    (\?)
-		printf "%s\n" "" >&2
-		usage
-		exit 2
+		usage_error
 		;;
 	esac
     done
@@ -406,15 +400,20 @@ parse_arguments() {
 }
 
 usage() {
+    cat <<EOF >&2
+Usage: $0 [-f] [-p PREFIX] [-t TOOLKIT] [-v VERSION] [-w]
+       $0 -h
+EOF
+}
+
+usage_error() {
     if [ $# -gt 0 ]; then
 	printf "$@" >&2
-	printf "%s\n" "" >&2
     fi
 
-    cat <<-EOF >&2
-	Usage: $0 [-f] [-p PREFIX] [-t TOOLKIT] [-v VERSION] [-w]
-	       $0 -h
-	EOF
+    printf "%s\n" '' >&2
+    usage
+    exit 2
 }
 
 validate_platform() {

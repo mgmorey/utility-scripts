@@ -125,9 +125,7 @@ parse_arguments() {
 		exit 0
 		;;
 	    (\?)
-		printf "%s\n" "" >&2
-		usage
-		exit 2
+		usage_error
 		;;
 	esac
     done
@@ -141,15 +139,20 @@ prefix_lines() {
 }
 
 usage() {
+    cat <<EOF >&2
+Usage: $0 -f
+       $0 -h
+EOF
+}
+
+usage_error() {
     if [ $# -gt 0 ]; then
 	printf "$@" >&2
-	printf "%s\n" "" >&2
     fi
 
-    cat <<-EOF >&2
-	Usage: $0 -f
-	       $0 -h
-	EOF
+    printf "%s\n" '' >&2
+    usage
+    exit 2
 }
 
 case "$0" in

@@ -184,8 +184,7 @@ parse_arguments() {
 			dialect=sqlite
 			;;
 		    (*)
-			usage "%s: invalid argument -- %s\n" "$0" "$OPTARG"
-			exit 1
+			usage_error "%s: %s: Invalid argument\n" "$0" "$OPTARG"
 			;;
 		esac
 		;;
@@ -207,8 +206,7 @@ parse_arguments() {
 			qualifier=postgres
 			;;
 		    (*)
-			usage "%s: invalid argument -- %s\n" "$0" "$OPTARG"
-			exit 1
+			usage_error "%s: %s: Invalid argument\n" "$0" "$OPTARG"
 			;;
 		esac
 		;;
@@ -232,9 +230,7 @@ parse_arguments() {
 		exit 0
 		;;
 	    (\?)
-		printf "%s\n" "" >&2
-		usage
-		exit 2
+		usage_error
 		;;
 	esac
     done
@@ -248,17 +244,22 @@ to_upper() {
 }
 
 usage() {
-    if [ $# -gt 0 ]; then
-	printf "$@" >&2
-	printf "%s\n" "" >&2
-    fi
-
     cat <<EOF >&2
 Usage: $0 [-D] [-d DIALECT] [-H HOST] [-P PORT] [-p PASSWORD]
        [-q QUALIFIER] [-r ROOT-PASSWORD] [-S SCHEMA] [-s|-t]
        [-u USER]
        $0 -h
 EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf "%s\n" '' >&2
+    usage
+    exit 2
 }
 
 parse_arguments "$@"
