@@ -166,7 +166,7 @@ install_dependencies() {
 }
 
 install_kubernetes() {
-    validate_username root
+    validate_user_name root
     validate_platform
     configure_network
     configure_platform

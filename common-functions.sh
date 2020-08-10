@@ -230,7 +230,7 @@ set_user_profile() {
     fi
 }
 
-validate_username() {
+validate_user_name() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
