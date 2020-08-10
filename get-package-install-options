@@ -33,24 +33,43 @@ get_package_install_options() {
 	    (amzn)
 		case "$VERSION_ID" in
 		    (2)
-			options="${options:+$options }"
+			if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+			    options="${options:+$options }-y"
+			else
+			    break
+			fi
 			;;
 		    (*)
-			break
+			if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+			    options="${options:+$options }-y"
+			else
+			    break
+			fi
 			;;
 		esac
 		;;
 	    (centos)
-		if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
-		    options="${options:+$options }-y"
-		fi
-
 		case "$VERSION_ID" in
+		    (7)
+			if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+			    options="${options:+$options }-y"
+			fi
+
+			options="${options:+$options }--nobest"
+			;;
 		    (8)
+			if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+			    options="${options:+$options }-y"
+			fi
+
 			options="${options:+$options }--nobest"
 			;;
 		    (*)
-			break
+			if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+			    options="${options:+$options }-y"
+			else
+			    break
+			fi
 			;;
 		esac
 		;;
@@ -72,16 +91,20 @@ get_package_install_options() {
 		options="${options:+$options }--no-recommends"
 		;;
 	    (rhel|ol)
-		if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
-		    options="${options:+$options }-y"
-		fi
-
 		case "$VERSION_ID" in
 		    (8.*)
+			if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+			    options="${options:+$options }-y"
+			fi
+
 			options="${options:+$options }--nobest"
 			;;
 		    (*)
-			break
+			if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+			    options="${options:+$options }-y"
+			else
+			    break
+			fi
 			;;
 		esac
 		;;
