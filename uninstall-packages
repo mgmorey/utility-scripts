@@ -76,7 +76,7 @@ parse_arguments() {
 
 uninstall_packages() {
     validate_platform
-    managers=$(get-package-managers)
+    managers=$("${script_prefix}get-package-managers")
 
     if [ $# -eq 0 ]; then
 	return 0
@@ -112,7 +112,7 @@ uninstall_using() (
     manager=$1
     shift 1
 
-    uninstall=$(get-uninstall-command $manager)
+    uninstall=$("${script_prefix}get-uninstall-command" $manager)
 
     case "$manager" in
 	(brew|*/brew)
@@ -173,6 +173,5 @@ script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 
 . "${script_prefix}common-functions.sh"
 
-set_user_profile "$script_dir"
-eval $(get-os-release -x)
+eval $("${script_prefix}get-os-release" -x)
 uninstall_packages "$@"
