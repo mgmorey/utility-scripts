@@ -109,5 +109,5 @@ parse_arguments "$@"
 if [ $is_query = true ]; then
     "${script_prefix}get-askpass-helper"
 else
-    "${script_prefix}set-askpass" -s $shell ${commands-}
+    "${script_prefix}set-askpass-parameters" -s $shell ${commands-}
 fi

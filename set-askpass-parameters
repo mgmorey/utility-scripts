@@ -66,7 +66,7 @@ parse_arguments() {
     commands="$*"
 }
 
-set_askpass() {
+set_askpass_parameters() {
     validate_arguments
     askpass_helper=$("${script_prefix}get-askpass-helper" | awk '! /^#/')
 
@@ -166,4 +166,4 @@ esac
 script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 
 parse_arguments "$@"
-set_askpass
+set_askpass_parameters
