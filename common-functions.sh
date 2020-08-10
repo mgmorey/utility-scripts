@@ -44,6 +44,10 @@ get_bin_directory() (
     done
 )
 
+get_effective_user() {
+    printf "%s\n" "${LOGNAME-${USER-${USERNAME-$(id -nu)}}}"
+}
+
 get_entry() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
@@ -75,6 +79,10 @@ get_profile_path() (
 
     printf "%s\n" "$path"
 )
+
+get_real_user() {
+    printf "%s\n" "${SUDO_USER-$(get_effective_user)}"
+}
 
 get_setpriv_command() (
     version=$(setpriv --version 2>/dev/null)
@@ -135,10 +143,6 @@ get_user_home() {
 	    get_field passwd $1 6
 	    ;;
     esac
-}
-
-get_real_user() {
-    printf "%s\n" "${SUDO_USER-${USER-${USERNAME-${LOGNAME-$(id -nu)}}}}"
 }
 
 get_user_shell() {
