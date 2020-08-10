@@ -80,7 +80,7 @@ configure_platform() {
     done
 }
 
-get_askpass() {
+get_askpass_helper() {
     configure_platform
     package=$("${script_prefix}get-askpass-package")
 
@@ -134,4 +134,4 @@ esac
 script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 
 eval $("${script_prefix}get-os-release" -x)
-get_askpass
+get_askpass_helper
