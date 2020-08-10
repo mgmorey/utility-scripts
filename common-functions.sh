@@ -230,11 +230,38 @@ set_user_profile() {
     fi
 }
 
+validate_group_id() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    if [ "$(id -g)" != $1 ]; then
+	abort "%s: Please try again with group GID %s\n" "$0" "$1"
+    fi
+}
+
+validate_group_name() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    if [ "$(id -ng)" != $1 ]; then
+	abort "%s: Please try again with group %s\n" "$0" "$1"
+    fi
+}
+
+validate_user_id() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    if [ "$(id -u)" != $1 ]; then
+	abort "%s: Please try again as user UID %s\n" "$0" "$1"
+    fi
+}
+
 validate_user_name() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
     if [ "$(id -nu)" != $1 ]; then
-	abort "%s: Please try again as %s\n" "$0" "$1"
+	abort "%s: Please try again as user %s\n" "$0" "$1"
     fi
 }
