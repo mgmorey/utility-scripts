@@ -79,15 +79,19 @@ get_install_options() {
     "${script_prefix}get-package-install-options" ${1-}
 }
 
-get_manager() {
+get_options() {
+    printf "%s\n" "$install_options"
+}
+
+get_package_manager() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     assert [ $1 -ge 1 -a -$1 -le 2 ]
     printf "%s\n" $package_managers | awk 'NR == '"$1"' {print $0}'
 }
 
-get_options() {
-    printf "%s\n" "$install_options"
+get_package_managers() {
+    "${script_prefix}get-package-managers"
 }
 
 get_packages() {
@@ -128,7 +132,7 @@ install_packages() {
     validate_platform
     configure_platform
     install_options=$(get_install_options $general_options)
-    package_managers=$("${script_prefix}get-package-managers")
+    package_managers=$(get_package_managers)
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -169,7 +173,7 @@ install_packages_from_args() (
 
     while [ $index -le 2 ]; do
 	install_packages_using \
-	    "$(get_manager $index)" \
+	    "$(get_package_manager $index)" \
 	    "$install_options" \
 	    $(get_packages $index)
 	index=$((index + 1))
@@ -206,7 +210,7 @@ install_pattern_from_args() (
 	return
     fi
 
-    install_pattern_using "$(get_manager 1)" "$install_options" "$pattern"
+    install_pattern_using $(get_package_manager 1) "$install_options" "$pattern"
 )
 
 install_pattern_using() (

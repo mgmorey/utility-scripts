@@ -29,6 +29,14 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_install_options() {
+    "${script_prefix}get-package-install-options"
+}
+
+get_package_manager() {
+    "${script_prefix}get-package-managers" | awk 'NR == 1 {print $0}'
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -48,9 +56,9 @@ get_realpath() (
 
 install_build_deps() {
     validate_platform
-    manager=$(get-package-managers | awk 'NR == 1 {print $0}')
-    options=$(get-package-install-options)
-    $manager build-dep $options "$@"
+    install_options=$(get_install_options)
+    package_manager=$(get_package_manager)
+    $package_manager build-dep $install_options "$@"
 }
 
 validate_platform() {
@@ -71,7 +79,16 @@ validate_platform() {
     esac
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
+case "$0" in
+    (*/*)
+	script_dir=$(dirname "$0")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 
 eval $("$script_dir/get-os-release" -x)
 install_build_deps "$@"
