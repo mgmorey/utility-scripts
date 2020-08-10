@@ -107,7 +107,7 @@ script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 parse_arguments "$@"
 
 if [ $is_query = true ]; then
-    "${script_prefix}get-askpass"
+    "${script_prefix}get-askpass-helper"
 else
     "${script_prefix}set-askpass" -s $shell ${commands-}
 fi
