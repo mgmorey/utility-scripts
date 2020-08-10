@@ -125,7 +125,7 @@ usage_error() {
 }
 
 validate_arguments() {
-    case $(basename $shell) in
+    case $(basename ${shell%.exe}) in
 	(*bash|ksh*|zsh)
 	    true
 	    ;;
