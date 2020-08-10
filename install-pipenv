@@ -49,11 +49,12 @@ install_dependencies() {
 	    ;;
     esac
 
-    install-packages $(get-python-pip-packages)
+    packages=$("${script_prefix}get-python-pip-packages")
+    "${script_prefix}install-packages" $packages
 }
 
 install_pipenv() {
-    run-python -m pip install --upgrade --user pip pipenv
+    "${script_prefix}run-python" -m pip install --upgrade --user pip pipenv
 }
 
 case "$0" in
@@ -69,8 +70,7 @@ script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 
 . "${script_prefix}common-functions.sh"
 
-set_user_profile "$script_dir"
-eval $(get-os-release -x)
+eval $("${script_prefix}get-os-release" -x)
 
 if [ "$(id -u)" -eq 0 ]; then
     install_dependencies

@@ -48,11 +48,8 @@ get_realpath() (
 
 install_pip() {
     validate_platform
-    packages=$(get-python-pip-packages)
-
-    if [ -n "$packages" ]; then
-	install-packages $packages
-    fi
+    packages=$("${script_prefix}get-python-pip-packages")
+    "${script_prefix}install-packages" $packages
 }
 
 validate_platform() {
@@ -147,6 +144,5 @@ script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 
 . "${script_prefix}common-functions.sh"
 
-set_user_profile "$script_dir"
-eval $(get-os-release -x)
+eval $("${script_prefix}get-os-release" -x)
 install_pip
