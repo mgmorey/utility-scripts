@@ -26,7 +26,7 @@ assert() {
 }
 
 format_python_packages() {
-    data=$(get-python-metadata)
+    data=$("${script_prefix}get-python-metadata")
 
     package_name=$(printf "%s" "$data" | awk '{print $1}')
     package_modifier=$(printf "%s" "$data" | awk '{print $2}')
@@ -62,10 +62,18 @@ get_realpath() (
     fi
 )
 
-script_dir=$(get_realpath "$(dirname "$0")")
+case "$0" in
+    (*/*)
+	script_dir=$(dirname "$0")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
 
-. "$script_dir/common-functions.sh"
+script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 
-set_user_profile "$script_dir"
-eval $(get-os-release -x)
+. "${script_prefix}common-functions.sh"
+
+eval $("${script_prefix}get-os-release" -x)
 format_python_packages "$@"
