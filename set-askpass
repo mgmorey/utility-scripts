@@ -68,7 +68,7 @@ parse_arguments() {
 
 set_askpass() {
     validate_arguments
-    askpass_helper=$("${script_prefix}get-askpass" | awk '! /^#/')
+    askpass_helper=$("${script_prefix}get-askpass-helper" | awk '! /^#/')
 
     if [ -z "$askpass_helper" ]; then
 	exit 0
