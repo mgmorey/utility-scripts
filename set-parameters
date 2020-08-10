@@ -330,7 +330,7 @@ remove_directory() {
 }
 
 set_askpass_parameters() {
-    "${script_prefix}set-askpass" -s $shell || true
+    "${script_prefix}set-askpass-parameters" -s $shell || true
 }
 
 set_profile_parameters() {
