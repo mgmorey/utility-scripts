@@ -137,7 +137,7 @@ get_user_home() {
     esac
 }
 
-get_user_name() {
+get_real_user() {
     printf "%s\n" "${SUDO_USER-${USER-${USERNAME-${LOGNAME-$(id -nu)}}}}"
 }
 
@@ -198,7 +198,7 @@ run_unpriv() (
 )
 
 set_user_profile() {
-    user=$(get_user_name)
+    user=$(get_real_user)
     home=$(get_user_home "$user")
 
     if [ -n "$home" -a "$HOME" != "$home" ]; then

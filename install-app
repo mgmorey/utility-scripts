@@ -220,7 +220,7 @@ install_uwsgi_from_source() (
     if [ $dryrun = false ]; then
 	install_dependencies
 	build_uwsgi_from_source $SYSTEM_PYTHON $SYSTEM_PYTHON_VERSION
-	home="$(get_user_home $(get_user_name))"
+	home="$(get_user_home $(get_real_user))"
 
 	if ! cd "$home/git/$UWSGI_BRANCH"; then
 	    return 1
@@ -273,7 +273,7 @@ parse_arguments() {
 }
 
 preinstall_app() {
-    home="$(get_user_home "$(get_user_name)")"
+    home="$(get_user_home "$(get_real_user)")"
     path="$(get_profile_path "$home" "$script_dir")"
     script="\"${script_prefix}run-app\" -d \"$(pwd)\" -h \"$home\" -p \"$path\""
 

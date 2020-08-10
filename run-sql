@@ -29,7 +29,7 @@ assert() {
 }
 
 configure_platform() {
-    user=$(get_user_name)
+    user=$(get_real_user)
 }
 
 exec_sql_command() {
@@ -142,7 +142,7 @@ get_realpath() (
     fi
 )
 
-get_user_name() {
+get_real_user() {
     printf "%s\n" "${SUDO_USER-${USER-${USERNAME-${LOGNAME-}}}}"
 }
 

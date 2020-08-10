@@ -86,7 +86,7 @@ get_realpath() (
     fi
 )
 
-get_user_name() {
+get_real_user() {
     printf "%s\n" "${SUDO_USER-${USER-${USERNAME-${LOGNAME-}}}}"
 }
 
@@ -96,7 +96,7 @@ install_startup_files() {
     cd git
 
     if [ ! -d $PROJECT_NAME ]; then
-	git clone $(printf "$PROJECT_URL\n" "$(get_user_name)")
+	git clone $(printf "$PROJECT_URL\n" "$(get_real_user)")
     fi
 
     cd

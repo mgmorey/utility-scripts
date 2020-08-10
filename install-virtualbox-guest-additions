@@ -69,7 +69,7 @@ configure_platform() {
 		    ;;
 		(ubuntu)
 		    cdrom_dev=/dev/cdrom
-		    mount_dir=/media/$(get_user_name)
+		    mount_dir=/media/$(get_real_user)
 		    packages=$DEBIAN_PKGS
 		    ;;
 	    esac
