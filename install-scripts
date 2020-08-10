@@ -132,6 +132,7 @@ install_script_files() {
 
 install_scripts() {
     configure_platform
+    validate_user_name "$(get_real_user)"
     source_dir=$(get_realpath "$(pwd)")
 
     case "$(basename "$source_dir")" in
@@ -223,6 +224,8 @@ case "$0" in
 esac
 
 script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
+
+. "${script_prefix}common-functions.sh"
 
 eval $("${script_prefix}get-os-release" -x)
 parse_arguments "$@"
