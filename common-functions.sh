@@ -226,8 +226,8 @@ set_user_profile() {
     fi
 
     if [ -n "${HOME-}" ]; then
-	if [ -x "$HOME/bin/set-parameters" ]; then
-	    eval "$($HOME/bin/set-parameters -s /bin/sh)"
+	if [ -x "$HOME/bin/set-profile-parameters" ]; then
+	    eval "$($HOME/bin/set-profile-parameters -s /bin/sh)"
 	else
 	    export PATH=$(get_profile_path "$home" "$1")
 	fi

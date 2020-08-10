@@ -1,7 +1,7 @@
 #!/bin/sh -eu
 
 # set-parameters: print shell commands to set profile parameters
-# Copyright (C) 2019  "Michael G. Morey" <mgmorey@gmail.com>
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,16 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
-
-LINUXBREW_DIRS="$(ls -d /home/linuxbrew/.linuxbrew 2>/dev/null || true)"
-PKGSRC_DIRS="$(ls -d /usr/pkg /opt/pkg /opt/local 2>/dev/null || true)"
-SOLARIS_DIRS="$(ls -d /opt/csw /opt/*studio* 2>/dev/null || true)"
-SYSTEM_DIRS="/usr /usr/gnu"
-
-COMMON_BINDIRS="/usr/lib/cups/bin"
-PROFILE_BINDIRS="bin .cargo/bin .linuxbrew/bin .local/bin .pyenv/bin"
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -34,46 +24,6 @@ abort() {
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
-
-configure_platform() {
-    bindirs=
-
-    for id in $ID $ID_LIKE; do
-	case $id in
-	    (debian|opensuse|freebsd|windows)
-		bindirs="bin sbin"
-		break
-		;;
-	esac
-    done
-
-    if [ -z "${bindirs-}" ]; then
-	bindirs="sbin bin"
-    fi
-}
-
-get_homebrew_binary() (
-    for dir in $HOME/.linuxbrew $LINUXBREW_DIRS /usr/local; do
-	if [ -x $dir/bin/brew ]; then
-	    printf "%s\n" "$dir/bin/brew"
-	fi
-    done
-)
-
-get_homebrew_prefix() (
-    brew=$(get_homebrew_binary)
-
-    if [ -z "$brew" ]; then
-	return
-    fi
-
-    dir="$(get_realpath "$(dirname "$brew")/../opt")"
-
-    if [ -d "$dir" ]; then
-	printf "%s\n" "$dir"
-	break
-    fi
-)
 
 get_realpath() (
     assert [ $# -ge 1 ]
@@ -91,188 +41,6 @@ get_realpath() (
 	done
     fi
 )
-
-include_binary_directories() {
-    for bindir; do
-	if is_to_be_included "$dir/$bindir" "${PATH-}"; then
-	    case "$dir" in
-		(/opt/csw)
-		    PATH="${PATH:+$PATH:}$dir/$bindir"
-		    ;;
-		(*)
-		    PATH="$dir/$bindir${PATH:+:$PATH}"
-		    ;;
-	    esac
-	fi
-    done
-}
-
-include_common_directories() {
-    # add common binary directories to PATH (if they exist)
-    for dir in $COMMON_BINDIRS; do
-	if is_to_be_included "$dir" "$PATH"; then
-	    PATH="$dir${PATH:+:$PATH}"
-	fi
-    done
-
-    # add common prefix directories to paths (if they exist)
-
-    dirs="$SYSTEM_DIRS $SOLARIS_DIRS $PKGSRC_DIRS $LINUXBREW_DIRS /usr/local"
-
-    for dir in $dirs; do
-	case "$dir" in
-	    (/opt/local|/opt/pkg|/usr/gnu|/usr/local|/usr/pkg)
-		INFOPATH="$(remove_directory "$dir/share/info" "${INFOPATH-}")"
-		MANPATH="$(remove_directory "$dir/share/man" "${MANPATH-}")"
-		INFOPATH="$(remove_directory "$dir/info" "${INFOPATH-}")"
-		MANPATH="$(remove_directory "$dir/man" "${MANPATH-}")"
-		PATH="$(remove_directory "$dir/sbin" "${PATH-}")"
-		PATH="$(remove_directory "$dir/bin" "${PATH-}")"
-		;;
-	    (*)
-		if [ ! -d "$dir" ]; then
-		    continue
-		fi
-	esac
-
-	if is_to_be_included "$dir/info" "${INFOPATH-}"; then
-	    INFOPATH="$dir/info${INFOPATH:+:$INFOPATH}"
-	elif is_to_be_included "$dir/share/info" "${INFOPATH-}"; then
-	    INFOPATH="$dir/share/info${INFOPATH:+:$INFOPATH}"
-	fi
-
-	if is_to_be_included "$dir/man" "${MANPATH-}"; then
-	    MANPATH="$dir/man${MANPATH:+:$MANPATH}"
-	elif is_to_be_included "$dir/share/man" "${MANPATH-}"; then
-	    MANPATH="$dir/share/man${MANPATH:+:$MANPATH}"
-	fi
-
-	include_binary_directories $bindirs
-	include_pkgconf_directories $dir
-    done
-}
-
-include_homebrew_keg_directories() {
-    prefix=$(get_homebrew_prefix)
-
-    if [ -z "${prefix-}" ]; then
-	return
-    fi
-
-    for pkg in $("${script_prefix}brew-list-keg-only" 2>/dev/null || true); do
-	if [ -d $prefix/$pkg/include ]; then
-	    CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
-	fi
-
-	if [ -d $prefix/$pkg/lib ]; then
-	    LDFLAGS="-L$prefix/$pkg/lib -R$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
-	fi
-
-	if is_to_be_included $prefix/$pkg/lib/$pkg/man "${MANPATH-}"; then
-	    MANPATH="$prefix/$pkg/lib/$pkg/man${MANPATH:+:$MANPATH}"
-	fi
-
-	if is_to_be_included $prefix/$pkg/share/man "${MANPATH-}"; then
-	    MANPATH="$prefix/$pkg/share/man${MANPATH:+:$MANPATH}"
-	fi
-
-	if is_to_be_included $prefix/$pkg/bin "${PATH-}"; then
-	    PATH="$prefix/$pkg/bin${PATH:+:$PATH}"
-	fi
-
-	for pkgdir in $prefix/$pkg/lib/pkgconfig /usr/share/pkgconfig; do
-	    if is_to_be_included $pkgdir "${PKG_CONFIG_PATH-}"; then
-		PKG_CONFIG_PATH="$pkgdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-	    fi
-	done
-    done
-
-}
-
-include_macos_directories() {
-    if [ -x /usr/bin/xcrun ]; then
-	dir=$(/usr/bin/xcrun --show-sdk-path)
-	CPPFLAGS="-I$dir/usr/include"
-	LDFLAGS="-L$dir/usr/lib -R$dir/usr/lib"
-    fi
-
-    MANPATH=${MANPATH:-$(manpath)}
-
-    # set PATH so it includes user's private Python 3 bin if it exists
-    for version in 3.8 3.7 3.6; do
-	if [ -d "$HOME/Library/Python/$version/bin" ] ; then
-	    PATH="$HOME/Library/Python/$version/bin${PATH:+:$PATH}"
-	    break
-	fi
-    done
-}
-
-include_pkgconf_directories() {
-    pkgdir=$1/lib/pkgconfig
-
-    if is_to_be_included $pkgdir "${PKG_CONFIG_PATH-}"; then
-	case "$1" in
-	    (/opt/csw)
-	    	true
-	    	;;
-	    (/opt/local)
-	    	PKG_CONFIG_PATH="${PKG_CONFIG_PATH:+$PKG_CONFIG_PATH:}$pkgdir"
-	    	;;
-	    (*)
-		PKG_CONFIG_PATH="$pkgdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-		;;
-	esac
-    fi
-}
-
-include_platform_directories() {
-    case "$kernel_name" in
-	(Darwin)
-	    include_macos_directories
-	    ;;
-    esac
-
-    include_homebrew_keg_directories
-}
-
-include_profile_directories() {
-    INFOPATH="$(remove_directory "$HOME/info" "${INFOPATH-}")"
-    MANPATH="$(remove_directory "$HOME/man" "${MANPATH-}")"
-    PATH="$(remove_directory "$HOME/bin" "${PATH-}")"
-
-    for dir in $PROFILE_BINDIRS; do
-	PATH="$(remove_directory "$HOME/$dir" "${PATH-}")"
-    done
-
-    # add user info directory to INFOPATH (if it exists)
-    if ! is_included "$HOME/info" "${PATH-}"; then
-	INFOPATH="$HOME/info${INFOPATH:+:$INFOPATH}"
-    fi
-
-    # add user man directory to MANPATH (if it exists)
-    if ! is_included "$HOME/man" "${PATH-}"; then
-	MANPATH="$HOME/man${MANPATH:+:$MANPATH}"
-    fi
-
-    # add user binary directories to PATH (if they exist)
-    for dir in $PROFILE_BINDIRS; do
-	if ! is_included "$HOME/$dir" "${PATH-}"; then
-	    PATH="$HOME/$dir${PATH:+:$PATH}"
-	fi
-    done
-}
-
-is_included() {
-    assert [ $# -eq 2 ]
-    assert [ -n "$1" ]
-    printf "%s\n" "$2" | egrep '(^|:)'$1'(:|$)' >/dev/null
-}
-
-is_to_be_included() {
-    assert [ $# -eq 2 ]
-    assert [ -n "$1" ]
-    test -d $1 && ! is_included $1 "$2"
-}
 
 parse_arguments() {
     shell=$SHELL
@@ -295,51 +63,10 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 }
 
-print_parameters() {
-    assert [ $# -gt 0 ]
-
-    for var; do
-	eval value=\${$var-}
-
-	if [ -z "$value" ]; then
-	    continue
-	fi
-
-	case "$(basename $shell)" in
-	    (*bash|ksh*|zsh)
-		printf 'export %s="%s"\n' "$var" "$value"
-		;;
-	    (csh|tcsh)
-		printf 'setenv %s "%s";\n' "$var" "$value"
-		;;
-	    (fish)
-		printf 'set -x %s "%s";\n' "$var" "$value"
-		;;
-	    (*)
-		printf '%s="%s"\n' "$var" "$value"
-		printf 'export %s\n' "$var"
-		;;
-	esac
-    done
-}
-
-remove_directory() {
-    assert [ $# -eq 2 ]
-    assert [ -n "$1" ]
-    printf "%s\n" "$2" | sed -e 's|^'"$1"':||g;s|:'"$1"':|:|g;s|:'"$1"'$||g'
-}
-
-set_askpass_parameters() {
-    "${script_prefix}set-askpass-parameters" -s $shell || true
-}
-
-set_profile_parameters() {
+set_parameters() {
     validate_arguments
-    configure_platform
-    include_common_directories
-    include_platform_directories
-    include_profile_directories
-    print_parameters $ALL_PARAMETERS
+    "${script_prefix}set-askpass-parameters" -s $shell || true
+    "${script_prefix}set-profile-parameters" -s $shell || true
 }
 
 usage() {
@@ -393,5 +120,4 @@ script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 eval $("${script_prefix}get-os-release" -x)
 
 parse_arguments "$@"
-set_askpass_parameters
-set_profile_parameters
+set_parameters
