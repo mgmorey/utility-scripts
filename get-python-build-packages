@@ -26,8 +26,8 @@ assert() {
 }
 
 get_packages() {
-    get-development-packages
-    get-python-library-packages
+    "${script_prefix}get-development-packages"
+    "${script_prefix}get-python-library-packages"
 }
 
 get_python_build_packages() {
@@ -64,6 +64,5 @@ script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 
 . "${script_prefix}common-functions.sh"
 
-set_user_profile "$script_dir"
-eval $(get-os-release -x)
+eval $("${script_prefix}get-os-release" -x)
 get_python_build_packages

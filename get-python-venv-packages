@@ -70,7 +70,7 @@ get_python_venv_packages() {
 	    ;;
     esac
 
-    format-python-packages ${packages-}
+    "${script_prefix}format-python-packages" ${packages-}
 }
 
 case "$0" in
@@ -86,6 +86,5 @@ script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 
 . "${script_prefix}common-functions.sh"
 
-set_user_profile "$script_dir"
-eval $(get-os-release -x)
+eval $("${script_prefix}get-os-release" -x)
 get_python_venv_packages

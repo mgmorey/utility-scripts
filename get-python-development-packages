@@ -25,9 +25,13 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_packages() {
+    "${script_prefix}get-python-pip-packages"
+    "${script_prefix}get-python-venv-packages"
+}
+
 get_python_devel_packages() {
-    (get-python-pip-packages
-     get-python-venv-packages) | sort -u
+    get_packages | sort -u
 }
 
 get_realpath() (
@@ -61,5 +65,5 @@ script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
 . "${script_prefix}common-functions.sh"
 
 set_user_profile "$script_dir"
-eval $(get-os-release -x)
+eval $("${script_prefix}get-os-release" -x)
 get_python_devel_packages
