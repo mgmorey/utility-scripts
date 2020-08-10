@@ -29,11 +29,15 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_manager() {
+get_package_manager() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     assert [ $1 -ge 1 -a -$1 -le 2 ]
-    printf "%s\n" $managers | awk 'NR == '"$1"' {print $0}'
+    printf "%s\n" $package_managers | awk 'NR == '"$1"' {print $0}'
+}
+
+get_package_managers() {
+    "${script_prefix}get-package-managers"
 }
 
 get_packages() {
@@ -76,7 +80,7 @@ parse_arguments() {
 
 uninstall_packages() {
     validate_platform
-    managers=$("${script_prefix}get-package-managers")
+    package_managers=$(get_package_managers)
 
     if [ $# -eq 0 ]; then
 	return 0
@@ -94,7 +98,7 @@ uninstall_packages_from_args() (
     index=1
 
     while [ $index -le 2 ]; do
-	uninstall_using "$(get_manager $index)" \
+	uninstall_using "$(get_package_manager $index)" \
 			$(get_packages $index)
 	index=$((index + 1))
     done
