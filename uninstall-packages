@@ -29,6 +29,10 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_options() {
+    "${script_prefix}get-package-uninstall-options"
+}
+
 get_package_manager() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
@@ -98,13 +102,15 @@ uninstall_packages_from_args() (
     index=1
 
     while [ $index -le 2 ]; do
-	uninstall_using "$(get_package_manager $index)" \
-			$(get_packages $index)
+	uninstall_packages_using \
+	    "$(get_package_manager $index)" \
+	    $(get_options) \
+	    $(get_packages $index)
 	index=$((index + 1))
     done
 )
 
-uninstall_using() (
+uninstall_packages_using() (
     assert [ $# -ge 1 ]
 
     if [ $# -eq 1 ]; then
@@ -114,7 +120,8 @@ uninstall_using() (
     fi
 
     manager=$1
-    shift 1
+    options=$2
+    shift 2
 
     uninstall=$("${script_prefix}get-uninstall-command" $manager)
 
@@ -123,7 +130,7 @@ uninstall_using() (
 	    run_unpriv /bin/sh -c "$manager $uninstall $*"
 	    ;;
 	(*)
-	    $manager $uninstall $*
+	    $manager $uninstall $options $*
 	    ;;
     esac
 )
