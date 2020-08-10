@@ -142,10 +142,6 @@ get_realpath() (
     fi
 )
 
-get_real_user() {
-    printf "%s\n" "${SUDO_USER-${USER-${USERNAME-${LOGNAME-}}}}"
-}
-
 has_env_file() {
     if [ "$1" = / ]; then
 	return 0
@@ -261,6 +257,19 @@ usage_error() {
     usage
     exit 2
 }
+
+case "$0" in
+    (*/*)
+	script_dir=$(dirname "$0")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
+
+. "${script_prefix}common-functions.sh"
 
 env_dir=$(pwd)
 
