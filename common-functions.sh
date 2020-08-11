@@ -70,6 +70,23 @@ get_field() {
     get_entry $1 "$2" | cut -d: -f $3
 }
 
+get_group_id() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "${kernel_name=$(uname -s)}" in
+	(MINGW64_NT-*)
+	    true
+	    ;;
+	(Darwin)
+	    true
+	    ;;
+	(*)
+	    get_field passwd $1 4
+	    ;;
+    esac
+}
+
 get_profile_path() (
     path=$PATH
 
@@ -130,7 +147,7 @@ get_su_command() (
     printf "%s\n" su
 )
 
-get_user_home() {
+get_home() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
@@ -147,7 +164,24 @@ get_user_home() {
     esac
 }
 
-get_user_shell() {
+get_user_id() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "${kernel_name=$(uname -s)}" in
+	(MINGW64_NT-*)
+	    true
+	    ;;
+	(Darwin)
+	    true
+	    ;;
+	(*)
+	    get_field passwd $1 3
+	    ;;
+    esac
+}
+
+get_shell() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
@@ -205,7 +239,7 @@ run_unpriv() (
 
 set_user_profile() {
     user=$(get_real_user)
-    home=$(get_user_home "$user")
+    home=$(get_home "$user")
 
     if [ -n "$home" -a "$HOME" != "$home" ]; then
 	if [ "${ENV_VERBOSE-false}" = true ]; then
@@ -216,7 +250,7 @@ set_user_profile() {
 	export HOME="$home"
     fi
 
-    shell=$(get_user_shell "$user")
+    shell=$(get_shell "$user")
 
     if [ -n "$shell" -a "$SHELL" != "$shell" ]; then
 	if [ "${ENV_VERBOSE-false}" = true ]; then

@@ -277,7 +277,6 @@ generate_requirements() (
 	fi
     done
 
-    chgrp $(id -g) "$@"
     chmod a+r "$@"
 )
 
