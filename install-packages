@@ -39,13 +39,13 @@ configure_platform() {
 
 		case "$VERSION_ID" in
 		    (7)
-			install-epel
+			"${script_prefix}install-epel"
 			;;
 		    (8)
-			install-epel
+			"${script_prefix}install-epel"
 			;;
 		    (*)
-			install-epel
+			"${script_prefix}install-epel"
 			;;
 		esac
 		break

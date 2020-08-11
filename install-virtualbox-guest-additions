@@ -94,8 +94,7 @@ get_awk_command() {
 
 get_hypervisor_vendor() (
     awk="$(get_awk_command)"
-    script="$(which get-hypervisor-vendor)"
-    (lscpu 2>/dev/null | $awk -f $script) || true
+    (lscpu 2>/dev/null | $awk -f "${script_prefix}get-hypervisor-vendor")
 )
 
 get_package_directory() {
@@ -121,7 +120,7 @@ get_realpath() (
 
 install_kernel_packages() {
     if [ -n "${packages-}" ]; then
-	install-packages $packages
+	"${script_prefix}install-packages" $packages
     fi
 }
 
@@ -130,7 +129,7 @@ install_prerequisites() {
 	(Linux|GNU)
 	    case "$ID" in
 		(rhel|ol|centos)
-		    install-epel
+		    "${script_prefix}install-epel"
 		    ;;
 	    esac
 	    ;;
@@ -207,7 +206,7 @@ update_kernel_packages() {
 }
 
 update_redhat_kernel_packages() {
-    manager=$(get-package-managers | awk 'NR == 1 {print $0}')
+    manager=$("${script_prefix}get-package-managers" | awk 'NR == 1 {print $0}')
 
     if ! $manager update 'kernel*'; then
 	exit $?
@@ -281,7 +280,7 @@ validate_platform() {
 	    ;;
     esac
 
-    vendor=$(get_hypervisor_vendor)
+    vendor=$(get_hypervisor_vendor || true)
 
     case "$vendor" in
 	(KVM)
@@ -313,6 +312,5 @@ script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
 
-set_user_profile "$script_dir"
-eval $(get-os-release -x)
+eval $("${script_prefix}get-os-release" -x)
 install_virtualbox_guest
