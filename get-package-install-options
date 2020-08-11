@@ -53,9 +53,9 @@ get_package_install_options() {
 		    (7)
 			if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
 			    options="${options:+$options }-y"
+			else
+			    break
 			fi
-
-			options="${options:+$options }--nobest"
 			;;
 		    (8)
 			if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then

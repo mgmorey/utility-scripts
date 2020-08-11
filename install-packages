@@ -205,7 +205,7 @@ install_pattern_from_args() (
 	return
     fi
 
-    install_pattern_using $(get_package_manager 1) "$install_options" "$pattern"
+    install_pattern_using $(get_package_manager 1) "$(get_options)" "$pattern"
 )
 
 install_pattern_using() (
