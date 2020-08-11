@@ -45,15 +45,20 @@ clean_up_kernel_dumps() {
 
 clean_up_kernel_packages() {
     validate_platform
-    packages=$(get_packages || true)
+    packages=$(get_kernel_packages)
 
     if [ -n "$packages" ]; then
 	"${script_prefix}uninstall-packages" $packages
     fi
 }
 
+get_installed_kernel_packages() {
+    "${script_prefix}get-installed-packages" -f | \
+	egrep "$KERNEL_REGEX"
+}
+
 get_kernel_dumps() {
-    find /boot -type f -name 'initramfs-*kdump.img'
+    find /boot -type f -name 'initramfs-*kdump.img' 2>/dev/null
 }
 
 get_kernel_file() {
@@ -62,11 +67,15 @@ get_kernel_file() {
     printf '%s\n' "$1" | sed 's/kdump\.img$/.img/'
 }
 
-get_packages() {
-    kernel_release=$(uname -r | sed 's/-default$//')
-    "${script_prefix}get-installed-packages" -f | \
-	egrep "$KERNEL_REGEX" | \
-	grep -v $kernel_release
+get_kernel_packages() {
+    package_release=$(get_current_kernel_package_release)
+    get_installed_kernel_packages | grep -v "$package_release"
+}
+
+get_current_kernel_package_release() {
+    machine=$(uname -m)
+    release=$(uname -r)
+    printf '%s\n' "${release%.$machine}" | sed -e 's/-default$//'
 }
 
 get_realpath() (
@@ -134,6 +143,8 @@ case "$0" in
 esac
 
 script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
 
 eval $("${script_prefix}get-os-release" -X)
 clean_up_kernel_packages

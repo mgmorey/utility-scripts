@@ -38,11 +38,29 @@ get_package_uninstall_options() {
 		fi
 		;;
 	    (centos)
-		if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
-		    options="${options:+$options }-y"
-		else
-		    break
-		fi
+		case "$VERSION_ID" in
+		    (7)
+			if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+			    options="${options:+$options }-y"
+			fi
+
+			options="${options:+$options }--nobest"
+			;;
+		    (8)
+			if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+			    options="${options:+$options }-y"
+			fi
+
+			options="${options:+$options }--nobest"
+			;;
+		    (*)
+			if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+			    options="${options:+$options }-y"
+			else
+			    break
+			fi
+			;;
+		esac
 		;;
 	    (debian)
 		if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
@@ -62,11 +80,22 @@ get_package_uninstall_options() {
 		break
 		;;
 	    (rhel|ol)
-		if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
-		    options="${options:+$options }-y"
-		else
-		    break
-		fi
+		case "$VERSION_ID" in
+		    (8.*)
+			if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+			    options="${options:+$options }-y"
+			fi
+
+			options="${options:+$options }--nobest"
+			;;
+		    (*)
+			if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+			    options="${options:+$options }-y"
+			else
+			    break
+			fi
+			;;
+		esac
 		;;
 	    (solaris)
 		options="${options:+$options }--accept"
