@@ -87,7 +87,16 @@ if [ $# -gt 0 ]; then
     usage_error "%s: Too many arguments\n" "$0"
 fi
 
-script_dir=$(get_realpath "$(dirname "$0")")
+case "$0" in
+    (*/*)
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
 
-eval $("$script_dir/get-os-release" -x)
+script_prefix=${script_dir:+$script_dir/}
+
+eval $("${script_prefix}get-os-release" -x)
 install_pyenv_on_macos "$@"
