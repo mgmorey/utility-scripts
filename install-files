@@ -162,14 +162,14 @@ usage_error() {
 
 case "$0" in
     (*/*)
-	script_dir=$(dirname "$0")
+	script_dir=$(get_realpath "$(dirname "$0")")
 	;;
     (*)
 	script_dir=
 	;;
 esac
 
-script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
+script_prefix=${script_dir:+$script_dir/}
 
 eval $("${script_prefix}get-os-release" -x)
 parse_arguments "$@"
