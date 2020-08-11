@@ -34,7 +34,7 @@ get_bin_directory() (
     assert [ -n "$1" ]
     dir="$1"
 
-    if [ $1 != . ]; then
+    if [ $dir != . ]; then
 	while [ "$(dirname "$dir")" != / ]; do
 	    dir=$(dirname "$dir")
 
