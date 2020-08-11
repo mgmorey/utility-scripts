@@ -64,6 +64,5 @@ script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
 
-set_user_profile "$script_dir"
 eval $("${script_prefix}get-os-release" -x)
 get_python_devel_packages
