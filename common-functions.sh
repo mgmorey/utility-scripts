@@ -34,14 +34,16 @@ get_bin_directory() (
     assert [ -n "$1" ]
     dir="$1"
 
-    while [ "$(dirname "$dir")" != / ]; do
-	dir=$(dirname "$dir")
+    if [ $1 != . ]; then
+	while [ "$(dirname "$dir")" != / ]; do
+	    dir=$(dirname "$dir")
 
-	if [ -d "$dir/bin" ]; then
-	    printf "$dir/bin"
-	    return
-	fi
-    done
+	    if [ -d "$dir/bin" ]; then
+		printf "$dir/bin"
+		return
+	    fi
+	done
+    fi
 )
 
 get_effective_user() {
