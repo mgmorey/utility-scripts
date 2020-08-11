@@ -90,5 +90,5 @@ esac
 
 script_prefix=${script_dir:+$script_dir/}
 
-eval $("$script_dir/get-os-release" -x)
+eval $("${script_prefix}get-os-release" -x)
 install_build_deps "$@"
