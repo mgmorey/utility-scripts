@@ -68,7 +68,16 @@ validate_platform() {
     abort_not_supported "Operating system"
 }
 
-script_dir=$(get_realpath "$(dirname "$0")")
+case "$0" in
+    (*/*)
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
 
-eval $("$script_dir/get-os-release" -x)
+script_prefix=${script_dir:+$script_dir/}
+
+eval $("${script_prefix}get-os-release" -x)
 install_opencsw
