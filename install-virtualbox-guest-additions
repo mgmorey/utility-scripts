@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DEBIAN_PKGS="build-essential dkms linux-headers-$(uname -r)"
+DEBIAN_PKGS="bzip2 dkms gcc linux-headers-$(uname -r) make perl"
 
 FEDORA_PKGS="bzip2 dkms gcc kernel-headers kernel-devel make perl"
 
