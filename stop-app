@@ -82,8 +82,6 @@ esac
 
 script_prefix=${script_dir:+$script_dir/}
 
-script_prefix=${script_dir:+$(get_realpath "$script_dir")/}
-
 . "${script_prefix}common-functions.sh"
 . "${script_prefix}utility-functions.sh"
 . "${script_prefix}restapi-functions.sh"
