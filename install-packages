@@ -33,45 +33,45 @@ configure_platform() {
     is_pattern_supported=false
 
     for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (centos)
-		is_pattern_supported=true
+        case "$id" in
+            (centos)
+                is_pattern_supported=true
 
-		case "$VERSION_ID" in
-		    (7)
-			"${script_prefix}install-epel"
-			;;
-		    (8)
-			"${script_prefix}install-epel"
-			;;
-		    (*)
-			"${script_prefix}install-epel"
-			;;
-		esac
-		break
-		;;
-	    (debian)
-		is_pattern_supported=true
-		break
-		;;
-	    (fedora)
-		is_pattern_supported=true
-		break
-		;;
-	    (opensuse)
-		is_pattern_supported=true
-		break
-		;;
-	    (rhel|ol)
-		is_pattern_supported=true
-		break
-		;;
-	    (solaris)
-		is_pattern_supported=true
-		set-publisher-sfe
-		break
-		;;
-	esac
+                case "$VERSION_ID" in
+                    (7)
+                        "${script_prefix}install-epel"
+                        ;;
+                    (8)
+                        "${script_prefix}install-epel"
+                        ;;
+                    (*)
+                        "${script_prefix}install-epel"
+                        ;;
+                esac
+                break
+                ;;
+            (debian)
+                is_pattern_supported=true
+                break
+                ;;
+            (fedora)
+                is_pattern_supported=true
+                break
+                ;;
+            (opensuse)
+                is_pattern_supported=true
+                break
+                ;;
+            (rhel|ol)
+                is_pattern_supported=true
+                break
+                ;;
+            (solaris)
+                is_pattern_supported=true
+                set-publisher-sfe
+                break
+                ;;
+        esac
     done
 }
 
@@ -96,12 +96,12 @@ get_packages() {
     assert [ $1 -ge 1 -a -$1 -le 2 ]
 
     case "$1" in
-	(1)
-	    awk_expr='NF == 1 {print $0} NF == 2 {print $1}'
-	    ;;
-	(2)
-	    awk_expr='NF == 2 {print $2}'
-	    ;;
+        (1)
+            awk_expr='NF == 1 {print $0} NF == 2 {print $1}'
+            ;;
+        (2)
+            awk_expr='NF == 2 {print $2}'
+            ;;
     esac
 
     printf "%s\n" $packages | awk -F: "$awk_expr"
@@ -112,15 +112,15 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-	$realpath "$@"
+        $realpath "$@"
     else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
+        for file; do
+            if expr "$file" : '/.*' >/dev/null; then
+                printf "%s\n" "$file"
+            else
+                printf "%s\n" "$PWD/${file#./}"
+            fi
+        done
     fi
 )
 
@@ -128,32 +128,34 @@ install_packages() {
     validate_platform
     configure_platform
     package_managers=$(get_package_managers)
+    package_options=$(get_options)
+    pattern_options=$(get_options)
 
     for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (debian)
-		move_pattern_to_packages
-		break
-		;;
-	    (solaris)
-		move_pattern_to_packages
-		break
-		;;
-	esac
+        case "$id" in
+            (debian)
+                move_pattern_to_packages
+                break
+                ;;
+            (solaris)
+                move_pattern_to_packages
+                break
+                ;;
+        esac
     done
 
     if [ -n "$packages" ]; then
-	packages="$("${script_prefix}get-uninstalled-packages" $packages)"
+        packages="$("${script_prefix}get-uninstalled-packages" $packages)"
     fi
 
     if [ -z "$packages" -a -z "$pattern" ]; then
-	return
+        return
     fi
 
     "${script_prefix}install-package-managers" $package_managers
 
     if [ "$is_pattern_supported" = true ]; then
-	install_pattern_from_args || true
+        install_pattern_from_args || true
     fi
 
     install_packages_from_args
@@ -161,17 +163,23 @@ install_packages() {
 
 install_packages_from_args() (
     if [ -z "$packages" ]; then
-	return
+        return
     fi
 
     index=1
 
     while [ $index -le 2 ]; do
-	install_packages_using \
-	    "$(get_package_manager $index)" \
-	    $(get_options) \
-	    $(get_packages $index)
-	index=$((index + 1))
+        package_manager=$(get_package_manager $index)
+
+        if [ -z "$package_manager" ]; then
+            break
+        fi
+
+        install_packages_using \
+            "$package_manager" \
+            "$package_options" \
+            $(get_packages $index)
+        index=$((index + 1))
     done
 )
 
@@ -179,9 +187,9 @@ install_packages_using() (
     assert [ $# -ge 2 ]
 
     if [ $# -eq 2 ]; then
-	return
+        return
     elif [ -z "$1" ]; then
-	return
+        return
     fi
 
     manager=$1
@@ -191,30 +199,34 @@ install_packages_using() (
     install=$("${script_prefix}get-install-command" $manager)
 
     case "$(basename $manager)" in
-	(brew)
-	    run_unpriv /bin/sh -c "$manager $install $options $*"
-	    ;;
-	(*)
-	    $manager $install $options $*
-	    ;;
+        (brew)
+            run_unpriv /bin/sh -c "$manager $install $options $*"
+            ;;
+        (*)
+            $manager $install $options $*
+            ;;
     esac
 )
 
 install_pattern_from_args() (
     if [ -z "$pattern" ]; then
-	return
+        return
     fi
 
-    install_pattern_using $(get_package_manager 1) "$(get_options)" "$pattern"
+    package_manager=$(get_package_manager 1)
+    install_pattern_using \
+        "$package_manager" \
+        "$pattern_options" \
+        "$pattern"
 )
 
 install_pattern_using() (
     assert [ $# -ge 2 ]
 
     if [ $# -eq 2 ]; then
-	return
+        return
     elif [ -z "$1" ]; then
-	return
+        return
     fi
 
     manager=$1
@@ -222,27 +234,27 @@ install_pattern_using() (
     pattern=$3
 
     case "$(basename $manager)" in
-	(dnf|yum)
-	    if $manager groupinfo $pattern >/dev/null 2>&1; then
-		return
-	    fi
-	    ;;
-	(zypper)
-	    if $manager -nq info -t pattern $pattern >/dev/null 2>&1; then
-		return
-	    fi
-	    ;;
+        (dnf|yum)
+            if $manager groupinfo $pattern >/dev/null 2>&1; then
+                return
+            fi
+            ;;
+        (zypper)
+            if $manager -nq info -t pattern $pattern >/dev/null 2>&1; then
+                return
+            fi
+            ;;
     esac
 
     install=$("${script_prefix}get-pattern-install-command" $manager)
 
     case "$(basename $manager)" in
-	(brew)
-	    run_unpriv /bin/sh -c "$manager $install $options \"$pattern\""
-	    ;;
-	(*)
-	    $manager $install $options "$pattern"
-	    ;;
+        (brew)
+            run_unpriv /bin/sh -c "$manager $install $options \"$pattern\""
+            ;;
+        (*)
+            $manager $install $options "$pattern"
+            ;;
     esac
 )
 
@@ -256,21 +268,21 @@ parse_arguments() {
     pattern=
 
     while getopts o:p:h opt; do
-	case $opt in
-	    (o)
-		options=$OPTARG
-		;;
-	    (p)
-		pattern=$OPTARG
-		;;
-	    (h)
-		usage
-		exit 0
-		;;
-	    (\?)
-		usage_error
-		;;
-	esac
+        case $opt in
+            (o)
+                options=$OPTARG
+                ;;
+            (p)
+                pattern=$OPTARG
+                ;;
+            (h)
+                usage
+                exit 0
+                ;;
+            (\?)
+                usage_error
+                ;;
+        esac
     done
 
     shift $(($OPTIND - 1))
@@ -286,7 +298,7 @@ EOF
 
 usage_error() {
     if [ $# -gt 0 ]; then
-	printf "$@" >&2
+        printf "$@" >&2
     fi
 
     printf "%s\n" '' >&2
@@ -296,55 +308,55 @@ usage_error() {
 
 validate_platform() {
     for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (centos)
-		case "$VERSION_ID" in
-		    (7)
-			return
-			;;
-		    (8)
-			return
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (debian)
-		return
-		;;
-	    (fedora)
-		return
-		;;
-	    (opensuse)
-		return
-		;;
-	    (rhel|ol)
-		case "$VERSION_ID" in
-		    (7.*)
-			return
-			;;
-		    (8.*)
-			return
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (freebsd)
-		return
-		;;
-	    (macos)
-		return
-		;;
-	    (netbsd)
-		return
-		;;
-	    (solaris)
-		return
-		;;
-	esac
+        case "$id" in
+            (centos)
+                case "$VERSION_ID" in
+                    (7)
+                        return
+                        ;;
+                    (8)
+                        return
+                        ;;
+                    (*)
+                        break
+                        ;;
+                esac
+                ;;
+            (debian)
+                return
+                ;;
+            (fedora)
+                return
+                ;;
+            (opensuse)
+                return
+                ;;
+            (rhel|ol)
+                case "$VERSION_ID" in
+                    (7.*)
+                        return
+                        ;;
+                    (8.*)
+                        return
+                        ;;
+                    (*)
+                        break
+                        ;;
+                esac
+                ;;
+            (freebsd)
+                return
+                ;;
+            (macos)
+                return
+                ;;
+            (netbsd)
+                return
+                ;;
+            (solaris)
+                return
+                ;;
+        esac
     done
 
     abort_not_supported "Operating system"
@@ -352,11 +364,11 @@ validate_platform() {
 
 case "$0" in
     (*/*)
-	script_dir=$(get_realpath "$(dirname "$0")")
-	;;
+        script_dir=$(get_realpath "$(dirname "$0")")
+        ;;
     (*)
-	script_dir=
-	;;
+        script_dir=
+        ;;
 esac
 
 script_prefix=${script_dir:+$script_dir/}
