@@ -34,8 +34,6 @@ assert() {
 }
 
 get_gnu_diff_command() {
-    diff=
-
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (solaris)
