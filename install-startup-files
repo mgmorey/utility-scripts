@@ -33,40 +33,40 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_diff_command() {
+get_gnu_diff_command() {
     diff=
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (solaris)
-		diff=gdiff
+		printf "%s\n" gdiff
+		break
 		;;
 	esac
-
-	if [ -n "${diff:-}" ]; then
-	    break
-	fi
     done
 
-    printf "%s\n" "${diff:-diff}"
+    printf "%s\n" diff
 }
 
-get_install_command() {
-    install=
-
+get_gnu_install_command() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (solaris)
-		install=ginstall
+		printf "%s\n" ginstall
+		break
 		;;
 	esac
-
-	if [ -n "${install:-}" ]; then
-	    break
-	fi
     done
 
-    printf "%s\n" "${install:-install}"
+    printf "%s\n" install
+}
+
+get_project_directory() {
+    if [ -d "$HOME/Documents" ]; then
+	printf "%s\n" "$HOME/Documents/git"
+    else
+	printf "%s\n" "$HOME/git"
+    fi
 }
 
 get_realpath() (
@@ -86,12 +86,12 @@ get_realpath() (
     fi
 )
 
-get_real_user() {
-    printf "%s\n" "${SUDO_USER-${USER-${USERNAME-${LOGNAME-}}}}"
-}
-
 install_startup_files() {
-    cd
+    git_dir=$(get_project_directory)
+    gnu_diff=$(get_gnu_diff_command)
+    gnu_install=$(get_gnu_install_command)
+
+    cd "$(dirname "$git_dir")"
     mkdir -p git
     cd git
 
@@ -106,10 +106,10 @@ install_startup_files() {
 	    printf "Installing %s\n" $file
 
 	    if [ -r /etc/skel/$file -a "$file" = .profile ]; then
-		$install -bm 644 /etc/skel/$file $file
-		cat $HOME/git/$PROJECT_NAME/$file >>$file
+		$gnu_install -bm 644 /etc/skel/$file $file
+		cat $git_dir/$PROJECT_NAME/$file >>$file
 	    else
-		$install -bm 644 $HOME/git/$PROJECT_NAME/$file $file
+		$gnu_install -bm 644 $git_dir/$PROJECT_NAME/$file $file
 	    fi
 	fi
     done
@@ -124,7 +124,7 @@ install_startup_files() {
 
 	if [ ! -e init.el ]; then
 	    printf "Installing %s\n" .emacs.d/init.el
-	    $install -bm 644 $HOME/git/$PROJECT_NAME/.emacs.d/init.el init.el
+	    $gnu_install -bm 644 $git_dir/$PROJECT_NAME/.emacs.d/init.el init.el
 	fi
     fi
 
@@ -146,16 +146,23 @@ is_to_be_installed() {
     elif [ ! -r /etc/skel/$1 ]; then
 	return 1
     else
-	$diff -qs /etc/skel/$1 $1
+	$gnu_diff -qs /etc/skel/$1 $1
     fi
 }
 
-if [ "$(basename $(pwd))" = utility-scripts ]; then
-    abort "Please change from source directory before running this script\n"
-fi
+case "$0" in
+    (*/*)
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
 
-eval $(get-os-release -x)
+script_prefix=${script_dir:+$script_dir/}
 
-diff="$(get_diff_command)"
-install="$(get_install_command)"
+. "${script_prefix}common-functions.sh"
+
+eval $("${script_prefix}get-os-release" -x)
+
 install_startup_files
