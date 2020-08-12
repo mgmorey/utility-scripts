@@ -108,6 +108,13 @@ get_package_install_options() {
 			;;
 		esac
 		;;
+	    (freebsd)
+		if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+		    options="${options:+$options }-y"
+		else
+		    break
+		fi
+		;;
 	    (solaris)
 		options="${options:+$options }--accept"
 		;;
