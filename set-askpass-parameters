@@ -90,7 +90,7 @@ set_askpass_parameters() {
 	    (git|ssh|sudo)
 		var=$(printf "%s\n" ${command}_askpass | to_upper)
 
-		case $(basename ${shell-$SHELL}) in
+		case $(basename ${shell:-${SHELL%.exe}}) in
 		    (*bash|ksh*|zsh)
 			printf 'export %s="%s"\n' "$var" "$askpass_helper"
 			;;
@@ -134,7 +134,7 @@ usage_error() {
 }
 
 validate_arguments() {
-    case $(basename ${shell%.exe}) in
+    case $(basename ${shell:-${SHELL%.exe}}) in
 	(*bash|ksh*|zsh)
 	    true
 	    ;;
