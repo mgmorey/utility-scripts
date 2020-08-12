@@ -61,16 +61,20 @@ get_uninstalled_packages() {
     "${script_prefix}get-installed-packages" >$tmpfile
 
     for package; do
-	if ! grep_package $package $tmpfile; then
+	if ! grep_package $gnu_grep $package $tmpfile; then
 	   printf "%s\n" "$package"
 	fi
     done
 }
 
-grep_package() (
-    quoted_package=$(printf "%s\n" $package | sed -e 's/\+/\\\+/g')
-    $gnu_grep -Eq '^'"$quoted_package"'([0-9]*|-[0-9\.]+)?(nb[0-9]+)?$' "$@"
-)
+grep_package() {
+    assert [ $# -eq 3 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    assert [ -n "$3" ]
+    quoted_package=$(printf "%s\n" "$2" | sed -e 's/\+/\\\+/g')
+    "$1" -Eq '^'"$quoted_package"'([0-9]*|-[0-9\.]+)?(nb[0-9]+)?$' "$3"
+}
 
 case "$0" in
     (*/*)
