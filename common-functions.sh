@@ -22,11 +22,24 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+clean_up() {
+    cd
+    rm -f ${tmpfiles-}
+    rm -rf ${tmpdirs-}
+}
+
+create_tmpdir() {
+    tmpdir=$(mktemp -d)
+    assert [ -n "${tmpdir}" ]
+    tmpdirs="${tmpdirs+$tmpdirs }$tmpdir"
+    trap clean_up EXIT INT QUIT TERM
+}
+
 create_tmpfile() {
     tmpfile=$(mktemp)
     assert [ -n "${tmpfile}" ]
     tmpfiles="${tmpfiles+$tmpfiles }$tmpfile"
-    trap "/bin/rm -f $tmpfiles" EXIT INT QUIT TERM
+    trap clean_up EXIT INT QUIT TERM
 }
 
 get_bin_directory() (
