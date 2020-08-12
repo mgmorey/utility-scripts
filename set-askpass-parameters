@@ -59,7 +59,23 @@ parse_arguments() {
 		desktop_name=$OPTARG
 		;;
 	    (s)
-		shell=$OPTARG
+		case $(basename $OPTARG) in
+		    (*bash|ksh*|zsh)
+			shell=$OPTARG
+			;;
+		    (csh|tcsh)
+			shell=$OPTARG
+			;;
+		    (fish)
+			shell=$OPTARG
+			;;
+		    (sh)
+			shell=$OPTARG
+			;;
+		    (*)
+			usage_error "%s: %s: Unsupported shell\n" "$0" "$OPTARG"
+			;;
+		esac
 		;;
 	    (h)
 		usage
@@ -72,11 +88,21 @@ parse_arguments() {
     done
 
     shift $(($OPTIND - 1))
+
+    for command; do
+	case "$command" in
+	    (git|ssh|sudo)
+		true
+		;;
+	    (*)
+		usage_error "%s: %s: Unsupported command\n" "$0" "$command"
+	esac
+    done
+
     commands="$*"
 }
 
 set_askpass_parameters() {
-    validate_arguments
     askpass_helper=$(get_askpass_helper | awk '! /^#/')
 
     if [ -z "$askpass_helper" ]; then
@@ -100,14 +126,17 @@ set_askpass_parameters() {
 		    (fish)
 			printf 'set -x %s "%s"\n' "$var" "$askpass_helper"
 			;;
-		    (*)
+		    (sh)
 			printf '%s="%s"\n' "$var" "$askpass_helper"
 			printf 'export %s\n' "$var"
+			;;
+		    (*)
+			true
 			;;
 		esac
 		;;
 	    (*)
-		abort "%s: %s: Not a valid command\n" "$0" "$command"
+		abort "%s: %s: Unsupported command\n" "$0" "$command"
 	esac
     done
 }
@@ -131,36 +160,6 @@ usage_error() {
     printf "%s\n" '' >&2
     usage
     exit 2
-}
-
-validate_arguments() {
-    case $(basename ${shell:-${SHELL%.exe}}) in
-	(*bash|ksh*|zsh)
-	    true
-	    ;;
-	(csh|tcsh)
-	    true
-	    ;;
-	(fish)
-	    true
-	    ;;
-	(sh)
-	    true
-	    ;;
-	(*)
-	    abort "%s: %s: Shell not supported\n" "$0" "$shell"
-	    ;;
-    esac
-
-    for command in ${commands:-$COMMANDS}; do
-	case "$command" in
-	    (git|ssh|sudo)
-		true
-		;;
-	    (*)
-		abort "%s: %s: Not a valid command\n" "$0" "$command"
-	esac
-    done
 }
 
 case "$0" in
