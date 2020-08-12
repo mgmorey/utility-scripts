@@ -25,22 +25,17 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_grep_command() {
-    grep=
-
+get_gnu_grep_command() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (solaris)
-		grep=ggrep
+		printf "%s\n" ggrep
+		break
 		;;
 	esac
-
-	if [ -n "${grep:-}" ]; then
-	    break
-	fi
     done
 
-    printf "%s\n" "${grep:-grep}"
+    printf "%s\n" grep
 }
 
 get_realpath() (
@@ -62,11 +57,11 @@ get_realpath() (
 
 get_uninstalled_packages() {
     create_tmpfile
-    grep=$(get_grep_command)
+    gnu_grep=$(get_gnu_grep_command)
     "${script_prefix}get-installed-packages" >$tmpfile
 
     for package; do
-	if ! grep_package $package; then
+	if ! grep_package $package $tmpfile; then
 	   printf "%s\n" "$package"
 	fi
     done
@@ -74,7 +69,7 @@ get_uninstalled_packages() {
 
 grep_package() (
     quoted_package=$(printf "%s\n" $package | sed -e 's/\+/\\\+/g')
-    $grep -Eq '^'"$quoted_package"'([0-9]*|-[0-9\.]+)?(nb[0-9]+)?$' $tmpfile
+    $gnu_grep -Eq '^'"$quoted_package"'([0-9]*|-[0-9\.]+)?(nb[0-9]+)?$' "$@"
 )
 
 case "$0" in
