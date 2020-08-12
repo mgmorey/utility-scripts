@@ -99,8 +99,6 @@ run_in_virtualenv() {
 		fi
 		;;
 	    (\?)
-		printf "%s\n" "" >&2
-		usage
 		exit 2
 		;;
 	esac

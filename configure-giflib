@@ -106,7 +106,7 @@ parse_arguments() {
 		exit 0
 		;;
 	    (\?)
-		usage_error
+		exit 2
 		;;
 	esac
     done

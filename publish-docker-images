@@ -136,7 +136,7 @@ parse_arguments() {
 		exit 0
 		;;
 	    (\?)
-		usage_error
+		exit 2
 		;;
 	esac
     done
@@ -171,6 +171,11 @@ publish_image() (
 	fi
     fi
 )
+
+usage_error() {
+    printf "$@" >&2
+    exit 2
+}
 
 parse_arguments "$@"
 publish_docker_images ${databases:-$DATABASES}
