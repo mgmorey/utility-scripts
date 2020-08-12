@@ -31,7 +31,7 @@ get_uninstall_command() {
 
     case "$(basename $1)" in
 	(pkg)
-	    uninstall=uninstall
+	    uninstall=remove
 	    ;;
 	(pkgutil)
 	    uninstall=--remove
