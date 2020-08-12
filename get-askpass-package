@@ -26,8 +26,6 @@ assert() {
 }
 
 get_askpass_package() {
-    desktop_name=$("${script_prefix}get-desktop-name")
-
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
@@ -37,6 +35,9 @@ get_askpass_package() {
 			;;
 		    (KDE*)
 			package=ksshaskpass
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;
@@ -48,6 +49,9 @@ get_askpass_package() {
 		    (KDE*)
 			package=ksshaskpass5
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (rhel|fedora)
@@ -58,6 +62,9 @@ get_askpass_package() {
 		    (KDE*)
 			package=ksshaskpass
 			;;
+		    (*)
+			break
+			;;
 		esac
 		;;
 	    (freebsd)
@@ -67,6 +74,9 @@ get_askpass_package() {
 			;;
 		    (KDE*)
 			package=ksshaskpass
+			;;
+		    (*)
+			break
 			;;
 		esac
 		;;

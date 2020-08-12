@@ -80,7 +80,7 @@ configure_platform() {
 
 get_askpass_helper() {
     configure_platform
-    package=$("${script_prefix}get-askpass-package")
+    package=$("${script_prefix}get-askpass-package" $desktop_name)
 
     if [ -z "${helper:-}" -a -n "${package-}" ]; then
 	helper=$(get_filenames $package 2>/dev/null | get_helper)
