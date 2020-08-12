@@ -28,7 +28,8 @@ assert() {
 }
 
 get_askpass_helper() {
-    "${script_prefix}get-askpass-helper" $desktop_name
+    "${script_prefix}get-askpass-helper" \
+	${desktop_name:-$("${script_prefix}get-desktop-name")}
 }
 
 get_realpath() (
