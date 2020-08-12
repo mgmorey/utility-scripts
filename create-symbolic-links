@@ -16,7 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DIRS="build git logs src"
+DOCUMENTS="$HOME/Documents"
+SUBDIRS="build git logs src"
 MODE=go-w
 
 abort() {
@@ -24,29 +25,29 @@ abort() {
     exit 1
 }
 
-create_directories() (
-    cd "$HOME/Documents"
-    mkdir -m $MODE -p $DIRS
-)
-
 create_symbolic_links() {
-    create_directories
-    cd
-
-    if [ ! -d Documents/bin ]; then
-        mkdir -m $MODE -p Documents
-
-        if [ -d bin ]; then
-	    /bin/mv bin Documents/bin
-        else
-	    mkdir -m $MODE Documents/bin
-        fi
+    if [ ! -d "$DOCUMENTS" ]; then
+	exit 0
     fi
 
-    for dir in bin $DIRS; do
-        if [ -e Documents/$dir -a ! -e $dir ]; then
-	    ln -s Documents/$dir $HOME/$dir
-        fi
+    cd "$DOCUMENTS"
+    mkdir -m $MODE -p $SUBDIRS
+    cd
+
+    if [ ! -d "$DOCUMENTS/bin" ]; then
+	mkdir -m $MODE -p "$DOCUMENTS"
+
+	if [ -d bin ]; then
+	    /bin/mv bin "$DOCUMENTS/bin"
+	else
+	    mkdir -m $MODE "$DOCUMENTS/bin"
+	fi
+    fi
+
+    for dir in bin $SUBDIRS; do
+	if [ -e "$DOCUMENTS/$dir" -a ! -e $dir ]; then
+	    ln -s "$DOCUMENTS/$dir" "$HOME/$dir"
+	fi
     done
 }
 
