@@ -50,7 +50,8 @@ get_realpath() (
 )
 
 parse_arguments() {
-    shell=$SHELL
+    desktop_name=
+    shell=
 
     while getopts d:s:h opt; do
 	case $opt in
@@ -89,7 +90,7 @@ set_askpass_parameters() {
 	    (git|ssh|sudo)
 		var=$(printf "%s\n" ${command}_askpass | to_upper)
 
-		case $(basename $shell) in
+		case $(basename ${shell-$SHELL}) in
 		    (*bash|ksh*|zsh)
 			printf 'export %s="%s"\n' "$var" "$askpass_helper"
 			;;
