@@ -36,8 +36,6 @@ assert() {
 }
 
 configure_platform() {
-    desktop_name=$("${script_prefix}get-desktop-name")
-
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
@@ -122,6 +120,14 @@ get_realpath() (
     fi
 )
 
+parse_arguments() {
+    if [ $# -eq 1 ]; then
+	desktop_name="$1"
+    else
+	desktop_name=$("${script_prefix}get-desktop-name")
+    fi
+}
+
 case "$0" in
     (*/*)
 	script_dir=$(get_realpath "$(dirname "$0")")
@@ -134,4 +140,5 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 eval $("${script_prefix}get-os-release" -x)
+parse_arguments "$@"
 get_askpass_helper

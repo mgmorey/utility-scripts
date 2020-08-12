@@ -27,6 +27,10 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_askpass_helper() {
+    "${script_prefix}get-askpass-helper" $desktop_name
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -47,8 +51,11 @@ get_realpath() (
 parse_arguments() {
     shell=$SHELL
 
-    while getopts s:h opt; do
+    while getopts d:s:h opt; do
 	case $opt in
+	    (d)
+		desktop_name=$OPTARG
+		;;
 	    (s)
 		shell=$OPTARG
 		;;
@@ -68,7 +75,7 @@ parse_arguments() {
 
 set_askpass_parameters() {
     validate_arguments
-    askpass_helper=$("${script_prefix}get-askpass-helper" | awk '! /^#/')
+    askpass_helper=$(get_askpass_helper | awk '! /^#/')
 
     if [ -z "$askpass_helper" ]; then
 	exit 0
