@@ -42,8 +42,9 @@ get_realpath() (
     fi
 )
 
-install_askpass() {
-    install-packages $(${script_prefix}get-askpass-package)
+install_askpass_helper() {
+    "${script_prefix}install-packages" \
+	$("${script_prefix}get-askpass-package" "$@")
 }
 
 case "$0" in
@@ -57,4 +58,4 @@ esac
 
 script_prefix=${script_dir:+$script_dir/}
 
-install_askpass
+install_askpass_helper
