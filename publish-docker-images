@@ -19,59 +19,69 @@ abort() {
     exit 1
 }
 
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
 build_image() {
-    docker $(get_build_command $image)
+    $(get_command $method) $(get_build_subcommand $method $image)
 }
 
 create_builder() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
     case $1 in
-	(tableau-ibm-db2-*)
-	    if [ "${DOCKER_CLI_EXPERIMENTAL-}" = enabled ]; then
-		builder=$(get_insecure_builder)
+	(docker-buildx)
+	    builder=$(get_insecure_builder)
 
-		if [ "$builder" != insecure-builder ]; then
-		    docker $(get_buildx_create_command) \
-			   "$(get_buildkitd_flags)"
-		fi
+	    if [ "$builder" != insecure-builder ]; then
+		docker buildx create \
+		       --use \
+		       --name insecure-builder \
+		       --buildkitd-flags \
+		       '--allow-insecure-entitlement security.insecure'
 	    fi
 	    ;;
     esac
 }
 
-get_build_command() {
+get_build_subcommand() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+
     case "$1" in
-	(tableau-ibm-db2-*)
-	    if [ "${DOCKER_CLI_EXPERIMENTAL-}" = enabled ]; then
-		get_buildx_build_command -t "$1" .
-	    else
-		printf '%s\n' build -t "$1" .
-	    fi
+	(buildah-bud)
+	    printf '%s\n' bud -t "$2" .
 	    ;;
-	(tableau-*)
-	    printf '%s\n' build -t "$1" .
+	(docker-build)
+	    printf '%s\n' build -t "$2" .
+	    ;;
+	(docker-buildx)
+	    printf '%s\n' buildx build \
+		   --allow security.insecure \
+		   --load -t "$2" .
 	    ;;
     esac
 }
 
-get_buildkitd_flags() {
-    printf '%s\n' "--allow-insecure-entitlement security.insecure"
-}
+get_command() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
 
-get_buildx_build_command() {
-    printf '%s\n' buildx build --allow security.insecure --load "$@"
-}
-
-get_buildx_create_command() {
-    printf '%s\n' buildx create --use --name insecure-builder --buildkitd-flags
-}
-
-get_buildx_ls_command() {
-    printf '%s\n' "buildx ls"
+    case "$1" in
+	(buildah-bud)
+	    printf '%s\n' buildah
+	    ;;
+	(docker-*)
+	    printf '%s\n' docker
+	    ;;
+    esac
 }
 
 get_insecure_builder() {
-    docker $(get_buildx_ls_command) | \
-	awk 'NR > 1 && $1 == "insecure-builder" { print $1 }'
+    docker buildx ls | awk 'NR > 1 && $1 == "insecure-builder" { print $1 }'
 }
 
 get_versions() {
@@ -107,13 +117,29 @@ get_versions() {
 
 parse_arguments() {
     databases=
+    method=docker-build
     no_build=true
     only_build=false
     tag=
     versions=
 
-    while getopts blnt:v:h opt; do
+    while getopts M:blnt:v:h opt; do
 	case $opt in
+	    (M)
+		case "$OPTARG" in
+		    (buildah-bud)
+			method="$OPTARG"
+			;;
+		    (docker-build)
+			method="$OPTARG"
+			;;
+		    (docker-buildx)
+			if [ "${DOCKER_CLI_EXPERIMENTAL-}" = enabled ]; then
+			    method="$OPTARG"
+			fi
+			;;
+		esac
+		;;
 	    (b)
 		no_build=false
 		only_build=true
@@ -161,13 +187,13 @@ publish_image() (
 	cd docker-${1}/$2
 
 	if [ "$no_build" = false ]; then
-	    create_builder $image
-	    build_image $image
+	    create_builder $method
+	    build_image $method $image
 	fi
 
 	if [ "$only_build" = false ]; then
-	    docker tag $image $repo_image
-	    docker push $repo_image
+	    $(get_command $method) tag $image $repo_image
+	    $(get_command $method) push $repo_image
 	fi
     fi
 )
