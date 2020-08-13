@@ -89,7 +89,6 @@ get_python_metadata() {
 		    ;;
 	    esac
 	    ;;
-	    ;;
 	(rhel|ol)
 	    case "$VERSION_ID" in
 		(7.*)
