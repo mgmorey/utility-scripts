@@ -83,7 +83,12 @@ get_python_metadata() {
 	    esac
 	    ;;
 	(opensuse-tumbleweed)
-	    data="$OPENSUSE_TW_DATA"
+	    case "$VERSION_ID" in
+		(*)
+		    data="$OPENSUSE_TW_DATA"
+		    ;;
+	    esac
+	    ;;
 	    ;;
 	(rhel|ol)
 	    case "$VERSION_ID" in
