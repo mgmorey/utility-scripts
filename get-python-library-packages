@@ -38,7 +38,11 @@ MACOS_HOMEBREW_PKGS="bzip2 gdbm gettext libffi ncurses openssl readline sqlite x
 
 NETBSD_PKGS="bzip2 gdbm libffi lzma ncurses readline sqlite3"
 
-OPENSUSE_PKGS="gdbm-devel libbz2-devel libffi-devel libopenssl-devel \
+OPENSUSE_LP_PKGS="gdbm-devel libbz2-devel libffi-devel libopenssl-devel \
+lzma-sdk-devel ncurses-devel pcre-devel python3-devel readline-devel \
+sqlite3-devel uuid-devel zlib-devel"
+
+OPENSUSE_TW_PKGS="gdbm-devel libbz2-devel libffi-devel libopenssl-devel \
 lzma-sdk-devel ncurses-devel pcre-devel python38-devel readline-devel \
 sqlite3-devel uuid-devel zlib-devel"
 
@@ -114,8 +118,15 @@ get_python_library_packages() {
 	(fedora)
 	    packages=$FEDORA_PKGS
 	    ;;
-	(opensuse-*)
-	    packages=$OPENSUSE_PKGS
+	(opensuse-leap)
+	    case "$VERSION_ID" in
+		(*)
+		    packages=$OPENSUSE_LP_PKGS
+		    ;;
+	    esac
+	    ;;
+	(opensuse-tumbleweed)
+	    packages=$OPENSUSE_TW_PKGS
 	    ;;
 	(rhel|ol)
 	    case "$VERSION_ID" in
