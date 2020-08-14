@@ -87,7 +87,7 @@ get_library_files() {
     assert [ -n "$1" ]
     find "$1" \
 	 -maxdepth 1 \
-	 -name '*.sh' \
+	 -name '*.*' \
 	 -type f
 }
 
