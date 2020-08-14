@@ -17,6 +17,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 CONTAINER_DIRS="/mnt/data /mnt/downloads /mnt/scripts"
+ENV_VARS_TABLEAU="Password User"
+ENV_VARS_VENDOR="DB2INST1_PASSWORD DBNAME LICENSE"
 
 abort() {
     printf "$@" >&2
@@ -30,6 +32,17 @@ assert() {
 docker_run_sap_hana() {
     set_options
     docker run $opts --privileged=true $image
+}
+
+get_env_vars() {
+    case ${image%:*} in
+	(*/tableau-ibm-db2-*|tableau-ibm-db2-*)
+	    printf "%s\n" $ENV_VARS_TABLEAU
+	    ;;
+	(*)
+	    printf "%s\n" $ENV_VARS_VENDOR
+	    ;;
+    esac
 }
 
 get_host_dir() {
@@ -79,7 +92,7 @@ set_options() {
     port_opts=
     vol_opts=
 
-    for var in DB2INST1_PASSWORD DBNAME LICENSE; do
+    for var in $(get_env_vars); do
 	eval value=\${$var-}
 	env_opts="${env_opts:+$env_opts }-e $var=$value"
     done
