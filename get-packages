@@ -29,90 +29,21 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_configuration_filename() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (centos)
-		case "$VERSION_ID" in
-		    (7)
-			basename=$ID-$VERSION_ID
-			;;
-		    (8)
-			basename=$ID-$VERSION_ID
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (debian)
-		basename=$ID-$VERSION_ID
-		;;
-	    (opensuse-leap)
-		basename=$ID-$VERSION_ID
-		;;
-	    (opensuse-tumbleweed)
-		basename=$ID
-		;;
-	    (rhel|fedora)
-		basename=$ID-$VERSION_ID
-		;;
-	    (ubuntu)
-		case "$VERSION_ID" in
-		    (18.04)
-			basename=$ID-$VERSION_ID
-			;;
-		    (20.04)
-			basename=$ID-$VERSION_ID
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (freebsd)
-		basename=$ID-$VERSION_ID
-		;;
-	    (illumos)
-		basename=$ID
-		;;
-	    (macos)
-		basename=$ID-$VERSION_ID
-		;;
-	    (netbsd)
-		basename=$ID-$VERSION_ID
-	    	;;
-	    (solaris)
-		basename=$ID-$VERSION_ID
-		;;
-	    (windows)
-		true
-		;;
-	esac
-
-	if [ -n "${basename-}" ]; then
-	    break
-	fi
-    done
-
-    if [ -n "${basename-}" ]; then
-	printf "%s%s\n" "$script_prefix" "$basename.ini"
-    fi
+get_os_configuration() {
+    ${script_prefix}get-os-configuration -i $ID -l "$ID_LIKE" -v $VERSION_ID
 }
 
 get_packages() {
-    filename=$(get_configuration_filename)
+    configuration=$(get_os_configuration)
 
-    if [ -n "$filename" -a -r "$filename" ]; then
-	eval $(get-configuration --extended $filename)
+    if [ -n "$configuration" ] ; then
+	eval $configuration
 
 	for category in $categories; do
 	    parameter=$(get_parameter "$category")
 	    eval packages="\${$parameter-}"
 	    printf "%s\n" $packages
 	done | sort -u
-    else
-	abort_not_supported "Operating system"
     fi
 }
 
@@ -170,7 +101,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $0 [-i ID] [-l ID_LIKE] [-v VERSION_ID]
+Usage: $0 [-i ID] [-l ID_LIKE] [-v VERSION_ID] CATEGORY [CATEGORY [...]]
        $0 -h
 EOF
 }
