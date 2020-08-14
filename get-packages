@@ -96,7 +96,7 @@ get_configuration_filename() {
     done
 
     if [ -n "${basename-}" ]; then
-	printf "%s\n" $basename.ini
+	printf "%s%s\n" "$script_prefix" "$basename.ini"
     fi
 }
 
