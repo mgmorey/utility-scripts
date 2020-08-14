@@ -1,0 +1,185 @@
+#!/bin/sh -eu
+
+# get-os-configuration: get operating system configuration
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_configuration_filename() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			basename=$ID-$VERSION_ID
+			;;
+		    (8)
+			basename=$ID-$VERSION_ID
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (debian)
+		basename=$ID-$VERSION_ID
+		;;
+	    (opensuse-leap)
+		basename=$ID-$VERSION_ID
+		;;
+	    (opensuse-tumbleweed)
+		basename=$ID
+		;;
+	    (rhel|fedora)
+		basename=$ID-$VERSION_ID
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.04)
+			basename=$ID-$VERSION_ID
+			;;
+		    (20.04)
+			basename=$ID-$VERSION_ID
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (freebsd)
+		basename=$ID-$VERSION_ID
+		;;
+	    (illumos)
+		basename=$ID
+		;;
+	    (macos)
+		basename=$ID-$VERSION_ID
+		;;
+	    (netbsd)
+		basename=$ID-$VERSION_ID
+	    	;;
+	    (solaris)
+		basename=$ID-$VERSION_ID
+		;;
+	    (windows)
+		true
+		;;
+	esac
+
+	if [ -n "${basename-}" ]; then
+	    break
+	fi
+    done
+
+    if [ -n "${basename-}" ]; then
+	printf "%s%s\n" "$script_prefix" "$basename.ini"
+    fi
+}
+
+get_os_configuration() {
+    filename=$(get_configuration_filename)
+
+    if [ -n "$filename" -a -r "$filename" ]; then
+	get-configuration --extended $filename
+    else
+	abort_not_supported "Operating system"
+    fi
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+parse_arguments() {
+    while getopts i:l:v:h opt; do
+	case $opt in
+	    (i)
+		ID="$OPTARG"
+		;;
+	    (l)
+		ID_LIKE="$OPTARG"
+		;;
+	    (v)
+		VERSION_ID="$OPTARG"
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $0 [-i ID] [-l ID_LIKE] [-v VERSION_ID]
+       $0 -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf "%s\n" '' >&2
+    usage
+    exit 2
+}
+
+case "$0" in
+    (*/*)
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+eval $("${script_prefix}get-os-release" -x)
+parse_arguments "$@"
+get_os_configuration
