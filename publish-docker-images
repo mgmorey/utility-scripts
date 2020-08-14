@@ -32,7 +32,7 @@ create_builder() {
     assert [ -n "$1" ]
 
     case $1 in
-	(docker-buildx)
+	(buildx)
 	    builder=$(get_insecure_builder)
 
 	    if [ "$builder" != insecure-builder ]; then
@@ -52,16 +52,19 @@ get_build_subcommand() {
     assert [ -n "$2" ]
 
     case "$1" in
-	(buildah-bud)
+	(buildah)
 	    printf '%s\n' bud -t "$2" .
 	    ;;
-	(docker-build)
-	    printf '%s\n' build -t "$2" .
-	    ;;
-	(docker-buildx)
+	(buildx)
 	    printf '%s\n' buildx build \
 		   --allow security.insecure \
 		   --load -t "$2" .
+	    ;;
+	(docker)
+	    printf '%s\n' build -t "$2" .
+	    ;;
+	(podman)
+	    printf '%s\n' build -t "$2" .
 	    ;;
     esac
 }
@@ -71,11 +74,17 @@ get_command() {
     assert [ -n "$1" ]
 
     case "$1" in
-	(buildah-bud)
+	(buildah)
 	    printf '%s\n' buildah
 	    ;;
-	(docker-*)
+	(buildx)
 	    printf '%s\n' docker
+	    ;;
+	(docker)
+	    printf '%s\n' docker
+	    ;;
+	(podman)
+	    printf '%s\n' podman
 	    ;;
     esac
 }
@@ -117,8 +126,8 @@ get_versions() {
 
 parse_arguments() {
     databases=
-    method=docker-build
-    no_build=true
+    method=docker
+    no_build=false
     only_build=false
     tag=
     versions=
@@ -127,16 +136,19 @@ parse_arguments() {
 	case $opt in
 	    (M)
 		case "$OPTARG" in
-		    (buildah-bud)
+		    (buildah)
 			method="$OPTARG"
 			;;
-		    (docker-build)
-			method="$OPTARG"
-			;;
-		    (docker-buildx)
+		    (buildx)
 			if [ "${DOCKER_CLI_EXPERIMENTAL-}" = enabled ]; then
 			    method="$OPTARG"
 			fi
+			;;
+		    (docker)
+			method="$OPTARG"
+			;;
+		    (podman)
+			method="$OPTARG"
 			;;
 		esac
 		;;
