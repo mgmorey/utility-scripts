@@ -20,25 +20,32 @@
 """Print application configuration parameters."""
 
 import argparse
-import configparser
+from configparser import *
 
-TRANSLATE = str.maketrans('-', '_')
+TO_UNDERSCORES = str.maketrans(' .-', '___')
+TO_SPACES = str.maketrans('\n', ' ')
 
 
-def format_key(key: str, prefix: str):
+def format_key(key: str, prefix: str) -> str:
     """Format application configuration parameter key."""
-    return '_'.join([prefix, key]).translate(TRANSLATE).upper()
+    return '_'.join([prefix, key]).translate(TO_UNDERSCORES).upper()
 
 
-def format_pair(key: str, value: str, prefix: str):
+def format_pair(key: str, value: str, prefix: str) -> str:
     """Format application configuration parameter key and value."""
-    return "{0}='{1}'".format(format_key(key, prefix), value)
+    return "{0}='{1}'".format(format_key(key, prefix), format_value(value))
+
+
+def format_value(value: str) -> str:
+    return value.translate(TO_SPACES)
 
 
 def parse_args():
     """Parse script arguments."""
     description = 'Print application configuration parameters'
     parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('--extended',
+                        action='store_true')
     parser.add_argument('files',
                         metavar='FILES',
                         nargs='*',
@@ -57,7 +64,8 @@ def parse_args():
 def main():
     """Print configuration parameters."""
     args = parse_args()
-    config = configparser.ConfigParser()
+    config = ConfigParser(interpolation=ExtendedInterpolation()
+                          if args.extended else BasicInterpolation())
 
     for filename in args.files:
         config.read(filename)
