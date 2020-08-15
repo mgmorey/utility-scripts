@@ -16,5 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+if [ ! -d $HOME/.pyenv ]; then
+    abort "%s: pyenv not installed\n" "$0"
+    exit 1
+fi
+
 cd $HOME/.pyenv/plugins/python-build/../..
 git pull
