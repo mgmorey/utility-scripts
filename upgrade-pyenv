@@ -21,10 +21,13 @@ abort() {
     exit 1
 }
 
-if [ ! -d $HOME/.pyenv ]; then
-    abort "%s: pyenv not installed\n" "$0"
-    exit 1
-fi
+upgrade_pyenv() {
+    if [ ! -d $HOME/.pyenv ]; then
+	abort "%s: pyenv not installed\n" "$0"
+    fi
 
-cd $HOME/.pyenv/plugins/python-build/../..
-git pull
+    cd $HOME/.pyenv/plugins/python-build/../..
+    git pull
+}
+
+upgrade_pyenv
