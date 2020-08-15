@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if which dhclient >/dev/null 2>&1; then
+    dhclient -r
+    dhclient
+elif which systemctl >/dev/null 2>&1; then
+    systemctl restart network.service
+fi
