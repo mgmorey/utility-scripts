@@ -26,27 +26,30 @@ abort() {
 }
 
 create_symbolic_links() {
-    if [ ! -d "$DOCUMENTS" ]; then
+    absolute_dir=$DOCUMENTS
+    relative_dir=$(basename "$DOCUMENTS")
+
+    if [ ! -d "$absolute_dir" ]; then
 	exit 0
     fi
 
-    cd "$DOCUMENTS"
+    cd "$absolute_dir"
     mkdir -m $MODE -p $SUBDIRS
     cd
 
-    if [ ! -d "$DOCUMENTS/bin" ]; then
-	mkdir -m $MODE -p "$DOCUMENTS"
+    if [ ! -d "$relative_dir/bin" ]; then
+	mkdir -m $MODE -p "$relative_dir"
 
 	if [ -d bin ]; then
-	    /bin/mv bin "$DOCUMENTS/bin"
+	    /bin/mv bin "$relative_dir/bin"
 	else
-	    mkdir -m $MODE "$DOCUMENTS/bin"
+	    mkdir -m $MODE "$relative_dir/bin"
 	fi
     fi
 
     for dir in bin $SUBDIRS; do
-	if [ -e "$DOCUMENTS/$dir" -a ! -e $dir ]; then
-	    ln -s "$DOCUMENTS/$dir" "$HOME/$dir"
+	if [ -e "$relative_dir/$dir" -a ! -e $dir ]; then
+	    ln -s "$relative_dir/$dir" "$HOME/$dir"
 	fi
     done
 }
