@@ -29,6 +29,7 @@ MACOS_HOMEBREW_PKGS=""
 OPENSUSE_PKGS=""
 
 REDHAT_7_PKGS="curl-devel expat-devel openssl-devel"
+REDHAT_8_PKGS="curl-devel expat-devel openssl-devel"
 
 FREEBSD_11_PKGS=""
 FREEBSD_12_RELEASE_PKGS=""
