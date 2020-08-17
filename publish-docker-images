@@ -53,7 +53,7 @@ get_build_subcommand() {
 
     case "$1" in
 	(buildah)
-	    printf '%s\n' bud -t "$2" .
+	    printf '%s\n' bud --cap-add=all -t "$2" .
 	    ;;
 	(buildx)
 	    printf '%s\n' buildx build \
