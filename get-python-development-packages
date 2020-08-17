@@ -16,6 +16,34 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+AMAZON_2_PKG=python3-devel
+
+DEBIAN_10_PKG=python3-dev
+
+FEDORA_PKG=python3-devel
+
+FREEBSD_11_PKG=
+FREEBSD_12_PKG=
+
+ILLUMOS_PKG=
+
+MACOS_HOMEBREW_PKG=
+
+NETBSD_PKG=
+
+OPENSUSE_LP_PKG=python3-devel
+
+OPENSUSE_TW_PKG=python38-devel
+
+REDHAT_7_PKG=python3-devel
+REDHAT_8_PKG=python36-devel
+
+SOLARIS_PKG=
+
+UBUNTU_18_PKG=python3-dev
+UBUNTU_19_PKG=python3-dev
+UBUNTU_20_PKG=python3-dev
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -26,11 +54,123 @@ assert() {
 }
 
 get_packages() {
+    get_python_development_package
     "${script_prefix}get-python-pip-packages"
     "${script_prefix}get-python-venv-packages"
 }
 
-get_python_devel_packages() {
+get_python_development_package() {
+    package=
+
+    case "$ID" in
+	(amzn)
+	    case "$VERSION_ID" in
+		(2)
+		    package=$AMAZON_2_PKG
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    package=$REDHAT_7_PKG
+		    ;;
+		(8)
+		    package=$REDHAT_8_PKG
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    case "$VERSION_ID" in
+		(10)
+		    package=$DEBIAN_10_PKG
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(fedora)
+	    package=$FEDORA_PKG
+	    ;;
+	(opensuse-leap)
+	    case "$VERSION_ID" in
+		(*)
+		    package=$OPENSUSE_LP_PKG
+		    ;;
+	    esac
+	    ;;
+	(opensuse-tumbleweed)
+	    package=$OPENSUSE_TW_PKG
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    package=$REDHAT_7_PKG
+		    ;;
+		(8.*)
+		    package=$REDHAT_8_PKG
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    case "$VERSION_ID" in
+		(18.04)
+		    package=$UBUNTU_18_PKG
+		    ;;
+		(19.10)
+		    package=$UBUNTU_19_PKG
+		    ;;
+		(20.04)
+		    package=$UBUNTU_19_PKG
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(freebsd)
+	    case "$VERSION_ID" in
+		(11.3-*)
+		    package=$FREEBSD_11_PKG
+		    ;;
+		(12.1-*)
+		    package=$FREEBSD_12_PKG
+		    ;;
+		(*)
+		    break
+		    ;;
+	    esac
+	    ;;
+	(illumos)
+	    package=$ILLUMOS_PKG
+	    ;;
+	(macos)
+	    package=$MACOS_HOMEBREW_PKG
+	    ;;
+	(netbsd)
+	    package=$NETBSD_PKG
+	    ;;
+	(solaris)
+	    package=$SOLARIS_PKG
+	    ;;
+    esac
+
+    if [ -n "${package-}" ]; then
+	printf "%s\n" $package
+    fi
+}
+
+get_python_development_packages() {
     get_packages | sort -u
 }
 
@@ -65,4 +205,4 @@ script_prefix=${script_dir:+$script_dir/}
 . "${script_prefix}common-functions.sh"
 
 eval $("${script_prefix}get-os-release" -x)
-get_python_devel_packages
+get_python_development_packages
