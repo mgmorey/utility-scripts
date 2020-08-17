@@ -42,7 +42,10 @@ get_packages() {
 	for category in $categories; do
 	    parameter=$(get_parameter "$category")
 	    eval packages="\${$parameter-}"
-	    printf "%s\n" $packages
+
+	    if [ -n "$packages" ]; then
+		printf "%s\n" $packages
+	    fi
 	done | sort -u
     fi
 }
