@@ -89,6 +89,20 @@ get_command() {
     esac
 }
 
+get_default_method() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "$1" in
+	(*-ibm-db2-*)
+	    printf '%s\n' buildah
+	    ;;
+	(*)
+	    printf '%s\n' docker
+	    ;;
+    esac
+}
+
 get_insecure_builder() {
     docker buildx ls | awk 'NR > 1 && $1 == "insecure-builder" { print $1 }'
 }
@@ -126,7 +140,7 @@ get_versions() {
 
 parse_arguments() {
     databases=
-    method=docker
+    method=
     no_build=false
     only_build=false
     tag=
@@ -193,6 +207,11 @@ publish_docker_images() {
 
 publish_image() (
     image=localhost/tableau-${1}-${2%.0}
+
+    if [ -z "$method" ]; then
+	method=$(get_default_method $image)
+    fi
+
     repo_image=$BASE_URL/${image#*/}:${tag:-$TAG}
 
     if [ -d docker-${1}/$2 ]; then
