@@ -192,8 +192,8 @@ publish_docker_images() {
 }
 
 publish_image() (
-    image=tableau-${1}-${2%.0}
-    repo_image=$BASE_URL/$image:${tag:-$TAG}
+    image=localhost/tableau-${1}-${2%.0}
+    repo_image=$BASE_URL/${image#*/}:${tag:-$TAG}
 
     if [ -d docker-${1}/$2 ]; then
 	cd docker-${1}/$2
