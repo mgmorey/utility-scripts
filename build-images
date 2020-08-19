@@ -1,17 +1,5 @@
 #!/bin/sh -eu
 
-BASE_URL=artifactory.prod.tableautools.com:6555/dataservices
-
-DATABASES="ibm-db2 mssql mysql oracle postgres presto sap-hana"
-
-IBM_DB2_VERSIONS="11.5.4.0"
-MSSQL_VERSIONS="2017 2019"
-MYSQL_VERSIONS="5.6 5.7 8.0"
-ORACLE_VERSIONS="12 18 19"
-POSTGRES_VERSIONS="9.4 11 12"
-PRESTO_VERSIONS="336"
-SAP_HANA_VERSIONS="ee2"
-
 TAG="$(date +%Y%m%d%H%M)"
 
 abort() {
@@ -53,18 +41,18 @@ get_build_subcommand() {
 
     case "$1" in
 	(buildah)
-	    printf '%s\n' bud --cap-add=all -t "$2" .
+	    printf "%s\n" bud --cap-add=all -t "$2" .
 	    ;;
 	(buildx)
-	    printf '%s\n' buildx build \
+	    printf "%s\n" buildx build \
 		   --allow security.insecure \
 		   --load -t "$2" .
 	    ;;
 	(docker)
-	    printf '%s\n' build -t "$2" .
+	    printf "%s\n" build -t "$2" .
 	    ;;
 	(podman)
-	    printf '%s\n' build -t "$2" .
+	    printf "%s\n" build -t "$2" .
 	    ;;
     esac
 }
@@ -75,16 +63,16 @@ get_command() {
 
     case "$1" in
 	(buildah)
-	    printf '%s\n' buildah
+	    printf "%s\n" buildah
 	    ;;
 	(buildx)
-	    printf '%s\n' docker
+	    printf "%s\n" docker
 	    ;;
 	(docker)
-	    printf '%s\n' docker
+	    printf "%s\n" docker
 	    ;;
 	(podman)
-	    printf '%s\n' podman
+	    printf "%s\n" podman
 	    ;;
     esac
 }
@@ -95,58 +83,63 @@ get_default_method() {
 
     case "$1" in
 	(*-ibm-db2-*)
-	    printf '%s\n' buildah
+	    printf "%s\n" buildah
 	    ;;
 	(*)
-	    printf '%s\n' docker
+	    printf "%s\n" docker
 	    ;;
     esac
+}
+
+get_dockerfiles() {
+    dir_prefix=$(get_image_dir_prefix)
+    dir_root=$(get_image_dir_root)
+    find "$dir_root" -type f -name Dockerfile
+}
+
+get_image_dir_prefix() {
+    printf "%s\n" "${IMAGE_DIR_PREFIX-docker}-"
+}
+
+get_image_dir_root() {
+    printf "%s\n" "$(get_realpath "${IMAGE_DIR_ROOT-$HOME}")"
+}
+
+get_image_name() {
+    dir_prefix=$(get_image_dir_prefix)
+    name_prefix=${IMAGE_NAME_PREFIX+$IMAGE_NAME_PREFIX-}
+    sed -e 's|^.*/'"$dir_prefix"'\(.*\)/|'"${name_prefix}"'\1-|' \
+	-e 's/\.0$//'
 }
 
 get_insecure_builder() {
     docker buildx ls | awk 'NR > 1 && $1 == "insecure-builder" { print $1 }'
 }
 
-get_versions() {
-    case $database in
-	(ibm-db2)
-	    versions_default=$IBM_DB2_VERSIONS
-	    ;;
-	(mssql)
-	    versions_default=$MSSQL_VERSIONS
-	    ;;
-	(mysql)
-	    versions_default=$MYSQL_VERSIONS
-	    ;;
-	(oracle)
-	    versions_default=$ORACLE_VERSIONS
-	    ;;
-	(postgres)
-	    versions_default=$POSTGRES_VERSIONS
-	    ;;
-	(presto)
-	    versions_default=$PRESTO_VERSIONS
-	    ;;
-	(sap-hana)
-	    versions_default=$SAP_HANA_VERSIONS
-	    ;;
-	(*)
-	    abort '%s: %s: DBMS not recognized\n' "$0" "$database"
-	    ;;
-    esac
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
 
-    printf '%s\n' "$versions_default"
-}
+    if [ -n "$realpath" ]; then
+    	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
 
 parse_arguments() {
-    databases=
     method=
-    no_build=false
-    only_build=false
     tag=
-    versions=
+    with_build=false
+    with_push=false
 
-    while getopts M:blnt:v:h opt; do
+    while getopts M:blpt:h opt; do
 	case $opt in
 	    (M)
 		case "$OPTARG" in
@@ -167,21 +160,16 @@ parse_arguments() {
 		esac
 		;;
 	    (b)
-		no_build=false
-		only_build=true
+		with_build=true
 		;;
 	    (l)
 		tag=latest
 		;;
-	    (n)
-		no_build=true
-		only_build=false
+	    (p)
+		with_push=true
 		;;
 	    (t)
 		tag="$OPTARG"
-		;;
-	    (v)
-		versions="$OPTARG"
 		;;
 	    (h)
 		usage
@@ -194,35 +182,41 @@ parse_arguments() {
     done
 
     shift $(($OPTIND - 1))
-    databases="$@"
+    dockerfiles="$@"
+
+    if [ "$with_build" = false -a "$with_push" = false ]; then
+	with_build=true
+	with_push=true
+    fi
 }
 
 publish_docker_images() {
-    for database; do
-	for version in ${versions:-$(get_versions)}; do
-	    publish_image $database $version
-	done
+    for dockerfile; do
+	dir=$(get_realpath "$(dirname "$dockerfile")")
+	image=$(printf "%s\n" "$dir" | get_image_name)
+	publish_image $dir $image
     done
 }
 
 publish_image() (
-    image=localhost/tableau-${1}-${2%.0}
+    dir=$1
+    image=$2
 
     if [ -z "$method" ]; then
 	method=$(get_default_method $image)
     fi
 
-    repo_image=$BASE_URL/${image#*/}:${tag:-$TAG}
+    repo_image=${IMAGE_BASE_URL+$IMAGE_BASE_URL/}${image#*/}:${tag:-$TAG}
 
-    if [ -d docker-${1}/$2 ]; then
-	cd docker-${1}/$2
+    if [ -d "$dir" ]; then
+	cd "$dir"
 
-	if [ "$no_build" = false ]; then
+	if [ "$with_build" = true ]; then
 	    create_builder $method
 	    build_image $method $image
 	fi
 
-	if [ "$only_build" = false ]; then
+	if [ "$with_push" = true -a "$repo_image" != "$image" ]; then
 	    $(get_command $method) tag $image $repo_image
 	    $(get_command $method) push $repo_image
 	fi
@@ -235,4 +229,4 @@ usage_error() {
 }
 
 parse_arguments "$@"
-publish_docker_images ${databases:-$DATABASES}
+publish_docker_images ${dockerfiles:-$(get_dockerfiles)}
