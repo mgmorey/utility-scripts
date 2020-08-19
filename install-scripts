@@ -88,6 +88,9 @@ get_library_files() {
     find "$1" \
 	 -maxdepth 1 \
 	 -name '*.*' \
+	 ! -name .editorconfig \
+	 ! -name .gitattributes \
+	 ! -name .gitignore \
 	 ! -name '*~' \
 	 -type f
 }
