@@ -134,6 +134,7 @@ get_realpath() (
 )
 
 parse_arguments() {
+    dockerfiles=
     method=
     tag=
     with_build=false
@@ -181,13 +182,29 @@ parse_arguments() {
 	esac
     done
 
-    shift $(($OPTIND - 1))
-    dockerfiles="$@"
-
     if [ "$with_build" = false -a "$with_push" = false ]; then
 	with_build=true
 	with_push=true
     fi
+
+    shift $(($OPTIND - 1))
+
+    for file; do
+	if [ -f "$file" ]; then
+	    case "$file" in
+		(*/Dockerfile|Dockerfile)
+		    dockerfiles="${dockerfiles+$dockerfiles }$file"
+		    ;;
+		(*)
+		    abort "%s: %s: Not a Dockerfile\n" "$0" "$file"
+		    ;;
+	    esac
+	elif [ -e "$file" ]; then
+	    abort "%s: %s: Not a Dockerfile\n" "$0" "$file"
+	else
+	    abort "%s: %s: No such file\n" "$0" "$file"
+	fi
+    done
 }
 
 publish_docker_images() {
