@@ -165,19 +165,22 @@ parse_arguments() {
 		;;
 	    (l)
 		tag=latest
+		with_push=true
 		;;
 	    (p)
+		with_push=true
 		with_push=true
 		;;
 	    (t)
 		tag="$OPTARG"
+		with_push=true
 		;;
 	    (h)
 		usage
 		exit 0
 		;;
 	    (\?)
-		exit 2
+		usage_error
 		;;
 	esac
     done
@@ -240,10 +243,33 @@ publish_image() (
     fi
 )
 
+usage() {
+    cat <<EOF >&2
+Usage: $0 [-M METHOD] [-b] [-l] [-p] [-t TAG]
+       $0 -h
+EOF
+}
+
 usage_error() {
-    printf "$@" >&2
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf "%s\n" '' >&2
+    usage
     exit 2
 }
+
+case "$0" in
+    (*/*)
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
 
 parse_arguments "$@"
 publish_docker_images ${dockerfiles:-$(get_dockerfiles)}
