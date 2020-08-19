@@ -31,7 +31,7 @@ build_images() {
     for dockerfile; do
 	dir=$(get_realpath "$(dirname "$dockerfile")")
 	image=$(printf "%s\n" "$dir" | get_image_name)
-	publish_image $dir $image
+	build_image $dir $image
     done
 }
 
@@ -50,10 +50,7 @@ build_image() (
 
 	if [ "$with_build" = true ]; then
 	    create_builder $method
-	    $(get_command $method) \
-		$(get_build_subcommand $method $image) \
-		$method \
-		$image
+	    $(get_command $method) $(get_build_subcommand $method $image)
 	fi
 
 	if [ "$with_push" = true -a "$repo_image" != "$image" ]; then
