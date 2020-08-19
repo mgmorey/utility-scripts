@@ -1,0 +1,199 @@
+#!/bin/sh -eu
+
+# run-image: run container image
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+TAG="$(date +%Y%m%d%H%M)"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_command() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "$1" in
+	(buildah)
+	    printf "%s\n" buildah
+	    ;;
+	(docker)
+	    printf "%s\n" docker
+	    ;;
+	(podman)
+	    printf "%s\n" podman
+	    ;;
+    esac
+}
+
+get_default_method() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "$1" in
+	(*-ibm-db2-*)
+	    printf "%s\n" buildah
+	    ;;
+	(*)
+	    printf "%s\n" docker
+	    ;;
+    esac
+}
+
+get_image_dir_prefix() {
+    printf "%s\n" "${IMAGE_DIR_PREFIX-docker}-"
+}
+
+get_image_dir_root() {
+    printf "%s\n" "$(get_realpath "${IMAGE_DIR_ROOT-$HOME}")"
+}
+
+get_image_name() {
+    dir_prefix=$(get_image_dir_prefix)
+    name_prefix=${IMAGE_NAME_PREFIX+$IMAGE_NAME_PREFIX-}
+    sed -e 's|^.*/'"$dir_prefix"'\(.*\)/|'"${name_prefix}"'\1-|' \
+	-e 's/\.0$//'
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+    	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+parse_arguments() {
+    dockerfile=
+    method=
+    run_options=-d
+
+    while getopts M:o:h opt; do
+	case $opt in
+	    (M)
+		case "$OPTARG" in
+		    (buildah)
+			method="$OPTARG"
+			;;
+		    (docker)
+			method="$OPTARG"
+			;;
+		    (podman)
+			method="$OPTARG"
+			;;
+		    (*)
+			usage_error "%s: %s: Invalid method\n" "$0" "$OPTARG"
+			;;
+		esac
+		;;
+	    (o)
+		run_options="$OPTARG"
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		usage_error
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -lt 1 ]; then
+	usage_error "%s: Not enough arguments\n" "$0"
+    elif [ $# -gt 1 ]; then
+	usage_error "%s: Too many arguments\n" "$0"
+    fi
+
+    file=$1
+    shift
+
+    if [ -f "$file" ]; then
+	case "$file" in
+	    (*/Dockerfile|Dockerfile)
+		dockerfile="$file"
+		;;
+	    (*)
+		abort "%s: %s: Not a Dockerfile\n" "$0" "$file"
+		;;
+	esac
+    elif [ -e "$file" ]; then
+	abort "%s: %s: Not a Dockerfile\n" "$0" "$file"
+    else
+	abort "%s: %s: No such file\n" "$0" "$file"
+    fi
+}
+
+run_image() {
+    dir=$(get_realpath "$(dirname "$dockerfile")")
+    image=$(printf "%s\n" "$dir" | get_image_name)
+
+    if [ -z "$method" ]; then
+	method=$(get_default_method $image)
+    fi
+
+    if [ -d "$dir" ]; then
+	cd "$dir"
+	$(get_command $method) run $run_options $image
+    fi
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $0 [-M METHOD] DOCKERFILE [ARG [...]]
+       $0 -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf "%s\n" '' >&2
+    usage
+    exit 2
+}
+
+case "$0" in
+    (*/*)
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+parse_arguments "$@"
+run_image ${dockerfile}
