@@ -1,5 +1,21 @@
 #!/bin/sh -eu
 
+# build-images: build container images
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 TAG="$(date +%Y%m%d%H%M)"
 
 abort() {
@@ -11,9 +27,41 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-build_image() {
-    $(get_command $method) $(get_build_subcommand $method $image)
+build_images() {
+    for dockerfile; do
+	dir=$(get_realpath "$(dirname "$dockerfile")")
+	image=$(printf "%s\n" "$dir" | get_image_name)
+	publish_image $dir $image
+    done
 }
+
+build_image() (
+    dir=$1
+    image=$2
+
+    if [ -z "$method" ]; then
+	method=$(get_default_method $image)
+    fi
+
+    repo_image=${IMAGE_BASE_URL+$IMAGE_BASE_URL/}${image#*/}:${tag:-$TAG}
+
+    if [ -d "$dir" ]; then
+	cd "$dir"
+
+	if [ "$with_build" = true ]; then
+	    create_builder $method
+	    $(get_command $method) \
+		$(get_build_subcommand $method $image) \
+		$method \
+		$image
+	fi
+
+	if [ "$with_push" = true -a "$repo_image" != "$image" ]; then
+	    $(get_command $method) tag $image $repo_image
+	    $(get_command $method) push $repo_image
+	fi
+    fi
+)
 
 create_builder() {
     assert [ $# -eq 1 ]
@@ -158,6 +206,9 @@ parse_arguments() {
 		    (podman)
 			method="$OPTARG"
 			;;
+		    (*)
+			usage_error "%s: %s: Invalid method\n" "$0" "$OPTARG"
+			;;
 		esac
 		;;
 	    (b)
@@ -210,39 +261,6 @@ parse_arguments() {
     done
 }
 
-publish_docker_images() {
-    for dockerfile; do
-	dir=$(get_realpath "$(dirname "$dockerfile")")
-	image=$(printf "%s\n" "$dir" | get_image_name)
-	publish_image $dir $image
-    done
-}
-
-publish_image() (
-    dir=$1
-    image=$2
-
-    if [ -z "$method" ]; then
-	method=$(get_default_method $image)
-    fi
-
-    repo_image=${IMAGE_BASE_URL+$IMAGE_BASE_URL/}${image#*/}:${tag:-$TAG}
-
-    if [ -d "$dir" ]; then
-	cd "$dir"
-
-	if [ "$with_build" = true ]; then
-	    create_builder $method
-	    build_image $method $image
-	fi
-
-	if [ "$with_push" = true -a "$repo_image" != "$image" ]; then
-	    $(get_command $method) tag $image $repo_image
-	    $(get_command $method) push $repo_image
-	fi
-    fi
-)
-
 usage() {
     cat <<EOF >&2
 Usage: $0 [-M METHOD] [-b] [-l] [-p] [-t TAG]
@@ -272,4 +290,4 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 parse_arguments "$@"
-publish_docker_images ${dockerfiles:-$(get_dockerfiles)}
+build_images ${dockerfiles:-$(get_dockerfiles)}
