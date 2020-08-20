@@ -81,7 +81,7 @@ get_configuration_filename() {
 		;;
 	    (netbsd)
 		basename=$ID-$VERSION_ID
-	    	;;
+		;;
 	    (solaris)
 		basename=$ID-$VERSION_ID
 		;;
