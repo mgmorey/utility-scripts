@@ -44,20 +44,6 @@ get_command() {
     esac
 }
 
-get_default_method() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-
-    case "$1" in
-	(*-ibm-db2-*)
-	    printf "%s\n" buildah
-	    ;;
-	(*)
-	    printf "%s\n" docker
-	    ;;
-    esac
-}
-
 get_image_dir_prefix() {
     printf "%s\n" "${IMAGE_DIR_PREFIX-docker}-"
 }
@@ -78,7 +64,7 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
@@ -93,9 +79,11 @@ get_realpath() (
 parse_arguments() {
     dockerfile=
     method=
-    run_options=-d
+    options=-d
+    repo=
+    tag=
 
-    while getopts M:o:h opt; do
+    while getopts M:o:rt:h opt; do
 	case $opt in
 	    (M)
 		case "$OPTARG" in
@@ -114,7 +102,13 @@ parse_arguments() {
 		esac
 		;;
 	    (o)
-		run_options="$OPTARG"
+		options="$OPTARG"
+		;;
+	    (r)
+		repo="$IMAGE_BASE_URL"
+		;;
+	    (t)
+		tag="$OPTARG"
 		;;
 	    (h)
 		usage
@@ -156,20 +150,13 @@ parse_arguments() {
 run_image() {
     dir=$(get_realpath "$(dirname "$dockerfile")")
     image=$(printf "%s\n" "$dir" | get_image_name)
-
-    if [ -z "$method" ]; then
-	method=$(get_default_method $image)
-    fi
-
-    if [ -d "$dir" ]; then
-	cd "$dir"
-	$(get_command $method) run $run_options $image
-    fi
+    $(get_command ${method:-docker}) run $options \
+		  ${repo:+$repo/}$image${tag:+:$tag}
 }
 
 usage() {
     cat <<EOF >&2
-Usage: $0 [-M METHOD] DOCKERFILE [ARG [...]]
+Usage: $0 [-M METHOD] [-o OPTIONS] [-r] [-t TAG] DOCKERFILE
        $0 -h
 EOF
 }
