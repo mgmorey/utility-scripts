@@ -16,7 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-TAG="$(date +%Y%m%d%H%M)"
+CAPABILITIES="CAP_BLOCK_SUSPEND CAP_CHOWN CAP_DAC_OVERRIDE \
+CAP_DAC_READ_SEARCH CAP_FOWNER CAP_FSETID CAP_IPC_LOCK CAP_IPC_OWNER \
+CAP_KILL CAP_LEASE CAP_LINUX_IMMUTABLE CAP_MAC_ADMIN CAP_MAC_OVERRIDE \
+CAP_MKNOD CAP_NET_BIND_SERVICE CAP_NET_RAW CAP_SETFCAP CAP_SETGID \
+CAP_SETPCAP CAP_SETUID CAP_SYS_ADMIN CAP_SYS_BOOT CAP_SYS_CHROOT \
+CAP_SYSLOG CAP_SYS_MODULE CAP_SYS_NICE CAP_SYS_PACCT CAP_SYS_PTRACE \
+CAP_SYS_RAWIO CAP_SYS_RESOURCE CAP_SYS_TIME"
 
 abort() {
     printf "$@" >&2
@@ -27,19 +33,21 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_command() {
+get_buildah_from_options() {
+    printf -- "--cap-add=%s\n" $CAPABILITIES
+    printf -- "%s\n" $from_options
+}
+
+get_default_method() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
     case "$1" in
-	(buildah)
+	(*-ibm-db2-*)
 	    printf "%s\n" buildah
 	    ;;
-	(docker)
+	(*)
 	    printf "%s\n" docker
-	    ;;
-	(podman)
-	    printf "%s\n" podman
 	    ;;
     esac
 }
@@ -77,13 +85,15 @@ get_realpath() (
 )
 
 parse_arguments() {
+    command=sh
     dockerfile=
+    from_options=
     method=
-    options=-d
+    options=
     repo=
     tag=
 
-    while getopts M:o:rt:h opt; do
+    while getopts M:c:f:o:rt:h opt; do
 	case $opt in
 	    (M)
 		case "$OPTARG" in
@@ -100,6 +110,12 @@ parse_arguments() {
 			usage_error "%s: %s: Invalid method\n" "$0" "$OPTARG"
 			;;
 		esac
+		;;
+	    (c)
+		command="$OPTARG"
+		;;
+	    (f)
+		from_options="$OPTARG"
 		;;
 	    (o)
 		options="$OPTARG"
@@ -150,13 +166,28 @@ parse_arguments() {
 run_image() {
     dir=$(get_realpath "$(dirname "$dockerfile")")
     image=$(printf "%s\n" "$dir" | get_image_name)
-    $(get_command ${method:-docker}) run $options \
-		  ${repo:+$repo/}$image${tag:+:$tag}
+
+    if [ -z "$method" ]; then
+	method=$(get_default_method $image)
+    fi
+
+    case "$method" in
+	(buildah)
+	    container=$($method from $(get_buildah_from_options) \
+				${repo:+$repo/}$image${tag:+:$tag})
+	    $method run $options $container $command
+	    $method rm $container
+	    ;;
+	(*)
+	    $method run $options ${repo:+$repo/}$image${tag:+:$tag}
+	    ;;
+    esac
 }
 
 usage() {
     cat <<EOF >&2
-Usage: $0 [-M METHOD] [-o OPTIONS] [-r] [-t TAG] DOCKERFILE
+Usage: $0 [-M METHOD] [-c COMMAND] [-f FROM-OPTIONS] [-o OPTIONS] [-r] \
+[-t TAG] DOCKERFILE
        $0 -h
 EOF
 }
