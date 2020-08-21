@@ -16,14 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DB2_CAPABILITIES="CAP_BLOCK_SUSPEND CAP_CHOWN CAP_DAC_OVERRIDE \
-CAP_DAC_READ_SEARCH CAP_FOWNER CAP_FSETID CAP_IPC_LOCK CAP_IPC_OWNER \
-CAP_KILL CAP_LEASE CAP_LINUX_IMMUTABLE CAP_MAC_ADMIN CAP_MAC_OVERRIDE \
-CAP_MKNOD CAP_NET_BIND_SERVICE CAP_NET_RAW CAP_SETFCAP CAP_SETGID \
-CAP_SETPCAP CAP_SETUID CAP_SYS_ADMIN CAP_SYS_BOOT CAP_SYS_CHROOT \
-CAP_SYSLOG CAP_SYS_MODULE CAP_SYS_NICE CAP_SYS_PACCT CAP_SYS_PTRACE \
-CAP_SYS_RAWIO CAP_SYS_RESOURCE CAP_SYS_TIME"
-
 TAG="$(date +%Y%m%d%H%M)"
 
 abort() {
@@ -150,7 +142,11 @@ get_default_capabilities() {
 
     case "$1" in
 	(*-ibm-db2-*)
-	    printf "%s\n" $DB2_CAPABILITIES
+	    capabilities=$("${script_prefix}get-all-capabilities")
+
+	    if [ -n "$capabilities" ]; then
+		printf "%s\n" $capabilities
+	    fi
 	    ;;
     esac
 }
