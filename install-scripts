@@ -44,17 +44,6 @@ configure_platform() {
     esac
 }
 
-get_install_command() {
-    case "$ID" in
-	(illumos)
-	    which install
-	    ;;
-	(*)
-	    which install
-	    ;;
-    esac
-}
-
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
