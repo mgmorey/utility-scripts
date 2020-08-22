@@ -83,6 +83,45 @@ get_field() {
     get_entry $1 "$2" | cut -d: -f $3
 }
 
+get_gnu_diff_command() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (solaris)
+		printf "%s\n" gdiff
+		return
+		;;
+	esac
+    done
+
+    printf "%s\n" diff
+}
+
+get_gnu_grep_command() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (solaris)
+		printf "%s\n" ggrep
+		return
+		;;
+	esac
+    done
+
+    printf "%s\n" grep
+}
+
+get_gnu_install_command() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (solaris)
+		printf "%s\n" ginstall
+		return
+		;;
+	esac
+    done
+
+    printf "%s\n" install
+}
+
 get_group_id() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]

@@ -33,32 +33,6 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_gnu_diff_command() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (solaris)
-		printf "%s\n" gdiff
-		break
-		;;
-	esac
-    done
-
-    printf "%s\n" diff
-}
-
-get_gnu_install_command() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (solaris)
-		printf "%s\n" ginstall
-		break
-		;;
-	esac
-    done
-
-    printf "%s\n" install
-}
-
 get_project_directory() {
     if [ -d "$HOME/Documents" ]; then
 	printf "%s\n" "$HOME/Documents/git"

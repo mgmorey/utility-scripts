@@ -25,19 +25,6 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_gnu_grep_command() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (solaris)
-		printf "%s\n" ggrep
-		break
-		;;
-	esac
-    done
-
-    printf "%s\n" grep
-}
-
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
