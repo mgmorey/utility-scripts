@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DARWIN_PKG="mariadb"
-
 DEBIAN_10_PKG="mariadb-client-10.3"
 
 FEDORA_PKG="mariadb"
@@ -25,6 +23,8 @@ FEDORA_PKG="mariadb"
 FREEBSD_PKG="mariadb103-client"
 
 ILLUMOS_PKG="database/mariadb-101/client"
+
+MACOS_HOMEBREW_PKG="mariadb"
 
 NETBSD_PKG="mariadb-client"
 
@@ -97,7 +97,7 @@ get_mysql_client_packages() {
 	    packages="${package:-$ILLUMOS_PKG}"
 	    ;;
 	(macos)
-	    packages="${package:-$DARWIN_PKG}"
+	    packages="${package:-$MACOS_HOMEBREW_PKG}"
 	    ;;
 	(netbsd)
 	    packages="${package:-$NETBSD_PKG}"
