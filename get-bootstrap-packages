@@ -25,7 +25,7 @@ FREEBSD_12_PKGS="bash curl wget"
 
 ILLUMOS_PKGS="shell/bash"
 
-MACOS_PKGS="bash curl wget"
+MACOS_HOMEBREW_PKGS="bash curl wget"
 
 NETBSD_PKGS="bash curl wget"
 
@@ -113,7 +113,7 @@ get_bootstrap_packages() {
 	    packages=$ILLUMOS_PKGS
 	    ;;
 	(macos)
-	    packages=$MACOS_PKGS
+	    packages=$MACOS_HOMEBREW_PKGS
 	    ;;
 	(netbsd)
 	    packages=$NETBSD_PKGS
