@@ -54,6 +54,7 @@ build_image() (
 	fi
 
 	if [ "$with_push" = true -a "$remote" != "$image" ]; then
+	    $method login $IMAGE_REMOTE_BASE_URL
 	    $(get_command $method) tag $image $remote
 	    $(get_command $method) push $remote
 	fi
