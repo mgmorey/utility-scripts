@@ -77,7 +77,7 @@ get_configuration_filename() {
 		basename=$ID
 		;;
 	    (macos)
-		basename=$ID-$VERSION_ID
+		basename=$ID-${VERSION_ID%.*}
 		;;
 	    (netbsd)
 		basename=$ID-$VERSION_ID
