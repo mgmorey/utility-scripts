@@ -43,7 +43,7 @@ build_image() (
 	method=$(get_default_method $image)
     fi
 
-    repo_image=${IMAGE_BASE_URL+$IMAGE_BASE_URL/}${image#*/}:${tag:-$TAG}
+    remote=$(get_remote_image_name)
 
     if [ -d "$dir" ]; then
 	cd "$dir"
@@ -53,9 +53,9 @@ build_image() (
 	    $(get_command $method) $(get_build_subcommand $method $image)
 	fi
 
-	if [ "$with_push" = true -a "$repo_image" != "$image" ]; then
-	    $(get_command $method) tag $image $repo_image
-	    $(get_command $method) push $repo_image
+	if [ "$with_push" = true -a "$remote" != "$image" ]; then
+	    $(get_command $method) tag $image $remote
+	    $(get_command $method) push $remote
 	fi
     fi
 )
@@ -184,6 +184,14 @@ get_image_name() {
     name_prefix=${IMAGE_NAME_PREFIX+$IMAGE_NAME_PREFIX-}
     sed -e 's|^.*/'"$dir_prefix"'\(.*\)/|'"${name_prefix}"'\1-|' \
 	-e 's/\.0$//'
+}
+
+get_remote_image_name() {
+    printf "%s%s%s:%s\n" \
+	   "${IMAGE_REMOTE_BASE_URL:+${IMAGE_REMOTE_BASE_URL#*//}/}" \
+	   "${IMAGE_REMOTE_DIR:+$IMAGE_REMOTE_DIR/}" \
+	   "${image#*/}" \
+	   "${tag:-$TAG}"
 }
 
 get_insecure_builder() {

@@ -81,6 +81,20 @@ get_image_name() {
 	-e 's/\.0$//'
 }
 
+get_remote_image_name() {
+    if [ "$is_remote" = true ]; then
+	printf "%s%s%s%s\n" \
+	       "${IMAGE_REMOTE_BASE_URL:+${IMAGE_REMOTE_BASE_URL#*//}/}" \
+	       "${IMAGE_REMOTE_DIR:+$IMAGE_REMOTE_DIR/}" \
+	       "${image#*/}" \
+	       "${tag:+:$tag}"
+    else
+	printf "%s%s\n"
+	       "${image#*/}" \
+	       "${tag:+:$tag}"
+    fi
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -102,9 +116,9 @@ parse_arguments() {
     command=sh
     dockerfile=
     from_options=
+    is_remote=false
     method=
     options=
-    repo=
     tag=
 
     while getopts M:c:f:o:rt:h opt; do
@@ -135,7 +149,7 @@ parse_arguments() {
 		options="$OPTARG"
 		;;
 	    (r)
-		repo="$IMAGE_BASE_URL"
+		is_remote=true
 		;;
 	    (t)
 		tag="$OPTARG"
@@ -185,15 +199,18 @@ run_image() {
 	method=$(get_default_method $image)
     fi
 
+    remote=$(get_remote_image_name)
+
     case "$method" in
 	(buildah)
-	    container=$($method from $(get_buildah_from_options $image) \
-				${repo:+$repo/}$image${tag:+:$tag})
+	    container=$($method from \
+				$(get_buildah_from_options $image) \
+				$remote)
 	    $method run $options $container $command
 	    $method rm $container
 	    ;;
 	(*)
-	    $method run $options ${repo:+$repo/}$image${tag:+:$tag}
+	    $method run $options $remote
 	    ;;
     esac
 }
