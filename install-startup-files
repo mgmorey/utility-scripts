@@ -33,15 +33,34 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_project_directory() {
-    if [ -d "$HOME/Documents" ]; then
-	printf "%s\n" "$HOME/Documents/git"
-    else
-	printf "%s\n" "$HOME/git"
-    fi
+format_project_directory() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    printf "%s\n" "$1/git/$2"
 }
 
-get_realpath() (
+format_project_url() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf "$PROJECT_URL\n" "$(get_real_user)"
+}
+
+get_project_directory() {
+    for root_dir in "$HOME/Documents" "$HOME"; do
+	dir=$(format_project_directory $root_dir $PROJECT_NAME)
+
+	if [ -d "$dir" ]; then
+	    printf "%s\n" "$dir"
+	    return
+	fi
+    done
+
+    create_tmpdir INT QUIT TERM
+    format_project_directory "$tmpdir" $PROJECT_NAME
+}
+
+get_realpath() {
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
 
@@ -56,22 +75,22 @@ get_realpath() (
 	    fi
 	done
     fi
-)
+}
 
-install_startup_files() {
+install_startup_files() (
     git_dir=$(get_project_directory)
     gnu_diff=$(get_gnu_diff_command)
     gnu_install=$(get_gnu_install_command)
 
-    cd "$(dirname "$git_dir")"
-    mkdir -p git
-    cd git
+    parent_dir=$(dirname "$git_dir")
+    mkdir -p "$parent_dir"
+    cd "$parent_dir"
 
     if [ ! -d $PROJECT_NAME ]; then
-	git clone $(printf "$PROJECT_URL\n" "$(get_real_user)")
+	git clone $(format_project_url "$(get_real_user)")
     fi
 
-    cd
+    cd "$git_dir"
 
     for file in $STARTUP_FILES; do
 	if is_to_be_installed $file; then
@@ -110,9 +129,13 @@ install_startup_files() {
     done
 
     printf "Please log out and back in again to activate the new environment.\n"
-}
+    clean_up
+)
 
 is_to_be_installed() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
     if [ ! -r $1 ]; then
 	return 0;
     elif [ ! -r /etc/skel/$1 ]; then
