@@ -33,31 +33,42 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-format_project_directory() {
-    assert [ $# -eq 2 ]
+format_git_directory() {
+    assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    assert [ -n "$2" ]
-    printf "%s\n" "$1/git/$2"
+    printf "%s/%s\n" "$1" "git"
+}
+
+format_project_directory() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf "%s/%s\n" "$1" "$PROJECT_NAME"
 }
 
 format_project_url() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    printf "$PROJECT_URL\n" "$(get_real_user)"
+    printf "$PROJECT_URL\n" "$1"
 }
 
 get_project_directory() {
-    for root_dir in "$HOME/Documents" "$HOME"; do
-	dir=$(format_project_directory $root_dir $PROJECT_NAME)
+    user=$(get_real_user)
 
-	if [ -d "$dir" ]; then
-	    printf "%s\n" "$dir"
-	    return
-	fi
+    for root_dir in "$HOME/Documents" "$HOME"; do
+	git_dir=$(format_git_directory $root_dir)
+
+	for parent_dir in "$git_dir/$user" "$git_dir"; do
+	    project_dir=$(format_project_directory "$parent_dir")
+
+	    if [ -d "$project_dir" ]; then
+		printf "%s\n" "$project_dir"
+		return
+	    fi
+	done
     done
 
     create_tmpdir INT QUIT TERM
-    format_project_directory "$tmpdir" $PROJECT_NAME
+    format_project_directory "$tmpdir"
 }
 
 get_realpath() {
@@ -78,6 +89,7 @@ get_realpath() {
 }
 
 install_startup_files() (
+    validate_user_name "$(get_real_user)"
     git_dir=$(get_project_directory)
     gnu_diff=$(get_gnu_diff_command)
     gnu_install=$(get_gnu_install_command)
