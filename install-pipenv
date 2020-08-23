@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+PIP_OPTIONS="--no-warn-script-location --upgrade --user"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -54,7 +56,11 @@ install_dependencies() {
 }
 
 install_pipenv() {
-    "${script_prefix}run-python" -m pip install --upgrade --user pip pipenv
+    pip_install $PIP_OPTIONS pip pipenv
+}
+
+pip_install() {
+    "${script_prefix}run-python" -m pip install "$@"
 }
 
 case "$0" in
