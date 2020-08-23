@@ -32,14 +32,24 @@ create_tmpdir() {
     tmpdir=$(mktemp -d)
     assert [ -n "${tmpdir}" ]
     tmpdirs="${tmpdirs+$tmpdirs }$tmpdir"
-    trap clean_up EXIT INT QUIT TERM
+
+    if [ $# -gt 0 ]; then
+	trap "$@"
+    else
+	trap clean_up EXIT INT QUIT TERM
+    fi
 }
 
 create_tmpfile() {
     tmpfile=$(mktemp)
     assert [ -n "${tmpfile}" ]
     tmpfiles="${tmpfiles+$tmpfiles }$tmpfile"
-    trap clean_up EXIT INT QUIT TERM
+
+    if [ $# -gt 0 ]; then
+	trap "$@"
+    else
+	trap clean_up EXIT INT QUIT TERM
+    fi
 }
 
 get_bin_directory() (
