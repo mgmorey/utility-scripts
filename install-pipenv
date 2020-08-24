@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-PIP_OPTIONS="--no-warn-script-location --upgrade --user"
+PIP_OPTIONS="--upgrade --user"
 
 abort() {
     printf "$@" >&2
@@ -25,6 +25,22 @@ abort() {
 
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_pip_options() {
+    options=$PIP_OPTIONS
+
+    case $(pip_version) in
+	(9.0.3)
+	    true
+	    ;;
+	(*)
+	    options="${options:+$options }--no-warn-script-location"
+	    ;;
+    esac
+
+    options=${options:+$options }$PIP_OPTIONS
+    printf "%s\n" $options
 }
 
 get_realpath() (
@@ -56,11 +72,15 @@ install_dependencies() {
 }
 
 install_pipenv() {
-    pip_install $PIP_OPTIONS pip pipenv
+    pip_install $(get_pip_options) pip pipenv
 }
 
 pip_install() {
     "${script_prefix}run-python" -m pip install "$@"
+}
+
+pip_version() {
+    "${script_prefix}run-python" -m pip --version | awk '{print $2}'
 }
 
 case "$0" in
