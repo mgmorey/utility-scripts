@@ -135,6 +135,9 @@ validate_platform() {
 		    (7)
 			return
 			;;
+		    (8)
+			return
+			;;
 		    (*)
 			break
 			;;
