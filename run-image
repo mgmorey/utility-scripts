@@ -74,6 +74,12 @@ get_image_dir_root() {
     printf "%s\n" "$(get_realpath "${IMAGE_DIR_ROOT-$HOME}")"
 }
 
+get_image_method() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf "%s\n" "${method:-$(get_default_method "$1")}"
+}
+
 get_image_name() {
     dir_prefix=$(get_image_dir_prefix)
     name_prefix=${IMAGE_NAME_PREFIX+$IMAGE_NAME_PREFIX-}
@@ -194,23 +200,19 @@ parse_arguments() {
 run_image() {
     dir=$(get_realpath "$(dirname "$dockerfile")")
     image=$(printf "%s\n" "$dir" | get_image_name)
-
-    if [ -z "$method" ]; then
-	method=$(get_default_method $image)
-    fi
-
-    remote=$(get_remote_image_name)
+    image_method=$(get_image_method $image)
+    remote_image=$(get_remote_image_name)
 
     case "$method" in
 	(buildah)
-	    container=$($method from \
-				$(get_buildah_from_options $image) \
-				$remote)
-	    $method run $options $container $command
-	    $method rm $container
+	    container=$($image_method from \
+				      $(get_buildah_from_options $image) \
+				      $remote_image)
+	    $image_method run $options $container $command
+	    $image_method rm $container
 	    ;;
 	(*)
-	    $method run $options $remote
+	    $image_method run $options $remote_image
 	    ;;
     esac
 }

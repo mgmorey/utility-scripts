@@ -29,35 +29,29 @@ assert() {
 
 build_images() {
     for dockerfile; do
-	dir=$(get_realpath "$(dirname "$dockerfile")")
-	image=$(printf "%s\n" "$dir" | get_image_name)
-	build_image $dir $image
+	build_image $(get_realpath "$(dirname "$dockerfile")")
     done
 }
 
 build_image() (
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
     dir=$1
-    image=$2
+    image=$(printf "%s\n" "$dir" | get_image_name)
+    image_method=$(get_image_method $image)
+    method_command=$(get_command $image_method)
+    remote_image=$(get_remote_image_name)
+    cd "$dir"
 
-    if [ -z "$method" ]; then
-	method=$(get_default_method $image)
+    if [ "$with_build" = true ]; then
+	create_builder $image_method
+	$method_command $(get_build_subcommand $image_method $image)
     fi
 
-    remote=$(get_remote_image_name)
-
-    if [ -d "$dir" ]; then
-	cd "$dir"
-
-	if [ "$with_build" = true ]; then
-	    create_builder $method
-	    $(get_command $method) $(get_build_subcommand $method $image)
-	fi
-
-	if [ "$with_push" = true -a "$remote" != "$image" ]; then
-	    $method login $IMAGE_REMOTE_BASE_URL
-	    $(get_command $method) tag $image $remote
-	    $(get_command $method) push $remote
-	fi
+    if [ "$with_push" = true -a "$remote_image" != "$image" ]; then
+	$method_command login $IMAGE_REMOTE_BASE_URL
+	$method_command tag $image $remote_image
+	$method_command push $remote_image
     fi
 )
 
@@ -82,20 +76,6 @@ create_builder() {
     esac
 }
 
-get_buildah_bud_options() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    capabilities=$(get_default_capabilities "$1")
-
-    if [ -n "$capabilities" ]; then
-	printf -- "--cap-add=%s\n" $capabilities
-    fi
-}
-
-get_docker_buildx_options() {
-    printf -- "--allow=security.insecure"
-}
-
 get_build_subcommand() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
@@ -118,6 +98,16 @@ get_build_subcommand() {
 	    printf "%s\n" build -t "$2" .
 	    ;;
     esac
+}
+
+get_buildah_bud_options() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    capabilities=$(get_default_capabilities "$1")
+
+    if [ -n "$capabilities" ]; then
+	printf -- "--cap-add=%s\n" $capabilities
+    fi
 }
 
 get_command() {
@@ -166,6 +156,10 @@ get_default_method() {
     esac
 }
 
+get_docker_buildx_options() {
+    printf -- "--allow=security.insecure"
+}
+
 get_dockerfiles() {
     dir_prefix=$(get_image_dir_prefix)
     dir_root=$(get_image_dir_root)
@@ -178,6 +172,12 @@ get_image_dir_prefix() {
 
 get_image_dir_root() {
     printf "%s\n" "$(get_realpath "${IMAGE_DIR_ROOT-$HOME}")"
+}
+
+get_image_method() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf "%s\n" "${method:-$(get_default_method "$1")}"
 }
 
 get_image_name() {
