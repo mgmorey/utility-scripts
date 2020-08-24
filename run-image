@@ -89,7 +89,7 @@ get_remote_image_name() {
 	       "${image#*/}" \
 	       "${tag:+:$tag}"
     else
-	printf "%s%s\n"
+	printf "%s%s\n" \
 	       "${image#*/}" \
 	       "${tag:+:$tag}"
     fi
