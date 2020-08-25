@@ -414,16 +414,7 @@ usage_error() {
 
 validate_platform() {
     case "$ID" in
-	(debian|raspbian)
-	    return
-	    ;;
-	(fedora)
-	    return
-	    ;;
-	(opensuse-*)
-	    return
-	    ;;
-	(rhel|centos)
+	(centos)
             case "$VERSION_ID" in
                 (8)
 		    return
@@ -433,7 +424,29 @@ validate_platform() {
 		    ;;
             esac
 	    ;;
+	(debian|raspbian)
+	    return
+	    ;;
+	(fedora)
+	    return
+	    ;;
+	(opensuse-*)
+	    return
+	    ;;
+	(rhel|el)
+            case "$VERSION_ID" in
+                (8.*)
+		    return
+		    ;;
+                (*)
+		    abort_not_supported Release
+		    ;;
+            esac
+	    ;;
 	(freebsd)
+	    return
+	    ;;
+	(illumos)
 	    return
 	    ;;
 	(netbsd)
