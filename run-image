@@ -87,20 +87,6 @@ get_image_name() {
 	-e 's/\.0$//'
 }
 
-get_remote_image_name() {
-    if [ "$is_remote" = true ]; then
-	printf "%s%s%s%s\n" \
-	       "${IMAGE_REMOTE_BASE_URL:+${IMAGE_REMOTE_BASE_URL#*//}/}" \
-	       "${IMAGE_REMOTE_DIR:+$IMAGE_REMOTE_DIR/}" \
-	       "${image#*/}" \
-	       "${tag:+:$tag}"
-    else
-	printf "%s%s\n" \
-	       "${image#*/}" \
-	       "${tag:+:$tag}"
-    fi
-}
-
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -117,6 +103,20 @@ get_realpath() (
 	done
     fi
 )
+
+get_remote_image_name() {
+    if [ "$is_remote" = true ]; then
+	printf "%s%s%s%s\n" \
+	       "${IMAGE_REMOTE_BASE_URL:+${IMAGE_REMOTE_BASE_URL#*//}/}" \
+	       "${IMAGE_REMOTE_DIR:+$IMAGE_REMOTE_DIR/}" \
+	       "${image#*/}" \
+	       "${tag:+:$tag}"
+    else
+	printf "%s%s\n" \
+	       "${image#*/}" \
+	       "${tag:+:$tag}"
+    fi
+}
 
 parse_arguments() {
     command=sh
