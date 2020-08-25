@@ -87,6 +87,24 @@ get_image_name() {
 	-e 's/\.0$//'
 }
 
+get_image_run_options() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+
+    case "$1" in
+	(docker)
+	    case "$2" in
+		(*-ibm-db2-*)
+		    options="${options:+--privileged }$options"
+		    ;;
+	    esac
+	    ;;
+    esac
+
+    printf "%s\n" $options
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -212,7 +230,9 @@ run_image() {
 	    $image_method rm $container
 	    ;;
 	(*)
-	    $image_method run $options $remote_image
+	    $image_method run \
+			  $(get_image_run_options $method $image) \
+			  $remote_image
 	    ;;
     esac
 }
