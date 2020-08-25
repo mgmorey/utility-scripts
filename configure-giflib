@@ -48,15 +48,16 @@ assert() {
 configure_giflib() {
     validate_platform
     parse_arguments "$@"
-    basename=giflib-$GIFLIB_VERSION
-
     archive_dir="$HOME/Downloads/GIFLIB"
-    src_dir="$HOME/Documents/src/giflib/$basename"
-
+    basename=giflib-$GIFLIB_VERSION
     filename=$basename.tar.gz
-
     pathname=$archive_dir/$filename
 
+    if [ ! -f $pathname ]; then
+	abort "%s: %s: No such archive file\n" "$0" "$pathname"
+    fi
+
+    src_dir="$HOME/Documents/src/giflib/$basename"
     mkdir -p "$(dirname "$src_dir")"
     extract_files
 }
@@ -132,14 +133,34 @@ usage_error() {
 }
 
 validate_platform() {
-    case "$id" in
+    case "$ID" in
+	(centos)
+            case "$VERSION_ID" in
+                (8)
+		    return
+		    ;;
+                (*)
+		    abort_not_supported Release
+		    ;;
+            esac
+	    ;;
 	(debian|raspbian)
 	    return
 	    ;;
 	(opensuse-*)
 	    return
 	    ;;
-	(rhel|centos|fedora)
+	(rhel|el)
+            case "$VERSION_ID" in
+                (8.*)
+		    return
+		    ;;
+                (*)
+		    abort_not_supported Release
+		    ;;
+            esac
+	    ;;
+	(illumos)
 	    return
 	    ;;
 	(freebsd)
