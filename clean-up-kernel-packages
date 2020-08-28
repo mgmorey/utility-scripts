@@ -45,11 +45,19 @@ clean_up_kernel_dumps() {
 
 clean_up_kernel_packages() {
     validate_platform
-    packages=$(get_kernel_packages)
 
-    if [ -n "$packages" ]; then
-	"${script_prefix}uninstall-packages" $packages
-    fi
+    case "$ID" in
+	(centos|fedora|ol|rhel)
+	    package-cleanup --oldkernels --count=1
+	    ;;
+	(*)
+	    packages=$(get_kernel_packages)
+
+	    if [ -n "$packages" ]; then
+		"${script_prefix}uninstall-packages" $packages
+	    fi
+	    ;;
+    esac
 }
 
 get_installed_kernel_packages() {
