@@ -71,7 +71,7 @@ get_configuration_basename() {
 		esac
 		;;
 	    (freebsd)
-		basename=$ID-$VERSION_ID
+		basename=$ID-${VERSION_ID%-p*}
 		;;
 	    (macos)
 		basename=$ID-${VERSION_ID%.*}
