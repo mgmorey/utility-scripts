@@ -105,6 +105,9 @@ get_http_client_packages() {
 	(freebsd)
 	    packages=$FREEBSD_PKGS
 	    ;;
+	(illumos)
+	    packages=$SOLARIS_PKGS
+	    ;;
 	(netbsd)
 	    packages=$NETBSD_PKGS
 	    ;;
