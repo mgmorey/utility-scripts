@@ -73,9 +73,6 @@ get_configuration_filename() {
 	    (freebsd)
 		basename=$ID-$VERSION_ID
 		;;
-	    (illumos)
-		basename=$ID
-		;;
 	    (macos)
 		basename=$ID-${VERSION_ID%.*}
 		;;
