@@ -29,7 +29,7 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_configuration_filename() {
+get_configuration_basename() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (centos)
@@ -93,12 +93,13 @@ get_configuration_filename() {
     done
 
     if [ -n "${basename-}" ]; then
-	printf "%s%s\n" "$script_prefix" "$basename.ini"
+	printf "%s\n" "$basename.ini"
     fi
 }
 
 get_os_configuration() {
-    filename=$(get_configuration_filename)
+    basename=$(get_configuration_basename | to_lower)
+    filename="$script_prefix$basename"
 
     if [ -n "$filename" -a -r "$filename" ]; then
 	get-configuration --extended $filename
@@ -147,6 +148,10 @@ parse_arguments() {
     done
 
     shift $(($OPTIND - 1))
+}
+
+to_lower() {
+    tr '[:upper:]' '[:lower:]'
 }
 
 usage() {
