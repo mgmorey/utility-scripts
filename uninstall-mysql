@@ -48,8 +48,7 @@ get_realpath() (
 
 uninstall_mysql() {
     validate_platform
-    packages=$(get-mysql-packages client server)
-    uninstall-packages $packages
+    uninstall-packages $(get-mysql-packages client server)
 }
 
 validate_platform() {

@@ -56,8 +56,7 @@ get_realpath() (
 
 install_pip() {
     validate_platform
-    packages=$(get_packages)
-    "${script_prefix}install-packages" $packages
+    "${script_prefix}install-packages" $(get_packages)
 }
 
 validate_platform() {

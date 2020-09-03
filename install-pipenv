@@ -75,8 +75,7 @@ install_dependencies() {
 	    ;;
     esac
 
-    packages=$(get_packages)
-    "${script_prefix}install-packages" $packages
+    "${script_prefix}install-packages" $(get_packages)
 }
 
 install_pipenv() {

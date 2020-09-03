@@ -48,8 +48,7 @@ get_realpath() (
 
 install_odbc() {
     validate_platform
-    packages="$(get-odbc-packages)"
-    install-packages $packages
+    install-packages $(get-odbc-packages)
 }
 
 usage_error() {

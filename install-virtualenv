@@ -48,11 +48,7 @@ get_realpath() (
 
 install_pip() {
     validate_platform
-    packages=$(get-python-virtualenv-packages)
-
-    if [ -n "$packages" ]; then
-	install-packages $packages
-    fi
+    install-packages $(get-python-virtualenv-packages)
 }
 
 validate_platform() {

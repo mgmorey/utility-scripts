@@ -48,8 +48,7 @@ get_realpath() (
 
 install_mysql() {
     validate_platform
-    packages=$(get-mysql-packages "$@")
-    install-packages $packages
+    install-packages $(get-mysql-packages "$@")
 }
 
 validate_platform() {

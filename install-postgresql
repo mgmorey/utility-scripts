@@ -48,8 +48,7 @@ get_realpath() (
 
 install_postgresql() {
     validate_platform
-    packages=$(get-postgresql-packages "$@")
-    install-packages $packages
+    install-packages $(get-postgresql-packages "$@")
 }
 
 validate_platform() {

@@ -48,8 +48,7 @@ get_realpath() (
 
 install_nodejs() {
     validate_platform
-    packages=$(get-nodejs-packages)
-    install-packages $packages
+    install-packages $(get-nodejs-packages)
 }
 
 usage_error() {
