@@ -18,7 +18,7 @@
 
 DEBIAN_PKGS="containerd.io docker-ce docker-ce-cli"
 
-FEDORA_PKGS="containerd.io docker-ce docker-ce-cli"
+FEDORA_PKGS="container-selinux containerd docker-ce docker-ce-cli"
 
 REDHAT_7_PKGS="container-selinux containerd docker-ce docker-ce-cli"
 REDHAT_8_PKGS="container-selinux containerd docker-ce docker-ce-cli"
