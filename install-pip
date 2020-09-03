@@ -32,7 +32,7 @@ assert() {
 }
 
 get_packages() {
-    "${script_prefix}get-packages" $CATEGORIES | sort -u
+    "${script_prefix}get-packages" $CATEGORIES
 }
 
 get_realpath() (
