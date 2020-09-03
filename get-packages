@@ -30,7 +30,7 @@ assert() {
 }
 
 get_os_configuration() {
-    ${script_prefix}get-os-configuration -i $ID -l "$ID_LIKE" -v $VERSION_ID
+    "${script_prefix}get-os-configuration" -i $ID -l "$ID_LIKE" -v $VERSION_ID
 }
 
 get_packages() {
