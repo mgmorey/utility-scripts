@@ -39,12 +39,12 @@ MACOS_HOMEBREW_PKGS="bzip2 gdbm gettext libffi ncurses openssl readline sqlite x
 NETBSD_PKGS="bzip2 gdbm libffi lzma ncurses readline sqlite3"
 
 OPENSUSE_LP_PKGS="gdbm-devel libbz2-devel libffi-devel libopenssl-devel \
-lzma-sdk-devel ncurses-devel pcre-devel python3-devel readline-devel \
-sqlite3-devel uuid-devel zlib-devel"
+lzma-sdk-devel ncurses-devel pcre-devel readline-devel sqlite3-devel \
+uuid-devel zlib-devel"
 
 OPENSUSE_TW_PKGS="gdbm-devel libbz2-devel libffi-devel libopenssl-devel \
-lzma-sdk-devel ncurses-devel pcre-devel python38-devel readline-devel \
-sqlite3-devel uuid-devel zlib-devel"
+lzma-sdk-devel ncurses-devel pcre-devel readline-devel sqlite3-devel \
+uuid-devel zlib-devel"
 
 REDHAT_7_PKGS="bzip2-devel gdbm-devel libffi-devel libuuid-devel ncurses-devel \
 openssl-devel pcre-devel python3-devel readline-devel sqlite-devel xz-devel \
