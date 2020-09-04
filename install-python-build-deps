@@ -89,12 +89,12 @@ get_realpath() (
 
 install_python_build_deps() {
     validate_platform
-    packages="$(get-python-build-packages)"
-    pattern="$(get-development-pattern)"
-    install-packages ${pattern:+-p "$pattern" }$packages
+    packages=$("${script_prefix}get-packages" python-build)
+    pattern=$("${script_prefix}get-development-pattern")
+    "${script_prefix}install-packages" ${pattern:+-p "$pattern" }$packages
 
     if [ -n "${package:-}" ]; then
-	install-build-deps "$@" $package || true
+	"${script_prefix}install-build-deps" "$@" $package || true
     fi
 }
 
@@ -248,5 +248,5 @@ script_prefix=${script_dir:+$script_dir/}
 . "${script_prefix}common-functions.sh"
 
 set_user_profile "$script_dir"
-eval $(get-os-release -x)
+eval $("${script_prefix}get-os-release" -x)
 install_python_build_deps "$@"
