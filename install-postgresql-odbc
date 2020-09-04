@@ -49,8 +49,7 @@ configure_platform() {
 }
 
 get_packages() {
-    (get-odbc-development-packages
-     get-postgresql-odbc-packages) | sort -u
+    "${script_prefix}get-packages" odbc-development postgresql-odbc
 }
 
 get_realpath() (
@@ -85,8 +84,9 @@ EOF
 install_postgresql_odbc() {
     validate_platform
     configure_platform
-    if install-pgdg; then
-	install-packages $(get_packages)
+
+    if "${script_prefix}install-pgdg"; then
+	"${script_prefix}install-packages" $(get_packages)
 	postinstall_platform
     fi
 }
@@ -176,6 +176,5 @@ script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
 
-set_user_profile "$script_dir"
-eval $(get-os-release -x)
+eval $("${script_prefix}get-os-release" -x)
 install_postgresql_odbc
