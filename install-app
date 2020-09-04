@@ -108,10 +108,8 @@ generate_service_ini() {
     install_file 644 "$inifile" $1
 }
 
-get_packages_in() {
-    for category; do
-	get-$category-packages
-    done
+get_packages() {
+    get-packages $CATEGORIES
 }
 
 get_realpath() (
@@ -201,7 +199,7 @@ install_uwsgi_from_package() (
 
     case "$UWSGI_ORIGIN" in
 	(distro|pkgsrc|pypi)
-	    install-packages $(get_packages_in $CATEGORIES | sort -u)
+	    install-packages $(get_packages)
 	    ;;
     esac
 
