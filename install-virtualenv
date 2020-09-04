@@ -29,6 +29,10 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+get_packages() {
+    "${script_prefix}get-packages" python-virtualenv
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath)
@@ -48,7 +52,7 @@ get_realpath() (
 
 install_pip() {
     validate_platform
-    install-packages $(get-python-virtualenv-packages)
+    "${script_prefix}install-packages" $(get_packages)
 }
 
 validate_platform() {
@@ -143,6 +147,5 @@ script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
 
-set_user_profile "$script_dir"
-eval $(get-os-release -x)
+eval $("${script_prefix}get-os-release" -x)
 install_pip "$@"
