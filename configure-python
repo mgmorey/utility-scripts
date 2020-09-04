@@ -253,8 +253,7 @@ get_linker_flags() {
 }
 
 get_packages() {
-    get-bootstrap-packages
-    get-python-build-packages
+    get-packages bootstrap python-build
 }
 
 get_pkg_config_path() {
