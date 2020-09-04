@@ -26,13 +26,7 @@ assert() {
 }
 
 get_mysql_packages() {
-    get_packages_in $categories | sort -u
-}
-
-get_packages_in() {
-    for category; do
-	get-mysql-$category-packages
-    done
+    "${script_prefix}get-packages" $categories
 }
 
 get_realpath() (
@@ -58,16 +52,16 @@ parse_arguments() {
     for arg; do
 	case $arg in
 	    (all)
-		categories="client python server"
+		categories="mysql-client mysql-server python-mysql"
 		;;
 	    (client)
-		categories="${categories+$categories client}"
+		categories="${categories+$categories mysql-client}"
 		;;
 	    (python)
-		categories="${categories+$categories python}"
+		categories="${categories+$categories python-mysql}"
 		;;
 	    (server)
-		categories="${categories+$categories server}"
+		categories="${categories+$categories mysql-server}"
 		;;
 	    (*)
 		abort "%s: %s -- invalid argument\n" "$0" "$arg"
@@ -92,6 +86,5 @@ script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
 
-set_user_profile "$script_dir"
 parse_arguments "$@"
 get_mysql_packages
