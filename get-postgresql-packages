@@ -29,13 +29,7 @@ assert() {
 }
 
 get_postgresql_packages() {
-    get_packages_in $categories | sort -u
-}
-
-get_packages_in() {
-    for category; do
-	get-$category-packages
-    done
+    "${script_prefix}get-packages" $categories
 }
 
 get_realpath() (
