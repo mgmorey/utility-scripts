@@ -98,6 +98,5 @@ script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
 
-set_user_profile "$script_dir"
 parse_arguments "$@"
 get_postgresql_packages
