@@ -62,12 +62,12 @@ configure_platform() {
 install_python_development_tools() {
     validate_platform
     configure_platform
-    packages="$(get-python-development-packages)"
-    pattern="$(get-development-pattern)"
+    packages=$("${script_prefix}get-packages" python-development)
+    pattern=$("${script_prefix}get-development-pattern")
     install-packages ${pattern:+-p "$pattern" }$packages
 
     if [ -n "${package:-}" ]; then
-	install-build-deps "$@" $package
+	"${script_prefix}install-build-deps" "$@" $package
     fi
 }
 
@@ -174,5 +174,5 @@ script_prefix=${script_dir:+$script_dir/}
 . "${script_prefix}common-functions.sh"
 
 set_user_profile "$script_dir"
-eval $(get-os-release -x)
+eval $("${script_prefix}get-os-release" -x)
 install_python_development_tools "$@"
