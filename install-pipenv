@@ -30,7 +30,7 @@ assert() {
 }
 
 get_packages() {
-    "${script_prefix}get-packages" $CATEGORIES
+    get-packages $CATEGORIES
 }
 
 get_pip_options() {
@@ -73,7 +73,7 @@ install_dependencies() {
 	    ;;
     esac
 
-    "${script_prefix}install-packages" $(get_packages)
+    install-packages $(get_packages)
 }
 
 install_pipenv() {
@@ -81,11 +81,11 @@ install_pipenv() {
 }
 
 pip_install() {
-    "${script_prefix}run-python" -m pip install "$@"
+    run-python -m pip install "$@"
 }
 
 pip_version() {
-    "${script_prefix}run-python" -m pip --version | awk '{print $2}'
+    run-python -m pip --version | awk '{print $2}'
 }
 
 case "$0" in
@@ -101,7 +101,8 @@ script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
 
-eval $("${script_prefix}get-os-release" -x)
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
 
 if [ "$(id -u)" -eq 0 ]; then
     install_dependencies
