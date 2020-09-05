@@ -75,7 +75,7 @@ get_target_dir() {
 	    printf "%s\n" /usr/local/bin
 	    ;;
 	(rhel|ol|centos)
-	    printf "%s\n" /usr/sbin
+	    printf "%s\n" /usr/local/bin
 	    ;;
 	(*)
 	    printf "%s\n" /usr/local/bin
