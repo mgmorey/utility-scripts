@@ -102,7 +102,7 @@ install_startup_files() (
 	git clone $(format_project_url "$(get_real_user)")
     fi
 
-    cd "$git_dir"
+    cd
 
     for file in $STARTUP_FILES; do
 	if is_to_be_installed $file; then
