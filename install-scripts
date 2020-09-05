@@ -91,7 +91,8 @@ get_script_files() {
 	 -maxdepth 1 \
 	 ! -name LICENSE \
 	 ! -name README \
-	 ! -name install-root-scripts \
+	 ! -name get-python-interpreter \
+	 ! -name run-python \
 	 ! -name "$(basename "$0")" \
 	 ! -name '*.*' \
 	 ! -name '*~' \
