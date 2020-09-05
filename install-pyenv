@@ -75,7 +75,7 @@ configure_platform() {
 }
 
 get_packages() {
-    "${script_prefix}get-packages" $CATEGORIES
+    get-packages $CATEGORIES
 }
 
 get_realpath() (
@@ -105,11 +105,11 @@ install_dependencies() {
     done
 
     packages=$(get_packages)
-    pattern=$("${script_prefix}get-development-pattern")
-    "${script_prefix}install-packages" ${pattern:+-p "$pattern" }$packages
+    pattern=$(get-development-pattern)
+    install-packages ${pattern:+-p "$pattern" }$packages
 
     if [ -n "${package:-}" -a "$(id -u)" -eq 0 ]; then
-	"${script_prefix}install-build-deps" "$@" $package || true
+	install-build-deps "$@" $package || true
     fi
 }
 
@@ -268,7 +268,8 @@ script_prefix=${script_dir:+$script_dir/}
 . "${script_prefix}common-functions.sh"
 . "${script_prefix}utility-functions.sh"
 
-eval $("${script_prefix}get-os-release" -x)
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
 validate_platform
 configure_platform
 
