@@ -143,9 +143,6 @@ configure_baseline() {
 	    configure_unix_bsd
 
 	    case "$VERSION_ID" in
-		(10.14.*)
-		    configure_unix_macos
-		    ;;
 		(10.15.*)
 		    configure_unix_macos
 		    ;;
@@ -223,12 +220,12 @@ configure_baseline() {
 
     # Set application group and user accounts
 
-    if [ -z "${APP_GID-}" ]; then
-	APP_GID=uwsgi
-    fi
-
     if [ -z "${APP_UID-}" ]; then
 	APP_UID=uwsgi
+    fi
+
+    if [ -z "${APP_GID-}" ]; then
+	APP_GID=uwsgi
     fi
 
     # Set application directories from APP_NAME and APP_PREFIX
@@ -389,8 +386,8 @@ configure_linux_centos_8() {
 
 configure_linux_debian() {
     # Set application group and user accounts
-    APP_GID=www-data
     APP_UID=www-data
+    APP_GID=www-data
 
     # Set additional file/directory parameters
     APP_LOGDIR=/var/log/uwsgi/app
@@ -430,8 +427,8 @@ configure_linux_fedora_32() {
 
 configure_linux_opensuse() {
     # Set application group and user accounts
-    APP_GID=nogroup
     APP_UID=nobody
+    APP_GID=nogroup
 
     # Set uWSGI configuration directories
     UWSGI_APPDIRS=vassals
@@ -457,8 +454,8 @@ configure_linux_opensuse_tw() {
 
 configure_linux_redhat() {
     # Set application group and user accounts
-    APP_GID=nobody
     APP_UID=nobody
+    APP_GID=nobody
 }
 
 configure_linux_redhat_8() {
@@ -523,8 +520,8 @@ configure_unix_freebsd_12() {
 
 configure_unix_illumos() {
     # Set application group and user accounts
-    APP_GID=webservd
     APP_UID=webservd
+    APP_GID=webservd
 
     # Set system Python interpreter
     SYSTEM_PYTHON=/opt/local/bin/python3.7
@@ -541,8 +538,8 @@ configure_unix_illumos() {
 
 configure_unix_macos() {
     # Set application group and user accounts
-    APP_GID=_www
-    APP_UID=_www
+    APP_UID=${SUDO_USER:-$USER}
+    APP_GID=$(id -ng $APP_UID)
 
     # Set application prefix
     APP_PREFIX=/usr/local
@@ -560,8 +557,8 @@ configure_unix_macos() {
 
 configure_unix_netbsd() {
     # Set application group and user accounts
-    APP_GID=www
     APP_UID=www
+    APP_GID=www
 
     # Set system Python interpreter
     SYSTEM_PYTHON=/usr/pkg/bin/python3.7
@@ -578,8 +575,8 @@ configure_unix_netbsd() {
 
 configure_unix_solaris() {
     # Set application group and user accounts
-    APP_GID=webservd
     APP_UID=webservd
+    APP_GID=webservd
 
     # Set uWSGI parameters
     configure_from_source
