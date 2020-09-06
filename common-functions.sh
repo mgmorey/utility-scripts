@@ -132,6 +132,20 @@ get_gnu_install_command() {
     printf "%s\n" install
 }
 
+get_group() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "${kernel_name=$(uname -s)}" in
+	(MINGW64_NT-*)
+	    true
+	    ;;
+	(*)
+	    id -ng $1
+	    ;;
+    esac
+}
+
 get_group_id() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
@@ -140,11 +154,25 @@ get_group_id() {
 	(MINGW64_NT-*)
 	    true
 	    ;;
+	(*)
+	    id -g $1
+	    ;;
+    esac
+}
+
+get_home() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "${kernel_name=$(uname -s)}" in
+	(MINGW64_NT-*)
+	    printf "/c/Users/%s\n" $1
+	    ;;
 	(Darwin)
-	    true
+	    printf "/Users/%s\n" $1
 	    ;;
 	(*)
-	    get_field passwd $1 4
+	    get_field passwd $1 6
 	    ;;
     esac
 }
@@ -197,52 +225,6 @@ get_setpriv_options() (
     printf -- "%s\n" "--init-groups --reset-env --reuid $reuid --regid $regid"
 )
 
-get_su_command() (
-    case "${kernel_name=$(uname -s)}" in
-	(GNU|Linux)
-	    if get_setpriv_command; then
-		return
-	    fi
-	    ;;
-    esac
-
-    printf "%s\n" su
-)
-
-get_home() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-
-    case "${kernel_name=$(uname -s)}" in
-	(MINGW64_NT-*)
-	    printf "/c/Users/%s\n" $1
-	    ;;
-	(Darwin)
-	    printf "/Users/%s\n" $1
-	    ;;
-	(*)
-	    get_field passwd $1 6
-	    ;;
-    esac
-}
-
-get_user_id() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-
-    case "${kernel_name=$(uname -s)}" in
-	(MINGW64_NT-*)
-	    true
-	    ;;
-	(Darwin)
-	    true
-	    ;;
-	(*)
-	    get_field passwd $1 3
-	    ;;
-    esac
-}
-
 get_shell() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
@@ -256,6 +238,32 @@ get_shell() {
 	    ;;
 	(*)
 	    get_field passwd $1 7
+	    ;;
+    esac
+}
+
+get_su_command() (
+    case "${kernel_name=$(uname -s)}" in
+	(GNU|Linux)
+	    if get_setpriv_command; then
+		return
+	    fi
+	    ;;
+    esac
+
+    printf "%s\n" su
+)
+
+get_user_id() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "${kernel_name=$(uname -s)}" in
+	(MINGW64_NT-*)
+	    true
+	    ;;
+	(*)
+	    id -u $1
 	    ;;
     esac
 }
