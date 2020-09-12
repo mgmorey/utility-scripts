@@ -47,7 +47,7 @@ change_owner() (
 	check_permissions $dirs
     else
 	printf "Changing ownership of directory %s\n" $dirs
-	chown -R $APP_UID:$APP_GID $dirs
+	chown -R "$APP_UID:$APP_GID" $dirs
     fi
 )
 
