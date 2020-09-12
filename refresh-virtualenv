@@ -113,6 +113,10 @@ refresh_virtualenv() (
 
 		if refresh_via_pipenv $pipenv; then
 		    if generate_requirements $pipenv $PIP_INSTALL_ALL; then
+			user=$(get_real_user)
+			group=$(get_group "$user")
+			chown "$user:$group" $PIP_INSTALL_ALL
+
 			if $pipenv sync --dev; then
 			    return 0
 			fi
