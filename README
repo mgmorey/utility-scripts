@@ -15,8 +15,6 @@ This project has been tested on the following platforms:
 +-----------+---------------+-------------------------------+
 | GNU/Linux | openSUSE      | Tumbleweed 20200901 (x86_64)  |
 +-----------+---------------+-------------------------------+
-| GNU/Linux | Oracle Linux  | 8.2 (x86_64)                  |
-+-----------+---------------+-------------------------------+
 | GNU/Linux | Raspbian      | 10 (armhf)                    |
 +-----------+---------------+-------------------------------+
 | GNU/Linux | Red Hat       | Enterprise Linux 8.2 (x86_64) |
