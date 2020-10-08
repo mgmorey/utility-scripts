@@ -397,7 +397,7 @@ configure_linux_debian() {
     APP_PIDFILE=$APP_RUNDIR/pid
     APP_SOCKET=$APP_RUNDIR/socket
 
-    # Set uWSGI configuration directories
+    # Set uWSGI app configuration directories
     UWSGI_APPDIRS="apps-available apps-enabled"
 }
 
@@ -413,7 +413,7 @@ configure_linux_fedora() {
     # Set uWSGI configuration directory
     UWSGI_ETCDIR=/etc
 
-    # Set uWSGI app configuration directory
+    # Set uWSGI app configuration directories
     UWSGI_APPDIRS=uwsgi.d
 
     # Set uWSGI binary/plugin directories
@@ -546,6 +546,12 @@ configure_unix_macos() {
 
     # Set system Python interpreter
     SYSTEM_PYTHON=/usr/local/bin/python3
+
+    # Set uWSGI configuration directory
+    UWSGI_ETCDIR=/usr/local/etc/uwsgi
+
+    # Set uWSGI app configuration directories
+    UWSGI_APPDIRS=apps-enabled
 
     # Set uWSGI binary/plugin directories
     UWSGI_BINARY_DIR=/usr/local/bin
