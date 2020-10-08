@@ -53,7 +53,7 @@ control_app() {
 	    control_app_via_launchd $1
 	    ;;
 	(*)
-	    control_app_via_systemd $1
+	    control_app_via_symlinks $1
 	    ;;
     esac
 }
@@ -110,7 +110,7 @@ control_app_via_launchd() {
     esac
 }
 
-control_app_via_systemd() {
+control_app_via_symlinks() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
