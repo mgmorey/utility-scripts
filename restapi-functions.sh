@@ -50,7 +50,7 @@ control_app() {
 
     case "${kernel_name=$(uname -s)}" in
 	(Darwin)
-	    control_app_via_launchd $1
+	    control_app_via_symlinks $1
 	    ;;
 	(*)
 	    control_app_via_symlinks $1
@@ -136,10 +136,33 @@ control_service() {
 
     case "${kernel_name=$(uname -s)}" in
 	(Darwin)
-	    :
+	    control_service_via_homebrew $1 $2
 	    ;;
 	(*)
 	    control_service_via_systemd $1 $2
+	    ;;
+    esac
+}
+
+control_service_via_homebrew() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+
+    if [ $dryrun = true ]; then
+	return 0
+    fi
+
+    case $1 in
+	(disable)
+	    brew services stop $2
+	    ;;
+	(enable)
+	    brew services start $2
+	    ;;
+	(restart)
+	    brew services stop $2
+	    brew services start $2
 	    ;;
     esac
 }
@@ -154,7 +177,7 @@ control_service_via_systemd() {
     fi
 
     case $1 in
-	(enable|disable|restart)
+	(disable|enable|restart)
 	    systemctl $1 $2
 	    ;;
     esac
