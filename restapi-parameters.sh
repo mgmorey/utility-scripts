@@ -80,6 +80,9 @@ configure_baseline() {
 			(32)
 			    configure_linux_fedora_32
 			    ;;
+			(33)
+			    configure_linux_fedora_33
+			    ;;
 			(*)
 			    abort_not_supported Release
 			    ;;
@@ -422,6 +425,10 @@ configure_linux_fedora() {
 }
 
 configure_linux_fedora_32() {
+    configure_linux_fedora
+}
+
+configure_linux_fedora_33() {
     configure_linux_fedora
 }
 
