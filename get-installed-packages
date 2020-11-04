@@ -66,7 +66,7 @@ get_packages_using() {
 	    dpkg-query -Wf '${Status} ${Package}\n' | awk "$DPKG_AWK"
 	    ;;
 	(brew)
-	    run_unpriv /bin/sh -c "$1 list -1"
+	    run_unpriv /bin/sh -c "$1 list --formula"
 	    ;;
 	(dnf|yum|zypper)
 	    if [ $is_full = true ]; then
