@@ -164,6 +164,9 @@ configure_baseline() {
 		(12.1-*)
 		    configure_unix_freebsd_12
 		    ;;
+		(12.2-*)
+		    configure_unix_freebsd_12
+		    ;;
 		(*)
 		    abort_not_supported Release
 		    ;;
