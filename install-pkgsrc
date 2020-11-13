@@ -102,6 +102,9 @@ install_pkgsrc() {
 		(10.15.*)
 		    key=DARWIN
 		    ;;
+		(11.0.*)
+		    key=DARWIN
+		    ;;
 		(*)
 		    abort_not_supported Release
 		    ;;
