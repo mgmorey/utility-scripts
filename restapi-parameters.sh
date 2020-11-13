@@ -146,6 +146,9 @@ configure_baseline() {
 	    configure_unix_bsd
 
 	    case "$VERSION_ID" in
+		(10.14.*)
+		    configure_unix_macos_10_14
+		    ;;
 		(10.15.*)
 		    configure_unix_macos_10_15
 		    ;;
@@ -572,6 +575,10 @@ configure_unix_macos() {
 
     # Set other uWSGI parameters
     UWSGI_ORIGIN=homebrew
+}
+
+configure_unix_macos_10_14() {
+    configure_unix_macos
 }
 
 configure_unix_macos_10_15() {
