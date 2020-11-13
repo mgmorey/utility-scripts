@@ -147,7 +147,10 @@ configure_baseline() {
 
 	    case "$VERSION_ID" in
 		(10.15.*)
-		    configure_unix_macos
+		    configure_unix_macos_10_15
+		    ;;
+		(11.0.*)
+		    configure_unix_macos_11_0
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -569,6 +572,14 @@ configure_unix_macos() {
 
     # Set other uWSGI parameters
     UWSGI_ORIGIN=homebrew
+}
+
+configure_unix_macos_10_15() {
+    configure_unix_macos
+}
+
+configure_unix_macos_11_0() {
+    configure_unix_macos
 }
 
 configure_unix_netbsd() {
