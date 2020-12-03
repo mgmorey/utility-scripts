@@ -92,6 +92,13 @@ get_package_install_options() {
 		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
+		    (7.*)
+			if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
+			    options="${options:+$options }-y"
+			fi
+
+			options="${options:+$options }--skip-broken"
+			;;
 		    (8.*)
 			if [ "${CONFIRM_PACKAGE_INSTALL:-false}" = false ]; then
 			    options="${options:+$options }-y"
