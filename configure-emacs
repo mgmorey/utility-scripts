@@ -107,15 +107,16 @@ configure_platform() {
     make=make
     prefix=$PREFIX
     with_cairo=
+    with_gif=
     with_gnutls=
     with_toolkit=
     with_widgets=
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (rhel)
+	    (rhel|ol)
                 case "$VERSION_ID" in
-                    (8)
+                   (8.*)
 		        configure_platform_linux_redhat_8
 		        break
 		        ;;
@@ -243,6 +244,12 @@ get_configure_options() {
 	options="${options:+$options }--without-cairo${cairo:+=$cairo}"
     fi
 
+    if [ "${with_gif-}" = true ]; then
+	options="${options:+$options }--with-gif${gif:+=$gif}"
+    elif [ "${with_gif-}" = false ]; then
+	options="${options:+$options }--without-gif${gif:+=$gif}"
+    fi
+
     if [ "${with_gnutls-}" = true ]; then
 	options="${options:+$options }--with-gnutls${gnutls:+=$gnutls}"
     elif [ "${with_gnutls-}" = false ]; then
@@ -333,13 +340,16 @@ include_prefix() {
 }
 
 parse_arguments() {
-    while getopts cfp:t:v:wh opt; do
+    while getopts cfnp:t:v:wh opt; do
 	case $opt in
 	    (c)
 		with_cairo=true
 		;;
 	    (f)
 		force=true
+		;;
+	    (n)
+		with_gif=false
 		;;
 	    (p)
 		case $OPTARG in
@@ -433,8 +443,11 @@ validate_platform() {
 	(opensuse-*)
 	    return
 	    ;;
-	(rhel|el)
+	(rhel|ol)
             case "$VERSION_ID" in
+                (7.*)
+		    return
+		    ;;
                 (8.*)
 		    return
 		    ;;
