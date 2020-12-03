@@ -150,8 +150,11 @@ validate_platform() {
 	(opensuse-*)
 	    return
 	    ;;
-	(rhel|el)
+	(rhel|ol)
             case "$VERSION_ID" in
+                (7.*)
+		    return
+		    ;;
                 (8.*)
 		    return
 		    ;;
