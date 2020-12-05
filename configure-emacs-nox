@@ -1,0 +1,498 @@
+#!/bin/sh -eu
+
+# configure-emacs-nox: download and configure Emacs
+# Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+BASE_URL=https://mirrors.ocf.berkeley.edu/gnu
+EMACS_VERSION=26.3
+
+LOCAL_PREFIX=/usr/local
+OPENCSW_PREFIX=/opt/csw
+PREFIX=/usr/local
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_invalid_prefix() {
+    usage_error "%s: invalid prefix -- %s\n" "$0" "$*"
+}
+
+abort_invalid_toolkit() {
+    usage_error "%s: invalid toolkit -- %s\n" "$0" "$*"
+}
+
+abort_invalid_version() {
+    usage_error "%s: invalid version -- %s\n" "$0" "$*"
+}
+
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+clean_build() {
+    if [ -r Makefile ]; then
+	$make distclean
+    fi
+}
+
+configure_compiler() {
+    if [ -n "${1-}" ]; then
+	cc="$(get_compiler $1)"
+	cflags="$(get_compiler_flags $1)"
+    fi
+
+    if [ -n "${2-}" ]; then
+	cppflags="$(get_include_flags "$2")"
+    fi
+
+    if [ -n "${3-}" ]; then
+	ldflags="$(get_linker_flags "$3")"
+    fi
+
+    pkg_config_path="$(get_pkg_config_path)"
+}
+
+configure_emacs() {
+    basename=emacs-$EMACS_VERSION
+
+    archive_dir="$HOME/Downloads/GNU"
+    build_dir="$HOME/Documents/build/$basename"
+    src_dir="$HOME/Documents/src/GNU/$basename"
+
+    command=$(get_configure_command $src_dir)
+    filename=$basename.tar.gz
+
+    pathname=$archive_dir/$filename
+
+    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
+    download_archive
+    extract_files
+    cd "$build_dir"
+
+    if [ "$force" = true ]; then
+	clean_build
+    elif [ ! -r config.status ]; then
+	true
+    else
+	exit 0
+    fi
+
+    printf "%s\n" "$command"
+    eval $command
+}
+
+configure_platform() {
+    install-packages $(get-bootstrap-packages)
+    emacs_version=$EMACS_VERSION
+    force=false
+    make=make
+    prefix=$PREFIX
+    with_cairo=false
+    with_gif=
+    with_gnutls=
+    with_toolkit=false
+    with_widgets=false
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (rhel|ol)
+                case "$VERSION_ID" in
+                   (8.*)
+		        configure_platform_linux_redhat_8
+		        break
+		        ;;
+                esac
+		;;
+	    (illumos)
+		configure_platform_unix_illumos
+		break
+		;;
+	    (netbsd)
+	    	configure_platform_bsd_netbsd
+	    	break
+	    	;;
+	    (solaris)
+		configure_platform_unix_solaris
+		break
+		;;
+	esac
+    done
+
+    if [ -n "${cc-}" ] && [ ! -x $cc ]; then
+	abort "%s: %s: No such compiler\n" "$0" "$cc"
+    fi
+
+    if [ -n "${libgif-}" ] && [ ! -x $libgif ]; then
+	abort "%s: %s: No such shared object\n" "$0" "$libgif"
+    fi
+}
+
+configure_platform_bsd_netbsd() {
+    make=gmake
+    with_gnutls=false
+    include_prefix /usr/pkg
+    configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
+    libgif="$libdir/libgif.so"
+}
+
+configure_platform_linux_redhat_8() {
+    include_prefix $LOCAL_PREFIX
+    configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
+    libgif="$libdir/libgif.so"
+}
+
+configure_platform_unix_illumos() {
+    include_prefix $LOCAL_PREFIX
+    configure_compiler "/usr/bin/gcc -m64" "${incdirs-}" "${libdirs-}"
+    libgif="$libdir/libgif.so"
+}
+
+configure_platform_unix_solaris() {
+    include_prefix $OPENCSW_PREFIX amd64
+    configure_compiler "/opt/developerstudio12.6/bin/cc -m64" "${incdirs-}" "${libdirs-}"
+    libgif="$libdir/libgif.so"
+}
+
+download_archive() {
+    url=$BASE_URL/emacs/$filename
+
+    if [ ! -r "$pathname" ]; then
+	cd "$archive_dir"
+	wget $url
+    fi
+
+}
+
+extract_files() {
+    if [ ! -r "$src_dir/configure" ]; then
+	cd "$(dirname "$src_dir")"
+
+	case "$pathname" in
+	    (*.tar.gz)
+		gzip -dc "$pathname" | tar -xvf -
+		;;
+	    (*.tar.xz)
+		xz -dc "$pathname" | tar -xvf -
+		;;
+	esac
+    fi
+}
+
+get_compiler() {
+    printf "%s\n" "$1"
+}
+
+get_compiler_flags() {
+    shift
+    printf "%s\n" "$*"
+}
+
+get_configure_command() {
+    options=$(get_configure_options)
+    printf '%s' "$1/configure"
+
+    if [ -n "${options-}" ]; then
+	printf ' %s' "$options"
+    fi
+
+    if [ -n "${cc-}" ]; then
+	printf ' CC=\"%s\"' "${cc-}"
+    fi
+
+    if [ -n "${cflags-}" ]; then
+	printf ' CFLAGS=\"%s\"' "${cflags-}"
+    fi
+
+    if [ -n "${cppflags-}" ]; then
+	printf ' CPPFLAGS=\"%s\"' "${cppflags-}"
+    fi
+
+    if [ -n "${ldflags-}" ]; then
+	printf ' LDFLAGS=\"%s\"' "${ldflags-}"
+    fi
+
+    if [ -n "${pkg_config_path-}" ]; then
+	printf ' PKG_CONFIG_PATH=\"%s\"' "${pkg_config_path-}"
+    fi
+
+    printf '\n'
+}
+
+get_configure_options() {
+    if [ "${with_cairo-}" = true ]; then
+	options="${options:+$options }--with-cairo${cairo:+=$cairo}"
+    elif [ "${with_cairo-}" = false ]; then
+	options="${options:+$options }--without-cairo${cairo:+=$cairo}"
+    fi
+
+    if [ "${with_gif-}" = true ]; then
+	options="${options:+$options }--with-gif${gif:+=$gif}"
+    elif [ "${with_gif-}" = false ]; then
+	options="${options:+$options }--without-gif${gif:+=$gif}"
+    fi
+
+    if [ "${with_gnutls-}" = true ]; then
+	options="${options:+$options }--with-gnutls${gnutls:+=$gnutls}"
+    elif [ "${with_gnutls-}" = false ]; then
+	options="${options:+$options }--without-gnutls${gnutls:+=$gnutls}"
+    fi
+
+    if [ "${with_toolkit-}" = true ]; then
+	options="${options:+$options }--with-x-toolkit${toolkit:+=$toolkit}"
+    elif [ "${with_toolkit-}" = false ]; then
+	options="${options:+$options }--with-x-toolkit=no"
+    fi
+
+    if [ "${with_widgets-}" = true ]; then
+	options="${options:+$options }--with-xwidgets${widgets:+=$widgets}"
+    elif [ "${with_widgets-}" = false ]; then
+	options="${options:+$options }--without-xwidgets${widgets:+=$widgets}"
+    fi
+
+    if [ -n "${options:-}" ]; then
+	printf "%s\n" "$options"
+    fi
+}
+
+get_include_flags() {
+    assert [ $# -ge 1 ]
+    printf -- "-I%s\n" "$@"
+}
+
+get_linker_flags() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    ldflags=
+
+    for libdir; do
+	case "$os_family" in
+	    (gnu-*)
+		ldflags="-Wl,--rpath=$libdir"
+		;;
+	    (unix)
+		ldflags="-L$libdir -R$libdir"
+		;;
+	esac
+    done
+
+    if [ "${ldflags-}" ]; then
+	printf "%s\n" "$ldflags"
+    fi
+}
+
+get_pkg_config_path() {
+    for pkgdir in ${pkgdirs-}; do
+	pkg_config_path=${pkg_config_path+$pkg_config_path:}$pkgdir
+    done
+
+    if [ "${pkg_config_path-}" ]; then
+	printf "%s\n" "$pkg_config_path"
+    fi
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+include_prefix() {
+    assert [ $# -ge 1 -a $# -le 2 ]
+    assert [ -n "$1" ]
+    incdir="$1/include"
+    libdir="$1/lib${2+/$2}"
+    incdirs="${incdirs+$incdirs }$incdir"
+    libdirs="${libdirs+$libdirs }$libdir"
+
+    if [ -d "$libdir/pkgconfig" ]; then
+	pkgdirs="${pkgdirs+$pkgdirs }$libdir/pkgconfig"
+    fi
+}
+
+parse_arguments() {
+    while getopts cfnp:t:v:wh opt; do
+	case $opt in
+	    (c)
+		with_cairo=true
+		;;
+	    (f)
+		force=true
+		;;
+	    (n)
+		with_gif=false
+		;;
+	    (p)
+		case $OPTARG in
+		    ($HOME|/opt/*|/usr|/usr/local)
+			if [ -d $OPTARG ]; then
+			    prefix=$OPTARG
+			else
+			    abort_invalid_prefix $OPTARG
+			fi
+			;;
+		    (*)
+			abort_invalid_prefix $OPTARG
+			;;
+		esac
+		;;
+	    (t)
+		case $OPTARG in
+		    (athena|gtk|gtk2|gtk3|lucid|no)
+			toolkit=$OPTARG
+			with_toolkit=true
+			;;
+		    (*)
+			abort_invalid_toolkit $OPTARG
+		esac
+		;;
+	    (v)
+		case $OPTARG in
+		    (2[6789].[0-9]|2[6789].[1-9][0-9])
+			emacs_version=$OPTARG
+			;;
+		    (*)
+			abort_invalid_version $OPTARG
+			;;
+		esac
+		;;
+	    (w)
+		with_widgets=true
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error "%s: Too many arguments\n" "$0"
+    fi
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $0 [-f] [-p PREFIX] [-t TOOLKIT] [-v VERSION] [-w]
+       $0 -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf "%s\n" '' >&2
+    usage
+    exit 2
+}
+
+validate_platform() {
+    case "$ID" in
+	(centos)
+            case "$VERSION_ID" in
+                (8)
+		    return
+		    ;;
+                (*)
+		    abort_not_supported Release
+		    ;;
+            esac
+	    ;;
+	(debian|raspbian)
+	    return
+	    ;;
+	(fedora)
+	    return
+	    ;;
+	(opensuse-*)
+	    return
+	    ;;
+	(rhel|ol)
+            case "$VERSION_ID" in
+                (7.*)
+		    return
+		    ;;
+                (8.*)
+		    return
+		    ;;
+                (*)
+		    abort_not_supported Release
+		    ;;
+            esac
+	    ;;
+	(freebsd)
+	    return
+	    ;;
+	(illumos)
+	    return
+	    ;;
+	(netbsd)
+	    return
+	    ;;
+	(solaris)
+	    return
+	    ;;
+	(windows)
+	    return
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
+
+case "$0" in
+    (*/*)
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+validate_platform
+configure_platform
+parse_arguments "$@"
+configure_emacs

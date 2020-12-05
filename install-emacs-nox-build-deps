@@ -1,0 +1,212 @@
+#!/bin/sh -eu
+
+# install-emacs-nox-build-deps: install GNU Emacs build dependencies
+# Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+DEBIAN_10_PKG=emacs
+REDHAT_PKG=emacs
+UBUNTU_18_PKG=emacs25
+UBUNTU_19_PKG=emacs
+UBUNTU_20_PKG=emacs
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+configure_platform() {
+    package=
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			install-epel
+			;;
+		    (*)
+			break
+			;;
+		esac
+
+		package=$REDHAT_PKG
+		;;
+	    (debian)
+		package=$DEBIAN_10_PKG
+		;;
+	    (fedora)
+		package=$REDHAT_PKG
+		;;
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		    (7.*)
+			install-epel
+			;;
+		esac
+
+		package=$REDHAT_PKG
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.*)
+			package=$UBUNTU_18_PKG
+			;;
+		    (19.*)
+			package=$UBUNTU_19_PKG
+			;;
+		    (20.*)
+			package=$UBUNTU_20_PKG
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	esac
+
+	if [ -n "${package:-}" ]; then
+	    break
+	fi
+    done
+}
+
+install_emacs_build_deps() {
+    validate_platform
+    configure_platform
+    packages=$(get-emacs-nox-build-packages)
+
+    if [ -n "${package:-}" ]; then
+	install-build-deps $package || true
+    fi
+
+    if [ -n "${packages:-}" ]; then
+	if ! install-packages $packages; then
+	    return 1
+	fi
+    fi
+}
+
+validate_platform() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			return
+			;;
+		    (8)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (debian)
+		case "$VERSION_ID" in
+		    (10)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (fedora)
+		return
+		;;
+	    (opensuse)
+		return
+		;;
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		    (7.*)
+			return
+			;;
+		    (8.*)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.*)
+			return
+			;;
+		    (19.*)
+			return
+			;;
+		    (20.*)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (solaris)
+		return
+		;;
+	esac
+    done
+
+    abort_not_supported "Operating system"
+}
+
+case "$0" in
+    (*/*)
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+install_emacs_build_deps
