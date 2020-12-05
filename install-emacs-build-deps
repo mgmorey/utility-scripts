@@ -111,7 +111,7 @@ configure_platform() {
 install_emacs_build_deps() {
     validate_platform
     configure_platform
-    packages=$(get-emacs-build-packages)
+    packages=$(get-emacs-x11-build-packages)
 
     if [ -n "${package:-}" ]; then
 	install-build-deps $package || true
