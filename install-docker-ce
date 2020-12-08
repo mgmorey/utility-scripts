@@ -168,8 +168,8 @@ get_docker_repo() {
 	    (debian)
 		repo="deb [arch=$arch] $1 $(get_codename) stable"
 		;;
-	    (rhel|ol|centos|fedora)
-		repo="$DOCKER_BASE_URL/linux/centos/docker-ce.repo"
+	    (centos|fedora|ol|rhel)
+		repo="$(get_docker_url $id)/docker-ce.repo"
 		;;
 	esac
 
@@ -181,7 +181,7 @@ get_docker_repo() {
 }
 
 get_docker_url() {
-    printf "%s\n" "$DOCKER_BASE_URL/linux/$ID"
+    printf "%s\n" "$DOCKER_BASE_URL/linux/$1"
 }
 
 get_package_manager_basename() {
@@ -321,7 +321,7 @@ postinstall_platform() {
 }
 
 preinstall_docker() {
-    docker_url=$(get_docker_url)
+    docker_url=$(get_docker_url $ID)
     install_dependencies
     add_gpg_key "$docker_url"
     add_repositories "$docker_url"
