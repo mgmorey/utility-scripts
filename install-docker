@@ -271,7 +271,7 @@ validate_platform() {
 	    ;;
 	(rhel|ol)
 	    case "$VERSION_ID" in
-		(8.[01])
+		(8.*)
 		    true
 		    ;;
 		(*)
