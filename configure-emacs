@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# configure-emacs: download and configure emacs
+# configure-emacs: download and configure GNU Emacs
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
