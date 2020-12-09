@@ -135,14 +135,14 @@ usage_error() {
 validate_platform() {
     case "$ID" in
 	(centos)
-            case "$VERSION_ID" in
-                (8)
+	    case "$VERSION_ID" in
+		(8)
 		    return
 		    ;;
-                (*)
+		(*)
 		    abort_not_supported Release
 		    ;;
-            esac
+	    esac
 	    ;;
 	(debian|raspbian)
 	    return
@@ -151,17 +151,17 @@ validate_platform() {
 	    return
 	    ;;
 	(rhel|ol)
-            case "$VERSION_ID" in
-                (7.*)
+	    case "$VERSION_ID" in
+		(7.*)
 		    return
 		    ;;
-                (8.*)
+		(8.*)
 		    return
 		    ;;
-                (*)
+		(*)
 		    abort_not_supported Release
 		    ;;
-            esac
+	    esac
 	    ;;
 	(illumos)
 	    return
