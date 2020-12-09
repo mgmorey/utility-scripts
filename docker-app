@@ -26,7 +26,7 @@ assert() {
 }
 
 get_default_remote_image() {
-    printf "%s\n" "$(get_real_user)/$APP_NAME"
+    printf "%s\n" "${GITHUB_USERNAME-$(get_real_user)}/$APP_NAME"
 }
 
 get_default_run_options() {
