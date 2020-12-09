@@ -426,6 +426,9 @@ validate_platform() {
     case "$ID" in
 	(centos)
             case "$VERSION_ID" in
+                (7)
+		    return
+		    ;;
                 (8)
 		    return
 		    ;;
