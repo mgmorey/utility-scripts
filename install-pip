@@ -54,7 +54,7 @@ get_realpath() (
 
 install_pip() {
     validate_platform
-    "${script_prefix}install-packages" $(get_packages)
+    install-packages $(get_packages)
 }
 
 validate_platform() {
@@ -149,5 +149,6 @@ script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
 
-eval $("${script_prefix}get-os-release" -x)
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
 install_pip
