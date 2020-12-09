@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-python-development-tools: install Python development tools
+# install-pip: install PIP
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
