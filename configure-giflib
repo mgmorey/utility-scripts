@@ -57,7 +57,7 @@ configure_giflib() {
 	abort "%s: %s: No such archive file\n" "$0" "$pathname"
     fi
 
-    src_dir="$HOME/Documents/src/giflib/$basename"
+    src_dir="$HOME/Documents/src/GIFLIB/$basename"
     mkdir -p "$(dirname "$src_dir")"
     extract_files
 }
