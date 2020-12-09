@@ -16,26 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-AMAZON_2_PKGS=""
-
-DEBIAN_PKGS=""
-
-FEDORA_PKGS=""
-
-ILLUMOS_PKGS=""
-
-MACOS_HOMEBREW_PKGS=""
-
-OPENSUSE_PKGS=""
-
-REDHAT_7_PKGS="curl-devel expat-devel openssl-devel"
-REDHAT_8_PKGS="curl-devel expat-devel openssl-devel"
-
-FREEBSD_11_PKGS=""
-FREEBSD_12_RELEASE_PKGS=""
-FREEBSD_12_STABLE_PKGS=""
-
-SOLARIS_PKGS=""
+CATEGORIES="git-build"
 
 abort() {
     printf "$@" >&2
@@ -46,82 +27,8 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-get_git_packages() {
-    packages=
-
-    case "$ID" in
-	(amazon)
-	    case "$VERSION_ID" in
-		(2)
-		    packages=$AMAZON_2_PKGS
-		    ;;
-		(*)
-		    break
-		    ;;
-	    esac
-	    ;;
-	(centos)
-	    case "$VERSION_ID" in
-		(7)
-		    packages=$REDHAT_7_PKGS
-		    ;;
-		(8)
-		    packages=$REDHAT_8_PKGS
-		    ;;
-		(*)
-		    break
-		    ;;
-	    esac
-	    ;;
-	(debian|raspbian)
-	    packages=$DEBIAN_PKGS
-	    ;;
-	(fedora)
-	    packages=$FEDORA_PKGS
-	    ;;
-	(opensuse-*)
-	    packages=$OPENSUSE_PKGS
-	    ;;
-	(rhel|ol)
-	    case "$VERSION_ID" in
-		(7.*)
-		    packages=$REDHAT_7_PKGS
-		    ;;
-		(8.*)
-		    packages=$REDHAT_8_PKGS
-		    ;;
-	    esac
-	    ;;
-	(freebsd)
-	    case "$VERSION_ID" in
-		(11.3-*)
-		    packages=$FREEBSD_11_PKGS
-		    ;;
-		(12.1-RELEASE-*)
-		    packages=$FREEBSD_12_RELEASE_PKGS
-		    ;;
-		(12.1-STABLE)
-		    packages=$FREEBSD_12_STABLE_PKGS
-		    ;;
-		(*)
-		    break
-		    ;;
-	    esac
-	    ;;
-	(illumos)
-	    packages=$ILLUMOS_PKGS
-	    ;;
-	(macos)
-	    packages=$MACOS_HOMEBREW_PKGS
-	    ;;
-	(solaris)
-	    packages=$SOLARIS_PKGS
-	    ;;
-    esac
-
-    if [ -n "${packages-}" ]; then
-	printf "%s\n" $packages
-    fi
+get_git_build_packages() {
+    "${script_prefix}get-packages" $CATEGORIES
 }
 
 get_realpath() (
@@ -154,6 +61,5 @@ script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
 
-set_user_profile "$script_dir"
-eval $(get-os-release -x)
-get_git_packages
+eval $("${script_prefix}get-os-release" -x)
+get_git_build_packages
