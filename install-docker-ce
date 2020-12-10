@@ -168,8 +168,11 @@ get_docker_repo() {
 	    (debian)
 		repo="deb [arch=$arch] $1 $(get_codename) stable"
 		;;
-	    (centos|fedora|ol|rhel)
+	    (centos|fedora)
 		repo="$(get_docker_url $id)/docker-ce.repo"
+		;;
+	    (rhel|ol)
+		repo="$(get_docker_url centos)/docker-ce.repo"
 		;;
 	esac
 
