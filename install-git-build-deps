@@ -57,6 +57,11 @@ install_git_build_deps() {
     fi
 }
 
+usage_error() {
+    printf "$@" >&2
+    exit 2
+}
+
 validate_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -139,6 +144,10 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
+
+if [ $# -gt 0 ]; then
+    usage_error "%s: Too many arguments\n" "$0"
+fi
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
