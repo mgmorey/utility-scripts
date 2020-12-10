@@ -1,0 +1,79 @@
+#!/bin/sh -eu
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+        $realpath "$@"
+    else
+        for file; do
+            if expr "$file" : '/.*' >/dev/null; then
+                printf "%s\n" "$file"
+            else
+                printf "%s\n" "$PWD/${file#./}"
+            fi
+        done
+    fi
+)
+
+install_google_chrome() {
+    case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    yum install liberation-fonts vulkan
+		    ;;
+	    esac
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    yum install liberation-fonts vulkan
+		    ;;
+	    esac
+	    ;;
+    esac
+
+    case "$1" in
+	(*.rpm)
+	    rpm -i "$1"
+	    ;;
+    esac
+}
+
+usage_error() {
+    printf "$@" >&2
+    exit 2
+}
+
+case "$0" in
+    (*/*)
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+
+if [ $# -gt 1 ]; then
+    usage_error "%s: Too many arguments\n" "$0"
+fi
+
+install_google_chrome "$@"
