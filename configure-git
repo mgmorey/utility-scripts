@@ -295,10 +295,7 @@ include_prefix() {
 }
 
 usage_error() {
-    if [ $# -gt 0 ]; then
-        printf "$@" >&2
-    fi
-
+    printf "$@" >&2
     exit 2
 }
 
