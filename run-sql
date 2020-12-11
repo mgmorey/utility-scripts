@@ -67,7 +67,7 @@ get_cli_command() {
 
 get_cli_mssql() {
     printf "%s\n" sqlcmd \
-	   -H ${DATABASE_HOST:-${MSSQL_HOST:-localhost}} \
+	   -H ${DATABASE_HOST:-${MSSQL_HOST:-${WSL_HOST:-localhost}}} \
 	   -U ${DATABASE_USER:-${MSSQL_USER:-$user}} \
 	   -P ${DATABASE_PASSWORD:-${MYSQL_PASSWORD-}} \
 	   # -d ${DATABASE_INSTANCE:-${MYSQL_INSTANCE-}}
@@ -76,7 +76,7 @@ get_cli_mssql() {
 get_cli_mysql() {
     printf "%s\n" mysql \
 	   --protocol=${DATABASE_PROTOCOL:-${MYSQL_PROTOCOL:-TCP}} \
-	   --host=${DATABASE_HOST:-${MYSQL_HOST:-localhost}} \
+	   --host=${DATABASE_HOST:-${MYSQL_HOST:-${WSL_HOST:-localhost}}} \
 	   --port=${DATABASE_PORT:-${MYSQL_PORT:-3306}} \
 	   --user=${DATABASE_USER:-${MYSQL_USER:-$user}} \
 	   --password=${DATABASE_PASSWORD:-${MYSQL_PASSWORD-}} \
@@ -88,7 +88,7 @@ get_cli_mysql() {
 }
 
 get_cli_oracle() {
-    host=${DATABASE_HOST:-${ORACLE_HOST:-localhost}}
+    host=${DATABASE_HOST:-${ORACLE_HOST:-${WSL_HOST:-localhost}}}
     port=${DATABASE_PORT:-${ORACLE_PORT:-1521}}
     username=${DATABASE_USER:-${ORACLE_USER:-$user}}
     password=${DATABASE_PASSWORD:-${ORACLE_PASSWORD-}}
@@ -98,7 +98,7 @@ get_cli_oracle() {
 
 get_cli_postgresql() {
     printf "%s\n" psql \
-	   --host=${DATABASE_HOST:-${POSTGRES_HOST:-localhost}} \
+	   --host=${DATABASE_HOST:-${POSTGRES_HOST:-${WSL_HOST:-localhost}}} \
 	   --port=${DATABASE_PORT:-${POSTGRES_PORT:-5432}} \
 	   --username=${DATABASE_USER:-${POSTGRES_USER:-$user}} \
 	   --password
