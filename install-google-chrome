@@ -31,14 +31,20 @@ install_google_chrome() {
 	(centos)
 	    case "$VERSION_ID" in
 		(7)
-		    yum install liberation-fonts vulkan
+		    yum install -y liberation-fonts vulkan
+		    ;;
+		(8)
+		    yum install -y liberation-fonts vulkan
 		    ;;
 	    esac
 	    ;;
 	(rhel|ol)
 	    case "$VERSION_ID" in
 		(7.*)
-		    yum install liberation-fonts vulkan
+		    yum install -y liberation-fonts vulkan
+		    ;;
+		(8.*)
+		    yum install -y liberation-fonts vulkan
 		    ;;
 	    esac
 	    ;;
