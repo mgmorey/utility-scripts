@@ -54,46 +54,6 @@ get_realpath() (
 )
 
 install_files() {
-    if [ -d "$target_dir" ]; then
-	true
-    elif [ -e "$target_dir" ]; then
-	abort "%s: %s: Not a directory\n" "$0" "$target_dir"
-    elif ! mkdir -p "$target_dir"; then
-	abort "%s: %s: Cannot create directory\n" "$0" "$target_dir"
-    fi
-
-    case "$method" in
-	(copy)
-	    cp -f $files "$target_dir"
-	    ;;
-	(install)
-	    install=$(get_install_command)
-
-	    case "$ID" in
-		(illumos)
-		    case "$install" in
-			(/usr/gnu/bin/install)
-			    $install ${mode:+-m $mode }$files "$target_dir"
-			    ;;
-			(/usr/sbin/install)
-			    for file in $files; do
-				$install -f "$target_dir" -m ${mode:+-m $mode }-s $file
-			    done
-			    ;;
-		    esac
-		    ;;
-		(*)
-		    $install ${mode:+-m $mode }$files "$target_dir"
-		    ;;
-	    esac
-	    ;;
-	(symlink)
-	    ln -sf $files "$target_dir"
-	    ;;
-    esac
-}
-
-parse_arguments() {
     method=install
     mode=
 
@@ -140,7 +100,43 @@ parse_arguments() {
 	usage_error "%s: Not enough arguments\n" "$0"
     fi
 
-    files="$@"
+    if [ -d "$target_dir" ]; then
+	true
+    elif [ -e "$target_dir" ]; then
+	abort "%s: %s: Not a directory\n" "$0" "$target_dir"
+    elif ! mkdir -p "$target_dir"; then
+	abort "%s: %s: Cannot create directory\n" "$0" "$target_dir"
+    fi
+
+    case "$method" in
+	(copy)
+	    cp -f "$@" "$target_dir"
+	    ;;
+	(install)
+	    install=$(get_install_command)
+
+	    case "$ID" in
+		(illumos)
+		    case "$install" in
+			(/usr/gnu/bin/install)
+			    $install ${mode:+-m $mode }"$@" "$target_dir"
+			    ;;
+			(/usr/sbin/install)
+			    for file in "$@"; do
+				$install -f "$target_dir" -m ${mode:+-m $mode }-s $file
+			    done
+			    ;;
+		    esac
+		    ;;
+		(*)
+		    $install ${mode:+-m $mode }"$@" "$target_dir"
+		    ;;
+	    esac
+	    ;;
+	(symlink)
+	    ln -sf "$@" "$target_dir"
+	    ;;
+    esac
 }
 
 usage() {
@@ -172,5 +168,4 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 eval $("${script_prefix}get-os-release" -x)
-parse_arguments "$@"
-install_files
+install_files "$@"
