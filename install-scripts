@@ -81,7 +81,8 @@ get_library_files() {
 	 ! -name .gitattributes \
 	 ! -name .gitignore \
 	 ! -name '*~' \
-	 -type f
+	 -type f \
+	 -print0
 }
 
 get_script_files() {
@@ -96,12 +97,13 @@ get_script_files() {
 	 ! -name "$(basename "$0")" \
 	 ! -name '*.*' \
 	 ! -name '*~' \
-	 -type f
+	 -type f \
+	 -print0
 }
 
 install_files() {
     target_dir=$(get_realpath "$target_dir")
-    xargs "${script_prefix}install-files" -M $method ${mode:+-m $mode }"$target_dir"
+    xargs -0 "${script_prefix}install-files" -M $method ${mode:+-m $mode }"$target_dir"
 }
 
 install_library_files() {
