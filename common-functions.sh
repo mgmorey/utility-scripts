@@ -338,6 +338,12 @@ set_user_profile() {
     elif [ -n "$home" ]; then
 	export PATH=$(get_profile_path "$home" "$1")
     fi
+
+    params=$("${1+$1/}set-proxy-parameters" -s ${shell:-/bin/sh})
+
+    if [ -n "$params" ]; then
+	eval "$params"
+    fi
 }
 
 validate_group_id() {
