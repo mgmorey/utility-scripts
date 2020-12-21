@@ -280,7 +280,23 @@ parse_arguments() {
     while getopts s:h opt; do
 	case $opt in
 	    (s)
-		shell=$OPTARG
+		case $(basename $OPTARG) in
+		    (*bash|ksh*|zsh)
+			shell=$OPTARG
+			;;
+		    (csh|tcsh)
+			shell=$OPTARG
+			;;
+		    (fish)
+			shell=$OPTARG
+			;;
+		    (sh)
+			shell=$OPTARG
+			;;
+		    (*)
+			usage_error "%s: %s: Unsupported shell\n" "$0" "$OPTARG"
+			;;
+		esac
 		;;
 	    (h)
 		usage
@@ -330,7 +346,6 @@ remove_directory() {
 }
 
 set_profile_parameters() {
-    validate_arguments
     configure_platform
     include_common_directories
     include_platform_directories
@@ -353,26 +368,6 @@ usage_error() {
     printf "%s\n" '' >&2
     usage
     exit 2
-}
-
-validate_arguments() {
-    case $(basename ${shell%.exe}) in
-	(*bash|ksh*|zsh)
-	    true
-	    ;;
-	(csh|tcsh)
-	    true
-	    ;;
-	(fish)
-	    true
-	    ;;
-	(sh)
-	    true
-	    ;;
-	(*)
-	    abort "%s: %s: Shell not supported\n" "$0" "$shell"
-	    ;;
-    esac
 }
 
 case "$0" in
