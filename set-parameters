@@ -67,6 +67,7 @@ set_parameters() {
     validate_arguments
     "${script_prefix}set-askpass-parameters" -s $shell || true
     "${script_prefix}set-profile-parameters" -s $shell || true
+    "${script_prefix}set-proxy-parameters" -s $shell || true
 }
 
 usage() {
