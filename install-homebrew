@@ -18,7 +18,7 @@
 
 BASE_URL=https://raw.githubusercontent.com
 HOMEBREW_URL=$BASE_URL/Homebrew/install/master/install
-LINUXBREW_URL=$BASE_URL/Linuxbrew/install/master/install.sh
+LINUXBREW_URL=$BASE_URL/Homebrew/install/master/install.sh
 
 abort() {
     printf "$@" >&2
