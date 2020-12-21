@@ -1,0 +1,168 @@
+#!/bin/sh -eu
+
+# set-proxy-parameters: print shell commands to set proxy parameters
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+ALL_PARAMETERS="FTP_PROXY HTTP_PROXY HTTPS_PROXY ftp_proxy http_proxy https_proxy"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+configure_platform() {
+    case "$HOSTNAME" in
+	(ob1d-ddndesx8b)
+	    proxy=http://webproxy.pln.colo.services:80
+	    FTP_PROXY=$proxy
+	    HTTP_PROXY=$proxy
+	    HTTPS_PROXY=$proxy
+	    ftp_proxy=$proxy
+	    http_proxy=$proxy
+	    https_proxy=$proxy
+	    ;;
+	(*)
+	    FTP_PROXY=
+	    HTTP_PROXY=
+	    HTTPS_PROXY=
+	    ftp_proxy=
+	    http_proxy=
+	    https_proxy=
+	    ;;
+    esac
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+parse_arguments() {
+    shell=$SHELL
+
+    while getopts s:h opt; do
+	case $opt in
+	    (s)
+		case $(basename $OPTARG) in
+		    (*bash|ksh*|zsh)
+			shell=$OPTARG
+			;;
+		    (csh|tcsh)
+			shell=$OPTARG
+			;;
+		    (fish)
+			shell=$OPTARG
+			;;
+		    (sh)
+			shell=$OPTARG
+			;;
+		    (*)
+			usage_error "%s: %s: Unsupported shell\n" "$0" "$OPTARG"
+			;;
+		esac
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+}
+
+print_parameters() {
+    assert [ $# -gt 0 ]
+
+    for var; do
+	eval value=\${$var-}
+
+	if [ -z "$value" ]; then
+	    continue
+	fi
+
+	case "$(basename $shell)" in
+	    (*bash|ksh*|zsh)
+		printf 'export %s="%s"\n' "$var" "$value"
+		;;
+	    (csh|tcsh)
+		printf 'setenv %s "%s";\n' "$var" "$value"
+		;;
+	    (fish)
+		printf 'set -x %s "%s";\n' "$var" "$value"
+		;;
+	    (*)
+		printf '%s="%s"\n' "$var" "$value"
+		printf 'export %s\n' "$var"
+		;;
+	esac
+    done
+}
+
+set_proxy_parameters() {
+    configure_platform
+    print_parameters $ALL_PARAMETERS
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $0: [-s SHELL]
+       $0: -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf "%s\n" '' >&2
+    usage
+    exit 2
+}
+
+case "$0" in
+    (*/*)
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+parse_arguments "$@"
+set_proxy_parameters
