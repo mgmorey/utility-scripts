@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# set-askpass: print shell commands to set askpass parameters
+# set-askpass-parameters: print shell commands to set askpass parameters
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -51,7 +51,7 @@ get_realpath() (
 
 parse_arguments() {
     desktop_name=
-    shell=
+    shell=$SHELL
 
     while getopts d:s:h opt; do
 	case $opt in
