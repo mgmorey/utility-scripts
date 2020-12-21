@@ -28,25 +28,13 @@ assert() {
 }
 
 configure_platform() {
-    case "$HOSTNAME" in
-	(ob1d-ddndesx8b)
-	    proxy=http://webproxy.pln.colo.services:80
-	    FTP_PROXY=$proxy
-	    HTTP_PROXY=$proxy
-	    HTTPS_PROXY=$proxy
-	    ftp_proxy=$proxy
-	    http_proxy=$proxy
-	    https_proxy=$proxy
-	    ;;
-	(*)
-	    FTP_PROXY=
-	    HTTP_PROXY=
-	    HTTPS_PROXY=
-	    ftp_proxy=
-	    http_proxy=
-	    https_proxy=
-	    ;;
-    esac
+    proxy=$(if [ -r $HOME/.proxy ]; then cat $HOME/.proxy; fi)
+    FTP_PROXY=$proxy
+    HTTP_PROXY=$proxy
+    HTTPS_PROXY=$proxy
+    ftp_proxy=$proxy
+    http_proxy=$proxy
+    https_proxy=$proxy
 }
 
 get_realpath() (
