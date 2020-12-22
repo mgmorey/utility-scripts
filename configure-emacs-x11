@@ -459,6 +459,9 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
+	(ubuntu)
+	    return
+	    ;;
 	(freebsd)
 	    return
 	    ;;
