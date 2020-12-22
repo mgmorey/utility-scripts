@@ -72,7 +72,7 @@ configure_compiler() {
 }
 
 configure_emacs() {
-    basename=emacs-$EMACS_VERSION
+    basename=emacs-$emacs_version
 
     archive_dir="$HOME/Downloads/GNU"
     build_dir="$HOME/Documents/build/$basename"
