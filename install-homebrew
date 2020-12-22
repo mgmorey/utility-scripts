@@ -186,9 +186,6 @@ validate_platform() {
 	case "$id" in
 	    (centos)
 		case "$VERSION_ID" in
-		    (7)
-			return
-			;;
 		    (8)
 			return
 			;;
@@ -215,9 +212,6 @@ validate_platform() {
 		;;
 	    (rhel|ol)
 		case "$VERSION_ID" in
-		    (7.*)
-			return
-			;;
 		    (8.*)
 			return
 			;;
