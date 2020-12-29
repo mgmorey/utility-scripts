@@ -16,4 +16,100 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-grubby --update-kernel=ALL --args="video=hyperv_fb:1920x1080"
+GRUB_FILE=/etc/default/grub
+KERNEL_ARG=video=hyperv_fb:1920x1080
+KERNEL_VAR=GRUB_CMDLINE_LINUX_DEFAULT
+SED_FORMAT='s/\\(%s\\)="\\(.*\\)"/\\1="\\2 %s"/'
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+configure_hyper_v_guest() {
+    configure_platform
+
+    if which grubby >/dev/null 2>&1; then
+	grubby --update-kernel=ALL --args="$KERNEL_ARG"
+    elif [ -w $GRUB_FILE ]; then
+	sed -i "$(get_sed_expr $KERNEL_ARG)" $GRUB_FILE
+	grub2-mkconfig -o /boot/grub2/grub.cfg
+    elif [ -r $GRUB_FILE ]; then
+	sed "$(get_sed_expr $KERNEL_ARG)" $GRUB_FILE
+    fi
+}
+
+configure_platform() {
+    vendor=$(get_hypervisor_vendor || true)
+
+    case "$vendor" in
+	(Microsoft)
+	    true
+	    ;;
+	('')
+	    abort "%s: No hypervisor detected\n" "$0"
+	    ;;
+	(*)
+	    abort "%s: %s hypervisor not supported\n" "$0" "$vendor"
+	    ;;
+    esac
+}
+
+get_awk_command() {
+    case "$kernel_name" in
+	(SunOS)
+	    printf "%s" /usr/gnu/bin/awk
+	    ;;
+	(*)
+	    printf "%s" /usr/bin/awk
+	    ;;
+    esac
+}
+
+get_hypervisor_vendor() (
+    awk="$(get_awk_command)"
+    (lscpu 2>/dev/null | $awk -f "${script_prefix}get-hypervisor-vendor")
+)
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+get_sed_expr() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf "$SED_FORMAT\n" "$KERNEL_VAR" "$1"
+}
+
+case "$0" in
+    (*/*)
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+
+eval $("${script_prefix}get-os-release" -X)
+configure_hyper_v_guest
