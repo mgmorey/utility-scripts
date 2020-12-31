@@ -197,6 +197,9 @@ validate_platform() {
 		    (12.1-*)
 			return
 			;;
+		    (12.2-*)
+			return
+			;;
 		    (*)
 			break
 			;;
