@@ -16,6 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+PROXY_PARAMETERS="FTP_PROXY HTTP_PROXY HTTPS_PROXY \
+ftp_proxy http_proxy https_proxy no_proxy"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -35,6 +38,14 @@ get_default_run_options() {
 
 get_default_tag() {
     date +%Y%m%d%H%M
+}
+
+get_build_options() {
+    for var in $PROXY_PARAMETERS; do
+	if [ -n "${var:-}" ]; then
+	    printf "%s\n" --build-arg $var
+	fi
+    done
 }
 
 get_realpath() (
@@ -57,11 +68,11 @@ get_realpath() (
 docker_app() {
     eval $("${script_prefix}get-configuration" app.ini)
     image=$(get_default_remote_image)
-    opts=$(get_default_run_options)
 
     case "$action" in
 	(build)
-	    docker build -t $image${tag:+:$tag} .
+	    build_opts=$(get_build_options)
+	    docker build ${build_opts+$build_opts }-t $image${tag:+:$tag} .
 	    docker tag $image${tag:+:$tag} $image:latest
 	    ;;
 	(pull)
@@ -71,7 +82,8 @@ docker_app() {
 	    docker push $image${tag:+:$tag}
 	    ;;
 	(run)
-	    docker run $opts $image${tag:+:$tag}
+	    run_opts=$(get_default_run_options)
+	    docker run ${run_opts+$run_opts }$image${tag:+:$tag}
 	    ;;
 	(*)
 	    usage_error "%s: invalid argument -- %s\n" "$0" "$1"
