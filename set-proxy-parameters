@@ -16,7 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-ALL_PARAMETERS="FTP_PROXY HTTP_PROXY HTTPS_PROXY ftp_proxy http_proxy https_proxy"
+ALL_PARAMETERS="FTP_PROXY HTTP_PROXY HTTPS_PROXY \
+ftp_proxy http_proxy https_proxy no_proxy"
 
 abort() {
     printf "$@" >&2
@@ -29,6 +30,7 @@ assert() {
 
 configure_platform() {
     proxy=$(if [ -r $HOME/.proxy ]; then cat $HOME/.proxy; fi)
+    no_proxy=$(if [ -r $HOME/.no-proxy ]; then cat $HOME/.no-proxy; fi)
     FTP_PROXY=$proxy
     HTTP_PROXY=$proxy
     HTTPS_PROXY=$proxy
