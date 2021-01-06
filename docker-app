@@ -40,13 +40,24 @@ get_default_tag() {
     date +%Y%m%d%H%M
 }
 
+get_build_argument() {
+    eval value=\${$var-}
+
+    case "$var" in
+	(no_proxy)
+	    printf "%s %s=%s\n" --build-arg "$var" "${value:-*}"
+	    ;;
+	(*)
+	    if [ -n "$value" ]; then
+		printf "%s %s\n" --build-arg "$var"
+	    fi
+	    ;;
+    esac
+}
+
 get_build_options() {
     for var in $PROXY_PARAMETERS; do
-	eval value=\${$var-}
-
-	if [ -n "$value" ]; then
-	    printf "%s %s\n" --build-arg $var
-	fi
+	get_build_argument $var
     done
 }
 
