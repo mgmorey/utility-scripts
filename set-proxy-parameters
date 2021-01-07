@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-ALL_PARAMETERS="FTP_PROXY HTTP_PROXY HTTPS_PROXY \
-ftp_proxy http_proxy https_proxy no_proxy"
+ALL_FILES="$HOME/.proxy $HOME/.no-proxy"
+ALL_PARAMETERS="ftp_proxy http_proxy https_proxy no_proxy"
 
 abort() {
     printf "$@" >&2
@@ -29,14 +29,30 @@ assert() {
 }
 
 configure_platform() {
-    proxy=$(if [ -r $HOME/.proxy ]; then cat $HOME/.proxy; fi)
-    no_proxy=$(if [ -r $HOME/.no-proxy ]; then cat $HOME/.no-proxy; fi)
-    FTP_PROXY=$proxy
-    HTTP_PROXY=$proxy
-    HTTPS_PROXY=$proxy
-    ftp_proxy=$proxy
-    http_proxy=$proxy
-    https_proxy=$proxy
+    for file in $ALL_FILES; do
+	contents=$(get_file_contents "$file")
+
+	if [ -z "$contents" ]; then
+	    continue
+	fi
+
+	case "$(basename "$file")" in
+	    (.proxy)
+		ftp_proxy=$contents
+		http_proxy=$contents
+		https_proxy=$contents
+		;;
+	    (.no-proxy)
+		no_proxy=$contents
+		;;
+	esac
+    done
+}
+
+get_file_contents() {
+    if [ -r "$file" ]; then
+	cat "$file"
+    fi
 }
 
 get_realpath() (
