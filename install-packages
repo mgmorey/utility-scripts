@@ -247,7 +247,9 @@ install_pattern_using() (
     esac
 
     if [ $? -eq 0 ]; then
-	sed -e '/^Loaded/d' -i $tmpfile
+	sed -e '/^$/d' \
+	    -e '/^Loaded .*$/d' \
+	    -e '/^pattern .* not found.$/d' -i $tmpfile
     fi
 
     if [ ! -s $tmpfile ]; then
