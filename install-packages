@@ -130,6 +130,7 @@ install_packages() {
     package_managers=$(get_package_managers)
     package_options=$(get_options)
     pattern_options=$(get_options)
+    create_tmpfile
 
     for id in $ID $ID_LIKE; do
         case "$id" in
@@ -235,27 +236,32 @@ install_pattern_using() (
 
     case "$(basename $manager)" in
         (dnf|yum)
-            if $manager groupinfo $pattern >/dev/null 2>&1; then
-                return
-            fi
+            $manager groupinfo "$pattern" >$tmpfile
             ;;
         (zypper)
-            if $manager -nq info -t pattern $pattern >/dev/null 2>&1; then
-                return
-            fi
-            ;;
-    esac
-
-    install=$("${script_prefix}get-pattern-install-command" $manager)
-
-    case "$(basename $manager)" in
-        (brew)
-            run_unpriv /bin/sh -c "$manager $install $options \"$pattern\""
+            $manager -nq info -t pattern "$pattern" >$tmpfile
             ;;
         (*)
-            $manager $install $options "$pattern"
+            false
             ;;
     esac
+
+    if [ $? -eq 0 ]; then
+	sed -e '/^Loaded/d' -i $tmpfile
+    fi
+
+    if [ ! -s $tmpfile ]; then
+	install=$("${script_prefix}get-pattern-install-command" $manager)
+
+	case "$(basename $manager)" in
+	    (brew)
+		run_unpriv /bin/sh -c "$manager $install $options \"$pattern\""
+		;;
+	    (*)
+		$manager $install $options "$pattern"
+		;;
+	esac
+    fi
 )
 
 move_pattern_to_packages() {
