@@ -248,7 +248,7 @@ install_pattern_using() (
 
     if [ $? -eq 0 ]; then
 	sed -e '/^$/d' \
-	    -e '/^Loaded .*$/d' \
+	    -e '/^Loaded plugins: .*$/d' \
 	    -e '/^pattern .* not found.$/d' -i $tmpfile
     fi
 
