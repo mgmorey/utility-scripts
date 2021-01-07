@@ -331,7 +331,7 @@ set_user_profile() {
 	export SHELL="$shell"
     fi
 
-    profile=$("${1+$1/}set-profile-parameters" -s ${shell:-/bin/sh})
+    profile=$("${1:+$1/}set-profile-parameters" -s ${shell:-/bin/sh})
 
     if [ -n "$profile" ]; then
 	eval "$profile"
@@ -339,7 +339,7 @@ set_user_profile() {
 	export PATH=$(get_profile_path "$home" "$1")
     fi
 
-    params=$("${1+$1/}set-proxy-parameters" -s ${shell:-/bin/sh})
+    params=$("${1:+$1/}set-proxy-parameters" -s ${shell:-/bin/sh})
 
     if [ -n "$params" ]; then
 	eval "$params"
