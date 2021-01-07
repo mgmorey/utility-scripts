@@ -153,6 +153,12 @@ validate_platform() {
 		(2019*)
 		    true
 		    ;;
+		(2020*)
+		    true
+		    ;;
+		(2021*)
+		    true
+		    ;;
 		(*)
 		    abort_not_supported Release
 		    ;;
