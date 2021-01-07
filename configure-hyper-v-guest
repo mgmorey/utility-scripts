@@ -35,11 +35,18 @@ configure_hyper_v_guest() {
 
     if which grubby >/dev/null 2>&1; then
 	grubby --update-kernel=ALL --args="$KERNEL_ARG"
-    elif [ -w $GRUB_FILE ]; then
-	sed -i "$(get_sed_expr $KERNEL_ARG)" $GRUB_FILE
-	grub2-mkconfig -o /boot/grub2/grub.cfg
-    elif [ -r $GRUB_FILE ]; then
-	sed "$(get_sed_expr $KERNEL_ARG)" $GRUB_FILE
+    elif [ -e $GRUB_FILE ]; then
+	if [ -w $GRUB_FILE ]; then
+	    sed -i "$(get_sed_expr $KERNEL_ARG)" $GRUB_FILE
+	elif [ -r $GRUB_FILE ]; then
+	    sed "$(get_sed_expr $KERNEL_ARG)" $GRUB_FILE
+	fi
+
+	if which update-grub >/dev/null 2>&1; then
+	    update-grub
+	elif which grub2-mkconfig /dev/null 2>&1; then
+	    grub2-mkconfig -o /boot/grub2/grub.cfg
+	fi
     fi
 }
 
