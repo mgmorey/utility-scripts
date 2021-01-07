@@ -17,7 +17,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ALL_FILES="$HOME/.proxy $HOME/.no-proxy"
-ALL_PARAMETERS="ftp_proxy http_proxy https_proxy no_proxy"
+
+LOWER_PARAMETERS="ftp_proxy http_proxy https_proxy no_proxy"
+UPPER_PARAMETERS="FTP_PROXY HTTP_PROXY HTTPS_PROXY NO_PROXY"
 
 abort() {
     printf "$@" >&2
@@ -38,15 +40,23 @@ configure_platform() {
 
 	case "$(basename "$file")" in
 	    (.proxy)
+		FTP_PROXY=$contents
+		HTTP_PROXY=$contents
+		HTTPS_PROXY=$contents
 		ftp_proxy=$contents
 		http_proxy=$contents
 		https_proxy=$contents
 		;;
 	    (.no-proxy)
+		NO_PROXY=$contents
 		no_proxy=$contents
 		;;
 	esac
     done
+}
+
+get_all_parameters() {
+    printf "%s\n" $UPPER_PARAMETERS $LOWER_PARAMETERS
 }
 
 get_file_contents() {
@@ -139,7 +149,7 @@ print_parameters() {
 
 set_proxy_parameters() {
     configure_platform
-    print_parameters $ALL_PARAMETERS
+    print_parameters $(get_all_parameters)
 }
 
 usage() {
