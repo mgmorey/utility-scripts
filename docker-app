@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-PROXY_PARAMETERS="FTP_PROXY HTTP_PROXY HTTPS_PROXY \
-ftp_proxy http_proxy https_proxy no_proxy"
+LOWER_PARAMETERS="ftp_proxy http_proxy https_proxy no_proxy"
+UPPER_PARAMETERS="FTP_PROXY HTTP_PROXY HTTPS_PROXY NO_PROXY"
 
 abort() {
     printf "$@" >&2
@@ -26,6 +26,10 @@ abort() {
 
 assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_all_parameters() {
+    printf "%s\n" $UPPER_PARAMETERS $LOWER_PARAMETERS
 }
 
 get_default_remote_image() {
@@ -44,7 +48,7 @@ get_build_argument() {
     eval value=\${$var-}
 
     case "$var" in
-	(no_proxy)
+	(NO_PROXY|no_proxy)
 	    printf "%s %s=%s\n" --build-arg "$var" "${value:-*}"
 	    ;;
 	(*)
@@ -56,7 +60,7 @@ get_build_argument() {
 }
 
 get_build_options() {
-    for var in $PROXY_PARAMETERS; do
+    for var in $(get_all_parameters); do
 	get_build_argument $var
     done
 }
