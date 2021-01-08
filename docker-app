@@ -47,16 +47,15 @@ get_default_tag() {
 get_build_argument() {
     eval value=\${$var-}
 
-    case "$var" in
-	(NO_PROXY|no_proxy)
-	    printf "%s %s=%s\n" --build-arg "$var" "${value:-*}"
-	    ;;
-	(*)
-	    if [ -n "$value" ]; then
-		printf "%s %s\n" --build-arg "$var"
-	    fi
-	    ;;
-    esac
+    if [ -n "$value" ]; then
+	printf "%s %s\n" --build-arg "$var"
+    else
+	case "$var" in
+	    (NO_PROXY|no_proxy)
+		printf "%s %s=%s\n" --build-arg "$var" '*'
+		;;
+	esac
+    fi
 }
 
 get_build_options() {
