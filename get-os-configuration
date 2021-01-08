@@ -65,6 +65,9 @@ get_configuration_basename() {
 		    (20.04)
 			basename=$ID-$VERSION_ID
 			;;
+		    (20.10)
+			basename=$ID-$VERSION_ID
+			;;
 		    (*)
 			break
 			;;
