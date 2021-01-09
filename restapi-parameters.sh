@@ -132,6 +132,9 @@ configure_baseline() {
 			(20.04)
 			    configure_linux_ubuntu_20_04
 			    ;;
+			(20.10)
+			    configure_linux_ubuntu_20_10
+			    ;;
 			(*)
 			    abort_not_supported Release
 			    ;;
@@ -500,6 +503,13 @@ configure_linux_ubuntu_19_10() {
 }
 
 configure_linux_ubuntu_20_04() {
+    configure_linux_debian
+
+    # Set system Python interpreter
+    SYSTEM_PYTHON=/usr/bin/python3.8
+}
+
+configure_linux_ubuntu_20_10() {
     configure_linux_debian
 
     # Set system Python interpreter

@@ -57,6 +57,9 @@ configure_platform() {
 		    (20.04)
 			package=$DEBIAN_PKG
 			;;
+		    (20.10)
+			package=$DEBIAN_PKG
+			;;
 		    (*)
 			break
 			;;
@@ -166,6 +169,9 @@ validate_platform() {
 			return
 			;;
 		    (20.04)
+			return
+			;;
+		    (20.10)
 			return
 			;;
 		    (*)

@@ -103,6 +103,9 @@ configure_platform() {
 		(20.04)
 		    codename=xenial
 		    ;;
+		(20.10)
+		    codename=xenial
+		    ;;
 		(*)
 		    codename=$(lsb_release -cs)
 		    ;;
@@ -282,6 +285,9 @@ validate_platform() {
 		    true
 		    ;;
 		(20.04)
+		    true
+		    ;;
+		(20.10)
 		    true
 		    ;;
 		(*)

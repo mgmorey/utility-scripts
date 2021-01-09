@@ -97,6 +97,9 @@ get_http_client_packages() {
 		(20.04)
 		    packages=$DEBIAN_PKGS
 		    ;;
+		(20.10)
+		    packages=$DEBIAN_PKGS
+		    ;;
 		(*)
 		    break
 		    ;;

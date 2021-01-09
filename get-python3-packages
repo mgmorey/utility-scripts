@@ -95,6 +95,9 @@ get_python3_packages() {
 		(20.04)
 		    packages=$UBUNTU_20_PKGS
 		    ;;
+		(20.10)
+		    packages=$UBUNTU_20_PKGS
+		    ;;
 	    esac
 	    ;;
 	(freebsd)

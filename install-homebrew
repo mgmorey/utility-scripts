@@ -146,6 +146,10 @@ install_homebrew() {
 			run_unpriv brew
 			break
 			;;
+		    (20.10)
+			run_unpriv brew
+			break
+			;;
 		    (*)
 			break
 			;;
@@ -229,6 +233,9 @@ validate_platform() {
 			return
 			;;
 		    (20.04)
+			return
+			;;
+		    (20.10)
 			return
 			;;
 		    (*)
