@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-GRUB_COMMANDS="grubby grub2-mkconfig update-grub false"
+GRUB_COMMANDS="grub2-mkconfig grubby update-grub false"
 GRUB_CONFIG=/etc/default/grub
 KERNEL_ARG=video=hyperv_fb:1920x1080
 KERNEL_VAR=GRUB_CMDLINE_LINUX_DEFAULT
@@ -32,26 +32,28 @@ assert() {
 }
 
 configure_grub() {
-    if [ ! -e $GRUB_CONFIG ]; then
-	return
+    if [ -z "$1" -o ! -e "$1" ]; then
+	return 0
     fi
 
-    if [ -w $GRUB_CONFIG ]; then
+    if [ -w "$1" ]; then
         options=-i
-    elif [ -r $GRUB_CONFIG ]; then
+    elif [ -r "$1" ]; then
         options=
     fi
 
-    if ! grep $KERNEL_ARG $GRUB_CONFIG; then
-	sed ${options:+$options }"$(get_sed_expr $KERNEL_ARG)" $GRUB_CONFIG
+    if ! grep $KERNEL_ARG "$1"; then
+	sed ${options:+$options }"$(get_sed_expr $KERNEL_ARG)" "$1"
     fi
 }
 
 configure_hyper_v_guest() {
     configure_platform
+    update=$(get_grub_update_command)
+    config=$(get_grub_config_file $update)
 
-    if configure_grub; then
-	update_grub
+    if configure_grub "$config"; then
+	update_grub $update
     fi
 }
 
@@ -69,13 +71,6 @@ configure_platform() {
             abort "%s: %s hypervisor not supported\n" "$0" "$vendor"
             ;;
     esac
-
-    for command in $GRUB_COMMANDS; do
-	if which $command >/dev/null 2>&1; then
-            method=$command
-	    break
-	fi
-    done
 }
 
 get_awk_command() {
@@ -86,6 +81,49 @@ get_awk_command() {
         (*)
             printf "%s" /usr/bin/awk
             ;;
+    esac
+}
+
+get_grub_config_file() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "$1" in
+	(grubby)
+            true
+	    ;;
+	(grub2-mkconfig)
+            printf "%s\n" "$GRUB_CONFIG"
+	    ;;
+	(update-grub)
+            printf "%s\n" "$GRUB_CONFIG"
+	    ;;
+    esac
+}
+
+get_grub_update_command() {
+    for command in $GRUB_COMMANDS; do
+	if which $command >/dev/null 2>&1; then
+            printf "%s\n" "$command"
+	    break
+	fi
+    done
+}
+
+get_grub_update_options() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "$1" in
+	(grubby)
+            printf "%s\n" --update-kernel=ALL --args="$KERNEL_ARG"
+	    ;;
+	(grub2-mkconfig)
+            printf "%s\n" -o /boot/grub2/grub.cfg
+	    ;;
+	(update-grub)
+            true
+	    ;;
     esac
 }
 
@@ -118,17 +156,9 @@ get_sed_expr() {
 }
 
 update_grub() {
-    case "$method" in
-	(grubby)
-            grubby --update-kernel=ALL --args="$KERNEL_ARG"
-	    ;;
-	(grub2-mkconfig)
-            grub2-mkconfig -o /boot/grub2/grub.cfg
-	    ;;
-	(update-grub)
-            update-grub
-	    ;;
-    esac
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    $1 $(get_grub_update_options $1)
 }
 
 case "$0" in
@@ -141,8 +171,6 @@ case "$0" in
 esac
 
 script_prefix=${script_dir:+$script_dir/}
-
-. "${script_prefix}common-functions.sh"
 
 eval $("${script_prefix}get-os-release" -X)
 configure_hyper_v_guest
