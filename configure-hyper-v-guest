@@ -16,7 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-GRUB_FILE=/etc/default/grub
+GRUB_COMMANDS="grubby grub2-mkconfig update-grub false"
+GRUB_CONFIG=/etc/default/grub
 KERNEL_ARG=video=hyperv_fb:1920x1080
 KERNEL_VAR=GRUB_CMDLINE_LINUX_DEFAULT
 SED_FORMAT='s/\\(%s\\)="\\(.*\\)"/\\1="\\2 %s"/'
@@ -30,23 +31,27 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+configure_grub() {
+    if [ ! -e $GRUB_CONFIG ]; then
+	return
+    fi
+
+    if [ -w $GRUB_CONFIG ]; then
+        options=-i
+    elif [ -r $GRUB_CONFIG ]; then
+        options=
+    fi
+
+    if ! grep $KERNEL_ARG $GRUB_CONFIG; then
+	sed ${options:+$options }"$(get_sed_expr $KERNEL_ARG)" $GRUB_CONFIG
+    fi
+}
+
 configure_hyper_v_guest() {
     configure_platform
 
-    if which grubby >/dev/null 2>&1; then
-	grubby --update-kernel=ALL --args="$KERNEL_ARG"
-    elif [ -e $GRUB_FILE ]; then
-	if [ -w $GRUB_FILE ]; then
-	    sed -i "$(get_sed_expr $KERNEL_ARG)" $GRUB_FILE
-	elif [ -r $GRUB_FILE ]; then
-	    sed "$(get_sed_expr $KERNEL_ARG)" $GRUB_FILE
-	fi
-
-	if which update-grub >/dev/null 2>&1; then
-	    update-grub
-	elif which grub2-mkconfig /dev/null 2>&1; then
-	    grub2-mkconfig -o /boot/grub2/grub.cfg
-	fi
+    if configure_grub; then
+	update_grub
     fi
 }
 
@@ -54,26 +59,33 @@ configure_platform() {
     vendor=$(get_hypervisor_vendor || true)
 
     case "$vendor" in
-	(Microsoft)
-	    true
-	    ;;
-	('')
-	    abort "%s: No hypervisor detected\n" "$0"
-	    ;;
-	(*)
-	    abort "%s: %s hypervisor not supported\n" "$0" "$vendor"
-	    ;;
+        (Microsoft)
+            true
+            ;;
+        ('')
+            abort "%s: No hypervisor detected\n" "$0"
+            ;;
+        (*)
+            abort "%s: %s hypervisor not supported\n" "$0" "$vendor"
+            ;;
     esac
+
+    for command in $GRUB_COMMANDS; do
+	if which $command >/dev/null 2>&1; then
+            method=$command
+	    break
+	fi
+    done
 }
 
 get_awk_command() {
     case "$kernel_name" in
-	(SunOS)
-	    printf "%s" /usr/gnu/bin/awk
-	    ;;
-	(*)
-	    printf "%s" /usr/bin/awk
-	    ;;
+        (SunOS)
+            printf "%s" /usr/gnu/bin/awk
+            ;;
+        (*)
+            printf "%s" /usr/bin/awk
+            ;;
     esac
 }
 
@@ -87,15 +99,15 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-	$realpath "$@"
+        $realpath "$@"
     else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
+        for file; do
+            if expr "$file" : '/.*' >/dev/null; then
+                printf "%s\n" "$file"
+            else
+                printf "%s\n" "$PWD/${file#./}"
+            fi
+        done
     fi
 )
 
@@ -105,13 +117,27 @@ get_sed_expr() {
     printf "$SED_FORMAT\n" "$KERNEL_VAR" "$1"
 }
 
+update_grub() {
+    case "$method" in
+	(grubby)
+            grubby --update-kernel=ALL --args="$KERNEL_ARG"
+	    ;;
+	(grub2-mkconfig)
+            grub2-mkconfig -o /boot/grub2/grub.cfg
+	    ;;
+	(update-grub)
+            update-grub
+	    ;;
+    esac
+}
+
 case "$0" in
     (*/*)
-	script_dir=$(get_realpath "$(dirname "$0")")
-	;;
+        script_dir=$(get_realpath "$(dirname "$0")")
+        ;;
     (*)
-	script_dir=
-	;;
+        script_dir=
+        ;;
 esac
 
 script_prefix=${script_dir:+$script_dir/}
