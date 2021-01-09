@@ -19,7 +19,6 @@
 DEBIAN_10_PKG=emacs
 REDHAT_PKG=emacs
 UBUNTU_18_PKG=emacs25
-UBUNTU_19_PKG=emacs
 UBUNTU_20_PKG=emacs
 
 abort() {
@@ -88,9 +87,6 @@ configure_platform() {
 		case "$VERSION_ID" in
 		    (18.*)
 			package=$UBUNTU_18_PKG
-			;;
-		    (19.*)
-			package=$UBUNTU_19_PKG
 			;;
 		    (20.*)
 			package=$UBUNTU_20_PKG

@@ -19,7 +19,6 @@
 DEBIAN_10_PKGS="libxcb-composite0-dev libssl-dev libx11-dev"
 
 UBUNTU_18_PKGS="libxcb-composite0-dev libssl-dev libx11-dev"
-UBUNTU_19_PKGS="libxcb-composite0-dev libssl-dev libx11-dev"
 
 abort() {
     printf "$@" >&2

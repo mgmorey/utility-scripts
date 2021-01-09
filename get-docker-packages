@@ -33,7 +33,6 @@ REDHAT_PKGS="container-selinux containernetworking-plugins containers-common \
 podman podman-docker runc"
 
 UBUNTU_18_PKGS="containerd docker.io runc"
-UBUNTU_19_PKGS="containerd docker.io runc tini"
 UBUNTU_20_PKGS="containerd docker.io runc tini"
 
 abort() {

@@ -21,7 +21,6 @@ DEBIAN_10_PKGS="llvm-dev"
 OPENSUSE_PKGS="llvm-devel"
 
 UBUNTU_18_PKGS="llvm-dev"
-UBUNTU_19_PKGS="llvm-dev"
 UBUNTU_20_PKGS="llvm-dev"
 
 abort() {

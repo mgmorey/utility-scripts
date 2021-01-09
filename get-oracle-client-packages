@@ -22,7 +22,6 @@ REDHAT_7_PKGS="libaio"
 REDHAT_8_PKGS="libaio"
 
 UBUNTU_18_PKGS="libaio1 libodbc1"
-UBUNTU_19_PKGS="libaio1 libodbc1"
 UBUNTU_20_PKGS="libaio1 libodbc1"
 
 abort() {

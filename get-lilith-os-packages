@@ -21,7 +21,6 @@ DEBIAN_10_PKGS="binutils-i686-gnu gcc-i686-linux-gnu qemu"
 OPENSUSE_PKGS="cross-i386-binutils cross-i386-gcc9 qemu"
 
 UBUNTU_18_PKGS="binutils-i686-gnu gcc-i686-linux-gnu qemu"
-UBUNTU_19_PKGS="binutils-i686-gnu gcc-i686-linux-gnu qemu"
 
 abort() {
     printf "$@" >&2

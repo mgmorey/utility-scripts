@@ -24,8 +24,6 @@ readline-devel zlib-devel"
 
 UBUNTU_18_PKGS="libgmp-dev libreadline-dev libssl-dev libxml2-dev libyaml-dev \
 zlib1g-dev"
-UBUNTU_19_PKGS="libgmp-dev libreadline-dev libssl-dev libxml2-dev libyaml-dev \
-zlib1g-dev"
 UBUNTU_20_PKGS="libgmp-dev libreadline-dev libssl-dev libxml2-dev libyaml-dev \
 zlib1g-dev"
 

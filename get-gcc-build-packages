@@ -21,7 +21,6 @@ DEBIAN_10_PKGS="libgmp-dev libmpc-dev libmpfr-dev"
 OPENSUSE_PKGS="gmp-devel mpc-devel mpfr-devel"
 
 UBUNTU_18_PKGS="libgmp-dev libmpc-dev libmpfr-dev"
-UBUNTU_19_PKGS="libgmp-dev libmpc-dev libmpfr-dev"
 UBUNTU_20_PKGS="libgmp-dev libmpc-dev libmpfr-dev"
 
 abort() {

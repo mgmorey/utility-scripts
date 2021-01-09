@@ -37,7 +37,6 @@ REDHAT_8_PKGS="bash curl wget"
 SOLARIS_PKGS="shell/bash"
 
 UBUNTU_18_PKGS="bash curl wget"
-UBUNTU_19_PKGS="bash curl wget"
 UBUNTU_20_PKGS="bash curl wget"
 
 abort() {
