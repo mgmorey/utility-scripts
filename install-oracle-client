@@ -200,9 +200,6 @@ validate_platform() {
 		(18.04)
 		    true
 		    ;;
-		(19.10)
-		    true
-		    ;;
 		(20.04)
 		    true
 		    ;;

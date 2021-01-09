@@ -51,9 +51,6 @@ configure_platform() {
 		    (18.04)
 			package=$DEBIAN_PKG
 			;;
-		    (19.10)
-			package=$DEBIAN_PKG
-			;;
 		    (20.04)
 			package=$DEBIAN_PKG
 			;;
@@ -163,9 +160,6 @@ validate_platform() {
 	    (ubuntu)
 		case "$VERSION_ID" in
 		    (18.04)
-			return
-			;;
-		    (19.10)
 			return
 			;;
 		    (20.04)

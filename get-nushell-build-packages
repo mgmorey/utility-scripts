@@ -47,9 +47,6 @@ get_nushell_build_packages() {
 		    (18.04)
 			packages=$UBUNTU_18_PKGS
 			;;
-		    (19.10)
-			packages=$UBUNTU_19_PKGS
-			;;
 		esac
 		;;
 	esac

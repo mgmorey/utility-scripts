@@ -52,9 +52,6 @@ get_crystal_compiler_packages() {
 		(18.04)
 		    packages=$UBUNTU_18_PKGS
 		    ;;
-		(19.10)
-		    packages=$UBUNTU_19_PKGS
-		    ;;
 		(20.04)
 		    packages=$UBUNTU_20_PKGS
 		    ;;

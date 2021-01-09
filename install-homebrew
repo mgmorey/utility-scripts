@@ -138,10 +138,6 @@ install_homebrew() {
 			run_unpriv brew
 			break
 			;;
-		    (19.10)
-			run_unpriv brew
-			break
-			;;
 		    (20.04)
 			run_unpriv brew
 			break
@@ -227,9 +223,6 @@ validate_platform() {
 	    (ubuntu)
 		case "$VERSION_ID" in
 		    (18.04)
-			return
-			;;
-		    (19.10)
 			return
 			;;
 		    (20.04)
