@@ -79,7 +79,7 @@ configure_platform() {
 }
 
 get_awk_command() {
-    case "$kernel_name" in
+    case "${kernel_name=$(uname -s)}" in
         (SunOS)
             printf "%s\n" /usr/gnu/bin/awk
             ;;
@@ -180,5 +180,4 @@ esac
 
 script_prefix=${script_dir:+$script_dir/}
 
-eval $("${script_prefix}get-os-release" -x)
 configure_hyper_v_guest
