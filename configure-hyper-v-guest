@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-GRUB_COMMANDS="update-grub grubby grub2-mkconfig false"
+GRUB_COMMANDS="update-grub grubby grub2-mkconfig grub-mkconfig"
 GRUB_CONFIG=/etc/default/grub
 KERNEL_ARG=video=hyperv_fb:1920x1080
 KERNEL_VAR=GRUB_CMDLINE_LINUX_DEFAULT
@@ -50,6 +50,11 @@ configure_grub() {
 configure_hyper_v_guest() {
     configure_platform
     update=$(get_grub_update_command)
+
+    if [ -z "$update" ]; then
+        abort "%s: No grub update command detected\n" "$0"
+    fi
+
     config=$(get_grub_config_file $update)
 
     if configure_grub "$config"; then
@@ -117,6 +122,9 @@ get_grub_update_options() {
     case "$1" in
 	(grubby)
             printf "%s\n" --update-kernel=ALL --args="$KERNEL_ARG"
+	    ;;
+	(grub-mkconfig)
+            printf "%s\n" -o /boot/grub/grub.cfg
 	    ;;
 	(grub2-mkconfig)
             printf "%s\n" -o /boot/grub2/grub.cfg
