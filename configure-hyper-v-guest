@@ -180,5 +180,5 @@ esac
 
 script_prefix=${script_dir:+$script_dir/}
 
-eval $("${script_prefix}get-os-release" -X)
+eval $("${script_prefix}get-os-release" -x)
 configure_hyper_v_guest
