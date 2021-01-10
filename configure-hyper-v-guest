@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-GRUB_COMMANDS="update-grub grubby grub2-mkconfig grub-mkconfig"
-GRUB_CONFIG=/etc/default/grub
+GRUB_COMMANDS="grubby update-grub grub2-mkconfig grub-mkconfig"
+GRUB_DEFAULTS=/etc/default/grub
 KERNEL_ARG=video=hyperv_fb:1920x1080
 KERNEL_VAR=GRUB_CMDLINE_LINUX_DEFAULT
 SED_FORMAT='s/\\(%s\\)="\\(.*\\)"/\\1="\\2 %s"/'
@@ -32,12 +32,12 @@ assert() {
 }
 
 configure_grub() {
-    if [ -z "$1" ]; then
-	return 0
-    elif [ -w "$1" ]; then
+    if [ -w "$1" ]; then
         options=-i
     elif [ -r "$1" ]; then
         options=
+    else
+	return 0
     fi
 
     if ! grep $KERNEL_ARG "$1"; then
@@ -53,9 +53,7 @@ configure_hyper_v_guest() {
         abort "%s: No grub update command detected\n" "$0"
     fi
 
-    config=$(get_grub_config_file $update)
-
-    if configure_grub "$config"; then
+    if configure_grub "$GRUB_DEFAULTS"; then
 	update_grub $update
     fi
 }
@@ -84,26 +82,6 @@ get_awk_command() {
         (*)
             printf "%s\n" /usr/bin/awk
             ;;
-    esac
-}
-
-get_grub_config_file() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-
-    case "$1" in
-	(grubby)
-            true
-	    ;;
-	(grub-mkconfig)
-            printf "%s\n" "$GRUB_CONFIG"
-	    ;;
-	(grub2-mkconfig)
-            printf "%s\n" "$GRUB_CONFIG"
-	    ;;
-	(update-grub)
-            printf "%s\n" "$GRUB_CONFIG"
-	    ;;
     esac
 }
 
