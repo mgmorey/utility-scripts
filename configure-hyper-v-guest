@@ -76,10 +76,10 @@ configure_platform() {
 get_awk_command() {
     case "$kernel_name" in
         (SunOS)
-            printf "%s" /usr/gnu/bin/awk
+            printf "%s\n" /usr/gnu/bin/awk
             ;;
         (*)
-            printf "%s" /usr/bin/awk
+            printf "%s\n" /usr/bin/awk
             ;;
     esac
 }
