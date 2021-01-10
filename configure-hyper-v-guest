@@ -32,11 +32,9 @@ assert() {
 }
 
 configure_grub() {
-    if [ -z "$1" -o ! -e "$1" ]; then
+    if [ -z "$1" ]; then
 	return 0
-    fi
-
-    if [ -w "$1" ]; then
+    elif [ -w "$1" ]; then
         options=-i
     elif [ -r "$1" ]; then
         options=
@@ -96,6 +94,9 @@ get_grub_config_file() {
     case "$1" in
 	(grubby)
             true
+	    ;;
+	(grub-mkconfig)
+            printf "%s\n" "$GRUB_CONFIG"
 	    ;;
 	(grub2-mkconfig)
             printf "%s\n" "$GRUB_CONFIG"
