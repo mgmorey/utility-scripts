@@ -17,10 +17,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 GRUB_COMMANDS="grubby update-grub grub2-mkconfig grub-mkconfig"
-GRUB_DEFAULTS=/etc/default/grub
-KERNEL_ARG=video=hyperv_fb:1920x1080
-KERNEL_VAR=GRUB_CMDLINE_LINUX_DEFAULT
-SED_FORMAT='s/\\(%s\\)="\\(.*\\)"/\\1="\\2 %s"/'
+GRUB_DEFAULTS_FILE=/etc/default/grub
+GRUB_DEFAULTS_VARS='\(GRUB_CMDLINE_LINUX\|GRUB_CMDLINE_LINUX_DEFAULT\)'
+KERNEL_ARG='video=hyperv_fb:1920x1080'
+SED_FORMAT='s/ %s//g
+s/%s="\\(.*\\)"/\\1="\\2 %s"/'
 
 abort() {
     printf "$@" >&2
@@ -31,20 +32,6 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-configure_grub() {
-    if [ -w "$1" ]; then
-        options=-i
-    elif [ -r "$1" ]; then
-        options=
-    else
-	return 0
-    fi
-
-    if ! grep $KERNEL_ARG "$1"; then
-	sed ${options:+$options }"$(get_sed_expr $KERNEL_ARG)" "$1"
-    fi
-}
-
 configure_hyper_v_guest() {
     configure_platform
     update=$(get_grub_update_command)
@@ -53,7 +40,7 @@ configure_hyper_v_guest() {
         abort "%s: No grub update command detected\n" "$0"
     fi
 
-    if configure_grub "$GRUB_DEFAULTS"; then
+    if edit_grub_defaults "$GRUB_DEFAULTS_FILE"; then
 	update_grub $update
     fi
 }
@@ -72,6 +59,19 @@ configure_platform() {
             abort "%s: %s hypervisor not supported\n" "$0" "$vendor"
             ;;
     esac
+}
+
+edit_grub_defaults() {
+    if [ -w "$1" ]; then
+        options=-i
+    elif [ -r "$1" ]; then
+        options=
+    else
+	return 0
+    fi
+
+    expr=$(get_sed_expr "$GRUB_DEFAULTS_VARS" "$KERNEL_ARG")
+    sed ${options:+$options }"$expr" "$1"
 }
 
 get_awk_command() {
@@ -134,9 +134,9 @@ get_realpath() (
 )
 
 get_sed_expr() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    printf "$SED_FORMAT\n" "$KERNEL_VAR" "$1"
+    assert [ $# -eq 2 ]
+    assert [ -n "$2" ]
+    printf "$SED_FORMAT\n" "$2" "$1" "$2"
 }
 
 update_grub() {
