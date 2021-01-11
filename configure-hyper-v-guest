@@ -116,7 +116,7 @@ get_grub_update_options() {
 
 get_hypervisor_vendor() (
     awk="$(get_awk_command)"
-    (lscpu 2>/dev/null | $awk -f "${script_prefix}get-hypervisor-vendor")
+    lscpu 2>/dev/null | $awk -f "${script_prefix}get-hypervisor-vendor"
 )
 
 get_realpath() (
