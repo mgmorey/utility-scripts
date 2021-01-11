@@ -20,8 +20,11 @@ GRUB_COMMANDS="grubby update-grub grub2-mkconfig grub-mkconfig"
 GRUB_DEFAULTS_FILE=/etc/default/grub
 GRUB_DEFAULTS_VARS='\(GRUB_CMDLINE_LINUX\|GRUB_CMDLINE_LINUX_DEFAULT\)'
 KERNEL_ARG='video=hyperv_fb:1920x1080'
-SED_FORMAT='s/ %s//g
-s/%s="\\(.*\\)"/\\1="\\2 %s"/'
+SED_FORMAT='
+s/ %s//g
+s/%s=""/\\1="%s"/
+s/%s="\\(.*\\)"/\\1="\\2 %s"/
+'
 
 abort() {
     printf "$@" >&2
@@ -136,7 +139,7 @@ get_realpath() (
 get_sed_expr() {
     assert [ $# -eq 2 ]
     assert [ -n "$2" ]
-    printf "$SED_FORMAT\n" "$2" "$1" "$2"
+    printf "$SED_FORMAT\n" "$2" "$1" "$2" "$1" "$2"
 }
 
 update_grub() {
