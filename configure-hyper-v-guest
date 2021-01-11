@@ -99,17 +99,14 @@ get_grub_update_options() {
     assert [ -n "$1" ]
 
     case "$1" in
-	(grubby)
-            printf "%s\n" --update-kernel=ALL --args="$KERNEL_ARG"
-	    ;;
 	(grub-mkconfig)
             printf "%s\n" -o /boot/grub/grub.cfg
 	    ;;
 	(grub2-mkconfig)
             printf "%s\n" -o /boot/grub2/grub.cfg
 	    ;;
-	(update-grub)
-            true
+	(grubby)
+            printf "%s\n" --update-kernel=ALL --args="$KERNEL_ARG"
 	    ;;
     esac
 }
