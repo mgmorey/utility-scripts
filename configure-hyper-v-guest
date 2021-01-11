@@ -18,12 +18,12 @@
 
 GRUB_COMMANDS="grubby update-grub grub2-mkconfig grub-mkconfig"
 GRUB_DEFAULTS_FILE=/etc/default/grub
-GRUB_DEFAULTS_VARS='\(GRUB_CMDLINE_LINUX\|GRUB_CMDLINE_LINUX_DEFAULT\)'
+GRUB_DEFAULTS_VARS='\(GRUB_CMDLINE_LINUX\(\|_DEFAULT\)\)'
 KERNEL_ARG='video=hyperv_fb:1920x1080'
 SED_FORMAT='
 s/[ ]*%s//g
-s/%s="\\(.*\\)"/\\1="\\2 %s"/g
-s/%s=" \\(.*\\)"/\\1="\\2"/g
+s/%s="\\(.*\\)"/\\1="\\3 %s"/g
+s/%s=" \\(.*\\)"/\\1="\\3"/g
 '
 
 abort() {
