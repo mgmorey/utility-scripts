@@ -240,14 +240,7 @@ validate_platform() {
 	    esac
 	    ;;
 	(fedora)
-	    case "$VERSION_ID" in
-		(32)
-		    true
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
+	    true
 	    ;;
 	(opensuse-leap)
 	    case "$VERSION_ID" in
