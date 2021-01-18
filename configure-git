@@ -45,22 +45,22 @@ assert() {
 
 clean_build() {
     if [ -r Makefile ]; then
-        $make distclean
+	$make distclean
     fi
 }
 
 configure_compiler() {
     if [ -n "${1-}" ]; then
-        cc="$(get_compiler $1)"
-        cflags="$(get_compiler_flags $1)"
+	cc="$(get_compiler $1)"
+	cflags="$(get_compiler_flags $1)"
     fi
 
     if [ -n "${2-}" ]; then
-        cppflags="$(get_include_flags "$2")"
+	cppflags="$(get_include_flags "$2")"
     fi
 
     if [ -n "${3-}" ]; then
-        ldflags="$(get_linker_flags "$3")"
+	ldflags="$(get_linker_flags "$3")"
     fi
 
     pkg_config_path="$(get_pkg_config_path)"
@@ -83,11 +83,11 @@ configure_git() {
     cd "$src_dir"
 
     if [ "$force" = true ]; then
-        clean_build
+	clean_build
     elif [ ! -r config.status ]; then
-        true
+	true
     else
-        exit 0
+	exit 0
     fi
 
     $make configure
@@ -102,36 +102,36 @@ configure_platform() {
     prefix=$PREFIX
 
     for id in $ID $ID_LIKE; do
-        case "$id" in
-            (rhel|ol)
-                case "$VERSION_ID" in
-                   (8.*)
-                        configure_platform_linux_redhat_8
-                        break
-                        ;;
-                esac
-                ;;
-            (illumos)
-                configure_platform_unix_illumos
-                break
-                ;;
-            (netbsd)
-                configure_platform_bsd_netbsd
-                break
-                ;;
-            (solaris)
-                configure_platform_unix_solaris
-                break
-                ;;
-        esac
+	case "$id" in
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		   (8.*)
+			configure_platform_linux_redhat_8
+			break
+			;;
+		esac
+		;;
+	    (illumos)
+		configure_platform_unix_illumos
+		break
+		;;
+	    (netbsd)
+		configure_platform_bsd_netbsd
+		break
+		;;
+	    (solaris)
+		configure_platform_unix_solaris
+		break
+		;;
+	esac
     done
 
     if [ -n "${cc-}" ] && [ ! -x $cc ]; then
-        abort "%s: %s: No such compiler\n" "$0" "$cc"
+	abort "%s: %s: No such compiler\n" "$0" "$cc"
     fi
 
     if [ -n "${libgif-}" ] && [ ! -x $libgif ]; then
-        abort "%s: %s: No such shared object\n" "$0" "$libgif"
+	abort "%s: %s: No such shared object\n" "$0" "$libgif"
     fi
 }
 
@@ -164,21 +164,21 @@ download_archive() {
     url=$BASE_URL/$filename
 
     if [ ! -r "$pathname" ]; then
-        cd "$archive_dir"
-        wget $url
+	cd "$archive_dir"
+	wget $url
     fi
 
 }
 
 extract_files() {
     if [ ! -r "$src_dir/configure" ]; then
-        cd "$(dirname "$src_dir")"
+	cd "$(dirname "$src_dir")"
 
-        case "$pathname" in
-            (*.zip)
-                unzip "$pathname"
-                ;;
-        esac
+	case "$pathname" in
+	    (*.zip)
+		unzip "$pathname"
+		;;
+	esac
     fi
 }
 
@@ -196,27 +196,27 @@ get_configure_command() {
     printf '%s' "$1/configure"
 
     if [ -n "${options-}" ]; then
-        printf ' %s' "$options"
+	printf ' %s' "$options"
     fi
 
     if [ -n "${cc-}" ]; then
-        printf ' CC=\"%s\"' "${cc-}"
+	printf ' CC=\"%s\"' "${cc-}"
     fi
 
     if [ -n "${cflags-}" ]; then
-        printf ' CFLAGS=\"%s\"' "${cflags-}"
+	printf ' CFLAGS=\"%s\"' "${cflags-}"
     fi
 
     if [ -n "${cppflags-}" ]; then
-        printf ' CPPFLAGS=\"%s\"' "${cppflags-}"
+	printf ' CPPFLAGS=\"%s\"' "${cppflags-}"
     fi
 
     if [ -n "${ldflags-}" ]; then
-        printf ' LDFLAGS=\"%s\"' "${ldflags-}"
+	printf ' LDFLAGS=\"%s\"' "${ldflags-}"
     fi
 
     if [ -n "${pkg_config_path-}" ]; then
-        printf ' PKG_CONFIG_PATH=\"%s\"' "${pkg_config_path-}"
+	printf ' PKG_CONFIG_PATH=\"%s\"' "${pkg_config_path-}"
     fi
 
     printf '\n'
@@ -224,7 +224,7 @@ get_configure_command() {
 
 get_configure_options() {
     if [ -n "${options:-}" ]; then
-        printf "%s\n" "$options"
+	printf "%s\n" "$options"
     fi
 }
 
@@ -239,28 +239,28 @@ get_linker_flags() {
     ldflags=
 
     for libdir; do
-        case "$os_family" in
-            (gnu-*)
-                ldflags="-Wl,--rpath=$libdir"
-                ;;
-            (unix)
-                ldflags="-L$libdir -R$libdir"
-                ;;
-        esac
+	case "$os_family" in
+	    (gnu-*)
+		ldflags="-Wl,--rpath=$libdir"
+		;;
+	    (unix)
+		ldflags="-L$libdir -R$libdir"
+		;;
+	esac
     done
 
     if [ "${ldflags-}" ]; then
-        printf "%s\n" "$ldflags"
+	printf "%s\n" "$ldflags"
     fi
 }
 
 get_pkg_config_path() {
     for pkgdir in ${pkgdirs-}; do
-        pkg_config_path=${pkg_config_path+$pkg_config_path:}$pkgdir
+	pkg_config_path=${pkg_config_path+$pkg_config_path:}$pkgdir
     done
 
     if [ "${pkg_config_path-}" ]; then
-        printf "%s\n" "$pkg_config_path"
+	printf "%s\n" "$pkg_config_path"
     fi
 }
 
@@ -269,15 +269,15 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-        $realpath "$@"
+	$realpath "$@"
     else
-        for file; do
-            if expr "$file" : '/.*' >/dev/null; then
-                printf "%s\n" "$file"
-            else
-                printf "%s\n" "$PWD/${file#./}"
-            fi
-        done
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
     fi
 )
 
@@ -290,7 +290,7 @@ include_prefix() {
     libdirs="${libdirs+$libdirs }$libdir"
 
     if [ -d "$libdir/pkgconfig" ]; then
-        pkgdirs="${pkgdirs+$pkgdirs }$libdir/pkgconfig"
+	pkgdirs="${pkgdirs+$pkgdirs }$libdir/pkgconfig"
     fi
 }
 
@@ -301,69 +301,69 @@ usage_error() {
 
 validate_platform() {
     case "$ID" in
-        (centos)
-            case "$VERSION_ID" in
-                (7)
-                    return
-                    ;;
-                (8)
-                    return
-                    ;;
-                (*)
-                    abort_not_supported Release
-                    ;;
-            esac
-            ;;
-        (debian|raspbian)
-            return
-            ;;
-        (fedora)
-            return
-            ;;
-        (opensuse-*)
-            return
-            ;;
-        (rhel|ol)
-            case "$VERSION_ID" in
-                (7.*)
-                    return
-                    ;;
-                (8.*)
-                    return
-                    ;;
-                (*)
-                    abort_not_supported Release
-                    ;;
-            esac
-            ;;
-        (freebsd)
-            return
-            ;;
-        (illumos)
-            return
-            ;;
-        (netbsd)
-            return
-            ;;
-        (solaris)
-            return
-            ;;
-        (windows)
-            return
-            ;;
-        (*)
-            abort_not_supported "Operating system"
-            ;;
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    return
+		    ;;
+		(8)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    return
+	    ;;
+	(fedora)
+	    return
+	    ;;
+	(opensuse-*)
+	    return
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    return
+		    ;;
+		(8.*)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(freebsd)
+	    return
+	    ;;
+	(illumos)
+	    return
+	    ;;
+	(netbsd)
+	    return
+	    ;;
+	(solaris)
+	    return
+	    ;;
+	(windows)
+	    return
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
     esac
 }
 
 case "$0" in
     (*/*)
-        script_dir=$(get_realpath "$(dirname "$0")")
-        ;;
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
     (*)
-        script_dir=
-        ;;
+	script_dir=
+	;;
 esac
 
 script_prefix=${script_dir:+$script_dir/}

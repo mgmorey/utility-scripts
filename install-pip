@@ -40,7 +40,7 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-    	$realpath "$@"
+	$realpath "$@"
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
@@ -61,52 +61,52 @@ validate_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (centos)
-                case "$VERSION_ID" in
+		case "$VERSION_ID" in
 		    (7)
 			return
-                        ;;
+			;;
 		    (8)
 			return
 			;;
 		    (*)
 			break
 			;;
-                esac
+		esac
 		;;
 	    (debian)
-                case "$VERSION_ID" in
+		case "$VERSION_ID" in
 		    (10)
 			return
-                        ;;
+			;;
 		    (*)
 			break
-                        ;;
-                esac
-	    	;;
+			;;
+		esac
+		;;
 	    (fedora)
 		return
-	    	;;
+		;;
 	    (opensuse)
 		return
-	    	;;
+		;;
 	    (rhel|ol)
-                case "$VERSION_ID" in
+		case "$VERSION_ID" in
 		    (7|7.*)
 			return
-                        ;;
+			;;
 		    (8|8.*)
 			return
 			;;
 		    (*)
 			break
 			;;
-                esac
+		esac
 		;;
 	    (ubuntu)
-                case "$VERSION_ID" in
+		case "$VERSION_ID" in
 		    (18.*)
 			return
-                        ;;
+			;;
 		    (19.*)
 			return
 			;;
@@ -116,20 +116,20 @@ validate_platform() {
 		    (*)
 			break
 			;;
-                esac
-	    	;;
+		esac
+		;;
 	    (freebsd)
 		return
-    		;;
+		;;
 	    (macos)
 		return
-    		;;
+		;;
 	    (netbsd)
 		return
 		;;
 	    (solaris)
 		return
-    		;;
+		;;
 	esac
     done
 
