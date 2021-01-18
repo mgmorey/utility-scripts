@@ -22,7 +22,7 @@ get_options() {
     options=
 
     if [ "$id" -gt 0 ]; then
-        options="${options:+$options }--user"
+	options="${options:+$options }--user"
     fi
 
     printf '%s\n' $options
@@ -34,7 +34,7 @@ pip_install() {
     pip_install="$PYTHON -m pip install ${options+$options }"
 
     if [ "$id" -gt 0 ]; then
-        $pip_install --upgrade pip
+	$pip_install --upgrade pip
     fi
 
     $pip_install "$@"
@@ -42,11 +42,11 @@ pip_install() {
 
 case "$0" in
     (*/*)
-        script_dir=$(realpath "$(dirname "$0")")
-        ;;
+	script_dir=$(realpath "$(dirname "$0")")
+	;;
     (*)
-        script_dir=
-        ;;
+	script_dir=
+	;;
 esac
 
 script_prefix=${script_dir:+$script_dir/}

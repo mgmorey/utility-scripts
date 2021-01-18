@@ -38,7 +38,7 @@ configure_hyper_v_guest() {
     update=$(get_grub_update_command)
 
     if [ -z "$update" ]; then
-        abort "%s: No grub update command detected\n" "$0"
+	abort "%s: No grub update command detected\n" "$0"
     fi
 
     if edit_grub_defaults "$GRUB_DEFAULTS_FILE"; then
@@ -50,23 +50,23 @@ configure_platform() {
     vendor=$(get_hypervisor_vendor || true)
 
     case "$vendor" in
-        (Microsoft)
-            true
-            ;;
-        ('')
-            abort "%s: No hypervisor detected\n" "$0"
-            ;;
-        (*)
-            abort "%s: %s hypervisor not supported\n" "$0" "$vendor"
-            ;;
+	(Microsoft)
+	    true
+	    ;;
+	('')
+	    abort "%s: No hypervisor detected\n" "$0"
+	    ;;
+	(*)
+	    abort "%s: %s hypervisor not supported\n" "$0" "$vendor"
+	    ;;
     esac
 }
 
 edit_grub_defaults() {
     if [ -w "$1" ]; then
-        options=-i
+	options=-i
     elif [ -r "$1" ]; then
-        options=
+	options=
     else
 	return 0
     fi
@@ -77,19 +77,19 @@ edit_grub_defaults() {
 
 get_awk_command() {
     case "${kernel_name=$(uname -s)}" in
-        (SunOS)
-            printf "%s\n" /usr/gnu/bin/awk
-            ;;
-        (*)
-            printf "%s\n" /usr/bin/awk
-            ;;
+	(SunOS)
+	    printf "%s\n" /usr/gnu/bin/awk
+	    ;;
+	(*)
+	    printf "%s\n" /usr/bin/awk
+	    ;;
     esac
 }
 
 get_grub_update_command() {
     for command in $GRUB_COMMANDS; do
 	if which $command >/dev/null 2>&1; then
-            printf "%s\n" "$command"
+	    printf "%s\n" "$command"
 	    break
 	fi
     done
@@ -101,13 +101,13 @@ get_grub_update_options() {
 
     case "$1" in
 	(grub-mkconfig)
-            printf "%s\n" -o /boot/grub/grub.cfg
+	    printf "%s\n" -o /boot/grub/grub.cfg
 	    ;;
 	(grub2-mkconfig)
-            printf "%s\n" -o /boot/grub2/grub.cfg
+	    printf "%s\n" -o /boot/grub2/grub.cfg
 	    ;;
 	(grubby)
-            printf "%s\n" --update-kernel=ALL --args="$KERNEL_ARG"
+	    printf "%s\n" --update-kernel=ALL --args="$KERNEL_ARG"
 	    ;;
     esac
 }
@@ -122,15 +122,15 @@ get_realpath() (
     realpath=$(which realpath)
 
     if [ -n "$realpath" ]; then
-        $realpath "$@"
+	$realpath "$@"
     else
-        for file; do
-            if expr "$file" : '/.*' >/dev/null; then
-                printf "%s\n" "$file"
-            else
-                printf "%s\n" "$PWD/${file#./}"
-            fi
-        done
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
     fi
 )
 
@@ -148,11 +148,11 @@ update_grub() {
 
 case "$0" in
     (*/*)
-        script_dir=$(get_realpath "$(dirname "$0")")
-        ;;
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
     (*)
-        script_dir=
-        ;;
+	script_dir=
+	;;
 esac
 
 script_prefix=${script_dir:+$script_dir/}

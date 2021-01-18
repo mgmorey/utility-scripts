@@ -44,7 +44,7 @@ parse_arguments() {
     databases=
 
     if [ $# -gt 0 ]; then
-        databases="$@"
+	databases="$@"
     fi
 }
 
@@ -55,15 +55,15 @@ stop_database() {
     logfile=$(get_logfile "$HOME" "$ORACLE_SID")
     print_info "Stopping SID $ORACLE_SID"
     cat_sql_shutdown | sqlplus /nolog | \
-        tee $logfile | filter_sqlplus
+	tee $logfile | filter_sqlplus
 
     if grep "^Database dismounted." $logfile >/dev/null 2>&1; then
-        print_info "SID $ORACLE_SID stopped"
-        status=0
+	print_info "SID $ORACLE_SID stopped"
+	status=0
     else
-        print_error "SID $ORACLE_SID shutdown failed"
-        print_error "Check $logfile for errors"
-        status=1
+	print_error "SID $ORACLE_SID shutdown failed"
+	print_error "Check $logfile for errors"
+	status=1
     fi
 
     return $status
@@ -77,7 +77,7 @@ stop_databases() {
     check_dirs
 
     for database; do
-        stop_database "$database"
+	stop_database "$database"
     done
 }
 

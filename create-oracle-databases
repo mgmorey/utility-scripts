@@ -101,29 +101,29 @@ create_database() {
     tnsfile=$(get_tnsfile "${TNS_ADMIN-$ORACLE_HOME/network/admin}")
 
     if [ -f "$initfile" ]; then
-        print_warn "Parameter file $initfile already exists"
-        return 0
+	print_warn "Parameter file $initfile already exists"
+	return 0
     fi
 
     print_info "Creating database $db_name SID $ORACLE_SID"
     cat_init $db_name $ORACLE_HOME >$initfile
     cat_sql_create $db_name "$ORACLE_PWD" | sqlplus /nolog | \
-        tee $logfile | filter_sqlplus
+	tee $logfile | filter_sqlplus
 
     if grep "^Database created." $logfile >/dev/null 2>&1; then
-        print_info "Database $db_name created"
-        print_info "Building data dictionary views"
-        cat_sql_sysdba | sqlplus /nolog >>$logfile
-        cat_sql_system | sqlplus /nolog >>$logfile
-        print_info "Registering SID in $(basename $tnsfile)"
-        cat_tns $ORACLE_SID >>"$tnsfile"
-        print_info "Compressing $(basename $logfile)"
-        gzip -9f $logfile || true
-        status=0
+	print_info "Database $db_name created"
+	print_info "Building data dictionary views"
+	cat_sql_sysdba | sqlplus /nolog >>$logfile
+	cat_sql_system | sqlplus /nolog >>$logfile
+	print_info "Registering SID in $(basename $tnsfile)"
+	cat_tns $ORACLE_SID >>"$tnsfile"
+	print_info "Compressing $(basename $logfile)"
+	gzip -9f $logfile || true
+	status=0
     else
-        print_error "Database $db_name creation failed"
-        print_error "Check $logfile for errors"
-        status=1
+	print_error "Database $db_name creation failed"
+	print_error "Check $logfile for errors"
+	status=1
     fi
 
     return $status
@@ -137,7 +137,7 @@ create_databases() {
     check_dirs
 
     for database; do
-        create_database "$database"
+	create_database "$database"
     done
 }
 
@@ -165,7 +165,7 @@ parse_arguments() {
     databases=
 
     if [ $# -gt 0 ]; then
-        databases="$@"
+	databases="$@"
     fi
 }
 

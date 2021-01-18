@@ -45,7 +45,7 @@ parse_arguments() {
     databases=
 
     if [ $# -gt 0 ]; then
-        databases="$@"
+	databases="$@"
     fi
 }
 
@@ -56,15 +56,15 @@ start_database() {
     logfile=$(get_logfile "$HOME" "$ORACLE_SID")
     print_info "Starting SID $ORACLE_SID"
     cat_sql_startup | sqlplus /nolog | \
-        tee $logfile | filter_sqlplus
+	tee $logfile | filter_sqlplus
 
     if grep "^Database opened." $logfile >/dev/null 2>&1; then
-        print_info "SID $ORACLE_SID started"
-        status=0
+	print_info "SID $ORACLE_SID started"
+	status=0
     else
-        print_error "SID $ORACLE_SID startup failed"
-        print_error "Check $logfile for errors"
-        status=1
+	print_error "SID $ORACLE_SID startup failed"
+	print_error "Check $logfile for errors"
+	status=1
     fi
 
     return $status
@@ -78,7 +78,7 @@ start_databases() {
     check_dirs
 
     for database; do
-        start_database "$database"
+	start_database "$database"
     done
 }
 
