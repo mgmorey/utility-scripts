@@ -336,13 +336,16 @@ include_prefix() {
 }
 
 parse_arguments() {
-    while getopts cfnp:t:v:wh opt; do
+    while getopts cfgnp:t:v:wh opt; do
 	case $opt in
 	    (c)
 		with_cairo=true
 		;;
 	    (f)
 		force=true
+		;;
+	    (g)
+		with_gif=true
 		;;
 	    (n)
 		with_gif=false

@@ -107,7 +107,7 @@ configure_platform() {
     make=make
     prefix=$PREFIX
     with_cairo=false
-    with_gif=
+    with_gif=false
     with_gnutls=
     with_toolkit=false
     with_widgets=false
@@ -340,16 +340,10 @@ include_prefix() {
 }
 
 parse_arguments() {
-    while getopts cfnp:t:v:wh opt; do
+    while getopts fp:v:h opt; do
 	case $opt in
-	    (c)
-		with_cairo=true
-		;;
 	    (f)
 		force=true
-		;;
-	    (n)
-		with_gif=false
 		;;
 	    (p)
 		case $OPTARG in
@@ -365,16 +359,6 @@ parse_arguments() {
 			;;
 		esac
 		;;
-	    (t)
-		case $OPTARG in
-		    (athena|gtk|gtk2|gtk3|lucid|no)
-			toolkit=$OPTARG
-			with_toolkit=true
-			;;
-		    (*)
-			abort_invalid_toolkit $OPTARG
-		esac
-		;;
 	    (v)
 		case $OPTARG in
 		    (2[6789].[0-9]|2[6789].[1-9][0-9])
@@ -384,9 +368,6 @@ parse_arguments() {
 			abort_invalid_version $OPTARG
 			;;
 		esac
-		;;
-	    (w)
-		with_widgets=true
 		;;
 	    (h)
 		usage
