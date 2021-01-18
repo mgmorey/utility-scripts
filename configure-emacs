@@ -140,10 +140,6 @@ configure_platform() {
     if [ -n "${cc-}" ] && [ ! -x $cc ]; then
 	abort "%s: %s: No such compiler\n" "$0" "$cc"
     fi
-
-    if [ -n "${libgif-}" ] && [ ! -x $libgif ]; then
-	abort "%s: %s: No such shared object\n" "$0" "$libgif"
-    fi
 }
 
 configure_platform_bsd_netbsd() {
@@ -402,6 +398,10 @@ parse_arguments() {
 
     if [ $# -gt 0 ]; then
 	usage_error "%s: Too many arguments\n" "$0"
+    fi
+
+    if [ "$with_gif" = true -a -n "${libgif-}" ] && [ ! -x $libgif ]; then
+	abort "%s: %s: No such shared object\n" "$0" "$libgif"
     fi
 }
 
