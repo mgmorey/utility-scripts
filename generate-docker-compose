@@ -29,20 +29,20 @@ generate_docker_compose() {
     printf '%s: "%s"\n\n' "version" "$COMPOSE_VERSION"
     printf '%s:\n\n' "services"
     printf '    %s:\n' "$service_name"
-    printf '      %s: %s\n' "container_name" "$container_name"
-    printf '      %s:\n' "environment"
+    printf '        %s: %s\n' "container_name" "$container_name"
+    printf '        %s:\n' "environment"
     vars=$(get_environment_vars)
 
     for var in $vars; do
         value=$(get_environment_value $var)
-        printf '        - %s=%s\n' "$var" "$value"
+        printf '            - %s=%s\n' "$var" "$value"
     done
 
-    printf '      %s: %s\n' "image" "$docker_image"
-    printf '      %s:\n' "ports"
+    printf '        %s: %s\n' "image" "$docker_image"
+    printf '        %s:\n' "ports"
 
     cat $PORT_FILE | while read port; do
-        printf '        - %s:%s\n' "$port" "$port"
+        printf '            - %s:%s\n' "$port" "$port"
     done
 
     volumes=$(get_volumes)
@@ -51,11 +51,11 @@ generate_docker_compose() {
         return 0
     fi
 
-    printf '      %s:\n' "volumes"
+    printf '        %s:\n' "volumes"
 
     for volume in $volumes; do
         mount=$(get_volume_mount $volume)
-        printf '        - %s:%s\n' "$volume" "$mount"
+        printf '            - %s:%s\n' "$volume" "$mount"
     done
 
     printf '%s\n' ""
@@ -65,11 +65,11 @@ generate_docker_compose() {
         mount=$(get_volume_mount $volume)
         printf '%s\n' ""
         printf '    %s:\n' "$volume"
-        printf '      %s: %s\n' "driver" "local"
-        printf '      %s:\n' "driver_opts"
-        printf '        %s: %s\n' "o" "bind"
-        printf '        %s: %s\n' "type" "none"
-        printf '        %s: %s\n' "device" "$mount"
+        printf '        %s: %s\n' "driver" "local"
+        printf '        %s:\n' "driver_opts"
+        printf '            %s: %s\n' "o" "bind"
+        printf '            %s: %s\n' "type" "none"
+        printf '            %s: %s\n' "device" "$mount"
     done
 }
 
