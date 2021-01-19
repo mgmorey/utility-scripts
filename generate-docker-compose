@@ -1,0 +1,96 @@
+#!/bin/sh -eu
+
+# generate-docker-compose: print configuration file docker-compose.yaml
+# Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+COMPOSE_VERSION=3.3
+ENV_FILE=$HOME/docker-environment.txt
+NAME_FILE=$HOME/docker-names.txt
+PORT_FILE=$HOME/docker-ports.txt
+VOLUME_FILE=$HOME/docker-volumes.txt
+
+generate_docker_compose() {
+    container_name=$(get_name_value container_name)
+    docker_image=$(get_name_value docker_image)
+    service_name=$(get_name_value service_name)
+    printf '%s: "%s"\n\n' "version" "$COMPOSE_VERSION"
+    printf '%s:\n\n' "services"
+    printf '    %s:\n' "$service_name"
+    printf '      %s: %s\n' "container_name" "$container_name"
+    printf '      %s:\n' "environment"
+    vars=$(get_environment_vars)
+
+    for var in $vars; do
+        value=$(get_environment_value $var)
+        printf '        - %s=%s\n' "$var" "$value"
+    done
+
+    printf '      %s: %s\n' "image" "$docker_image"
+    printf '      %s:\n' "ports"
+
+    cat $PORT_FILE | while read port; do
+        printf '        - %s:%s\n' "$port" "$port"
+    done
+
+    volumes=$(get_volumes)
+
+    if [ -z "$volumes" ]; then
+        return 0
+    fi
+
+    printf '      %s:\n' "volumes"
+
+    for volume in $volumes; do
+        mount=$(get_volume_mount $volume)
+        printf '        - %s:%s\n' "$volume" "$mount"
+    done
+
+    printf '%s\n' ""
+    printf '%s:\n' "volumes"
+
+    for volume in $volumes; do
+        mount=$(get_volume_mount $volume)
+        printf '%s\n' ""
+        printf '    %s:\n' "$volume"
+        printf '      %s: %s\n' "driver" "local"
+        printf '      %s:\n' "driver_opts"
+        printf '        %s: %s\n' "o" "bind"
+        printf '        %s: %s\n' "type" "none"
+        printf '        %s: %s\n' "device" "$mount"
+    done
+}
+
+get_environment_value() {
+    awk -F: '$1 == "'"$1"'" {print $2}' $ENV_FILE
+}
+
+get_environment_vars() {
+    awk -F: '{print $1}' $ENV_FILE
+}
+
+get_name_value() {
+    awk -F: '$1 == "'"$1"'" {print $2}' $NAME_FILE
+}
+
+get_volume_mount() {
+    awk -F: '$1 == "'"$1"'" {print $2}' $VOLUME_FILE
+}
+
+get_volumes() {
+    awk -F: '{print $1}' $VOLUME_FILE
+}
+
+generate_docker_compose
