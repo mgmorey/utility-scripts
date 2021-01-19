@@ -62,14 +62,14 @@ generate_docker_compose() {
     printf '%s:\n' "volumes"
 
     for volume in $volumes; do
-        mount=$(get_volume_mount $volume)
+        device=$(get_volume_device $volume)
         printf '%s\n' ""
         printf '    %s:\n' "$volume"
         printf '        %s: %s\n' "driver" "local"
         printf '        %s:\n' "driver_opts"
         printf '            %s: %s\n' "o" "bind"
         printf '            %s: %s\n' "type" "none"
-        printf '            %s: %s\n' "device" "$mount"
+        printf '            %s: %s\n' "device" "$device"
     done
 }
 
@@ -83,6 +83,10 @@ get_environment_vars() {
 
 get_name_value() {
     awk -F: '$1 == "'"$1"'" {print $2}' $NAME_FILE
+}
+
+get_volume_device() {
+    awk -F: '$1 == "'"$1"'" {print $3}' $VOLUME_FILE
 }
 
 get_volume_mount() {
