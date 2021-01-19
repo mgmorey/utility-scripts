@@ -74,15 +74,15 @@ generate_docker_compose() {
 }
 
 get_environment_value() {
-    awk -F: '$1 == "'"$1"'" {print $2}' $ENV_FILE
+    awk -F= '$1 == "'"$1"'" {print $2}' $ENV_FILE
 }
 
 get_environment_vars() {
-    awk -F: '{print $1}' $ENV_FILE
+    awk -F= '{print $1}' $ENV_FILE
 }
 
 get_name_value() {
-    awk -F: '$1 == "'"$1"'" {print $2}' $NAME_FILE
+    awk -F= '$1 == "'"$1"'" {print $2}' $NAME_FILE
 }
 
 get_volume_device() {
