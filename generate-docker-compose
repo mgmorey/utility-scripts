@@ -23,11 +23,18 @@ PORT_FILE=docker-ports.txt
 VOLUME_FILE=docker-volumes.txt
 
 generate_docker_compose() {
+    printf '%s: "%s"\n' "version" "$COMPOSE_VERSION"
+    generate_services
+    generate_volumes
+}
+
+generate_services() {
     container_name=$(get_name_value container_name)
     docker_image=$(get_name_value docker_image)
     service_name=$(get_name_value service_name)
-    printf '%s: "%s"\n\n' "version" "$COMPOSE_VERSION"
-    printf '%s:\n\n' "services"
+    printf '%s\n' ""
+    printf '%s:\n' "services"
+    printf '%s\n' ""
     printf '    %s:\n' "$service_name"
     printf '        %s: %s\n' "container_name" "$container_name"
     printf '        %s:\n' "environment"
@@ -57,6 +64,14 @@ generate_docker_compose() {
         mount=$(get_volume_mount $volume)
         printf '            - %s:%s\n' "$volume" "$mount"
     done
+}
+
+generate_volumes() {
+    volume_count=$(get_volume_count)
+
+    if [ "$volume_count" -eq 0 ]; then
+        return 0
+    fi
 
     printf '%s\n' ""
     printf '%s:\n' "volumes"
