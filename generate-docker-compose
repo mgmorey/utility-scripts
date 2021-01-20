@@ -24,68 +24,8 @@ VOLUME_FILE=docker-volumes.txt
 
 generate_docker_compose() {
     printf '%s: "%s"\n' "version" "$COMPOSE_VERSION"
-    generate_services
-    generate_volumes
-}
-
-generate_services() {
-    container_name=$(get_name_value container_name)
-    docker_image=$(get_name_value docker_image)
-    service_name=$(get_name_value service_name)
-    printf '%s\n' ""
-    printf '%s:\n' "services"
-    printf '%s\n' ""
-    printf '    %s:\n' "$service_name"
-    printf '        %s: %s\n' "container_name" "$container_name"
-    printf '        %s:\n' "environment"
-    vars=$(get_environment_vars)
-
-    for var in $vars; do
-        value=$(get_environment_value $var)
-        printf '            - %s=%s\n' "$var" "$value"
-    done
-
-    printf '        %s: %s\n' "image" "$docker_image"
-    printf '        %s:\n' "ports"
-
-    get_ports | while read port; do
-        printf '            - %s:%s\n' "$port" "$port"
-    done
-
-    volume_count=$(get_volume_count)
-
-    if [ "$volume_count" -eq 0 ]; then
-        return 0
-    fi
-
-    printf '        %s:\n' "volumes"
-
-    get_volumes | while read volume; do
-        mount=$(get_volume_mount $volume)
-        printf '            - %s:%s\n' "$volume" "$mount"
-    done
-}
-
-generate_volumes() {
-    volume_count=$(get_volume_count)
-
-    if [ "$volume_count" -eq 0 ]; then
-        return 0
-    fi
-
-    printf '%s\n' ""
-    printf '%s:\n' "volumes"
-
-    get_volumes | while read volume; do
-        device=$(get_volume_device $volume)
-        printf '%s\n' ""
-        printf '    %s:\n' "$volume"
-        printf '        %s: %s\n' "driver" "local"
-        printf '        %s:\n' "driver_opts"
-        printf '            %s: %s\n' "o" "bind"
-        printf '            %s: %s\n' "type" "none"
-        printf '            %s: %s\n' "device" "$device"
-    done
+    print_services
+    print_volumes
 }
 
 get_environment_value() {
@@ -118,6 +58,76 @@ get_volume_mount() {
 
 get_volumes() {
     awk -F: '{print $1}' $VOLUME_FILE
+}
+
+print_service_environment() {
+    printf '        %s:\n' "environment"
+    vars=$(get_environment_vars)
+
+    for var in $vars; do
+        value=$(get_environment_value $var)
+        printf '            - %s=%s\n' "$var" "$value"
+    done
+}
+
+print_service_ports() {
+    printf '        %s:\n' "ports"
+
+    get_ports | while read port; do
+        printf '            - %s:%s\n' "$port" "$port"
+    done
+}
+
+print_service_volumes() {
+    volume_count=$(get_volume_count)
+
+    if [ "$volume_count" -eq 0 ]; then
+        return 0
+    fi
+
+    printf '        %s:\n' "volumes"
+
+    get_volumes | while read volume; do
+        mount=$(get_volume_mount $volume)
+        printf '            - %s:%s\n' "$volume" "$mount"
+    done
+}
+
+print_services() {
+    container_name=$(get_name_value container_name)
+    docker_image=$(get_name_value docker_image)
+    service_name=$(get_name_value service_name)
+    printf '%s\n' ""
+    printf '%s:\n' "services"
+    printf '%s\n' ""
+    printf '    %s:\n' "$service_name"
+    printf '        %s: %s\n' "container_name" "$container_name"
+    print_service_environment
+    printf '        %s: %s\n' "image" "$docker_image"
+    print_service_ports
+    print_service_volumes
+}
+
+print_volumes() {
+    volume_count=$(get_volume_count)
+
+    if [ "$volume_count" -eq 0 ]; then
+        return 0
+    fi
+
+    printf '%s\n' ""
+    printf '%s:\n' "volumes"
+
+    get_volumes | while read volume; do
+        device=$(get_volume_device $volume)
+        printf '%s\n' ""
+        printf '    %s:\n' "$volume"
+        printf '        %s: %s\n' "driver" "local"
+        printf '        %s:\n' "driver_opts"
+        printf '            %s: %s\n' "o" "bind"
+        printf '            %s: %s\n' "type" "none"
+        printf '            %s: %s\n' "device" "$device"
+    done
 }
 
 generate_docker_compose
