@@ -41,19 +41,19 @@ generate_docker_compose() {
     printf '        %s: %s\n' "image" "$docker_image"
     printf '        %s:\n' "ports"
 
-    cat $PORT_FILE | while read port; do
+    get_ports | while read port; do
         printf '            - %s:%s\n' "$port" "$port"
     done
 
-    volumes=$(get_volumes)
+    volume_count=$(get_volume_count)
 
-    if [ -z "$volumes" ]; then
+    if [ "$volume_count" -eq 0 ]; then
         return 0
     fi
 
     printf '        %s:\n' "volumes"
 
-    for volume in $volumes; do
+    get_volumes | while read volume; do
         mount=$(get_volume_mount $volume)
         printf '            - %s:%s\n' "$volume" "$mount"
     done
@@ -61,7 +61,7 @@ generate_docker_compose() {
     printf '%s\n' ""
     printf '%s:\n' "volumes"
 
-    for volume in $volumes; do
+    get_volumes | while read volume; do
         device=$(get_volume_device $volume)
         printf '%s\n' ""
         printf '    %s:\n' "$volume"
@@ -83,6 +83,14 @@ get_environment_vars() {
 
 get_name_value() {
     awk -F= '$1 == "'"$1"'" {print $2}' $NAME_FILE
+}
+
+get_ports() {
+    cat $PORT_FILE
+}
+
+get_volume_count() {
+    awk -F: 'END {print NR}' $VOLUME_FILE
 }
 
 get_volume_device() {
