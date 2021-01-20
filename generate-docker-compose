@@ -17,10 +17,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 COMPOSE_VERSION=3.3
-ENV_FILE=$HOME/docker-environment.txt
-NAME_FILE=$HOME/docker-names.txt
-PORT_FILE=$HOME/docker-ports.txt
-VOLUME_FILE=$HOME/docker-volumes.txt
+ENV_FILE=docker-environment.txt
+NAME_FILE=docker-names.txt
+PORT_FILE=docker-ports.txt
+VOLUME_FILE=docker-volumes.txt
 
 generate_docker_compose() {
     container_name=$(get_name_value container_name)
