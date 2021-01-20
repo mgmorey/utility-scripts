@@ -62,9 +62,8 @@ get_volumes() {
 
 print_service_environment() {
     printf '        %s:\n' "environment"
-    vars=$(get_environment_vars)
 
-    for var in $vars; do
+    get_environment_vars | while read var; do
         value=$(get_environment_value $var)
         printf '            - %s=%s\n' "$var" "$value"
     done
@@ -74,7 +73,11 @@ print_service_ports() {
     printf '        %s:\n' "ports"
 
     get_ports | while read port; do
-        printf '            - %s:%s\n' "$port" "$port"
+	if expr "$port" : '^[0-9-]*$' >/dev/null; then
+            printf '            - %s:%s\n' "$port" "$port"
+	else
+            printf '            - %s\n' "$port"
+	fi
     done
 }
 
