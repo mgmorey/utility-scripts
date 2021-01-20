@@ -64,8 +64,8 @@ print_service_environment() {
     printf '        %s:\n' "environment"
 
     get_environment_vars | while read var; do
-        value=$(get_environment_value $var)
-        printf '            - %s=%s\n' "$var" "$value"
+	value=$(get_environment_value $var)
+	printf '            - %s=%s\n' "$var" "$value"
     done
 }
 
@@ -74,9 +74,9 @@ print_service_ports() {
 
     get_ports | while read port; do
 	if expr "$port" : '^[0-9-]*$' >/dev/null; then
-            printf '            - %s:%s\n' "$port" "$port"
+	    printf '            - %s:%s\n' "$port" "$port"
 	else
-            printf '            - %s\n' "$port"
+	    printf '            - %s\n' "$port"
 	fi
     done
 }
@@ -85,14 +85,14 @@ print_service_volumes() {
     volume_count=$(get_volume_count)
 
     if [ "$volume_count" -eq 0 ]; then
-        return 0
+	return 0
     fi
 
     printf '        %s:\n' "volumes"
 
     get_volumes | while read volume; do
-        mount=$(get_volume_mount $volume)
-        printf '            - %s:%s\n' "$volume" "$mount"
+	mount=$(get_volume_mount $volume)
+	printf '            - %s:%s\n' "$volume" "$mount"
     done
 }
 
@@ -115,21 +115,21 @@ print_volumes() {
     volume_count=$(get_volume_count)
 
     if [ "$volume_count" -eq 0 ]; then
-        return 0
+	return 0
     fi
 
     printf '%s\n' ""
     printf '%s:\n' "volumes"
 
     get_volumes | while read volume; do
-        device=$(get_volume_device $volume)
-        printf '%s\n' ""
-        printf '    %s:\n' "$volume"
-        printf '        %s: %s\n' "driver" "local"
-        printf '        %s:\n' "driver_opts"
-        printf '            %s: %s\n' "o" "bind"
-        printf '            %s: %s\n' "type" "none"
-        printf '            %s: %s\n' "device" "$device"
+	device=$(get_volume_device $volume)
+	printf '%s\n' ""
+	printf '    %s:\n' "$volume"
+	printf '        %s: %s\n' "driver" "local"
+	printf '        %s:\n' "driver_opts"
+	printf '            %s: %s\n' "o" "bind"
+	printf '            %s: %s\n' "type" "none"
+	printf '            %s: %s\n' "device" "$device"
     done
 }
 
