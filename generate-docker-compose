@@ -41,7 +41,9 @@ get_name_value() {
 }
 
 get_ports() {
-    awk '/^([0-9-]+:|)[0-9-]+(|\/(tcp|udp))$/ {print $0}' $PORT_FILE
+    awk '/^([0-9]+(|-[0-9]+):|)[0-9]+(|-[0-9]+)(|\/(tcp|udp))$/ {
+    print $0
+}' $PORT_FILE
 }
 
 get_volume_count() {
