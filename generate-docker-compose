@@ -31,7 +31,7 @@ PORT_RE="(${PORT_RANGE_RE}:|)${PORT_RANGE_RE}(|[/](tcp|udp))"
 VOLUME_NAME_RE='[a-z][0-9_a-z-]+'
 VOLUME_RE="${VOLUME_NAME_RE}:.+"
 
-SERVICE_PARAMS="container_name hostname image"
+SERVICE_PARAMS="container_name hostname image network_mode"
 
 generate_docker_compose() {
     printf '%s: "%s"\n' "version" "$COMPOSE_VERSION"
