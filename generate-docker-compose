@@ -31,6 +31,8 @@ PORT_RE="(${PORT_RANGE_RE}:|)${PORT_RANGE_RE}(|[/](tcp|udp))"
 VOLUME_NAME_RE='[a-z][0-9_a-z-]+'
 VOLUME_RE="${VOLUME_NAME_RE}:.+"
 
+SERVICE_PARAMS="container_name hostname image"
+
 generate_docker_compose() {
     printf '%s: "%s"\n' "version" "$COMPOSE_VERSION"
     print_services
@@ -126,16 +128,21 @@ print_service_volumes() {
 }
 
 print_services() {
-    container_name=$(get_name_value container_name)
-    docker_image=$(get_name_value docker_image)
-    service_name=$(get_name_value service_name)
     printf '%s\n' ""
     printf '%s:\n' "services"
     printf '%s\n' ""
-    printf '    %s:\n' "$service_name"
-    printf '        %s: %s\n' "container_name" "$container_name"
+    service=$(get_name_value service)
+    printf '    %s:\n' "$service"
+
+    for param in $SERVICE_PARAMS; do
+	value=$(get_name_value $param)
+
+	if [ -n "$value" ]; then
+	    printf '        %s: %s\n' "$param" "$value"
+	fi
+    done
+
     print_service_environment
-    printf '        %s: %s\n' "image" "$docker_image"
     print_service_ports
     print_service_volumes
 }
