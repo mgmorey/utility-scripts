@@ -17,10 +17,19 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 COMPOSE_VERSION=3.3
-ENV_FILE=docker-environment.txt
+
+ENVIRONMENT_FILE=docker-environment.txt
 NAME_FILE=docker-names.txt
 PORT_FILE=docker-ports.txt
 VOLUME_FILE=docker-volumes.txt
+
+ENVIRONMENT_NAME_RE="[A-Za-z][0-9A-Z_a-z]+"
+ENVIRONMENT_RE="${ENVIRONMENT_NAME_RE}=.+"
+PORT_NUMBER_RE="[0-9]{1,5}"
+PORT_RANGE_RE="${PORT_NUMBER_RE}(|-${PORT_NUMBER_RE})"
+PORT_RE="(${PORT_RANGE_RE}:|)${PORT_RANGE_RE}(|[/](tcp|udp))"
+VOLUME_NAME_RE='[a-z][0-9_a-z-]+'
+VOLUME_RE="${VOLUME_NAME_RE}:.+"
 
 generate_docker_compose() {
     printf '%s: "%s"\n' "version" "$COMPOSE_VERSION"
@@ -28,26 +37,36 @@ generate_docker_compose() {
     print_volumes
 }
 
-get_environment_value() {
-    awk -F= '$1 == "'"$1"'" {print $2}' $ENV_FILE
+get_environment_var_count() {
+    get_environment_vars | wc -l
+}
+
+get_environment_var_value() {
+    awk -F= '$1 == "'"$1"'" {print $2}' $ENVIRONMENT_FILE
 }
 
 get_environment_vars() {
-    awk -F= '/^[A-Z][0-9A-Z_]+=.+/ {print $1}' $ENV_FILE
+    if [ -e $ENVIRONMENT_FILE ]; then
+	awk -F= '/^'"$ENVIRONMENT_RE"'$/ {print $1}' $ENVIRONMENT_FILE
+    fi
 }
 
 get_name_value() {
     awk -F= '$1 == "'"$1"'" {print $2}' $NAME_FILE
 }
 
+get_port_count() {
+    get_ports | wc -l
+}
+
 get_ports() {
-    awk '/^([0-9]+(|-[0-9]+):|)[0-9]+(|-[0-9]+)(|\/(tcp|udp))$/ {
-    print $0
-}' $PORT_FILE
+    if [ -e $PORT_FILE ]; then
+	awk '/^'"$PORT_RE"'$/ {print $0}' $PORT_FILE
+    fi
 }
 
 get_volume_count() {
-    awk -F: '/^[a-z][0-9_a-z-]+:.+/ {++n} END {print n}' $VOLUME_FILE
+    get_volume_names | wc -l
 }
 
 get_volume_device() {
@@ -58,20 +77,30 @@ get_volume_mount() {
     awk -F: '$1 == "'"$1"'" {print $2}' $VOLUME_FILE
 }
 
-get_volumes() {
-    awk -F: '/^[a-z][0-9_a-z-]+:.+/ {print $1}' $VOLUME_FILE
+get_volume_names() {
+    if [ -e $VOLUME_FILE ]; then
+	awk -F: '/^'"$VOLUME_RE"'$/ {print $1}' $VOLUME_FILE
+    fi
 }
 
 print_service_environment() {
+    if [ "$(get_environment_var_count)" -eq 0 ]; then
+	return 0
+    fi
+
     printf '        %s:\n' "environment"
 
     get_environment_vars | while read var; do
-	value=$(get_environment_value $var)
+	value=$(get_environment_var_value $var)
 	printf '            - %s=%s\n' "$var" "$value"
     done
 }
 
 print_service_ports() {
+    if [ "$(get_port_count)" -eq 0 ]; then
+	return 0
+    fi
+
     printf '        %s:\n' "ports"
 
     get_ports | while read port; do
@@ -84,17 +113,15 @@ print_service_ports() {
 }
 
 print_service_volumes() {
-    volume_count=$(get_volume_count)
-
-    if [ "$volume_count" -eq 0 ]; then
+    if [ "$(get_volume_count)" -eq 0 ]; then
 	return 0
     fi
 
     printf '        %s:\n' "volumes"
 
-    get_volumes | while read volume; do
-	mount=$(get_volume_mount $volume)
-	printf '            - %s:%s\n' "$volume" "$mount"
+    get_volume_names | while read volume_name; do
+	volume_mount=$(get_volume_mount $volume_name)
+	printf '            - %s:%s\n' "$volume_name" "$volume_mount"
     done
 }
 
@@ -114,24 +141,22 @@ print_services() {
 }
 
 print_volumes() {
-    volume_count=$(get_volume_count)
-
-    if [ "$volume_count" -eq 0 ]; then
+    if [ "$(get_volume_count)" -eq 0 ]; then
 	return 0
     fi
 
     printf '%s\n' ""
     printf '%s:\n' "volumes"
 
-    get_volumes | while read volume; do
-	device=$(get_volume_device $volume)
+    get_volume_names | while read volume_name; do
+	volume_device=$(get_volume_device $volume_name)
 	printf '%s\n' ""
-	printf '    %s:\n' "$volume"
+	printf '    %s:\n' "$volume_name"
 	printf '        %s: %s\n' "driver" "local"
 	printf '        %s:\n' "driver_opts"
 	printf '            %s: %s\n' "o" "bind"
 	printf '            %s: %s\n' "type" "none"
-	printf '            %s: %s\n' "device" "$device"
+	printf '            %s: %s\n' "device" "$volume_device"
     done
 }
 
