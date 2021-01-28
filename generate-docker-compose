@@ -18,13 +18,13 @@
 
 COMPOSE_VERSION=3.3
 
-ENVIRONMENT_FILE=docker-environment.txt
+ENV_FILE=docker-environment.txt
 PORT_FILE=docker-ports.txt
 SERVICE_FILE=docker-service.txt
 VOLUME_FILE=docker-volumes.txt
 
-ENVIRONMENT_NAME_RE="[A-Za-z][0-9A-Z_a-z]+"
-ENVIRONMENT_RE="${ENVIRONMENT_NAME_RE}=.+"
+ENV_NAME_RE="[A-Za-z][0-9A-Z_a-z]+"
+ENV_RE="${ENV_NAME_RE}=.+"
 IPV4_RE="([0-9]{1,3}[.]){3}[0-9]{1,3}"
 PORT_NUMBER_RE="[0-9]{1,5}"
 PORT_RANGE_RE="${PORT_NUMBER_RE}(|-${PORT_NUMBER_RE})"
@@ -41,16 +41,16 @@ generate_docker_compose() {
 }
 
 get_environment_var_count() {
-    get_environment_vars | wc -l
+    if [ -e $ENV_FILE ]; then
+	awk -F= '/^'"$ENV_RE"'$/ {++n} END {print n}' $ENV_FILE
+    else
+	printf '%d\n' 0
+    fi
 }
 
-get_environment_var_value() {
-    awk -F= '$1 == "'"$1"'" {print $2}' $ENVIRONMENT_FILE
-}
-
-get_environment_vars() {
-    if [ -e $ENVIRONMENT_FILE ]; then
-	awk -F= '/^'"$ENVIRONMENT_RE"'$/ {print $1}' $ENVIRONMENT_FILE
+get_environment_vars_and_values() {
+    if [ -e $ENV_FILE ]; then
+	awk -F= '/^'"$ENV_RE"'$/ {print $1, $2}' $ENV_FILE
     fi
 }
 
@@ -72,21 +72,27 @@ get_service_params() {
     awk -F= '/^'"$SERVICE_RE"'$/ {print $1}' $SERVICE_FILE
 }
 
+get_service_params_and_values() {
+    awk -F= '/^'"$SERVICE_RE"'$/ {print $1, $2}' $SERVICE_FILE
+}
+
 get_volume_count() {
-    get_volume_names | wc -l
-}
-
-get_volume_device() {
-    awk -F: '$1 == "'"$1"'" {print $3}' $VOLUME_FILE
-}
-
-get_volume_mount() {
-    awk -F: '$1 == "'"$1"'" {print $2}' $VOLUME_FILE
-}
-
-get_volume_names() {
     if [ -e $VOLUME_FILE ]; then
-	awk -F: '/^'"$VOLUME_RE"'$/ {print $1}' $VOLUME_FILE
+	awk -F: '/^'"$VOLUME_RE"'$/ {++n} END {print n}' $VOLUME_FILE
+    else
+	printf '%d\n' 0
+    fi
+}
+
+get_volume_names_and_devices() {
+    if [ -e $VOLUME_FILE ]; then
+	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $3}' $VOLUME_FILE
+    fi
+}
+
+get_volume_names_and_mounts() {
+    if [ -e $VOLUME_FILE ]; then
+	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2}' $VOLUME_FILE
     fi
 }
 
@@ -97,8 +103,7 @@ print_service_environment() {
 
     printf '        %s:\n' "environment"
 
-    get_environment_vars | sort | while read var; do
-	value=$(get_environment_var_value $var)
+    get_environment_vars_and_values | sort | while read var value; do
 	printf '            - %s=%s\n' "$var" "$value"
     done
 }
@@ -126,9 +131,8 @@ print_service_volumes() {
 
     printf '        %s:\n' "volumes"
 
-    get_volume_names | while read volume_name; do
-	volume_mount=$(get_volume_mount $volume_name)
-	printf '            - %s:%s\n' "$volume_name" "$volume_mount"
+    get_volume_names_and_mounts | while read name mount; do
+	printf '            - %s:%s\n' "$name" "$mount"
     done
 }
 
@@ -139,9 +143,8 @@ print_services() {
     service_name=$(get_service_param_value service_name)
     printf '    %s:\n' "${service_name:-default}"
 
-    get_service_params | sort | while read param; do
+    get_service_params_and_values | sort | while read param value; do
 	if [ "$param" != service_name ]; then
-	    value=$(get_service_param_value $param)
 	    printf '        %s: %s\n' "$param" "$value"
 	fi
     done
@@ -159,12 +162,11 @@ print_volumes() {
     printf '%s\n' ''
     printf '%s:\n' "volumes"
 
-    get_volume_names | while read volume_name; do
-	volume_device=$(get_volume_device $volume_name)
+    get_volume_names_and_devices | while read name device; do
 	printf '%s\n' ''
-	printf '    %s:\n' "$volume_name"
+	printf '    %s:\n' "$name"
 	printf '        %s:\n' "driver_opts"
-	printf '            %s: %s\n' "device" "$volume_device"
+	printf '            %s: %s\n' "device" "$device"
     done
 }
 
