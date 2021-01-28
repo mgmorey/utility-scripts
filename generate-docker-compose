@@ -133,9 +133,9 @@ print_service_volumes() {
 }
 
 print_services() {
-    printf '%s\n' ""
+    printf '%s\n' ''
     printf '%s:\n' "services"
-    printf '%s\n' ""
+    printf '%s\n' ''
     service_name=$(get_service_param_value service_name)
     printf '    %s:\n' "${service_name:-default}"
 
@@ -156,17 +156,14 @@ print_volumes() {
 	return 0
     fi
 
-    printf '%s\n' ""
+    printf '%s\n' ''
     printf '%s:\n' "volumes"
 
     get_volume_names | while read volume_name; do
 	volume_device=$(get_volume_device $volume_name)
-	printf '%s\n' ""
+	printf '%s\n' ''
 	printf '    %s:\n' "$volume_name"
-	printf '        %s: %s\n' "driver" "local"
 	printf '        %s:\n' "driver_opts"
-	printf '            %s: %s\n' "o" "bind"
-	printf '            %s: %s\n' "type" "none"
 	printf '            %s: %s\n' "device" "$volume_device"
     done
 }
