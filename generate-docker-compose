@@ -165,7 +165,10 @@ print_volumes() {
     get_volume_names_and_devices | while read name device; do
 	printf '%s\n' ''
 	printf '    %s:\n' "$name"
+	printf '        %s: %s\n' "driver" "local"
 	printf '        %s:\n' "driver_opts"
+	printf '            %s: %s\n' "o" "bind"
+	printf '            %s: %s\n' "type" "none"
 	printf '            %s: %s\n' "device" "$device"
     done
 }
