@@ -17,6 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 COMPOSE_VERSION=3.3
+NAMED_VOLUMES=true
 
 ENV_FILE=docker-environment.txt
 PORT_FILE=docker-ports.txt
@@ -84,6 +85,12 @@ get_volume_count() {
     fi
 }
 
+get_volume_devices_and_mounts() {
+    if [ -e $VOLUME_FILE ]; then
+	awk -F: '/^'"$VOLUME_RE"'$/ {print $3, $2}' $VOLUME_FILE
+    fi
+}
+
 get_volume_names_and_devices() {
     if [ -e $VOLUME_FILE ]; then
 	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $3}' $VOLUME_FILE
@@ -93,6 +100,34 @@ get_volume_names_and_devices() {
 get_volume_names_and_mounts() {
     if [ -e $VOLUME_FILE ]; then
 	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2}' $VOLUME_FILE
+    fi
+}
+
+parse_arguments() {
+    named_volumes=$NAMED_VOLUMES
+
+    while getopts nuh opt; do
+        case $opt in
+            (n)
+                named_volumes=true
+                ;;
+            (u)
+                named_volumes=false
+                ;;
+            (h)
+                usage
+                exit 0
+                ;;
+            (\?)
+                exit 2
+                ;;
+        esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+        usage_error "%s: Too many arguments\n" "$0"
     fi
 }
 
@@ -131,9 +166,15 @@ print_service_volumes() {
 
     printf '        %s:\n' "volumes"
 
-    get_volume_names_and_mounts | while read name mount; do
-	printf '            - %s:%s\n' "$name" "$mount"
-    done
+    if [ "$named_volumes" = true ]; then
+	get_volume_names_and_mounts | while read name mount; do
+	    printf '            - %s:%s\n' "$name" "$mount"
+	done
+    else
+	get_volume_devices_and_mounts | while read device mount; do
+	    printf '            - %s:%s\n' "$device" "$mount"
+	done
+    fi
 }
 
 print_services() {
@@ -155,6 +196,10 @@ print_services() {
 }
 
 print_volumes() {
+    if [ "$named_volumes" = false ]; then
+	return 0
+    fi
+
     if [ "$(get_volume_count)" -eq 0 ]; then
 	return 0
     fi
@@ -173,4 +218,23 @@ print_volumes() {
     done
 }
 
+usage() {
+    cat <<EOF >&2
+Usage: $0 [-n]
+       $0 [-u]
+       $0 -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+        printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+parse_arguments "$@"
 generate_docker_compose
