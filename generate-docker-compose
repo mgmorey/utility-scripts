@@ -33,12 +33,23 @@ PORT_RE="(${IPV4_RE}:|)(${PORT_RANGE_RE}:|)${PORT_RANGE_RE}(|[/](tcp|udp))"
 SERVICE_NAME_RE="[a-z][0-9_a-z]+"
 SERVICE_RE="${SERVICE_NAME_RE}=.+"
 VOLUME_NAME_RE='[a-z][0-9_a-z-]+'
-VOLUME_RE="${VOLUME_NAME_RE}:.+"
+VOLUME_PATH_RE="([/]${VOLUME_NAME_RE})+"
+VOLUME_RE="[.]?(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(|:${VOLUME_NAME_RE})"
+
+check_device() {
+    if [ ! -d "$1" ]; then
+	printf '%s: WARNING: %s: No such directory\n' "$(basename $0)" "$1" >&2
+    fi
+}
 
 generate_docker_compose() {
     printf '%s: "%s"\n' "version" "$COMPOSE_VERSION"
     print_services
     print_volumes
+}
+
+get_default_volume_name() {
+    printf '%s\n' "$1" | awk -F/ '{printf("%s-%s\n", $(NF - 1), $NF)}'
 }
 
 get_environment_var_count() {
@@ -70,10 +81,6 @@ get_service_param_value() {
 }
 
 get_service_params() {
-    awk -F= '/^'"$SERVICE_RE"'$/ {print $1}' $SERVICE_FILE
-}
-
-get_service_params_and_values() {
     awk -F= '/^'"$SERVICE_RE"'$/ {print $1, $2}' $SERVICE_FILE
 }
 
@@ -85,21 +92,9 @@ get_volume_count() {
     fi
 }
 
-get_volume_devices_and_mounts() {
+get_volumes() {
     if [ -e $VOLUME_FILE ]; then
-	awk -F: '/^'"$VOLUME_RE"'$/ {print $3, $2}' $VOLUME_FILE
-    fi
-}
-
-get_volume_names_and_devices() {
-    if [ -e $VOLUME_FILE ]; then
-	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $3}' $VOLUME_FILE
-    fi
-}
-
-get_volume_names_and_mounts() {
-    if [ -e $VOLUME_FILE ]; then
-	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2}' $VOLUME_FILE
+	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2, $3}' $VOLUME_FILE
     fi
 }
 
@@ -166,15 +161,15 @@ print_service_volumes() {
 
     printf '        %s:\n' "volumes"
 
-    if [ "$named_volumes" = true ]; then
-	get_volume_names_and_mounts | while read name mount; do
-	    printf '            - %s:%s\n' "$name" "$mount"
-	done
-    else
-	get_volume_devices_and_mounts | while read device mount; do
-	    printf '            - %s:%s\n' "$device" "$mount"
-	done
-    fi
+    get_volumes | while read device mount name; do
+	check_device "$device"
+
+	if [ "$named_volumes" = true ]; then
+	    print_volume_name_and_mount "$name" "$mount"
+	else
+	    print_volume_device_and_mount "$device" "$mount"
+	fi
+    done
 }
 
 print_services() {
@@ -184,7 +179,7 @@ print_services() {
     service_name=$(get_service_param_value service_name)
     printf '    %s:\n' "${service_name:-default}"
 
-    get_service_params_and_values | sort | while read param value; do
+    get_service_params | sort | while read param value; do
 	if [ "$param" != service_name ]; then
 	    printf '        %s: %s\n' "$param" "$value"
 	fi
@@ -193,6 +188,24 @@ print_services() {
     print_service_environment
     print_service_ports
     print_service_volumes
+}
+
+print_volume() {
+    printf '%s\n' ''
+    printf '    %s:\n' "${3:-$(get_default_volume_name $2)}"
+    printf '        %s: %s\n' "driver" "local"
+    printf '        %s:\n' "driver_opts"
+    printf '            %s: %s\n' "o" "bind"
+    printf '            %s: %s\n' "type" "none"
+    printf '            %s: %s\n' "device" "$1"
+}
+
+print_volume_device_and_mount() {
+    printf '            - %s:%s\n' "$1" "$2"
+}
+
+print_volume_name_and_mount() {
+    printf '            - %s:%s\n' "${1:-$(get_default_volume_name $2)}" "$2"
 }
 
 print_volumes() {
@@ -207,14 +220,9 @@ print_volumes() {
     printf '%s\n' ''
     printf '%s:\n' "volumes"
 
-    get_volume_names_and_devices | while read name device; do
-	printf '%s\n' ''
-	printf '    %s:\n' "$name"
-	printf '        %s: %s\n' "driver" "local"
-	printf '        %s:\n' "driver_opts"
-	printf '            %s: %s\n' "o" "bind"
-	printf '            %s: %s\n' "type" "none"
-	printf '            %s: %s\n' "device" "$device"
+    get_volumes | while read device mount name; do
+	check_device "$device"
+	print_volume "$device" "$mount" "$name"
     done
 }
 
