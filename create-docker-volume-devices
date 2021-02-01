@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-VOLUME_ARCHIVE=docker-volume.tar
+VOLUME_ARCHIVE=docker-volumes.tar
 VOLUME_COMMENT='Docker Volume Account'
 VOLUME_FILE=docker-volumes.txt
 VOLUME_GID=500
