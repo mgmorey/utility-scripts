@@ -1,0 +1,175 @@
+#!/bin/sh -eu
+
+# create-docker-volume-devices: create Docker volume devices
+# Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+VOLUME_ARCHIVE=docker-volume.tar
+VOLUME_COMMENT='Docker Volume Account'
+VOLUME_FILE=docker-volumes.txt
+VOLUME_GID=500
+VOLUME_HOME=/local/volumes
+VOLUME_SHELL=/sbin/nologin
+VOLUME_UID=500
+VOLUME_USER=docker-volume
+
+VOLUME_NAME_RE='[a-z][0-9_a-z-]+'
+VOLUME_PATH_RE="([/]${VOLUME_NAME_RE})+"
+VOLUME_RE="[.]?(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(|:${VOLUME_NAME_RE})"
+
+create_volume_devices() {
+    if [ ! -d $volume_home ]; then
+	mkdir -p $volume_home
+    fi
+
+    get_volumes | while read device mount name; do
+	if expr "$device" : "$volume_home"'/' >/dev/null; then
+	    if [ ! -d $device ]; then
+		mkdir -p $device
+	    fi
+	fi
+    done
+
+    if [ -r $VOLUME_ARCHIVE.gz ]; then
+	tar -C $volume_home -xpvf $VOLUME_ARCHIVE.gz
+    fi
+
+    create_volume_group
+    create_volume_user
+
+    if [ -d $volume_home -a -w $volume_home ]; then
+	chown -R $VOLUME_UID:$VOLUME_GID $volume_home
+    fi
+}
+
+create_volume_group() {
+    volume_group_args=$(print_volume_group_args)
+    volume_group_data=$(get_volume_group_data)
+
+    if [ -z "$volume_group_data" ]; then
+	eval groupadd $volume_group_args
+    elif [ "$volume_group_data" != "$(print_volume_group_data)" ]; then
+	eval groupmod $volume_group_args
+    fi
+}
+
+create_volume_user() {
+    volume_user_args=$(print_volume_user_args)
+    volume_user_data=$(get_volume_user_data)
+
+    if [ -z "$volume_user_data" ]; then
+	eval useradd $volume_user_args
+    elif [ "$volume_user_data" != "$(print_volume_user_data)" ]; then
+	eval usermod $volume_user_args
+    fi
+}
+
+get_volume_group_data() {
+    getent group $volume_user || true
+}
+
+get_volume_user_data() {
+    getent passwd $volume_user || true
+}
+
+get_volumes() {
+    if [ -e $VOLUME_FILE ]; then
+	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2, $3}' $VOLUME_FILE
+    fi
+}
+
+parse_arguments() {
+    volume_home=$VOLUME_HOME
+    volume_user=$VOLUME_USER
+
+    while getopts d:n:h opt; do
+	case $opt in
+	    (d)
+		volume_home=$OPTARG
+		;;
+	    (n)
+		volume_user=$OPTARG
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error "%s: Too many arguments\n" "$0"
+    fi
+}
+
+print_volume_group_args() {
+    printf '%s\n' \
+	   -g $VOLUME_GID \
+	   $volume_user
+}
+
+print_volume_group_data() {
+    printf '%s:%s:%s:%s\n' \
+	   "$volume_user" \
+	   "x" \
+	   "$VOLUME_GID" \
+	   ""
+}
+
+print_volume_user_args() {
+    printf '%s\n' \
+	   -c '"'"$VOLUME_COMMENT"'"' \
+	   -d $volume_home \
+	   -g $VOLUME_GID \
+	   -s $VOLUME_SHELL \
+	   -u $VOLUME_UID \
+	   $volume_user
+}
+
+print_volume_user_data() {
+    printf '%s:%s:%s:%s:%s:%s:%s\n' \
+	   "$volume_user" \
+	   "x" \
+	   "$VOLUME_UID" \
+	   "$VOLUME_GID" \
+	   "$VOLUME_COMMENT" \
+	   "$volume_home" \
+	   "$VOLUME_SHELL"
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $0 [-d RTDS-HOME] [-n RTDS-NAME]
+       $0 -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+parse_arguments "$@"
+create_volume_devices
