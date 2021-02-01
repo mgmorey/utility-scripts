@@ -56,7 +56,7 @@ create_volume_devices() {
 
 create_volume_group() {
     volume_group_args=$(print_volume_group_args)
-    volume_group_data=$(get_volume_group_data)
+    volume_group_data=$(get_volume_group_data || true)
 
     if [ -z "$volume_group_data" ]; then
 	eval groupadd $volume_group_args
@@ -67,7 +67,7 @@ create_volume_group() {
 
 create_volume_user() {
     volume_user_args=$(print_volume_user_args)
-    volume_user_data=$(get_volume_user_data)
+    volume_user_data=$(get_volume_user_data || true)
 
     if [ -z "$volume_user_data" ]; then
 	eval useradd $volume_user_args
@@ -77,11 +77,11 @@ create_volume_user() {
 }
 
 get_volume_group_data() {
-    (getent group $volume_user || true) | cut -d: -f 1-3
+    getent group $VOLUME_GID | cut -d: -f 1-3
 }
 
 get_volume_user_data() {
-    getent passwd $volume_user || true
+    getent passwd $VOLUME_UID
 }
 
 get_volumes() {
@@ -138,9 +138,11 @@ print_volume_group_data() {
 
 print_volume_user_args() {
     printf '%s\n' \
+	   -N \
 	   -c '"'"$volume_comment"'"' \
 	   -d $volume_home \
 	   -g $VOLUME_GID \
+	   -r \
 	   -s $VOLUME_SHELL \
 	   -u $VOLUME_UID \
 	   $volume_user
