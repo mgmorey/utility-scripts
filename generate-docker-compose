@@ -67,7 +67,11 @@ get_environment_vars_and_values() {
 }
 
 get_port_count() {
-    get_ports | wc -l
+    if [ -e $PORT_FILE ]; then
+	awk '/^'"$PORT_RE"'$/ {++n} END {print n}' $PORT_FILE
+    else
+	printf '%d\n' 0
+    fi
 }
 
 get_ports() {
