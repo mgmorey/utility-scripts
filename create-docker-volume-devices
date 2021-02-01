@@ -70,7 +70,7 @@ create_volume_user() {
     volume_user_data=$(get_volume_user_data || true)
 
     if [ -z "$volume_user_data" ]; then
-	eval useradd $volume_user_args
+	eval useradd -Nr $volume_user_args
     elif [ "$volume_user_data" != "$(print_volume_user_data)" ]; then
 	eval usermod $volume_user_args
     fi
@@ -138,11 +138,9 @@ print_volume_group_data() {
 
 print_volume_user_args() {
     printf '%s\n' \
-	   -N \
 	   -c '"'"$volume_comment"'"' \
 	   -d $volume_home \
 	   -g $VOLUME_GID \
-	   -r \
 	   -s $VOLUME_SHELL \
 	   -u $VOLUME_UID \
 	   $volume_user
@@ -161,7 +159,7 @@ print_volume_user_data() {
 
 usage() {
     cat <<EOF >&2
-Usage: $0 [-d RTDS-HOME] [-n RTDS-NAME]
+Usage: $0 [-d VOLUME-HOME] [-n VOLUME-USER]
        $0 -h
 EOF
 }
