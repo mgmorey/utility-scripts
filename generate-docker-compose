@@ -125,7 +125,7 @@ print_service_environment() {
 
     printf '        %s:\n' "environment"
 
-    get_environment_vars_and_values | sort | while read var value; do
+    get_environment_vars | sort | while read var value; do
 	printf '            - %s=%s\n' "$var" "$value"
     done
 }
