@@ -1,0 +1,125 @@
+#!/bin/sh -eu
+
+# remove-docker-volume-devices: remove Docker volume devices
+# Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+VOLUME_FILE=docker-volumes.txt
+VOLUME_UID=500
+
+VOLUME_NAME_RE='[a-z][0-9_a-z-]+'
+VOLUME_PATH_RE="([/]${VOLUME_NAME_RE})+"
+VOLUME_RE="[.]?(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(|:${VOLUME_NAME_RE})"
+
+get_volume_gid() {
+    getent passwd $1 | cut -d: -f 4
+}
+
+get_volume_group() {
+    getent group $1 | cut -d: -f 1
+}
+
+get_volume_user() {
+    getent passwd $1 | cut -d: -f 1
+}
+
+get_volumes() {
+    if [ -e $VOLUME_FILE ]; then
+	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2, $3}' $VOLUME_FILE
+    fi
+}
+
+parse_arguments() {
+    keep_files=false
+    volume_user=
+
+    while getopts kn:h opt; do
+	case $opt in
+	    (k)
+		keep_files=true
+		;;
+	    (n)
+		volume_user=$OPTARG
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error "%s: Too many arguments\n" "$0"
+    fi
+}
+
+remove_volume_devices() {
+    if [ -z "$volume_user" ]; then
+	volume_user=$(get_volume_user $VOLUME_UID)
+    fi
+
+    volume_gid=$(get_volume_gid ${volume_user:-$VOLUME_UID})
+    remove_volume_user "${volume_user:-$VOLUME_UID}"
+    remove_volume_group "$(get_volume_group ${volume_gid:-$VOLUME_GID})"
+
+    if [ "$keep_files" = true ]; then
+	return 0
+    fi
+
+    get_volumes | while read device mount name; do
+	if expr "$device" : "$volume_home"'/' >/dev/null; then
+	    /bin/rm -rf $device
+	fi
+    done
+
+    /bin/rm -rf $volume_home
+}
+
+remove_volume_group() {
+    if [ -n "$1" ]; then
+	groupdel $1
+    fi
+}
+
+remove_volume_user() {
+    if [ -n "$1" ]; then
+	userdel $1
+    fi
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $0 [-k] [-n RTDS-NAME]
+       $0 -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+parse_arguments "$@"
+remove_volume_devices
