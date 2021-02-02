@@ -49,7 +49,7 @@ generate_docker_compose() {
 }
 
 get_default_service_name() {
-    image=$(get_service_param_value image | sed 's/:.*//')
+    image=$(get_service_param_value image | sed 's/:.*$//')
 
     if [ -n "$image" ]; then
 	printf '%s\n' "$(basename $image)"
