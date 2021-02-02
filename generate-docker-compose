@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-COMPOSE_VERSION=3.3
+FILE_VERSION=3.3
 NAMED_VOLUMES=true
 
 ENV_FILE=docker-environment.txt
@@ -43,9 +43,19 @@ check_device() {
 }
 
 generate_docker_compose() {
-    printf '%s: "%s"\n' "version" "$COMPOSE_VERSION"
+    printf '%s: "%s"\n' "version" "$FILE_VERSION"
     print_services
     print_volumes
+}
+
+get_default_service_name() {
+    image=$(get_service_param_value image)
+
+    if [ -n "$image" ]; then
+	printf '%s\n' "$(basename ${image%:*})"
+    else
+	printf '%s\n' app
+    fi
 }
 
 get_default_volume_name() {
@@ -169,7 +179,7 @@ print_services() {
     printf '%s:\n' "services"
     printf '%s\n' ''
     service_name=$(get_service_param_value service_name)
-    printf '    %s:\n' "${service_name:-default}"
+    printf '    %s:\n' "${service_name:-$(get_default_service_name)}"
 
     get_service_params | sort | while read param value; do
 	if [ "$param" != service_name ]; then
