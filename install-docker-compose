@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-docker-compose: install Docker-compose packages
+# install-docker-compose: install Docker Compose program script
 # Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-BASE_URL=https://github.com/docker/compose/releases/download
-FILE=/usr/local/bin/docker-compose
+VERSION=1.28.2
 
-url="$BASE_URL/1.28.0/docker-compose-$(uname -s)-$(uname -m)"
-curl -L "$url" -o $FILE
-chmod a+x $FILE
+BASE_URL=https://github.com/docker/compose/releases
+TARGET=/usr/local/bin/docker-compose
+
+source="docker-compose-$(uname -s)-$(uname -m)"
+url="$BASE_URL/download/$VERSION/$source"
+
+curl -L "$url" -o $TARGET
+chmod a+x $TARGET
