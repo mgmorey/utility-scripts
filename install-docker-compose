@@ -16,13 +16,58 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-VERSION=1.28.2
+COMPOSE_VERSION=1.28.2
 
 BASE_URL=https://github.com/docker/compose/releases
-TARGET=/usr/local/bin/docker-compose
+TARGET_FILE=/usr/local/bin/docker-compose
 
-source="docker-compose-$(uname -s)-$(uname -m)"
-url="$BASE_URL/download/$VERSION/$source"
+get_compose_version() {
+    get_version_string docker-compose | cut -d, -f 1
+}
 
-curl -L "$url" -o $TARGET
-chmod a+x $TARGET
+get_version_number() {
+    printf '%s\n' "$*" | awk '{print $3}'
+}
+
+get_version_string() {
+    if which "$1" >/dev/null 2>&1; then
+	"$1" --version
+    fi
+}
+
+get_compose_url() {
+    file="docker-compose-$(uname -s)-$(uname -m)"
+    dir="download/$COMPOSE_VERSION"
+    url="$BASE_URL/$dir/$file"
+    printf '%s\n' "$url"
+}
+
+install_binary_file() {
+    tmpfile=$(mktemp -p $(dirname "$1") -t "$(basename "$1").XXXXXXXXXX.tmp")
+    trap "/bin/rm -f $tmpfile" EXIT INT QUIT TERM
+    curl -L $(get_compose_url) -o "$tmpfile"
+    /bin/mv "$tmpfile" "$1"
+    chmod a+x "$1"
+}
+
+install_docker_compose() {
+    current=$(get_compose_version || true)
+
+    if [ $(get_version_number $current) = "$COMPOSE_VERSION" ]; then
+	exit 0
+    fi
+
+    prior=$current
+    install_binary_file $TARGET_FILE
+    current=$(get_compose_version || true)
+    printf '%s\n' ''
+
+    if [ -z "$prior" ]; then
+	printf 'Installed %s\n' "$current"
+    elif [ "$current" != "$prior" ]; then
+	printf 'Upgraded from %s\n' "$prior"
+	printf 'Upgraded to %s\n' "$current"
+    fi
+}
+
+install_docker_compose
