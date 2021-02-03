@@ -42,8 +42,25 @@ check_device() {
     fi
 }
 
+find_file() {
+    for dir in . .. "$HOME"; do
+	file="$dir/$1"
+
+	if [ -f "$file" ]; then
+	    printf '%s\n' "$file"
+	    return 0
+	fi
+    done
+
+    printf '%s\n' "$1"
+}
+
 generate_docker_compose() {
-    printf '%s: "%s"\n' "version" "$FILE_VERSION"
+    env_file=$(find_file $ENV_FILE)
+    port_file=$(find_file $PORT_FILE)
+    service_file=$(find_file $SERVICE_FILE)
+    volume_file=$(find_file $VOLUME_FILE)
+    print_file_version
     print_services
     print_volumes
 }
@@ -67,8 +84,8 @@ get_environment_var_count() {
 }
 
 get_environment_vars() {
-    if [ -e $ENV_FILE ]; then
-	awk -F= '/^'"$ENV_RE"'$/ {print $1, $2}' $ENV_FILE
+    if [ -f $ENV_FILE ]; then
+	awk -F= '/^'"$ENV_RE"'$/ {print $1, $2}' $env_file
     fi
 }
 
@@ -77,17 +94,17 @@ get_port_count() {
 }
 
 get_ports() {
-    if [ -e $PORT_FILE ]; then
-	awk '/^'"$PORT_RE"'$/ {print $0}' $PORT_FILE
+    if [ -f $PORT_FILE ]; then
+	awk '/^'"$PORT_RE"'$/ {print $0}' $port_file
     fi
 }
 
 get_service_param_value() {
-    awk -F= '$1 == "'"$1"'" {print $2}' $SERVICE_FILE
+    awk -F= '$1 == "'"$1"'" {print $2}' $service_file
 }
 
 get_service_params() {
-    awk -F= '/^'"$SERVICE_RE"'$/ {print $1, $2}' $SERVICE_FILE
+    awk -F= '/^'"$SERVICE_RE"'$/ {print $1, $2}' $service_file
 }
 
 get_volume_count() {
@@ -95,8 +112,8 @@ get_volume_count() {
 }
 
 get_volumes() {
-    if [ -e $VOLUME_FILE ]; then
-	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2, $3}' $VOLUME_FILE
+    if [ -f $volume_file ]; then
+	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2, $3}' $volume_file
     fi
 }
 
@@ -126,6 +143,10 @@ parse_arguments() {
     if [ $# -gt 0 ]; then
 	usage_error "%s: Too many arguments\n" "$0"
     fi
+}
+
+print_file_version() {
+    printf '%s: "%s"\n' "version" "$FILE_VERSION"
 }
 
 print_service_environment() {
