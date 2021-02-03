@@ -30,21 +30,24 @@ VOLUME_PATH_RE="([/]${VOLUME_NAME_RE})+"
 VOLUME_RE="[.]?(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(|:${VOLUME_NAME_RE})"
 
 create_volume_devices() {
-    if [ ! -d $volume_home ]; then
-	mkdir -p $volume_home
+    if [ -z "$template_dir" ]; then
+	template_dir=$(get_template_dir)
     fi
 
     get_volumes | while read device mount name; do
-	if expr "$device" : "$volume_home"'/' >/dev/null; then
-	    if [ ! -d $device ]; then
-		mkdir -p $device
-	    fi
+	if ! expr "$device" : "$volume_home"'/' >/dev/null; then
+	    continue
+	elif [ -d $device ]; then
+	    continue
+	fi
+
+	mkdir -p $device
+	sub_dir=$(basename $device)
+
+	if [ -d $template_dir/$sub_dir ]; then
+	    /bin/cp -f $template_dir/$sub_dir/* $device
 	fi
     done
-
-    if [ -r $VOLUME_ARCHIVE.gz ]; then
-	tar -C $volume_home -xpvf $VOLUME_ARCHIVE.gz
-    fi
 
     create_volume_group
     create_volume_user
@@ -76,6 +79,11 @@ create_volume_user() {
     fi
 }
 
+get_template_dir() {
+    user_home=$(getent passwd ${SUDO_USER-$USER} | cut -d: -f 6)
+    printf '%s\n' $user_home/docker-volumes
+}
+
 get_volume_group_data() {
     getent group $VOLUME_GID | cut -d: -f 1-3
 }
@@ -91,11 +99,12 @@ get_volumes() {
 }
 
 parse_arguments() {
+    template_dir=
     volume_comment="$VOLUME_COMMENT"
     volume_home=$VOLUME_HOME
     volume_user=$VOLUME_USER
 
-    while getopts c:d:n:h opt; do
+    while getopts c:d:n:t:h opt; do
 	case $opt in
 	    (c)
 		volume_comment="$OPTARG"
@@ -105,6 +114,9 @@ parse_arguments() {
 		;;
 	    (n)
 		volume_user=$OPTARG
+		;;
+	    (t)
+		template_dir=$OPTARG
 		;;
 	    (h)
 		usage
@@ -159,7 +171,7 @@ print_volume_user_data() {
 
 usage() {
     cat <<EOF >&2
-Usage: $0 [-d VOLUME-HOME] [-n VOLUME-USER]
+Usage: $0 [-d VOLUME-HOME] [-n VOLUME-USER] [-t TEMPLATE-DIR]
        $0 -h
 EOF
 }
