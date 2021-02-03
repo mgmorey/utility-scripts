@@ -51,22 +51,23 @@ install_binary_file() {
 }
 
 install_docker_compose() {
-    current=$(get_compose_version || true)
+    current_string=$(get_compose_version || true)
+    current_number=$(get_version_number "$current_string")
 
-    if [ $(get_version_number $current) = "$COMPOSE_VERSION" ]; then
+    if [ "$current_number" = "$COMPOSE_VERSION" ]; then
 	exit 0
     fi
 
-    prior=$current
+    prior_string=$current_string
     install_binary_file $TARGET_FILE
-    current=$(get_compose_version $TARGET_FILE || true)
+    current_string=$(get_compose_version $TARGET_FILE)
     printf '%s\n' ''
 
-    if [ -z "$prior" ]; then
-	printf 'Installed %s\n' "$current"
-    elif [ "$current" != "$prior" ]; then
-	printf 'Upgraded from %s\n' "$prior"
-	printf 'Upgraded to %s\n' "$current"
+    if [ -z "$prior_string" ]; then
+	printf 'Installed %s\n' "$current_string"
+    elif [ "$current_string" != "$prior_string" ]; then
+	printf 'Upgraded from %s\n' "$prior_string"
+	printf 'Upgraded to %s\n' "$current_string"
     fi
 }
 
