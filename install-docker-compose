@@ -16,13 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+BASE_URL=https://github.com/docker/compose/releases
 COMPOSE_VERSION=1.28.2
 
-BASE_URL=https://github.com/docker/compose/releases
-TARGET_FILE=/usr/local/bin/docker-compose
-
 get_compose_version() {
-    get_version_string ${1-docker-compose} | cut -d, -f 1
+    get_version_string "${1-docker-compose}" | cut -d, -f 1
+}
+
+get_target_file() {
+    printf '%s/%s\n' "$prefix" bin/docker-compose
 }
 
 get_version_number() {
@@ -30,8 +32,10 @@ get_version_number() {
 }
 
 get_version_string() {
-    if which $1 >/dev/null 2>&1; then
-	$1 --version
+    file=$(env PATH=$prefix/bin:$PATH which $1)
+
+    if [ -n "$file" ]; then
+	"$file" --version
     fi
 }
 
@@ -43,14 +47,20 @@ get_compose_url() {
 }
 
 install_binary_file() {
-    tmpfile=$(mktemp -p $(dirname $1) -t $(basename $1).XXXXXXXXXX.tmp)
-    trap "/bin/rm -f $tmpfile" EXIT INT QUIT TERM
+    tmpfile=$(mktemp -p "$(dirname $1)" -t "$(basename $1).XXXXXXXXXX.tmp")
+    trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
     curl -L $(get_compose_url) -o $tmpfile
-    /bin/mv "$tmpfile" $1
-    chmod a+rx $1
+    /bin/mv "$tmpfile" "$1"
+    chmod a+rx "$1"
 }
 
 install_docker_compose() {
+    if [ "$(id -u)" -eq 0 ]; then
+	prefix=/usr/local
+    else
+	prefix=$HOME/.local
+    fi
+
     current_string=$(get_compose_version || true)
     current_number=$(get_version_number "$current_string")
 
@@ -59,13 +69,15 @@ install_docker_compose() {
     fi
 
     prior_string=$current_string
-    install_binary_file $TARGET_FILE
-    current_string=$(get_compose_version $TARGET_FILE)
-    printf '%s\n' ''
+    target_file=$(get_target_file)
+    install_binary_file "$target_file"
+    current_string=$(get_compose_version "$target_file")
 
     if [ -z "$prior_string" ]; then
+	printf '%s\n' ''
 	printf 'Installed %s\n' "$current_string"
     elif [ "$current_string" != "$prior_string" ]; then
+	printf '%s\n' ''
 	printf 'Upgraded from %s\n' "$prior_string"
 	printf 'Upgraded to %s\n' "$current_string"
     fi
