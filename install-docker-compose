@@ -22,7 +22,7 @@ BASE_URL=https://github.com/docker/compose/releases
 TARGET_FILE=/usr/local/bin/docker-compose
 
 get_compose_version() {
-    get_version_string docker-compose | cut -d, -f 1
+    get_version_string ${1-docker-compose} | cut -d, -f 1
 }
 
 get_version_number() {
@@ -30,8 +30,8 @@ get_version_number() {
 }
 
 get_version_string() {
-    if which "$1" >/dev/null 2>&1; then
-	"$1" --version
+    if which $1 >/dev/null 2>&1; then
+	$1 --version
     fi
 }
 
@@ -43,11 +43,11 @@ get_compose_url() {
 }
 
 install_binary_file() {
-    tmpfile=$(mktemp -p $(dirname "$1") -t "$(basename "$1").XXXXXXXXXX.tmp")
+    tmpfile=$(mktemp -p $(dirname $1) -t $(basename $1).XXXXXXXXXX.tmp)
     trap "/bin/rm -f $tmpfile" EXIT INT QUIT TERM
-    curl -L $(get_compose_url) -o "$tmpfile"
-    /bin/mv "$tmpfile" "$1"
-    chmod a+x "$1"
+    curl -L $(get_compose_url) -o $tmpfile
+    /bin/mv "$tmpfile" $1
+    chmod a+rx $1
 }
 
 install_docker_compose() {
@@ -59,7 +59,7 @@ install_docker_compose() {
 
     prior=$current
     install_binary_file $TARGET_FILE
-    current=$(get_compose_version || true)
+    current=$(get_compose_version $TARGET_FILE || true)
     printf '%s\n' ''
 
     if [ -z "$prior" ]; then
