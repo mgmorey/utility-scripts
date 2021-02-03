@@ -84,7 +84,7 @@ get_environment_var_count() {
 }
 
 get_environment_vars() {
-    if [ -f $ENV_FILE ]; then
+    if [ -f $env_file ]; then
 	awk -F= '/^'"$ENV_RE"'$/ {print $1, $2}' $env_file
     fi
 }
@@ -94,7 +94,7 @@ get_port_count() {
 }
 
 get_ports() {
-    if [ -f $PORT_FILE ]; then
+    if [ -f $port_file ]; then
 	awk '/^'"$PORT_RE"'$/ {print $0}' $port_file
     fi
 }
