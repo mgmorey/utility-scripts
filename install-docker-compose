@@ -47,9 +47,9 @@ get_compose_url() {
 }
 
 install_binary_file() {
-    tmpfile=$(mktemp -p "$(dirname $1)" -t "$(basename $1).XXXXXXXXXX.tmp")
+    tmpfile=$(mktemp -p $(dirname "$1") -t $(basename "$1").XXXXXXXXXX.tmp)
     trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
-    curl -L $(get_compose_url) -o $tmpfile
+    curl -L $(get_compose_url) -o "$tmpfile"
     /bin/mv "$tmpfile" "$1"
     chmod a+rx "$1"
 }
