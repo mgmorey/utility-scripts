@@ -56,6 +56,8 @@ create_volume_devices() {
 	chown -R $VOLUME_UID:$VOLUME_GID $volume_home
 	chmod -R go+r $volume_home
     fi
+
+    usermod -aG $volume_user ${SUDO_USER-$USER}
 }
 
 create_volume_group() {
