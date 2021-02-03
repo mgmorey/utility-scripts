@@ -41,7 +41,7 @@ create_volume_devices() {
 	    continue
 	fi
 
-	mkdir -p $device
+	mkdir -m u=rwx,go=rx -p $device
 	sub_dir=$(basename $device)
 
 	if [ -d $template_dir/$sub_dir ]; then
@@ -54,6 +54,7 @@ create_volume_devices() {
 
     if [ -d $volume_home -a -w $volume_home ]; then
 	chown -R $VOLUME_UID:$VOLUME_GID $volume_home
+	chmod -R go+r $volume_home
     fi
 }
 
