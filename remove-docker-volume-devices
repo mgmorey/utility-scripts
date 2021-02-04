@@ -17,6 +17,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 VOLUME_FILE=docker-volumes.txt
+VOLUME_GID=500
+VOLUME_HOME=/local/volumes
 VOLUME_UID=500
 
 VOLUME_NAME_RE='[a-z][0-9_a-z-]+'
@@ -24,15 +26,27 @@ VOLUME_PATH_RE="([/]${VOLUME_NAME_RE})+"
 VOLUME_RE="[.]?(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(|:${VOLUME_NAME_RE})"
 
 get_volume_gid() {
-    getent passwd $1 | cut -d: -f 4
+    if [ -n "${1-}" ]; then
+	getent passwd $1 | cut -d: -f 4
+    fi
 }
 
 get_volume_group() {
-    getent group $1 | cut -d: -f 1
+    if [ -n "${1-}" ]; then
+	getent group $1 | cut -d: -f 1
+    fi
+}
+
+get_volume_home() {
+    if [ -n "${1-}" ]; then
+	getent passwd $1 | cut -d: -f 6
+    fi
 }
 
 get_volume_user() {
-    getent passwd $1 | cut -d: -f 1
+    if [ -n "${1-}" ]; then
+	getent passwd $1 | cut -d: -f 1
+    fi
 }
 
 get_volumes() {
@@ -43,10 +57,14 @@ get_volumes() {
 
 parse_arguments() {
     keep_files=false
+    volume_home=
     volume_user=
 
-    while getopts kn:h opt; do
+    while getopts d:kn:h opt; do
 	case $opt in
+	    (d)
+		volume_home=$OPTARG
+		;;
 	    (k)
 		keep_files=true
 		;;
@@ -75,9 +93,21 @@ remove_volume_devices() {
 	volume_user=$(get_volume_user $VOLUME_UID)
     fi
 
-    volume_gid=$(get_volume_gid ${volume_user:-$VOLUME_UID})
-    remove_volume_user "${volume_user:-$VOLUME_UID}"
-    remove_volume_group "$(get_volume_group ${volume_gid:-$VOLUME_GID})"
+    volume_gid=$(get_volume_gid $volume_user)
+
+    if [ -z "$volume_gid" ]; then
+	volume_gid=$VOLUME_GID
+    fi
+
+    volume_group=$(get_volume_group $volume_gid)
+    volume_home=$(get_volume_home $VOLUME_UID)
+
+    if [ -z "$volume_home" ]; then
+	volume_home=$VOLUME_HOME
+    fi
+
+    remove_volume_user $volume_user
+    remove_volume_group $volume_group
 
     if [ "$keep_files" = true ]; then
 	return 0
@@ -89,24 +119,24 @@ remove_volume_devices() {
 	fi
     done
 
-    /bin/rm -rf $volume_home
+    /bin/rm -rf ${volume_home-$VOLUME_HOME}
 }
 
 remove_volume_group() {
-    if [ -n "$1" ]; then
+    if [ -n "${1-}" ]; then
 	groupdel $1
     fi
 }
 
 remove_volume_user() {
-    if [ -n "$1" ]; then
+    if [ -n "${1-}" ]; then
 	userdel $1
     fi
 }
 
 usage() {
     cat <<EOF >&2
-Usage: $0 [-k] [-n RTDS-NAME]
+Usage: $0 [-d VOLUME-HOME] [-k] [-n VOLUME-NAME]
        $0 -h
 EOF
 }
