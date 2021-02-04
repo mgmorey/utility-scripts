@@ -30,6 +30,8 @@ VOLUME_PATH_RE="([/]${VOLUME_NAME_RE})+"
 VOLUME_RE="[.]?(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(|:${VOLUME_NAME_RE})"
 
 create_volume_devices() {
+    volume_file=$(find_file $VOLUME_FILE)
+
     if [ -z "$template_dir" ]; then
 	template_dir=$(get_template_dir)
     fi
@@ -82,6 +84,19 @@ create_volume_user() {
     fi
 }
 
+find_file() {
+    for dir in . .. "$HOME"; do
+	file="$dir/$1"
+
+	if [ -f "$file" ]; then
+	    printf '%s\n' "$file"
+	    return 0
+	fi
+    done
+
+    printf '%s\n' "$1"
+}
+
 get_template_dir() {
     user_home=$(getent passwd ${SUDO_USER-$USER} | cut -d: -f 6)
     printf '%s\n' $user_home/docker-volumes
@@ -96,9 +111,7 @@ get_volume_user_data() {
 }
 
 get_volumes() {
-    if [ -e $VOLUME_FILE ]; then
-	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2, $3}' $VOLUME_FILE
-    fi
+    awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2, $3}' $volume_file
 }
 
 parse_arguments() {
