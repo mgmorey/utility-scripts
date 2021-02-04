@@ -46,12 +46,34 @@ get_compose_url() {
     printf '%s\n' "$url"
 }
 
+get_execmode() {
+    case "$1" in
+	($HOME/*)
+	    printf '%s\n' a+rx
+	    ;;
+	(*)
+	    printf '%s\n' u=rwx,go=rx
+	    ;;
+    esac
+}
+
 install_binary_file() {
-    tmpfile=$(mktemp -p $(dirname "$1") -t $(basename "$1").XXXXXXXXXX.tmp)
+    dir=$(dirname "$1")
+    file=$(basename "$1")
+    mode=$(get_execmode "$1")
+
+    if [ ! -d "$dir" ]; then
+	mkdir ${mode:+-m $mode }-p "$dir"
+    fi
+
+    tmpfile=$(mktemp -p "$dir" -t "$file.XXXXXXXXXX.tmp")
     trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
     curl -L $(get_compose_url) -o "$tmpfile"
     /bin/mv -f "$tmpfile" "$1"
-    chmod a+rx "$1"
+
+    if [ -n "$mode" ]; then
+	chmod $mode "$1"
+    fi
 }
 
 install_docker_compose() {
