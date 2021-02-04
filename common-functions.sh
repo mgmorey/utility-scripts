@@ -378,7 +378,7 @@ validate_user_name() {
     assert [ -n "$1" ]
     username="$(id -nu)"
 
-    if [ "${username#*+}" != $1 ]; then
+    if [ "${username#*+}" != ${1#*+} ]; then
 	abort "%s: Please try again as user %s\n" "$0" "$1"
     fi
 }
