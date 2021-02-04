@@ -32,7 +32,7 @@ get_version_number() {
 }
 
 get_version_string() {
-    file=$(env PATH=$prefix/bin:$PATH which $1)
+    file=$(env PATH="$prefix/bin:$PATH" which $1)
 
     if [ -n "$file" ]; then
 	"$file" --version
@@ -40,7 +40,10 @@ get_version_string() {
 }
 
 get_compose_url() {
-    file="docker-compose-$(uname -s)-$(uname -m)"
+    filetype=$(get_filetype)
+    hardware=$(get_hardware)
+    platform=$(get_platform)
+    file="docker-compose-$platform-$hardware${filetype:+.$filetype}"
     dir="download/$COMPOSE_VERSION"
     url="$BASE_URL/$dir/$file"
     printf '%s\n' "$url"
@@ -53,6 +56,33 @@ get_execmode() {
 	    ;;
 	(*)
 	    printf '%s\n' u=rwx,go=rx
+	    ;;
+    esac
+}
+
+get_filetype() {
+    system=$(uname -s)
+
+    case "$system" in
+	(MINGW64_NT-*)
+	    printf '%s\n' exe
+	    ;;
+    esac
+}
+
+get_hardware() {
+    uname -m
+}
+
+get_platform() {
+    system=$(uname -s)
+
+    case "$system" in
+	(MINGW64_NT-*)
+	    printf '%s\n' Windows
+	    ;;
+	(*)
+	    printf '%s\n' "$system"
 	    ;;
     esac
 }
