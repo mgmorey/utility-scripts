@@ -69,11 +69,12 @@ install_binary_file() {
     tmpfile=$(mktemp -p "$dir" -t "$file.XXXXXXXXXX.tmp")
     trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
     curl -L $(get_compose_url) -o "$tmpfile"
-    /bin/mv -f "$tmpfile" "$1"
 
     if [ -n "$mode" ]; then
-	chmod $mode "$1"
+	chmod $mode "$tmpfile"
     fi
+
+    /bin/mv -f "$tmpfile" "$1"
 }
 
 install_docker_compose() {
