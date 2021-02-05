@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-docker-compose: install Docker Compose program script
+# install-docker-compose: install Docker Compose from GitHub
 # Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -19,12 +19,16 @@
 BASE_URL=https://github.com/docker/compose/releases
 COMPOSE_VERSION=1.28.2
 
-get_compose_version() {
-    get_version_string "${1-docker-compose}" | cut -d, -f 1
+get_compose_target_file() {
+    printf '%s/%s\n' "$prefix" bin/docker-compose
 }
 
-get_target_file() {
-    printf '%s/%s\n' "$prefix" bin/docker-compose
+get_compose_version_number() {
+    get_version_number $(get_compose_version_string "$@" || true)
+}
+
+get_compose_version_string() {
+    get_version_string "${1-docker-compose}" | cut -d, -f 1
 }
 
 get_version_number() {
@@ -114,32 +118,91 @@ install_binary_file() {
 }
 
 install_docker_compose() {
-    if [ "$(id -u)" -eq 0 ]; then
-	prefix=/usr/local
-    else
-	prefix=$HOME/.local
+    if [ -z "$prefix" ]; then
+	if [ "$(id -u)" -eq 0 ]; then
+	    prefix=/usr/local
+	else
+	    prefix=$HOME/.local
+	fi
     fi
 
-    current_string=$(get_compose_version || true)
-    current_number=$(get_version_number "$current_string")
+    current_number=$(get_compose_version_number)
 
-    if [ "$current_number" = "$COMPOSE_VERSION" ]; then
+    if [ $force = false -a "$current_number" = "$COMPOSE_VERSION" ]; then
 	exit 0
     fi
 
-    prior_string=$current_string
-    target_file=$(get_target_file)
+    target_file=$(get_compose_target_file)
     install_binary_file "$target_file"
-    current_string=$(get_compose_version "$target_file")
+    current_string=$(get_compose_version_string "$target_file")
 
-    if [ -z "$prior_string" ]; then
-	printf '%s\n' ''
-	printf 'Installed %s\n' "$current_string"
-    elif [ "$current_string" != "$prior_string" ]; then
-	printf '%s\n' ''
-	printf 'Upgraded from %s\n' "$prior_string"
-	printf 'Upgraded to %s\n' "$current_string"
+    printf '%s\n' ''
+    printf 'Installed %s\n' "$current_string"
+}
+
+parse_arguments() {
+    prefix=
+    force=false
+
+    while getopts fp:h opt; do
+	case $opt in
+	    (f)
+		force=true
+		;;
+	    (p)
+		parse_prefix $OPTARG
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error "%s: Too many arguments\n" "$script"
     fi
 }
 
+parse_prefix() {
+    case "$1" in
+	($HOME/.local|/opt/*|/usr/local)
+	    prefix=$1
+	    ;;
+	(*)
+	    usage_error "%s: %s: Invalid prefix\n" "$script" "$1"
+	    ;;
+    esac
+
+    if [ ! -d "$prefix/bin" ]; then
+	usage_error "%s: %s: Invalid prefix\n" "$script" "$1"
+    elif [ ! -w "$prefix/bin" ]; then
+	usage_error "%s: %s: Invalid prefix\n" "$script" "$1"
+    fi
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script [-f] [-p PREFIX]
+       $script -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+script=$(basename "$0")
+parse_arguments "$@"
 install_docker_compose
