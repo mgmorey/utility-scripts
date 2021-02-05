@@ -136,7 +136,7 @@ remove_volume_user() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-d VOLUME-HOME] [-k] [-n VOLUME-NAME]
+Usage: $script [-d VOLUME-HOME] [-k] [-n VOLUME-USER]
        $script -h
 EOF
 }
