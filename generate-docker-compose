@@ -38,7 +38,7 @@ VOLUME_RE="[.]?(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(|:${VOLUME_NAME_RE})"
 
 check_device() {
     if [ ! -d "$1" ]; then
-	printf '%s: WARNING: %s: No such directory\n' "$(basename $0)" "$1" >&2
+	printf '%s: WARNING: %s: No such directory\n' "$script" "$1" >&2
     fi
 }
 
@@ -141,7 +141,7 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -gt 0 ]; then
-	usage_error "%s: Too many arguments\n" "$0"
+	usage_error "%s: Too many arguments\n" "$script"
     fi
 }
 
@@ -251,9 +251,9 @@ print_volumes() {
 
 usage() {
     cat <<EOF >&2
-Usage: $0 [-n]
-       $0 [-u]
-       $0 -h
+Usage: $script [-n]
+       $script [-u]
+       $script -h
 EOF
 }
 
@@ -267,5 +267,6 @@ usage_error() {
     exit 2
 }
 
+script="$0"
 parse_arguments "$@"
 generate_docker_compose
