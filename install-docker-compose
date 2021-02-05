@@ -64,6 +64,9 @@ get_filetype() {
     system=$(uname -s)
 
     case "$system" in
+	(CYGWIN_NT-*)
+	    printf '%s\n' exe
+	    ;;
 	(MINGW64_NT-*)
 	    printf '%s\n' exe
 	    ;;
@@ -78,6 +81,9 @@ get_platform() {
     system=$(uname -s)
 
     case "$system" in
+	(CYGWIN_NT-*)
+	    printf '%s\n' Windows
+	    ;;
 	(MINGW64_NT-*)
 	    printf '%s\n' Windows
 	    ;;
