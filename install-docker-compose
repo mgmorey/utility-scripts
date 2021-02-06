@@ -44,7 +44,7 @@ get_version_string() {
 }
 
 get_curl_options() {
-    printf '%s\n' -f
+    printf '%s\n' -L -f
 
     if [ "$bar" = true ]; then
 	printf '%s\n' -#
@@ -142,13 +142,24 @@ install_target_file() {
 
     tmpfile=$(mktemp -p "$dir" -t "$file.XXXXXXXXXX.tmp")
     trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
+    url=$(get_url)
 
-    if ! curl $(get_curl_options) -L "$(get_url)" -o "$tmpfile"; then
+    if [ "$verbose" = true ]; then
+	printf 'Downloading %s\n' "$url"
+	printf '%s\n' ''
+    fi
+
+    if ! curl $(get_curl_options) "$url" -o "$tmpfile"; then
 	return 1
     fi
 
     if [ ! -s "$tmpfile" ]; then
 	return 1
+    fi
+
+    if [ "$verbose" = true ]; then
+	printf '%s\n' ''
+	printf 'Installing %s\n' "$1"
     fi
 
     if [ -n "$mode" ]; then
