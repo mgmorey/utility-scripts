@@ -17,10 +17,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 BASE_URL=https://github.com/docker/compose/releases
+
+COMPOSE_NAME=docker-compose
 COMPOSE_VERSION=1.28.2
 
 get_compose_target_file() {
-    printf '%s/%s\n' "$prefix" bin/docker-compose
+    printf '%s/%s\n' "$prefix" bin/$COMPOSE_NAME
 }
 
 get_compose_version_number() {
@@ -28,7 +30,7 @@ get_compose_version_number() {
 }
 
 get_compose_version_string() {
-    get_version_string "${1-docker-compose}" | cut -d, -f 1
+    get_version_string "${1-$COMPOSE_NAME}" | cut -d, -f 1
 }
 
 get_version_number() {
@@ -36,21 +38,21 @@ get_version_number() {
 }
 
 get_version_string() {
-    file=$(env PATH="$prefix/bin:$PATH" which $1)
+    file=$(env PATH="$prefix/bin:$PATH" which $1 2>/dev/null)
 
     if [ -n "$file" ]; then
 	"$file" --version
     fi
 }
 
-get_compose_url() {
-    filetype=$(get_filetype)
-    hardware=$(get_hardware)
-    platform=$(get_platform)
-    file="docker-compose-$platform-$hardware${filetype:+.$filetype}"
-    dir="download/$COMPOSE_VERSION"
-    url="$BASE_URL/$dir/$file"
-    printf '%s\n' "$url"
+get_curl_options() {
+    printf '%s\n' -f
+
+    if [ "$hashes" = true ]; then
+	printf '%s\n' -#
+    elif [ "$quiet" = true ]; then
+	printf '%s\n' -s
+    fi
 }
 
 get_execmode() {
@@ -97,6 +99,16 @@ get_platform() {
     esac
 }
 
+get_url() {
+    filetype=$(get_filetype)
+    hardware=$(get_hardware)
+    platform=$(get_platform)
+    file="$COMPOSE_NAME-$platform-$hardware${filetype:+.$filetype}"
+    dir="download/$COMPOSE_VERSION"
+    url="$BASE_URL/$dir/$file"
+    printf '%s\n' "$url"
+}
+
 install_binary_file() {
     dir=$(dirname "$1")
     file=$(basename "$1")
@@ -108,7 +120,14 @@ install_binary_file() {
 
     tmpfile=$(mktemp -p "$dir" -t "$file.XXXXXXXXXX.tmp")
     trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
-    curl -L $(get_compose_url) -o "$tmpfile"
+
+    if ! curl $(get_curl_options) -L "$(get_url)" -o "$tmpfile"; then
+	return 1
+    fi
+
+    if [ ! -s "$tmpfile" ]; then
+	return 1
+    fi
 
     if [ -n "$mode" ]; then
 	chmod $mode "$tmpfile"
@@ -126,31 +145,43 @@ install_docker_compose() {
 	fi
     fi
 
-    current_number=$(get_compose_version_number)
-
-    if [ $force = false -a "$current_number" = "$COMPOSE_VERSION" ]; then
-	exit 0
-    fi
-
     target_file=$(get_compose_target_file)
-    install_binary_file "$target_file"
-    current_string=$(get_compose_version_string "$target_file")
+    version_before=$(get_compose_version_number "$target_file")
 
-    printf '%s\n' ''
-    printf 'Installed %s\n' "$current_string"
+    if [ $force = true -o "$version_before" != "$COMPOSE_VERSION" ]; then
+	if install_binary_file "$target_file"; then
+	    version_after=$(get_compose_version_number "$target_file")
+	    print_summary
+	fi
+    elif [ "$verbose" = true ]; then
+	version_after=
+	print_summary
+    fi
 }
 
 parse_arguments() {
     prefix=
     force=false
+    hashes=false
+    quiet=false
+    verbose=false
 
-    while getopts fp:h opt; do
+    while getopts fhp:qvh opt; do
 	case $opt in
 	    (f)
 		force=true
 		;;
+	    (h)
+		hashes=true
+		;;
 	    (p)
 		parse_prefix $OPTARG
+		;;
+	    (q)
+		quiet=true
+		;;
+	    (v)
+		verbose=true
 		;;
 	    (h)
 		usage
@@ -186,9 +217,45 @@ parse_prefix() {
     fi
 }
 
+print_summary() {
+    if [ "$quiet" = true ]; then
+	return 0
+    fi
+
+    if [ -n "$version_after" ]; then
+	printf '%s\n' ''
+    fi
+
+    printf '%s\n' 'Installation Summary:'
+    printf '%s\n' ''
+
+    which -a $COMPOSE_NAME | while read file; do
+	version_string=$(get_compose_version_string "$file")
+
+	if [ "$file" = "$target_file" ]; then
+	    if [ -z "$version_before" ]; then
+		status=installed
+	    elif [ "$version_after" = "$version_before" ]; then
+		status=reinstalled
+	    elif [ -n "$version_after" ]; then
+		status="upgraded from $version_before"
+	    else
+		status=unchanged
+	    fi
+	else
+	    status=unchanged
+	fi
+
+	printf '%s: %s\n' \
+	       "$version_string" \
+	       "$file${status:+ ($status)}"
+
+    done | sed "s/$COMPOSE_NAME/Docker Compose/"
+}
+
 usage() {
     cat <<EOF >&2
-Usage: $script [-f] [-p PREFIX]
+Usage: $script [-f] [-h] [-p PREFIX] [-q] [-v]
        $script -h
 EOF
 }
