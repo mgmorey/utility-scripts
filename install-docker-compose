@@ -18,11 +18,11 @@
 
 BASE_URL=https://github.com/docker/compose/releases
 
-COMPOSE_NAME=docker-compose
+COMPOSE_FILENAME=docker-compose
 COMPOSE_VERSION=1.28.2
 
 get_compose_target_file() {
-    printf '%s/%s\n' "$prefix" bin/$COMPOSE_NAME
+    printf '%s/%s\n' "$prefix" bin/$COMPOSE_FILENAME
 }
 
 get_compose_version_number() {
@@ -30,7 +30,7 @@ get_compose_version_number() {
 }
 
 get_compose_version_string() {
-    get_version_string "${1-$COMPOSE_NAME}" | cut -d, -f 1
+    get_version_string "${1-$COMPOSE_FILENAME}" | cut -d, -f 1
 }
 
 get_version_number() {
@@ -101,7 +101,7 @@ get_url() {
     filetype=$(get_filetype)
     hardware=$(get_hardware)
     platform=$(get_platform)
-    file="$COMPOSE_NAME-$platform-$hardware${filetype:+.$filetype}"
+    file="$COMPOSE_FILENAME-$platform-$hardware${filetype:+.$filetype}"
     dir="download/$COMPOSE_VERSION"
     url="$BASE_URL/$dir/$file"
     printf '%s\n' "$url"
@@ -239,7 +239,7 @@ print_summary() {
     printf '%s\n' 'Installation Summary:'
     printf '%s\n' ''
 
-    which -a $COMPOSE_NAME | while read file; do
+    which -a $COMPOSE_FILENAME | while read file; do
 	version_string=$(get_compose_version_string "$file")
 
 	if [ "$file" = "$target_file" ]; then
@@ -260,7 +260,7 @@ print_summary() {
 	       "$version_string" \
 	       "$file${status:+ ($status)}"
 
-    done | sed "s/$COMPOSE_NAME/Docker Compose/"
+    done | sed "s/$COMPOSE_FILENAME/Docker Compose/"
 }
 
 usage() {
