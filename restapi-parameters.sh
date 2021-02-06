@@ -57,6 +57,9 @@ configure_baseline() {
 	    case "$ID" in
 		(centos)
 		    case "$VERSION_ID" in
+			(7)
+			    configure_linux_centos_7
+			    ;;
 			(8)
 			    configure_linux_centos_8
 			    ;;
@@ -386,6 +389,26 @@ configure_gnu() {
     # Set ps command format and command column
     PS_COLUMN=10
     PS_FORMAT=pid,ppid,user,tt,lstart,command
+}
+
+configure_linux_centos_7() {
+    configure_linux_redhat
+
+    # Set system Python interpreter
+    SYSTEM_PYTHON=/usr/bin/python3.6
+
+    # Set uWSGI configuration directory
+    UWSGI_ETCDIR=/etc
+
+    # Set uWSGI app configuration directories
+    UWSGI_APPDIRS=uwsgi.d
+
+    # Set uWSGI binary/plugin directories
+    UWSGI_BINARY_DIR=/usr/sbin
+    UWSGI_PLUGIN_DIR=/usr/lib64/uwsgi
+
+    # Set uWSGI log and run directories
+    UWSGI_RUNDIR=/run/uwsgi
 }
 
 configure_linux_centos_8() {
