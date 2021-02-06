@@ -109,6 +109,9 @@ configure_baseline() {
 			(2020*)
 			    configure_linux_opensuse_tw
 			    ;;
+			(2021*)
+			    configure_linux_opensuse_tw
+			    ;;
 			(*)
 			    abort_not_supported Release
 			    ;;
