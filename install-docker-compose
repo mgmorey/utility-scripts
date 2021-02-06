@@ -144,8 +144,8 @@ install_target_file() {
     trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
     url=$(get_url)
 
-    if [ "$verbose" = true ]; then
-	printf 'Downloading %s\n' "$url"
+    if [ "$silent" = false ]; then
+	printf 'Downloading from %s\n' $(dirname "$url")
 	printf '%s\n' ''
     fi
 
@@ -157,9 +157,12 @@ install_target_file() {
 	return 1
     fi
 
-    if [ "$verbose" = true ]; then
+    if [ "$silent" = false ]; then
 	printf '%s\n' ''
-	printf 'Installing %s\n' "$1"
+	printf 'Installing %s %s as %s\n' \
+	       "Docker Compose" \
+	       "$COMPOSE_VERSION" \
+	       "$1"
     fi
 
     if [ -n "$mode" ]; then
@@ -260,7 +263,7 @@ print_summary() {
 	       "$version_string" \
 	       "$file${status:+ ($status)}"
 
-    done | sed "s/$COMPOSE_FILENAME/Docker Compose/"
+    done | sed "s/$COMPOSE_FILENAME version/Docker Compose/"
 }
 
 usage() {
