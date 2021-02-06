@@ -37,7 +37,7 @@ download_file() {
     options=$(get_curl_options)
     url=$(get_url)
 
-    if [ "$silent" = false ]; then
+    if [ $silent = false ]; then
 	printf 'Downloading from %s\n' $(dirname "$url")
 	print_newline
     fi
@@ -57,7 +57,7 @@ get_curl_options() {
 
     if [ "$bar" = true ]; then
 	printf '%s\n' -#
-    elif [ "$silent" = true ]; then
+    elif [ $silent = true ]; then
 	printf '%s\n' -s
     fi
 }
@@ -160,7 +160,7 @@ install_docker_compose() {
 		print_newline
 	    fi
 	fi
-    elif [ "$silent" = false ]; then
+    elif [ $silent = false ]; then
 	printf '%s %s is installed as %s\n' \
 	       "Docker Compose" \
 	       "$version" \
@@ -172,7 +172,7 @@ install_docker_compose() {
 }
 
 install_file() {
-    if [ "$silent" = false ]; then
+    if [ $silent = false ]; then
 	print_newline
 	printf 'Installing %s %s as %s\n' \
 	       "Docker Compose" \
@@ -268,13 +268,13 @@ parse_version() {
 }
 
 print_newline() {
-    if [ "$silent" = false ]; then
+    if [ $silent = false ]; then
 	printf '%s\n' ''
     fi
 }
 
 print_summary() {
-    if [ "$silent" = true ]; then
+    if [ $silent = true ]; then
 	return 0
     fi
 
@@ -306,7 +306,7 @@ print_summary() {
 }
 
 uninstall_file() {
-    if [ "$silent" = false ]; then
+    if [ $silent = false ]; then
 	printf 'Uninstalling %s\n' "$1"
     fi
 
