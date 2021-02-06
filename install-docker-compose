@@ -26,7 +26,7 @@ get_compose_target_file() {
 }
 
 get_compose_version_number() {
-    get_version_number $(get_compose_version_string "$@" || true)
+    get_version_number $(get_compose_version_string "$@")
 }
 
 get_compose_version_string() {
@@ -38,10 +38,8 @@ get_version_number() {
 }
 
 get_version_string() {
-    file=$(env PATH="$prefix/bin:$PATH" which $1 2>/dev/null)
-
-    if [ -n "$file" ]; then
-	"$file" --version
+    if [ -n "$1" ]; then
+	"$1" --version || true
     fi
 }
 
