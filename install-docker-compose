@@ -39,7 +39,7 @@ download_file() {
 
     if [ "$silent" = false ]; then
 	printf 'Downloading from %s\n' $(dirname "$url")
-	printf '%s\n' ''
+	print_newline
     fi
 
     if ! curl $options "$url" -o "$1" || [ ! -s "$1" ]; then
@@ -157,6 +157,12 @@ install_docker_compose() {
 		print_newline
 	    fi
 	fi
+    elif [ "$silent" = false ]; then
+	printf '%s %s is installed as %s\n' \
+	       "Docker Compose" \
+	       "$version" \
+	       "$target_file"
+	print_newline
     fi
 
     print_summary
@@ -164,7 +170,7 @@ install_docker_compose() {
 
 install_file() {
     if [ "$silent" = false ]; then
-	printf '%s\n' ''
+	print_newline
 	printf 'Installing %s %s as %s\n' \
 	       "Docker Compose" \
 	       "$version" \
@@ -266,7 +272,7 @@ print_summary() {
     fi
 
     printf '%s\n' 'Installation Summary:'
-    printf '%s\n' ''
+    print_newline
 
     which -a $COMPOSE_FILENAME | while read file; do
 	version_string=$(get_file_version_string "$file")
