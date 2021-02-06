@@ -52,6 +52,16 @@ get_compose_file() {
     printf '%s/%s\n' "$prefix" bin/$COMPOSE_FILENAME
 }
 
+get_curl_options() {
+    printf '%s\n' -L -f
+
+    if [ "$bar" = true ]; then
+	printf '%s\n' -#
+    elif [ "$silent" = true ]; then
+	printf '%s\n' -s
+    fi
+}
+
 get_file_version_number() {
     get_version_number $(get_file_version_string "$@")
 }
@@ -67,16 +77,6 @@ get_version_number() {
 get_version_string() {
     if [ -n "$1" -a -x "$1" ]; then
 	"$1" --version || true
-    fi
-}
-
-get_curl_options() {
-    printf '%s\n' -L -f
-
-    if [ "$bar" = true ]; then
-	printf '%s\n' -#
-    elif [ "$silent" = true ]; then
-	printf '%s\n' -s
     fi
 }
 
