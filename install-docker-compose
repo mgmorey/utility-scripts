@@ -21,16 +21,43 @@ BASE_URL=https://github.com/docker/compose/releases
 COMPOSE_FILENAME=docker-compose
 COMPOSE_VERSION=1.28.2
 
-get_compose_target_file() {
+create_tmpfile() {
+    dir=$(dirname "$1")
+    file=$(basename "$1")
+
+    if [ ! -d "$dir" ]; then
+	mkdir ${target_mode:+-m $target_mode }-p "$dir"
+    fi
+
+    tmpfile=$(mktemp -p "$dir" -t "$file.XXXXXXXXXX.tmp")
+    trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
+}
+
+download_file() {
+    options=$(get_curl_options)
+    url=$(get_url)
+
+    if [ "$silent" = false ]; then
+	printf 'Downloading from %s\n' $(dirname "$url")
+	printf '%s\n' ''
+    fi
+
+    if ! curl $options "$url" -o "$1" || [ ! -s "$1" ]; then
+	print_newline
+	return 1
+    fi
+}
+
+get_compose_file() {
     printf '%s/%s\n' "$prefix" bin/$COMPOSE_FILENAME
 }
 
-get_compose_version_number() {
-    get_version_number $(get_compose_version_string "$@")
+get_file_version_number() {
+    get_version_number $(get_file_version_string "$@")
 }
 
-get_compose_version_string() {
-    get_version_string "${1-$COMPOSE_FILENAME}" | cut -d, -f 1
+get_file_version_string() {
+    get_version_string "$1" | cut -d, -f 1
 }
 
 get_version_number() {
@@ -53,7 +80,7 @@ get_curl_options() {
     fi
 }
 
-get_execmode() {
+get_target_mode() {
     case "$1" in
 	($HOME/*)
 	    printf '%s\n' a+rx
@@ -102,7 +129,7 @@ get_url() {
     hardware=$(get_hardware)
     platform=$(get_platform)
     file="$COMPOSE_FILENAME-$platform-$hardware${filetype:+.$filetype}"
-    dir="download/$COMPOSE_VERSION"
+    dir="download/$version"
     url="$BASE_URL/$dir/$file"
     printf '%s\n' "$url"
 }
@@ -116,60 +143,49 @@ install_docker_compose() {
 	fi
     fi
 
-    target_file=$(get_compose_target_file)
-    version_before=$(get_compose_version_number "$target_file")
+    target_file=$(get_compose_file)
+    target_mode=$(get_target_mode "$target_file")
+    version_before=$(get_file_version_number "$target_file")
     version_after=
 
-    if [ $force = true -o "$version_before" != "$COMPOSE_VERSION" ]; then
-	if install_target_file "$target_file"; then
-	    version_after=$(get_compose_version_number "$target_file")
+    if [ $force = true -o "$version_before" != "$version" ]; then
+	create_tmpfile "$target_file"
+
+	if download_file "$tmpfile"; then
+	    if install_file "$tmpfile" "$target_file"; then
+		version_after=$(get_file_version_number "$target_file")
+		print_newline
+	    fi
 	fi
     fi
 
-    if [ "$verbose" = true -o "$version_after" ]; then
-	print_summary
-    fi
+    print_summary
 }
 
-install_target_file() {
-    dir=$(dirname "$1")
-    file=$(basename "$1")
-    mode=$(get_execmode "$1")
-
-    if [ ! -d "$dir" ]; then
-	mkdir ${mode:+-m $mode }-p "$dir"
-    fi
-
-    tmpfile=$(mktemp -p "$dir" -t "$file.XXXXXXXXXX.tmp")
-    trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
-    url=$(get_url)
-
-    if [ "$silent" = false ]; then
-	printf 'Downloading from %s\n' $(dirname "$url")
-	printf '%s\n' ''
-    fi
-
-    if ! curl $(get_curl_options) "$url" -o "$tmpfile"; then
-	return 1
-    fi
-
-    if [ ! -s "$tmpfile" ]; then
-	return 1
-    fi
-
+install_file() {
     if [ "$silent" = false ]; then
 	printf '%s\n' ''
 	printf 'Installing %s %s as %s\n' \
 	       "Docker Compose" \
-	       "$COMPOSE_VERSION" \
-	       "$1"
+	       "$version" \
+	       "$2"
     fi
 
-    if [ -n "$mode" ]; then
-	chmod $mode "$tmpfile"
+    if [ -n "$target_mode" ]; then
+	chmod $target_mode "$1"
     fi
 
-    /bin/mv -f "$tmpfile" "$1"
+    /bin/mv -f "$1" "$2"
+}
+
+is_valid_version() {
+    if expr "$1" : '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$'; then
+	true
+    elif expr "$1" : '[0-9][0-9]*\.[0-9][0-9]*$'; then
+	true
+    else
+	false
+    fi >/dev/null
 }
 
 parse_arguments() {
@@ -177,9 +193,9 @@ parse_arguments() {
     force=false
     prefix=
     silent=false
-    verbose=false
+    version=$COMPOSE_VERSION
 
-    while getopts bfp:svh opt; do
+    while getopts bfp:sv:h opt; do
 	case $opt in
 	    (b)
 		bar=true
@@ -194,7 +210,7 @@ parse_arguments() {
 		silent=true
 		;;
 	    (v)
-		verbose=true
+		parse_version $OPTARG
 		;;
 	    (h)
 		usage
@@ -230,20 +246,30 @@ parse_prefix() {
     fi
 }
 
+parse_version() {
+    if is_valid_version "$1"; then
+	version="$1"
+    else
+	usage_error "%s: %s: Invalid version\n" "$script" "$1"
+    fi
+}
+
+print_newline() {
+    if [ "$silent" = false ]; then
+	printf '%s\n' ''
+    fi
+}
+
 print_summary() {
     if [ "$silent" = true ]; then
 	return 0
-    fi
-
-    if [ -n "$version_after" ]; then
-	printf '%s\n' ''
     fi
 
     printf '%s\n' 'Installation Summary:'
     printf '%s\n' ''
 
     which -a $COMPOSE_FILENAME | while read file; do
-	version_string=$(get_compose_version_string "$file")
+	version_string=$(get_file_version_string "$file")
 
 	if [ "$file" = "$target_file" ]; then
 	    if [ -z "$version_before" ]; then
@@ -268,7 +294,7 @@ print_summary() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-f] [-p PREFIX] [-s] [-v]
+Usage: $script [-b] [-f] [-p PREFIX] [-s] [-v VERSION]
        $script -h
 EOF
 }
