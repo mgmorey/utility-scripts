@@ -148,7 +148,10 @@ install_docker_compose() {
     version_before=$(get_file_version_number "$target_file")
     version_after=
 
-    if [ $force = true -o "$version_before" != "$version" ]; then
+    if [ $uninstall = true ]; then
+	uninstall_file "$target_file"
+	print_newline
+    elif [ $force = true -o "$version_before" != "$version" ]; then
 	create_tmpfile "$target_file"
 
 	if download_file "$tmpfile"; then
@@ -199,9 +202,10 @@ parse_arguments() {
     force=false
     prefix=
     silent=false
+    uninstall=false
     version=$COMPOSE_VERSION
 
-    while getopts bfp:sv:h opt; do
+    while getopts bfp:suv:h opt; do
 	case $opt in
 	    (b)
 		bar=true
@@ -214,6 +218,9 @@ parse_arguments() {
 		;;
 	    (s)
 		silent=true
+		;;
+	    (u)
+		uninstall=true
 		;;
 	    (v)
 		parse_version $OPTARG
@@ -298,9 +305,17 @@ print_summary() {
     done | sed "s/$COMPOSE_FILENAME version/Docker Compose/"
 }
 
+uninstall_file() {
+    if [ "$silent" = false ]; then
+	printf 'Uninstalling %s\n' "$1"
+    fi
+
+    /bin/rm -f "$1"
+}
+
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-f] [-p PREFIX] [-s] [-v VERSION]
+Usage: $script [-b] [-f] [-p PREFIX] [-s] [-u] [-v VERSION]
        $script -h
 EOF
 }
