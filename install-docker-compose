@@ -80,17 +80,6 @@ get_curl_options() {
     fi
 }
 
-get_target_mode() {
-    case "$1" in
-	($HOME/*)
-	    printf '%s\n' a+rx
-	    ;;
-	(*)
-	    printf '%s\n' u=rwx,go=rx
-	    ;;
-    esac
-}
-
 get_filetype() {
     system=$(uname -s)
 
@@ -120,6 +109,17 @@ get_platform() {
 	    ;;
 	(*)
 	    printf '%s\n' "$system"
+	    ;;
+    esac
+}
+
+get_target_mode() {
+    case "$1" in
+	($HOME/*)
+	    printf '%s\n' a+rx
+	    ;;
+	(*)
+	    printf '%s\n' u=rwx,go=rx
 	    ;;
     esac
 }
