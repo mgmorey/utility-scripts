@@ -48,7 +48,7 @@ get_curl_options() {
 
     if [ "$hashes" = true ]; then
 	printf '%s\n' -#
-    elif [ "$quiet" = true ]; then
+    elif [ "$silent" = true ]; then
 	printf '%s\n' -s
     fi
 }
@@ -107,7 +107,31 @@ get_url() {
     printf '%s\n' "$url"
 }
 
-install_binary_file() {
+install_docker_compose() {
+    if [ -z "$prefix" ]; then
+	if [ "$(id -u)" -eq 0 ]; then
+	    prefix=/usr/local
+	else
+	    prefix=$HOME/.local
+	fi
+    fi
+
+    target_file=$(get_compose_target_file)
+    version_before=$(get_compose_version_number "$target_file")
+    version_after=
+
+    if [ $force = true -o "$version_before" != "$COMPOSE_VERSION" ]; then
+	if install_target_file "$target_file"; then
+	    version_after=$(get_compose_version_number "$target_file")
+	fi
+    fi
+
+    if [ "$verbose" = true -o "$version_after" ]; then
+	print_summary
+    fi
+}
+
+install_target_file() {
     dir=$(dirname "$1")
     file=$(basename "$1")
     mode=$(get_execmode "$1")
@@ -134,37 +158,14 @@ install_binary_file() {
     /bin/mv -f "$tmpfile" "$1"
 }
 
-install_docker_compose() {
-    if [ -z "$prefix" ]; then
-	if [ "$(id -u)" -eq 0 ]; then
-	    prefix=/usr/local
-	else
-	    prefix=$HOME/.local
-	fi
-    fi
-
-    target_file=$(get_compose_target_file)
-    version_before=$(get_compose_version_number "$target_file")
-
-    if [ $force = true -o "$version_before" != "$COMPOSE_VERSION" ]; then
-	if install_binary_file "$target_file"; then
-	    version_after=$(get_compose_version_number "$target_file")
-	    print_summary
-	fi
-    elif [ "$verbose" = true ]; then
-	version_after=
-	print_summary
-    fi
-}
-
 parse_arguments() {
     prefix=
     force=false
     hashes=false
-    quiet=false
+    silent=false
     verbose=false
 
-    while getopts fhp:qvh opt; do
+    while getopts fhp:svh opt; do
 	case $opt in
 	    (f)
 		force=true
@@ -175,8 +176,8 @@ parse_arguments() {
 	    (p)
 		parse_prefix $OPTARG
 		;;
-	    (q)
-		quiet=true
+	    (s)
+		silent=true
 		;;
 	    (v)
 		verbose=true
@@ -216,7 +217,7 @@ parse_prefix() {
 }
 
 print_summary() {
-    if [ "$quiet" = true ]; then
+    if [ "$silent" = true ]; then
 	return 0
     fi
 
@@ -253,7 +254,7 @@ print_summary() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-f] [-h] [-p PREFIX] [-q] [-v]
+Usage: $script [-f] [-h] [-p PREFIX] [-s] [-v]
        $script -h
 EOF
 }
