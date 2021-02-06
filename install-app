@@ -164,6 +164,10 @@ install_app() {
 	generate_service_ini $APP_CONFIG "$APP_VARS"
 	create_dirs $APP_VARDIR $APP_LOGDIR $APP_RUNDIR
 
+	if [ -n "${UWSGI_RUNDIR-}" ]; then
+	    create_dirs $UWSGI_RUNDIR
+	fi
+
 	if [ -n "${APP_SET_UP-}" ]; then
 	    run_in_virtualenv $APP_SET_UP
 	fi

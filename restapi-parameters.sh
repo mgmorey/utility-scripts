@@ -113,6 +113,9 @@ configure_baseline() {
 		    ;;
 		(rhel|ol)
 		    case "$VERSION_ID" in
+			(7.*)
+			    configure_linux_redhat_7
+			    ;;
 			(8.*)
 			    configure_linux_redhat_8
 			    ;;
@@ -472,6 +475,26 @@ configure_linux_redhat() {
     # Set application group and user accounts
     APP_UID=nobody
     APP_GID=nobody
+}
+
+configure_linux_redhat_7() {
+    configure_linux_redhat
+
+    # Set system Python interpreter
+    SYSTEM_PYTHON=/usr/bin/python3.6
+
+    # Set uWSGI configuration directory
+    UWSGI_ETCDIR=/etc
+
+    # Set uWSGI app configuration directories
+    UWSGI_APPDIRS=uwsgi.d
+
+    # Set uWSGI binary/plugin directories
+    UWSGI_BINARY_DIR=/usr/sbin
+    UWSGI_PLUGIN_DIR=/usr/lib64/uwsgi
+
+    # Set uWSGI log and run directories
+    UWSGI_RUNDIR=/run/uwsgi
 }
 
 configure_linux_redhat_8() {
