@@ -38,7 +38,7 @@ get_version_number() {
 }
 
 get_version_string() {
-    if [ -n "$1" ]; then
+    if [ -n "$1" -a -x "$1" ]; then
 	"$1" --version || true
     fi
 }
@@ -46,7 +46,7 @@ get_version_string() {
 get_curl_options() {
     printf '%s\n' -f
 
-    if [ "$hashes" = true ]; then
+    if [ "$bar" = true ]; then
 	printf '%s\n' -#
     elif [ "$silent" = true ]; then
 	printf '%s\n' -s
@@ -159,19 +159,19 @@ install_target_file() {
 }
 
 parse_arguments() {
-    prefix=
+    bar=false
     force=false
-    hashes=false
+    prefix=
     silent=false
     verbose=false
 
-    while getopts fhp:svh opt; do
+    while getopts bfp:svh opt; do
 	case $opt in
+	    (b)
+		bar=true
+		;;
 	    (f)
 		force=true
-		;;
-	    (h)
-		hashes=true
 		;;
 	    (p)
 		parse_prefix $OPTARG
@@ -254,7 +254,7 @@ print_summary() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-f] [-h] [-p PREFIX] [-s] [-v]
+Usage: $script [-b] [-f] [-p PREFIX] [-s] [-v]
        $script -h
 EOF
 }
