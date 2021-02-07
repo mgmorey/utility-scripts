@@ -19,6 +19,15 @@
 INPUT=-
 OUTPUT=/etc/systemd/system/docker.service.d/http-proxy.conf
 
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
 configure_docker_proxy()
 {
     tmpfile=$(mktemp)
@@ -26,14 +35,20 @@ configure_docker_proxy()
 
     printf '[%s]\n' "Service" >$tmpfile
 
-    case "$input" in
-	(-)
-	    cat
-	    ;;
-	(*)
-	    cat "$input"
-	    ;;
-    esac | grep -E '^(HTTP|NO)_PROXY=' | while read statement; do
+    if [ -n "${proxy-}" ]; then
+	"${script_prefix}generate-proxy-parameters" \
+	    ${no_proxy:+-n "$no_proxy"} \
+	    "$proxy"
+    else
+	case "$input" in
+	    (-)
+		cat
+		;;
+	    (*)
+		cat "$input"
+		;;
+	esac
+    fi | grep -E '^(HTTP|NO)_PROXY=' | while read statement; do
 	printf 'Environment="%s"\n' "$statement" >>$tmpfile
     done
 
@@ -52,6 +67,23 @@ configure_docker_proxy()
 	fi
     fi
 }
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
 
 is_valid_input_file() {
     case "$1" in
@@ -83,12 +115,17 @@ is_valid_output_file() {
 
 parse_arguments() {
     input=$INPUT
+    no_proxy=
     output=$OUTPUT
+    proxy=
 
-    while getopts i:o:h opt; do
+    while getopts i:n:o:h opt; do
 	case $opt in
 	    (i)
 		input="$OPTARG"
+		;;
+	    (n)
+		no_proxy="$OPTARG"
 		;;
 	    (o)
 		output="$OPTARG"
@@ -104,6 +141,11 @@ parse_arguments() {
     done
 
     shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	proxy="$1"
+	shift
+    fi
 
     if [ $# -gt 0 ]; then
 	usage_error "%s: Too many arguments\n" "$script"
@@ -128,7 +170,8 @@ parse_output_file() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-i INPUT] [-o OUTPUT]
+Usage: $script [-n NO-PROXY] [-o OUTPUT] PROXY-URL
+       $script [-i INPUT] [-o OUTPUT]
        $script -h
 EOF
 }
@@ -144,5 +187,17 @@ usage_error() {
 }
 
 script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
 parse_arguments "$@"
 configure_docker_proxy
