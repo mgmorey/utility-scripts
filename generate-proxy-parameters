@@ -32,6 +32,10 @@ get_proxy_parameters() {
     done
 }
 
+get_word_count() {
+    printf '%s\n' "$1" | wc -l
+}
+
 is_valid_name() {
     expr "$1" : '[a-z][0-9a-z-]*$' >/dev/null
 }
@@ -45,6 +49,12 @@ is_valid_fqdn() {
 }
 
 is_valid_fqdn_pattern() {
+    words=$(split_string "$1" ".")
+
+    if [ "$(get_word_count "$words")" -lt 2 ]; then
+	return 1
+    fi
+
     for word in $(split_string "$1" "."); do
 	if is_valid_wildcard "$word"; then
 	    continue
@@ -153,7 +163,7 @@ parse_no_proxy() {
     if is_valid_no_proxy $(printf '%s\n' "$1" | sed 's/\*/\\\*/'); then
 	no_proxy="$1"
     else
-	usage_error "%s: %s: Invalid NO_PROXY\n" "$script" "$1"
+	usage_error "%s: %s: Invalid proxy exception list\n" "$script" "$1"
     fi
 }
 
@@ -161,7 +171,7 @@ parse_proxy() {
     if is_valid_proxy "$1"; then
 	proxy="$1"
     else
-	usage_error "%s: %s: Invalid URL\n" "$script" "$1"
+	usage_error "%s: %s: Invalid proxy URL\n" "$script" "$1"
     fi
 }
 
