@@ -32,10 +32,20 @@ get_proxy_parameters() {
     done
 }
 
-is_valid_local_net() {
+is_valid_name() {
+    expr "$1" : '[a-z][0-9a-z-]*$' >/dev/null
+}
+
+is_valid_fqdn() {
+    for word in $(split_string "$1" "."); do
+	if ! is_valid_name "$word"; then
+	    return 1
+	fi
+    done
+}
+
+is_valid_local_host() {
     if expr "$1" : 'localhost$'; then
-	true
-    elif expr "$1" : '127.0.0.0/8$'; then
 	true
     elif expr "$1" : '127.0.0.1$'; then
 	true
@@ -46,22 +56,65 @@ is_valid_local_net() {
     fi >/dev/null
 }
 
-is_valid_no_proxy() {
-    for value in $(split_string "$1" ","); do
-	if ! is_valid_local_net "$value"; then
-	    return 1
-	fi
-    done
-
-    return 0
-}
-
-is_valid_proxy() {
-    if expr "$1" : 'http://[A-Za-z][[0-9A-Z_a-z./-]*:[0-9][0-9]*$'; then
+is_valid_local_net() {
+    if expr "$1" : '127.0.0.0/8$'; then
 	true
     else
 	false
     fi >/dev/null
+}
+
+is_valid_middle() {
+    if expr "$1" : '//' >/dev/null; then
+	is_valid_fqdn $(printf '%s\n' "$1" | sed 's/\/\///')
+    else
+	false
+    fi
+}
+
+is_valid_no_proxy() {
+    for word in $(split_string "$1" ","); do
+	if is_valid_wildcarded_fqdn "$word"; then
+	    continue
+	elif is_valid_local_net "$word"; then
+	    continue
+	else
+	    return 1
+	fi
+    done
+}
+
+is_valid_port() {
+    expr "$1" : '[1-9][0-9]*$' >/dev/null
+}
+
+is_valid_protocol() {
+    expr "$1" : 'http$' >/dev/null
+}
+
+is_valid_proxy() {
+    protocol=$(printf '%s\n' "$1" | awk -F: '{print $1}')
+    middle=$(printf '%s\n' "$1" | awk -F: '{print $2}')
+    port=$(printf '%s\n' "$1" | awk -F: '{print $3}')
+    is_valid_protocol $protocol && \
+	is_valid_middle $middle && \
+	is_valid_port $port
+}
+
+is_valid_wildcard() {
+    expr "$1" : '\\\*$' >/dev/null
+}
+
+is_valid_wildcarded_fqdn() {
+    for word in $(split_string "$1" "."); do
+	if is_valid_wildcard "$word"; then
+	    continue
+	elif is_valid_name "$word"; then
+	    continue
+	else
+	    return 1
+	fi
+    done
 }
 
 parse_arguments() {
@@ -97,7 +150,7 @@ parse_arguments() {
 }
 
 parse_no_proxy() {
-    if is_valid_no_proxy "$1"; then
+    if is_valid_no_proxy $(printf '%s\n' "$1" | sed 's/\*/\\\*/'); then
 	no_proxy="$1"
     else
 	usage_error "%s: %s: Invalid NO_PROXY\n" "$script" "$1"
