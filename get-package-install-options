@@ -143,7 +143,7 @@ get_package_install_options() {
 
 get_realpath() (
     assert [ $# -ge 1 ]
-    realpath=$(which realpath)
+    realpath=$(which realpath || true)
 
     if [ -n "$realpath" ]; then
 	$realpath "$@"

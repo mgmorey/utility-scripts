@@ -1,4 +1,4 @@
-#!/bin/sh -eu
+#!/bin/sh -eux
 
 # install-files: install files
 # Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
@@ -38,7 +38,7 @@ get_install_command() {
 
 get_realpath() (
     assert [ $# -ge 1 ]
-    realpath=$(which realpath)
+    realpath=$(which realpath || true)
 
     if [ -n "$realpath" ]; then
 	$realpath "$@"

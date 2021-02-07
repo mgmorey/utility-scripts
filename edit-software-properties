@@ -67,7 +67,7 @@ edit_software_properties() {
 
 get_realpath() (
     assert [ $# -ge 1 ]
-    realpath=$(which realpath)
+    realpath=$(which realpath || true)
 
     if [ -n "$realpath" ]; then
     	$realpath "$@"
