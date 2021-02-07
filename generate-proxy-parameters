@@ -168,7 +168,7 @@ parse_no_proxy() {
 }
 
 parse_proxy() {
-    if is_valid_proxy "$1"; then
+    if is_valid_proxy $(printf '%s\n' "$1" | sed 's/\*/\\\*/'); then
 	proxy="$1"
     else
 	usage_error "%s: %s: Invalid proxy URL\n" "$script" "$1"
