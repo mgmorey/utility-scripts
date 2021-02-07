@@ -37,7 +37,7 @@ get_word_count() {
 }
 
 is_valid_name() {
-    expr "$1" : '[a-z][0-9a-z-]*$' >/dev/null
+    expr "${1-}" : '[a-z][0-9a-z-]*$' >/dev/null
 }
 
 is_valid_fqdn() {
@@ -67,11 +67,11 @@ is_valid_fqdn_pattern() {
 }
 
 is_valid_local_host() {
-    if expr "$1" : 'localhost$'; then
+    if expr "${1-}" : 'localhost$'; then
 	true
-    elif expr "$1" : '127.0.0.1$'; then
+    elif expr "${1-}" : '127.0.0.1$'; then
 	true
-    elif expr "$1" : '::1$'; then
+    elif expr "${1-}" : '::1$'; then
 	true
     else
 	false
@@ -79,7 +79,7 @@ is_valid_local_host() {
 }
 
 is_valid_local_net() {
-    if expr "$1" : '127.0.0.0/8$'; then
+    if expr "${1-}" : '127.0.0.0/8$'; then
 	true
     else
 	false
@@ -87,7 +87,7 @@ is_valid_local_net() {
 }
 
 is_valid_middle() {
-    if expr "$1" : '//' >/dev/null; then
+    if expr "${1-}" : '//' >/dev/null; then
 	is_valid_fqdn $(printf '%s\n' "$1" | sed 's/\/\///')
     else
 	false
@@ -107,11 +107,11 @@ is_valid_no_proxy() {
 }
 
 is_valid_port() {
-    expr "$1" : '[1-9][0-9]*$' >/dev/null
+    expr "${1-}" : '[1-9][0-9]*$' >/dev/null
 }
 
 is_valid_protocol() {
-    expr "$1" : 'http$' >/dev/null
+    expr "${1-}" : 'http$' >/dev/null
 }
 
 is_valid_proxy() {
@@ -124,7 +124,7 @@ is_valid_proxy() {
 }
 
 is_valid_wildcard() {
-    expr "$1" : '\\\*$' >/dev/null
+    expr "${1-}" : '\\\*$' >/dev/null
 }
 
 parse_arguments() {
