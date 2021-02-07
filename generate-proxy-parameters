@@ -44,6 +44,18 @@ is_valid_fqdn() {
     done
 }
 
+is_valid_fqdn_pattern() {
+    for word in $(split_string "$1" "."); do
+	if is_valid_wildcard "$word"; then
+	    continue
+	elif is_valid_name "$word"; then
+	    continue
+	else
+	    return 1
+	fi
+    done
+}
+
 is_valid_local_host() {
     if expr "$1" : 'localhost$'; then
 	true
@@ -74,7 +86,7 @@ is_valid_middle() {
 
 is_valid_no_proxy() {
     for word in $(split_string "$1" ","); do
-	if is_valid_wildcarded_fqdn "$word"; then
+	if is_valid_fqdn_pattern "$word"; then
 	    continue
 	elif is_valid_local_net "$word"; then
 	    continue
@@ -103,18 +115,6 @@ is_valid_proxy() {
 
 is_valid_wildcard() {
     expr "$1" : '\\\*$' >/dev/null
-}
-
-is_valid_wildcarded_fqdn() {
-    for word in $(split_string "$1" "."); do
-	if is_valid_wildcard "$word"; then
-	    continue
-	elif is_valid_name "$word"; then
-	    continue
-	else
-	    return 1
-	fi
-    done
 }
 
 parse_arguments() {
