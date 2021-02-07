@@ -16,30 +16,128 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-INPUT=/etc/environment
+INPUT=-
 OUTPUT=/etc/systemd/system/docker.service.d/http-proxy.conf
 
-tmpfile=$(mktemp)
-trap "/bin/rm -f $tmpfile" EXIT INT QUIT TERM
+configure_docker_proxy()
+{
+    tmpfile=$(mktemp)
+    trap "/bin/rm -f $tmpfile" EXIT INT QUIT TERM
 
-printf '[%s]\n' "Service" >$tmpfile
+    printf '[%s]\n' "Service" >$tmpfile
 
-if [ -f $INPUT ]; then
-    cat $INPUT
-else
-    printenv
-fi | grep -E '^(HTTP|NO)_PROXY=' | while read statement; do
-    printf 'Environment="%s"\n' "$statement" >>$tmpfile
-done
+    case "$input" in
+	(-)
+	    cat
+	    ;;
+	(*)
+	    cat "$input"
+	    ;;
+    esac | grep -E '^(HTTP|NO)_PROXY=' | while read statement; do
+	printf 'Environment="%s"\n' "$statement" >>$tmpfile
+    done
 
-if [ "$(wc -l <$tmpfile)" -gt 1 ]; then
-    if [ -w $OUTPUT ]; then
-        mkdir -p $(dirname $OUTPUT)
-        chmod a+r $tmpfile
-        /bin/mv -f $tmpfile $OUTPUT
-        systemctl daemon-reload
-        systemctl restart docker
-    else
-        cat $tmpfile
+    if [ "$(wc -l <$tmpfile)" -gt 1 ]; then
+	if [ "$output" != - -a -w "$output" ]; then
+            mkdir -p "$(dirname "$output")"
+            chmod a+r $tmpfile
+            /bin/mv -f $tmpfile "$output"
+            systemctl daemon-reload
+
+	    if systemctl status docker >/dev/null; then
+		systemctl restart docker
+	    fi
+	else
+            cat $tmpfile
+	fi
     fi
-fi
+}
+
+is_valid_input_file() {
+    case "$1" in
+	(-)
+	    true
+	    ;;
+	(*)
+	    test -f "$1" -a -r "$1"
+	    ;;
+    esac
+}
+
+is_valid_output_file() {
+    if [ "$1" = - ]; then
+	true
+    elif [ ! -e "$1" ]; then
+	test -w "$(dirname "$1")"
+    elif [ -f "$1" ]; then
+	test -w "$1"
+    else
+	false
+    fi
+}
+
+parse_arguments() {
+    input=$INPUT
+    output=$OUTPUT
+
+    while getopts i:o:h opt; do
+	case $opt in
+	    (i)
+		input="$OPTARG"
+		;;
+	    (o)
+		output="$OPTARG"
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error "%s: Too many arguments\n" "$script"
+    fi
+}
+
+parse_input_file() {
+    if is_valid_input_file "$1"; then
+	input="$1"
+    else
+	usage_error "%s: %s: Invalid input file\n" "$script" "$1"
+    fi
+}
+
+parse_output_file() {
+    if is_valid_output_file "$1"; then
+	input="$1"
+    else
+	usage_error "%s: %s: Invalid output file\n" "$script" "$1"
+    fi
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script [-i INPUT] [-o OUTPUT]
+       $script -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+script=$(basename "$0")
+parse_arguments "$@"
+configure_docker_proxy
