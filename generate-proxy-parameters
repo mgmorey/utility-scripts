@@ -1,0 +1,104 @@
+#!/bin/sh -eu
+
+# generate-proxy-parameters: generate a list of proxy parameters
+# Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+KEYS="all ftp http https no"
+NO_PROXY="localhost,127.0.0.0/8"
+
+get_proxy_parameters() {
+    for key in $(printf '%s\n' $KEYS | tr '[:lower:]' '[:upper:]') $KEYS; do
+	case "$key" in
+	    (NO|no)
+		printf '%s_PROXY=%s\n' "$key" "$no_proxy"
+		;;
+	    (*)
+		printf '%s_PROXY=%s\n' "$key" "$proxy"
+		;;
+	esac
+    done
+}
+
+is_valid_proxy() {
+    if expr "$1" : 'http://[A-Za-z][[0-9A-Z_a-z./-]*:[0-9][0-9]*$'; then
+	true
+    else
+	false
+    fi >/dev/null
+}
+
+parse_arguments() {
+    no_proxy="$no_proxy"
+
+    while getopts h opt; do
+	case $opt in
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -eq 0 ]; then
+	usage_error "%s: Not enough arguments\n" "$script"
+    fi
+
+    parse_proxy "$1"
+    shift
+
+    if [ $# -gt 0 ]; then
+	no_proxy="$2"
+	shift
+    fi
+
+    if [ $# -gt 0 ]; then
+	usage_error "%s: Too many arguments\n" "$script"
+    fi
+}
+
+parse_proxy() {
+    if is_valid_proxy "$1"; then
+	proxy="$1"
+    else
+	usage_error "%s: %s: Invalid URL\n" "$script" "$1"
+    fi
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script PROXY [NO-PROXY]
+       $script -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+script=$(basename "$0")
+parse_arguments "$@"
+get_proxy_parameters
