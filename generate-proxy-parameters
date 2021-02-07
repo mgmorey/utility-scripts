@@ -41,7 +41,7 @@ is_valid_proxy() {
 }
 
 parse_arguments() {
-    no_proxy="$no_proxy"
+    no_proxy=$NO_PROXY
 
     while getopts h opt; do
 	case $opt in
