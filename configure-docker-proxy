@@ -27,8 +27,8 @@ printf '[%s]\n' "Service" >$tmpfile
 if [ -f $INPUT ]; then
     cat $INPUT
 else
-    printenv | grep -Ei '^(ftp|http|https|no)_proxy='
-fi | while read statement; do
+    printenv
+fi | grep -E '^(HTTP|NO)_PROXY=' | while read statement; do
     printf 'Environment="%s"\n' "$statement" >>$tmpfile
 done
 
