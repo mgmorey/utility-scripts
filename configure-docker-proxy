@@ -65,15 +65,20 @@ is_valid_input_file() {
 }
 
 is_valid_output_file() {
-    if [ "$1" = - ]; then
-	true
-    elif [ ! -e "$1" ]; then
-	test -w "$(dirname "$1")"
-    elif [ -f "$1" ]; then
-	test -w "$1"
-    else
-	false
-    fi
+    case "$1" in
+	(-)
+	    true
+	    ;;
+	(*)
+	    if [ ! -e "$1" ]; then
+		test -w "$(dirname "$1")"
+	    elif [ -f "$1" ]; then
+		test -w "$1"
+	    else
+		false
+	    fi
+	    ;;
+    esac
 }
 
 parse_arguments() {
