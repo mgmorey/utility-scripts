@@ -20,7 +20,7 @@ KEYS="all ftp http https no"
 NO_PROXY="localhost,127.0.0.0/8"
 
 get_proxy_parameters() {
-    for key in $(printf '%s\n' $KEYS | tr '[:lower:]' '[:upper:]') $KEYS; do
+    for key in $(printf '%s\n' $KEYS | to_upper) $KEYS; do
 	case "$key" in
 	    (NO|no)
 		printf '%s_PROXY=%s\n' "$key" "$no_proxy"
@@ -30,6 +30,30 @@ get_proxy_parameters() {
 		;;
 	esac
     done
+}
+
+is_valid_local_net() {
+    if expr "$1" : 'localhost$'; then
+	true
+    elif expr "$1" : '127.0.0.0/8$'; then
+	true
+    elif expr "$1" : '127.0.0.1$'; then
+	true
+    elif expr "$1" : '::1$'; then
+	true
+    else
+	false
+    fi >/dev/null
+}
+
+is_valid_no_proxy() {
+    for value in $(split_string "$1" ","); do
+	if ! is_valid_local_net "$value"; then
+	    return 1
+	fi
+    done
+
+    return 0
 }
 
 is_valid_proxy() {
@@ -43,8 +67,11 @@ is_valid_proxy() {
 parse_arguments() {
     no_proxy=$NO_PROXY
 
-    while getopts h opt; do
+    while getopts n:h opt; do
 	case $opt in
+	    (n)
+		parse_no_proxy "$OPTARG"
+		;;
 	    (h)
 		usage
 		exit 0
@@ -65,12 +92,15 @@ parse_arguments() {
     shift
 
     if [ $# -gt 0 ]; then
-	no_proxy="$2"
-	shift
-    fi
-
-    if [ $# -gt 0 ]; then
 	usage_error "%s: Too many arguments\n" "$script"
+    fi
+}
+
+parse_no_proxy() {
+    if is_valid_no_proxy "$1"; then
+	no_proxy="$1"
+    else
+	usage_error "%s: %s: Invalid NO_PROXY\n" "$script" "$1"
     fi
 }
 
@@ -82,9 +112,19 @@ parse_proxy() {
     fi
 }
 
+split_string() {
+    printf '%s\n' "$1" | awk -v rs="$2" '
+BEGIN {RS=rs}
+{print $0}'
+}
+
+to_upper() {
+    tr '[:lower:]' '[:upper:]'
+}
+
 usage() {
     cat <<EOF >&2
-Usage: $script PROXY [NO-PROXY]
+Usage: $script [-n NO-PROXY] PROXY-URL
        $script -h
 EOF
 }
