@@ -32,25 +32,9 @@ configure_docker_proxy()
 {
     tmpfile=$(mktemp)
     trap "/bin/rm -f $tmpfile" EXIT INT QUIT TERM
-
-    printf '[%s]\n' "Service" >$tmpfile
-
-    if [ -n "${proxy-}" ]; then
-	"${script_prefix}generate-proxy-parameters" \
-	    ${no_proxy:+-n "$no_proxy"} \
-	    "$proxy"
-    else
-	case "$input" in
-	    (-)
-		cat
-		;;
-	    (*)
-		cat "$input"
-		;;
-	esac
-    fi | grep -E '^(HTTP|NO)_PROXY=' | while read statement; do
-	printf 'Environment="%s"\n' "$statement" >>$tmpfile
-    done
+    read_proxy_parameters | \
+	grep -E '^(HTTP|NO)_PROXY=' | \
+	print_proxy_configuration >$tmpfile
 
     if [ "$(wc -l <$tmpfile)" -gt 1 ]; then
 	if [ "$output" != - -a -w "$output" ]; then
@@ -165,6 +149,31 @@ parse_output_file() {
 	input="$1"
     else
 	usage_error "%s: %s: Invalid output file\n" "$script" "$1"
+    fi
+}
+
+print_proxy_configuration() {
+    printf '[%s]\n' "Service"
+
+    while read parameter; do
+	printf 'Environment="%s"\n' "$parameter"
+    done
+}
+
+read_proxy_parameters() {
+    if [ -n "${proxy-}" ]; then
+	"${script_prefix}generate-proxy-parameters" \
+	    ${no_proxy:+-n "$no_proxy"} \
+	    "$proxy"
+    else
+	case "$input" in
+	    (-)
+		cat
+		;;
+	    (*)
+		cat "$input"
+		;;
+	esac
     fi
 }
 
