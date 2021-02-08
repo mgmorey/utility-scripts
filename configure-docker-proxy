@@ -18,6 +18,7 @@
 
 INPUT=-
 OUTPUT=/etc/systemd/system/docker.service.d/http-proxy.conf
+PROXY_PARAMETER_RE='^(HTTP|NO)_PROXY='
 
 abort() {
     printf "$@" >&2
@@ -30,26 +31,11 @@ assert() {
 
 configure_docker_proxy()
 {
-    tmpfile=$(mktemp)
-    trap "/bin/rm -f $tmpfile" EXIT INT QUIT TERM
-    read_proxy_parameters | \
-	grep -E '^(HTTP|NO)_PROXY=' | \
-	print_proxy_configuration >$tmpfile
+    eval ${action}_proxy
+}
 
-    if [ "$(wc -l <$tmpfile)" -gt 1 ]; then
-	if [ "$output" != - -a -w "$output" ]; then
-            mkdir -p "$(dirname "$output")"
-            chmod a+r $tmpfile
-            /bin/mv -f $tmpfile "$output"
-            systemctl daemon-reload
-
-	    if systemctl status docker >/dev/null; then
-		systemctl restart docker
-	    fi
-	else
-            cat $tmpfile
-	fi
-    fi
+filter_proxy_parameters() {
+    grep -E "$PROXY_PARAMETER_RE"
 }
 
 get_realpath() (
@@ -69,6 +55,37 @@ get_realpath() (
     fi
 )
 
+install_file() {
+    if mkdir -p "$(dirname "$2")"; then
+	if chmod a+r $"$1"; then
+	    /bin/mv -f $"$1" "$2"
+	fi
+    fi
+}
+
+install_proxy() {
+    tmpfile=$(mktemp)
+    trap "/bin/rm -f $tmpfile" EXIT INT QUIT TERM
+    read_proxy_parameters | \
+	filter_proxy_parameters | \
+	print_proxy_configuration >$tmpfile
+
+    if [ "$(wc -l <$tmpfile)" -le 1 ]; then
+	return 0
+    fi
+
+    case "$output" in
+	(-)
+	    cat $tmpfile
+	    ;;
+	(*)
+	    if install_file $tmpfile "$output"; then
+		restart_daemon
+	    fi
+	    ;;
+    esac
+}
+
 is_valid_input_file() {
     case "$1" in
 	(-)
@@ -80,39 +97,26 @@ is_valid_input_file() {
     esac
 }
 
-is_valid_output_file() {
-    case "$1" in
-	(-)
-	    true
-	    ;;
-	(*)
-	    if [ ! -e "$1" ]; then
-		test -w "$(dirname "$1")"
-	    elif [ -f "$1" ]; then
-		test -w "$1"
-	    else
-		false
-	    fi
-	    ;;
-    esac
-}
-
 parse_arguments() {
+    action=install
     input=$INPUT
     no_proxy=
     output=$OUTPUT
     proxy=
 
-    while getopts i:n:o:h opt; do
+    while getopts i:n:o:rh opt; do
 	case $opt in
 	    (i)
-		input="$OPTARG"
+		parse_input_file "$OPTARG"
 		;;
 	    (n)
 		no_proxy="$OPTARG"
 		;;
 	    (o)
 		output="$OPTARG"
+		;;
+	    (r)
+		action=remove
 		;;
 	    (h)
 		usage
@@ -140,15 +144,7 @@ parse_input_file() {
     if is_valid_input_file "$1"; then
 	input="$1"
     else
-	usage_error "%s: %s: Invalid input file\n" "$script" "$1"
-    fi
-}
-
-parse_output_file() {
-    if is_valid_output_file "$1"; then
-	input="$1"
-    else
-	usage_error "%s: %s: Invalid output file\n" "$script" "$1"
+	usage_error "%s: %s: No such file or no permissions\n" "$script" "$1"
     fi
 }
 
@@ -165,15 +161,32 @@ read_proxy_parameters() {
 	"${script_prefix}generate-proxy-parameters" \
 	    ${no_proxy:+-n "$no_proxy"} \
 	    "$proxy"
-    else
-	case "$input" in
-	    (-)
-		cat
-		;;
-	    (*)
-		cat "$input"
-		;;
-	esac
+	return 0
+    fi
+
+    case "$input" in
+	(-)
+	    cat
+	    ;;
+	(*)
+	    cat "$input"
+	    ;;
+    esac
+}
+
+remove_proxy() {
+    if [ "$output" != - ]; then
+        if /bin/rm -f "$output"; then
+	    restart_daemon
+	fi
+    fi
+}
+
+restart_daemon() {
+    if systemctl daemon-reload; then
+	if systemctl status docker >/dev/null; then
+	    systemctl restart docker
+	fi
     fi
 }
 
@@ -181,6 +194,7 @@ usage() {
     cat <<EOF >&2
 Usage: $script [-n NO-PROXY] [-o OUTPUT] PROXY-URL
        $script [-i INPUT] [-o OUTPUT]
+       $script -r [-o OUTPUT]
        $script -h
 EOF
 }
