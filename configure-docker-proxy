@@ -31,6 +31,12 @@ assert() {
 
 configure_docker_proxy()
 {
+    if [ "$action" = query -o "$(id -u)" -eq 0 ]; then
+	output=$OUTPUT
+    else
+	output=-
+    fi
+
     eval ${action}_proxy
 }
 
@@ -101,10 +107,9 @@ parse_arguments() {
     action=install
     input=$INPUT
     no_proxy=
-    output=$OUTPUT
     proxy=
 
-    while getopts i:n:o:rh opt; do
+    while getopts i:n:o:rqh opt; do
 	case $opt in
 	    (i)
 		parse_input_file "$OPTARG"
@@ -114,6 +119,9 @@ parse_arguments() {
 		;;
 	    (o)
 		output="$OPTARG"
+		;;
+	    (q)
+		action=query
 		;;
 	    (r)
 		action=remove
@@ -156,6 +164,12 @@ print_proxy_configuration() {
     done
 }
 
+query_proxy() {
+    if [ "$output" != - ]; then
+        cat "$output"
+    fi
+}
+
 read_proxy_parameters() {
     if [ -n "${proxy-}" ]; then
 	"${script_prefix}generate-proxy-parameters" \
@@ -194,6 +208,7 @@ usage() {
     cat <<EOF >&2
 Usage: $script [-n NO-PROXY] [-o OUTPUT] PROXY-URL
        $script [-i INPUT] [-o OUTPUT]
+       $script -q [-o OUTPUT]
        $script -r [-o OUTPUT]
        $script -h
 EOF
