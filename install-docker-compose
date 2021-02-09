@@ -24,17 +24,18 @@ COMPOSE_VERSION=1.28.2
 create_tmpfile() {
     dir=$(dirname "$1")
     file=$(basename "$1")
+    mktemp_options=$(get_mktemp_options $dir $file)
 
     if [ ! -d "$dir" ]; then
 	mkdir ${target_mode:+-m $target_mode }-p "$dir"
     fi
 
-    tmpfile=$(mktemp -p "$dir" -t "$file.XXXXXXXXXX.tmp")
+    tmpfile=$(mktemp $mktemp_options)
     trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
 }
 
 download_file() {
-    options=$(get_curl_options)
+    curl_options=$(get_curl_options)
     url=$(get_url)
 
     if [ $silent = false ]; then
@@ -42,7 +43,7 @@ download_file() {
 	print_newline
     fi
 
-    if ! curl $options "$url" -o "$1" || [ ! -s "$1" ]; then
+    if ! curl $curl_options "$url" -o "$1" || [ ! -s "$1" ]; then
 	print_newline
 	return 1
     fi
@@ -63,13 +64,8 @@ get_curl_options() {
 }
 
 get_filetype() {
-    system=$(uname -s)
-
-    case "$system" in
-	(CYGWIN_NT-*)
-	    printf '%s\n' exe
-	    ;;
-	(MINGW64_NT-*)
+    case "$(get_platform)" in
+	(Windows)
 	    printf '%s\n' exe
 	    ;;
     esac
@@ -85,6 +81,19 @@ get_file_version_string() {
 
 get_hardware() {
     uname -m
+}
+
+get_mktemp_options() {
+    case "$(get_platform)" in
+	(Darwin)
+	    true
+	    ;;
+	(*)
+	    printf '%s\n' -p "$1"
+	    ;;
+    esac
+
+    printf '%s\n' -t "$2.XXXXXXXXXX.tmp"
 }
 
 get_platform() {
