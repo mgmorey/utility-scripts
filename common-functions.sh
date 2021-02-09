@@ -70,26 +70,35 @@ get_bin_directory() (
 )
 
 get_effective_user() (
-    id=$(which id || true)
-    user=${LOGNAME-${USER-${USERNAME}}}
-
-    if [ -z "$user" -a -n "$id" ]; then
-	user=$($id -nu)
-    fi
-
-    get_user_name "$user"
+    get_user_name ${LOGNAME-${USER-${USERNAME}}}
 )
 
 get_entry() {
-    assert [ $# -eq 2 ]
+    assert [ $# -ge 1 -a $# -le 2 ]
     assert [ -n "$1" ]
-    assert [ -n "$2" ]
 
-    if which getent >/dev/null 2>&1; then
-	getent $1 "$2"
-    elif [ -r /etc/$1 ]; then
-	cat /etc/$1 | grep "^$2:"
-    fi
+    case "${kernel_name=$(uname -s)}" in
+	(MINGW64_NT-*)
+	    if which getent >/dev/null 2>&1; then
+		if [ -n "${2-}" ]; then
+		    getent $1 | awk -F: '$1 ~ /(^|+)'"${2#*+}"'$/ {print}'
+		else
+		    getent $1
+		fi
+	    fi
+	    ;;
+	(*)
+	    if which getent >/dev/null 2>&1; then
+		getent $1 ${2-}
+	    elif [ -r /etc/$1 ]; then
+		if [ -n "${2-}" ]; then
+		    awk -F: '$1 == "'"$2"'" {print}' /etc/$1
+		else
+		    cat /etc/$1
+		fi
+	    fi
+	    ;;
+    esac
 }
 
 get_field() {
@@ -104,67 +113,59 @@ get_gnu_diff_command() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (solaris)
-		printf "%s\n" gdiff
+		printf '%s\n' gdiff
 		return
 		;;
 	esac
     done
 
-    printf "%s\n" diff
+    printf '%s\n' diff
 }
 
 get_gnu_grep_command() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (solaris)
-		printf "%s\n" ggrep
+		printf '%s\n' ggrep
 		return
 		;;
 	esac
     done
 
-    printf "%s\n" grep
+    printf '%s\n' grep
 }
 
 get_gnu_install_command() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (solaris)
-		printf "%s\n" ginstall
+		printf '%s\n' ginstall
 		return
 		;;
 	esac
     done
 
-    printf "%s\n" install
+    printf '%s\n' install
 }
 
 get_group() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    case "${kernel_name=$(uname -s)}" in
-	(MINGW64_NT-*)
-	    true
-	    ;;
-	(*)
-	    id -ng $1
-	    ;;
-    esac
+    if which id >/dev/null 2>&1; then
+	id -ng $1
+    else
+	get_entry passwd | awk -F: '$1 ~ /(^|+)'"${1#*+}"'$/ {print $4}'
+    fi
 }
 
 get_group_id() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    case "${kernel_name=$(uname -s)}" in
-	(MINGW64_NT-*)
-	    true
-	    ;;
-	(*)
-	    id -g $1
-	    ;;
-    esac
+    if which id >/dev/null 2>&1; then
+	id -g $1
+    fi
 }
 
 get_home() {
@@ -193,11 +194,15 @@ get_profile_path() (
 	fi
     done
 
-    printf "%s\n" "$path"
+    printf '%s\n' "$path"
 )
 
 get_real_user() {
-    get_user_name ${SUDO_USER-$(get_effective_user)}
+    if [ -n "${SUDO_USER-}" ]; then
+	get_user_name $SUDO_USER
+    else
+	get_effective_user
+    fi
 }
 
 get_setpriv_command() (
@@ -221,15 +226,20 @@ get_setpriv_command() (
 	    ;;
     esac
 
-    printf "%s\n" setpriv
+    printf '%s\n' setpriv
 )
 
 get_setpriv_options() (
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    regid=$(id -g $1)
-    reuid=$(id -u $1)
-    printf -- "%s\n" "--init-groups --reset-env --reuid $reuid --regid $regid"
+
+    if which id >/dev/null 2>&1; then
+	printf '%s\n' \
+	       --init-groups \
+	       --reset-env \
+	       --reuid $(id -u $1) \
+	       --regid $(id -g $1)
+    fi
 )
 
 get_shell() {
@@ -238,10 +248,10 @@ get_shell() {
 
     case "${kernel_name=$(uname -s)}" in
 	(MINGW64_NT-*)
-	    printf "%s\n" /bin/bash
+	    printf '%s\n' /bin/bash
 	    ;;
 	(Darwin)
-	    printf "%s\n" /bin/bash
+	    printf '%s\n' /bin/bash
 	    ;;
 	(*)
 	    get_field passwd $1 7
@@ -258,31 +268,30 @@ get_su_command() (
 	    ;;
     esac
 
-    printf "%s\n" su
+    printf '%s\n' su
 )
 
 get_user_id() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    case "${kernel_name=$(uname -s)}" in
-	(MINGW64_NT-*)
-	    true
-	    ;;
-	(*)
-	    id -u $1
-	    ;;
-    esac
+    if which id >/dev/null 2>&1; then
+	id -u $1
+    else
+	get_entry passwd | awk -F: '$1 ~ /(^|+)'"${1#*+}"'$/ {print $3}'
+    fi
 }
 
 get_user_name() {
-    getent passwd | awk -F: '$1 ~ /'"${1#*+}"'$/ {print $1}'
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    get_entry passwd | awk -F: '$1 ~ /(^|+)'"${1#*+}"'$/ {print $1}'
 }
 
 is_included() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
-    printf "%s\n" "$2" | egrep '(^|:)'"$1"'(:|$)' >/dev/null
+    printf '%s\n' "${2-}" | egrep '(^|:)'"$1"'(:|$)' >/dev/null
 }
 
 is_to_be_included() {
