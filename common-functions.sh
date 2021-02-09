@@ -352,6 +352,9 @@ run_unpriv() (
 
 set_user_profile() {
     case "${uname_kernel=$(uname -s)}" in
+	(CYGWIN*)
+	    return 0
+	    ;;
 	(MINGW64*)
 	    return 0
 	    ;;
