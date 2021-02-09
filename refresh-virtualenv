@@ -27,6 +27,16 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+chown_real_user() {
+    user_name=$(get_real_user)
+    user_id=$(get_user_id $user_name)
+
+    if [ -n "$user_id" ]; then
+	group_id=$(get_group_id $user_name)
+	chown "$user_id${group_id:+:$group_id}" "$@"
+    fi
+}
+
 get_packages() {
     "${script_prefix}get-packages" $CATEGORIES
 }
@@ -113,20 +123,7 @@ refresh_virtualenv() (
 
 		if refresh_via_pipenv $pipenv; then
 		    if generate_requirements $pipenv $PIP_INSTALL_ALL; then
-			user=$(get_real_user)
-
-			if [ -n "$user" ]; then
-			    getent=$(which getent || true)
-			    group=$(get_group $user)
-
-			    if [ -n "$getent" ]; then
-				user=$(get_user_name $user)
-			    fi
-
-			    if [ -n "$user" ]; then
-				chown "$user${group:+:$group}" $PIP_INSTALL_ALL
-			    fi
-			fi
+			chown_real_user $PIP_INSTALL_ALL
 
 			if $pipenv sync --dev; then
 			    return 0
