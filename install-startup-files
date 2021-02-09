@@ -90,11 +90,7 @@ get_realpath() {
 
 install_startup_files() (
     real_user=$(get_real_user)
-
-    if [ -n "$real_user" ]; then
-	validate_user_name $real_user
-    fi
-
+    validate_user_name $real_user
     git_dir=$(get_project_directory)
     gnu_diff=$(get_gnu_diff_command)
     gnu_install=$(get_gnu_install_command)

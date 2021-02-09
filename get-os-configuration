@@ -86,7 +86,7 @@ get_configuration_basename() {
 		basename=$ID-$VERSION_ID
 		;;
 	    (windows)
-		basename=$kernel_name-$ID-${VERSION_ID%.0}
+		basename=${kernel_name%_*}-$ID-${VERSION_ID%.0}
 		;;
 	esac
 

@@ -77,33 +77,45 @@ get_entry() {
     assert [ $# -ge 1 -a $# -le 2 ]
     assert [ -n "$1" ]
 
-    case "${kernel_name=$(uname -s)}" in
+    case "${uname_kernel=$(uname -s)}" in
 	(Darwin)
-	    if [ $1 = passwd -a -n "${2-}" ]; then
-		printf '%s\n' $2
-	    fi
+	    get_entry_macos "$@"
 	    ;;
-	(MINGW64_NT-*)
-	    if which getent >/dev/null 2>&1; then
-		if [ -n "${2-}" ]; then
-		    getent $1 | awk -F: '$1 ~ /(^|+)'"${2#*+}"'$/ {print}'
-		else
-		    getent $1
-		fi
-	    fi
+	(MINGW64*)
+	    get_entry_mingw "$@"
 	    ;;
 	(*)
-	    if which getent >/dev/null 2>&1; then
-		getent $1 ${2-}
-	    elif [ -r /etc/$1 ]; then
-		if [ -n "${2-}" ]; then
-		    awk -F: '$1 == "'"$2"'" {print}' /etc/$1
-		else
-		    cat /etc/$1
-		fi
-	    fi
+	    get_entry_posix "$@"
 	    ;;
     esac
+}
+
+get_entry_macos() {
+    if [ $1 = passwd -a -n "${2-}" ]; then
+	printf '%s\n' $2
+    fi
+}
+
+get_entry_mingw() {
+    if which getent >/dev/null 2>&1; then
+	if [ -n "${2-}" ]; then
+	    getent $1 | awk -F: '$1 ~ /(^|+)'"${2#*+}"'$/ {print}'
+	else
+	    getent $1
+	fi
+    fi
+}
+
+get_entry_posix() {
+    if which getent >/dev/null 2>&1; then
+	getent $1 ${2-}
+    elif [ -r /etc/$1 ]; then
+	if [ -n "${2-}" ]; then
+	    awk -F: '$1 == "'"$2"'" {print}' /etc/$1
+	else
+	    cat /etc/$1
+	fi
+    fi
 }
 
 get_field() {
@@ -183,12 +195,12 @@ get_home() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    case "${kernel_name=$(uname -s)}" in
-	(MINGW64_NT-*)
-	    printf "/c/Users/%s\n" ${1#*+}
-	    ;;
+    case "${uname_kernel=$(uname -s)}" in
 	(Darwin)
 	    printf "/Users/%s\n" $1
+	    ;;
+	(MINGW64-*)
+	    printf "/c/Users/%s\n" ${1#*+}
 	    ;;
 	(*)
 	    get_field passwd $1 6
@@ -257,11 +269,11 @@ get_shell() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    case "${kernel_name=$(uname -s)}" in
-	(MINGW64_NT-*)
+    case "${uname_kernel=$(uname -s)}" in
+	(Darwin)
 	    printf '%s\n' /bin/bash
 	    ;;
-	(Darwin)
+	(MINGW64*)
 	    printf '%s\n' /bin/bash
 	    ;;
 	(*)
@@ -271,7 +283,7 @@ get_shell() {
 }
 
 get_su_command() (
-    case "${kernel_name=$(uname -s)}" in
+    case "${uname_kernel=$(uname -s)}" in
 	(GNU|Linux)
 	    if get_setpriv_command; then
 		return

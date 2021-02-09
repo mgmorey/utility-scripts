@@ -343,7 +343,7 @@ get_command_helper() (
 get_file_metadata() {
     assert [ $# -eq 2 ]
 
-    case "${kernel_name=$(uname -s)}" in
+    case "${uname_kernel=$(uname -s)}" in
 	(GNU|Linux|SunOS)
 	    /usr/bin/stat -Lc "$@"
 	    ;;
@@ -380,7 +380,7 @@ get_python_version() (
 )
 
 get_sort_command() {
-    case "${kernel_name=$(uname -s)}" in
+    case "${uname_kernel=$(uname -s)}" in
 	(NetBSD|SunOS)
 	    printf "%s\n" "sort -nrt."
 	    ;;

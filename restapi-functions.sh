@@ -48,7 +48,7 @@ control_app() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    case "${kernel_name=$(uname -s)}" in
+    case "${uname_kernel=$(uname -s)}" in
 	(Darwin)
 	    control_app_via_symlinks $1
 	    ;;
@@ -134,7 +134,7 @@ control_service() {
     assert [ -n "$1" ]
     assert [ -n "$2" ]
 
-    case "${kernel_name=$(uname -s)}" in
+    case "${uname_kernel=$(uname -s)}" in
 	(Darwin)
 	    control_service_via_homebrew $1 $2
 	    ;;
