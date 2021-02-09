@@ -351,6 +351,12 @@ run_unpriv() (
 )
 
 set_user_profile() {
+    case "${uname_kernel=$(uname -s)}" in
+	(MINGW64*)
+	    return 0
+	    ;;
+    esac
+
     user=$(get_real_user)
     home=$(get_home "$user")
 
@@ -365,13 +371,13 @@ set_user_profile() {
 
     shell=$(get_shell "$user")
 
-    if [ -n "$shell" -a "$SHELL" != "$shell" ]; then
+    if [ -n "$shell" -a $(basename ${SHELL%.exe}) != $(basename $shell) ]; then
 	if [ "${ENV_VERBOSE-false}" = true ]; then
 	    printf "Changing SHELL from: %s\n" "$SHELL" >&2
 	    printf "Changing SHELL to: %s\n" "$shell" >&2
 	fi
 
-	export SHELL="$shell"
+	export SHELL=$shell
     fi
 
     profile=$("${1:+$1/}set-profile-parameters" -s ${shell:-/bin/sh})
