@@ -69,9 +69,16 @@ get_bin_directory() (
     fi
 )
 
-get_effective_user() {
-    printf "%s\n" "${LOGNAME-${USER-${USERNAME-$(id -nu)}}}"
-}
+get_effective_user() (
+    id=$(which id || true)
+    user=${LOGNAME-${USER-${USERNAME}}}
+
+    if [ -z "$user" -a -n "$id" ]; then
+	user=$($id -nu)
+    fi
+
+    get_user_name "$user"
+)
 
 get_entry() {
     assert [ $# -eq 2 ]
@@ -166,7 +173,7 @@ get_home() {
 
     case "${kernel_name=$(uname -s)}" in
 	(MINGW64_NT-*)
-	    printf "/c/Users/%s\n" $1
+	    printf "/c/Users/%s\n" ${1#*+}
 	    ;;
 	(Darwin)
 	    printf "/Users/%s\n" $1
@@ -190,7 +197,7 @@ get_profile_path() (
 )
 
 get_real_user() {
-    printf "%s\n" "${SUDO_USER-$(get_effective_user)}"
+    get_user_name ${SUDO_USER-$(get_effective_user)}
 }
 
 get_setpriv_command() (
@@ -266,6 +273,10 @@ get_user_id() {
 	    id -u $1
 	    ;;
     esac
+}
+
+get_user_name() {
+    getent passwd | awk -F: '$1 ~ /'"${1#*+}"'$/ {print $1}'
 }
 
 is_included() {
@@ -376,9 +387,9 @@ validate_user_id() {
 validate_user_name() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    username="$(id -nu)"
+    username=$(id -nu)
 
-    if [ "${username#*+}" != ${1#*+} ]; then
+    if [ ${username#*+} != ${1#*+} ]; then
 	abort "%s: Please try again as user %s\n" "$0" "$1"
     fi
 }
