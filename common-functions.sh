@@ -114,6 +114,12 @@ get_field() {
     get_entry $1 "$2" | cut -d: -f $3
 }
 
+get_gecos() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    get_field passwd $1 5
+}
+
 get_gnu_diff_command() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -159,8 +165,6 @@ get_group() {
 
     if which id >/dev/null 2>&1; then
 	id -ng $1
-    else
-	get_entry passwd $1
     fi
 }
 
@@ -170,6 +174,8 @@ get_group_id() {
 
     if which id >/dev/null 2>&1; then
 	id -g $1
+    else
+	get_field passwd $1 4
     fi
 }
 
@@ -283,14 +289,14 @@ get_user_id() {
     if which id >/dev/null 2>&1; then
 	id -u $1
     else
-	get_entry passwd $1
+	get_field passwd $1 3
     fi
 }
 
 get_user_name() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    get_entry passwd $1
+    get_field passwd $1 1
 }
 
 is_included() {
