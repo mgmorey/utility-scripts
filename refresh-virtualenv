@@ -29,9 +29,9 @@ assert() {
 
 chown_real_user() {
     user_name=$(get_real_user)
-    user_id=$(get_user_id $user_name)
 
-    if [ -n "$user_id" ]; then
+    if [ -n "$user_name" ]; then
+        user_id=$(get_user_id $user_name)
 	group_id=$(get_group_id $user_name)
 	chown "$user_id${group_id:+:$group_id}" "$@"
     fi
