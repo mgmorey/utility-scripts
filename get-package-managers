@@ -88,6 +88,13 @@ get_package_managers() {
 	    (solaris)
 		managers="/usr/bin/pkg /opt/csw/bin/pkgutil"
 		;;
+	    (windows)
+		case "$kernel_name" in
+		    (MINGW64)
+			managers="/usr/bin/pacman"
+			;;
+		esac
+		;;
 	esac
 
 	if [ -n "${managers-}" ]; then

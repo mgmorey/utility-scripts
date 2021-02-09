@@ -30,6 +30,9 @@ get_install_command() {
     assert [ -n "$1" ]
 
     case "$(basename $1)" in
+	(pacman)
+	    install=--sync
+	    ;;
 	(pkgutil)
 	    install=--install
 	    ;;

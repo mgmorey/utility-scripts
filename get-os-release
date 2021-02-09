@@ -121,9 +121,9 @@ collect_data_for_unix() {
 collect_data_for_windows() {
     ID=windows
     NAME="Microsoft Windows"
-    VERSION=${system_name#*-}
-    kernel_name=${system_name%_*}
-    kernel_release=$(printf "%s\n" "$system_release" | sed -e 's/(.*)//')
+    VERSION=$(printf "%s\n" "$system_name" | cut -d- -f2)
+    kernel_name=$(printf "%s\n" "$system_name" | cut -d- -f1 | cut -d_ -f1)
+    kernel_release=$(printf "%s\n" "$system_release" | cut -d- -f1)
     os_family=ms-windows
 }
 
