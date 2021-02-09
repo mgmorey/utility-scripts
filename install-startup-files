@@ -89,7 +89,12 @@ get_realpath() {
 }
 
 install_startup_files() (
-    validate_user_name "$(get_real_user)"
+    real_user=$(get_real_user)
+
+    if [ -n "$real_user" ]; then
+	validate_user_name $real_user
+    fi
+
     git_dir=$(get_project_directory)
     gnu_diff=$(get_gnu_diff_command)
     gnu_install=$(get_gnu_install_command)
@@ -99,7 +104,7 @@ install_startup_files() (
     cd "$parent_dir"
 
     if [ ! -d $PROJECT_NAME ]; then
-	git clone $(format_project_url "$(get_real_user)")
+	git clone $(format_project_url $real_user)
     fi
 
     cd

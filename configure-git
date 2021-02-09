@@ -374,7 +374,11 @@ set_user_profile "$script_dir"
 eval $(get-os-release -x)
 validate_platform
 configure_platform
-validate_user_name "$(get_real_user)"
+real_user=$(get_real_user)
+
+if [ -n "$real_user" ]; then
+    validate_user_name $real_user
+fi
 
 if [ $# -gt 0 ]; then
     usage_error "%s: Too many arguments\n" "$0"

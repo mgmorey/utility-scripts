@@ -381,8 +381,10 @@ validate_group_id() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if [ "$(id -g)" != $1 ]; then
-	abort "%s: Please try again with group GID %s\n" "$0" "$1"
+    if which id >/dev/null 2>&1; then
+	if [ "$(id -g)" != $1 ]; then
+	    abort "%s: Please try again with group GID %s\n" "$0" "$1"
+	fi
     fi
 }
 
@@ -390,8 +392,10 @@ validate_group_name() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if [ "$(id -ng)" != $1 ]; then
-	abort "%s: Please try again with group %s\n" "$0" "$1"
+    if which id >/dev/null 2>&1; then
+	if [ "$(id -ng)" != $1 ]; then
+	    abort "%s: Please try again with group %s\n" "$0" "$1"
+	fi
     fi
 }
 
@@ -399,17 +403,22 @@ validate_user_id() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if [ "$(id -u)" != $1 ]; then
-	abort "%s: Please try again as user UID %s\n" "$0" "$1"
+    if which id >/dev/null 2>&1; then
+	if [ "$(id -u)" != $1 ]; then
+	    abort "%s: Please try again as user UID %s\n" "$0" "$1"
+	fi
     fi
 }
 
-validate_user_name() {
+validate_user_name() (
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    username=$(id -nu)
 
-    if [ ${username#*+} != ${1#*+} ]; then
-	abort "%s: Please try again as user %s\n" "$0" "$1"
+    if which id >/dev/null 2>&1; then
+	user_name=$(id -nu)
+
+	if [ ${user_name#*+} != ${1#*+} ]; then
+	    abort "%s: Please try again as user %s\n" "$0" "$1"
+	fi
     fi
-}
+)
