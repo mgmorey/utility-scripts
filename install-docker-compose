@@ -22,12 +22,12 @@ COMPOSE_VERSION=1.28.2
 FILENAME=docker-compose
 
 create_tmpfile() {
-    dir=$(dirname "$1")
-    file=$(basename "$1")
-    mktemp_options=$(get_mktemp_options $dir $file)
+    dir_name=$(dirname "$1")
+    filename=$(basename "$1")
+    mktemp_options=$(get_mktemp_options $dir_name $filename)
 
-    if [ ! -d "$dir" ]; then
-	mkdir ${target_mode:+-m $target_mode }-p "$dir"
+    if [ ! -d "$dir_name" ]; then
+	mkdir ${target_mode:+-m $target_mode }-p "$dir_name"
     fi
 
     tmpfile=$(mktemp $mktemp_options)
@@ -50,7 +50,11 @@ download_file() {
 }
 
 get_compose_file() {
-    printf '%s/%s\n' "$prefix" bin/$FILENAME${filetype:+.$filetype}
+    printf '%s/%s/%s%s\n' \
+	   "$prefix" \
+	   bin \
+	   $FILENAME \
+	   "${filetype:+.$filetype}"
 }
 
 get_curl_options() {
@@ -93,17 +97,17 @@ get_mktemp_options() {
 	    ;;
     esac
 
-    printf '%s\n' -t "$2.XXXXXXXXXX.tmp"
+    printf '%s\n' -t "${2%${filetype+.$filetype}}-XXXXXXXXXX.tmp"
 }
 
 get_platform() {
     uname_kernel=$(uname -s)
 
     case "$uname_kernel" in
-	(CYGWIN_NT-*)
+	(CYGWIN*)
 	    printf '%s\n' Windows
 	    ;;
-	(MINGW64_NT-*)
+	(MINGW64*)
 	    printf '%s\n' Windows
 	    ;;
 	(*)
@@ -134,10 +138,14 @@ get_version_string() {
 }
 
 get_url() {
-    file=$FILENAME-$platform-$hardware${filetype:+.$filetype}
-    dir=download/$version
-    url=$BASE_URL/$dir/$file
-    printf '%s\n' $url
+    printf '%s/%s/%s/%s-%s-%s%s\n' \
+	   $BASE_URL \
+	   download \
+	   $version \
+	   $FILENAME \
+	   $platform \
+	   $hardware \
+	   "${filetype:+.$filetype}"
 }
 
 install_docker_compose() {
@@ -291,10 +299,10 @@ print_summary() {
     printf '%s\n' 'Installation Summary:'
     print_newline
 
-    which -a $FILENAME | while read file; do
-	version_string=$(get_file_version_string "$file")
+    which -a $FILENAME | while read filename; do
+	version_string=$(get_file_version_string "$filename")
 
-	if [ "$file" = "$target_file" ]; then
+	if [ "$filename${filetype:+.$filetype}" = "$target_file" ]; then
 	    if [ -z "$version_before" ]; then
 		status=installed
 	    elif [ "$version_after" = "$version_before" ]; then
@@ -310,7 +318,7 @@ print_summary() {
 
 	printf '%s: %s\n' \
 	       "$version_string" \
-	       "$file${status:+ ($status)}"
+	       "$filename${filetype:+.$filetype}${status:+ ($status)}"
 
     done | sed "s/$FILENAME version/Docker Compose/"
 }
