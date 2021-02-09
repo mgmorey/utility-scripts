@@ -78,6 +78,11 @@ get_entry() {
     assert [ -n "$1" ]
 
     case "${kernel_name=$(uname -s)}" in
+	(Darwin)
+	    if [ $1 = passwd -a -n "${2-}" ]; then
+		printf '%s\n' $2
+	    fi
+	    ;;
 	(MINGW64_NT-*)
 	    if which getent >/dev/null 2>&1; then
 		if [ -n "${2-}" ]; then
@@ -155,7 +160,7 @@ get_group() {
     if which id >/dev/null 2>&1; then
 	id -ng $1
     else
-	get_entry passwd | awk -F: '$1 ~ /(^|+)'"${1#*+}"'$/ {print $4}'
+	get_entry passwd $1
     fi
 }
 
@@ -278,14 +283,14 @@ get_user_id() {
     if which id >/dev/null 2>&1; then
 	id -u $1
     else
-	get_entry passwd | awk -F: '$1 ~ /(^|+)'"${1#*+}"'$/ {print $3}'
+	get_entry passwd $1
     fi
 }
 
 get_user_name() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    get_entry passwd | awk -F: '$1 ~ /(^|+)'"${1#*+}"'$/ {print $1}'
+    get_entry passwd $1
 }
 
 is_included() {
