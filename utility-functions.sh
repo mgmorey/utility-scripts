@@ -119,11 +119,7 @@ create_virtualenv_via_pipenv() (
 	fi
     fi
 
-    if pyenv --version >/dev/null 2>&1; then
-	$pipenv --python "$(find_python)"
-    else
-	$pipenv --three
-    fi
+    $pipenv --python "$(find_python)"
 )
 
 find_python() (
