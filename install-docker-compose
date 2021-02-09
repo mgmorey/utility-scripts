@@ -18,8 +18,8 @@
 
 BASE_URL=https://github.com/docker/compose/releases
 
-COMPOSE_FILENAME=docker-compose
 COMPOSE_VERSION=1.28.2
+FILENAME=docker-compose
 
 create_tmpfile() {
     dir=$(dirname "$1")
@@ -50,7 +50,7 @@ download_file() {
 }
 
 get_compose_file() {
-    printf '%s/%s\n' "$prefix" bin/$COMPOSE_FILENAME
+    printf '%s/%s\n' "$prefix" bin/$FILENAME
 }
 
 get_curl_options() {
@@ -64,7 +64,7 @@ get_curl_options() {
 }
 
 get_filetype() {
-    case "$(get_platform)" in
+    case "$platform" in
 	(Windows)
 	    printf '%s\n' exe
 	    ;;
@@ -84,7 +84,7 @@ get_hardware() {
 }
 
 get_mktemp_options() {
-    case "$(get_platform)" in
+    case "$platform" in
 	(Darwin)
 	    true
 	    ;;
@@ -97,9 +97,9 @@ get_mktemp_options() {
 }
 
 get_platform() {
-    system=$(uname -s)
+    uname_kernel=$(uname -s)
 
-    case "$system" in
+    case "$uname_kernel" in
 	(CYGWIN_NT-*)
 	    printf '%s\n' Windows
 	    ;;
@@ -107,7 +107,7 @@ get_platform() {
 	    printf '%s\n' Windows
 	    ;;
 	(*)
-	    printf '%s\n' "$system"
+	    printf '%s\n' "$uname_kernel"
 	    ;;
     esac
 }
@@ -136,8 +136,7 @@ get_version_string() {
 get_url() {
     filetype=$(get_filetype)
     hardware=$(get_hardware)
-    platform=$(get_platform)
-    file="$COMPOSE_FILENAME-$platform-$hardware${filetype:+.$filetype}"
+    file="$FILENAME-$platform-$hardware${filetype:+.$filetype}"
     dir="download/$version"
     url="$BASE_URL/$dir/$file"
     printf '%s\n' "$url"
@@ -152,6 +151,7 @@ install_docker_compose() {
 	fi
     fi
 
+    platform=$(get_platform)
     target_file=$(get_compose_file)
     target_mode=$(get_target_mode "$target_file")
     version_before=$(get_file_version_number "$target_file")
@@ -290,7 +290,7 @@ print_summary() {
     printf '%s\n' 'Installation Summary:'
     print_newline
 
-    which -a $COMPOSE_FILENAME | while read file; do
+    which -a $FILENAME | while read file; do
 	version_string=$(get_file_version_string "$file")
 
 	if [ "$file" = "$target_file" ]; then
@@ -311,7 +311,7 @@ print_summary() {
 	       "$version_string" \
 	       "$file${status:+ ($status)}"
 
-    done | sed "s/$COMPOSE_FILENAME version/Docker Compose/"
+    done | sed "s/$FILENAME version/Docker Compose/"
 }
 
 uninstall_file() {
