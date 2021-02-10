@@ -87,6 +87,10 @@ get_hardware() {
     uname -m
 }
 
+get_installed_filenames() {
+    PATH="$prefix/bin:$PATH" which -a $FILENAME | sort -u
+}
+
 get_mktemp_options() {
     case "$platform" in
 	(Darwin)
@@ -262,7 +266,7 @@ parse_arguments() {
 
 parse_prefix() {
     case "$1" in
-	($HOME/.local|/opt/*|/usr/local)
+	($HOME/.local|/usr/local)
 	    prefix=$1
 	    ;;
 	(*)
@@ -299,7 +303,7 @@ print_summary() {
     printf '%s\n' 'Installation Summary:'
     print_newline
 
-    which -a $FILENAME | while read filename; do
+    get_installed_filenames | while read filename; do
 	version_string=$(get_file_version_string "$filename")
 
 	if [ "$filename${filetype:+.$filetype}" = "$target_file" ]; then
