@@ -1,0 +1,228 @@
+#!/bin/sh -eu
+
+# install-docker-compose-command-completion: install Docker Compose
+# command completion from GitHub
+# Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+BASE_URL=https://raw.githubusercontent.com/docker/compose
+
+COMPOSE_VERSION=1.28.2
+FILENAME=docker-compose
+
+create_tmpfile() {
+    dir_name=$(dirname "$1")
+    filename=$(basename "$1")
+    mktemp_options=$(get_mktemp_options $dir_name $filename)
+    tmpfile=$(mktemp $mktemp_options)
+    trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
+}
+
+download_file() {
+    curl_options=$(get_curl_options)
+    url=$(get_url)
+
+    if [ $silent = false ]; then
+	printf 'Downloading from %s\n' $(dirname $url)
+	print_newline
+    fi
+
+    if ! curl $curl_options "$url" -o "$1" || [ ! -s "$1" ]; then
+	print_newline
+	return 1
+    fi
+}
+
+get_compose_file() {
+    printf '/%s/%s/%s\n' \
+	   etc \
+	   bash_completion.d \
+	   $FILENAME
+}
+
+get_curl_options() {
+    printf '%s\n' -L -f
+
+    if [ "$bar" = true ]; then
+	printf '%s\n' -#
+    elif [ $silent = true ]; then
+	printf '%s\n' -s
+    fi
+}
+
+get_file_version_number() {
+    get_version_number $(get_file_version_string "$@")
+}
+
+get_file_version_string() {
+    get_version_string "$1" | cut -d, -f 1
+}
+
+get_mktemp_options() {
+    printf '%s\n' -t "${2%${filetype+.$filetype}}-XXXXXXXXXX.tmp"
+}
+
+get_platform() {
+    uname_kernel=$(uname -s)
+
+    case "$uname_kernel" in
+	(CYGWIN*)
+	    printf '%s\n' Windows
+	    ;;
+	(MINGW64*)
+	    printf '%s\n' Windows
+	    ;;
+	(*)
+	    printf '%s\n' $uname_kernel
+	    ;;
+    esac
+}
+
+get_target_mode() {
+    case "$1" in
+	(*)
+	    printf '%s\n' u=rw,go=r
+	    ;;
+    esac
+}
+
+get_version_number() {
+    printf '%s\n' "$*" | awk '{print $3}'
+}
+
+get_version_string() {
+    if [ -n "$1" -a -x "$1" ]; then
+	"$1" --version || true
+    fi
+}
+
+get_url() {
+    printf '%s/%s/%s/%s/%s/%s\n' \
+	   $BASE_URL \
+	   $version \
+	   contrib \
+	   completion \
+	   bash \
+	   $FILENAME
+}
+
+install_docker_compose() {
+    platform=$(get_platform)
+    target_file=$(get_compose_file)
+    target_mode=$(get_target_mode "$target_file")
+    version=$(get_file_version_number "$(which docker-compose)")
+
+    if [ -z "$version" ]; then
+	printf '%s: Docker Compose is not installed\n' "$script"
+	exit 1
+    fi
+
+    if [ $uninstall = true ]; then
+	uninstall_file "$target_file"
+    else
+	create_tmpfile "$target_file"
+
+	if download_file "$tmpfile"; then
+	    install_file "$tmpfile" "$target_file"
+	fi
+    fi
+}
+
+install_file() {
+    if [ $silent = false ]; then
+	print_newline
+	printf 'Installing %s as %s\n' \
+	       "Docker Compose Command Completion" \
+	       "$2"
+    fi
+
+    if [ -n "$target_mode" ]; then
+	chmod $target_mode "$1"
+    fi
+
+    /bin/mv -f "$1" "$2"
+}
+
+parse_arguments() {
+    bar=false
+    force=false
+    silent=false
+    uninstall=false
+
+    while getopts bfp:suv:h opt; do
+	case $opt in
+	    (b)
+		bar=true
+		;;
+	    (f)
+		force=true
+		;;
+	    (s)
+		silent=true
+		;;
+	    (u)
+		uninstall=true
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error "%s: Too many arguments\n" "$script"
+    fi
+}
+
+print_newline() {
+    if [ $silent = false ]; then
+	printf '%s\n' ''
+    fi
+}
+
+uninstall_file() {
+    if [ $silent = false ]; then
+	printf 'Uninstalling %s\n' "$1"
+    fi
+
+    /bin/rm -f "$1"
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script [-b] [-f] [-p PREFIX] [-s] [-u] [-v VERSION]
+       $script -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+script=$(basename "$0")
+parse_arguments "$@"
+install_docker_compose
