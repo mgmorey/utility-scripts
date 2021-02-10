@@ -19,7 +19,6 @@
 
 BASE_URL=https://raw.githubusercontent.com/docker/compose
 
-COMPOSE_VERSION=1.28.2
 FILENAME=docker-compose
 
 create_tmpfile() {
@@ -111,7 +110,7 @@ get_version_string() {
 get_url() {
     printf '%s/%s/%s/%s/%s/%s\n' \
 	   $BASE_URL \
-	   $version \
+	   ${version%.0} \
 	   contrib \
 	   completion \
 	   bash \
@@ -119,15 +118,17 @@ get_url() {
 }
 
 install_docker_compose() {
-    platform=$(get_platform)
-    target_file=$(get_compose_file)
-    target_mode=$(get_target_mode "$target_file")
-    version=$(get_file_version_number "$(which docker-compose)")
+    filename="$(which ${prefix:+$prefix/bin/}$FILENAME)"
 
-    if [ -z "$version" ]; then
+    if [ -z "$filename" ]; then
 	printf '%s: Docker Compose is not installed\n' "$script"
 	exit 1
     fi
+
+    platform=$(get_platform)
+    target_file=$(get_compose_file)
+    target_mode=$(get_target_mode "$target_file")
+    version=$(get_file_version_number $filename)
 
     if [ $uninstall = true ]; then
 	uninstall_file "$target_file"
@@ -157,17 +158,17 @@ install_file() {
 
 parse_arguments() {
     bar=false
-    force=false
+    prefix=
     silent=false
     uninstall=false
 
-    while getopts bfp:suv:h opt; do
+    while getopts bfp:suh opt; do
 	case $opt in
 	    (b)
 		bar=true
 		;;
-	    (f)
-		force=true
+	    (p)
+		parse_prefix $OPTARG
 		;;
 	    (s)
 		silent=true
@@ -192,6 +193,21 @@ parse_arguments() {
     fi
 }
 
+parse_prefix() {
+    case "$1" in
+	($HOME/.local|/usr/local|/usr)
+	    prefix=$1
+	    ;;
+	(*)
+	    usage_error "%s: %s: Invalid prefix\n" "$script" "$1"
+	    ;;
+    esac
+
+    if [ ! -d "$prefix/bin" ]; then
+	usage_error "%s: %s: Invalid prefix\n" "$script" "$1"
+    fi
+}
+
 print_newline() {
     if [ $silent = false ]; then
 	printf '%s\n' ''
@@ -208,7 +224,7 @@ uninstall_file() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-f] [-p PREFIX] [-s] [-u] [-v VERSION]
+Usage: $script [-b] [-p PREFIX] [-s] [-u]
        $script -h
 EOF
 }
