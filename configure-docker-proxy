@@ -156,6 +156,13 @@ parse_input_file() {
     fi
 }
 
+print_prompt() {
+    cat <<EOF >&2
+Enter proxy parameters, one per line.
+Type ^D to submit or ^C to quit:
+EOF
+}
+
 print_proxy_configuration() {
     printf '[%s]\n' "Service"
 
@@ -165,9 +172,7 @@ print_proxy_configuration() {
 }
 
 query_proxy() {
-    if [ "$output" != - ]; then
-        cat "$output"
-    fi
+    docker info | grep -E '^(Http|Https|No) Proxy'
 }
 
 read_proxy_parameters() {
@@ -180,6 +185,7 @@ read_proxy_parameters() {
 
     case "$input" in
 	(-)
+	    print_prompt
 	    cat
 	    ;;
 	(*)
@@ -190,16 +196,18 @@ read_proxy_parameters() {
 
 remove_proxy() {
     if [ "$output" != - ]; then
-        if /bin/rm -f "$output"; then
+	if /bin/rm -f "$output"; then
 	    restart_daemon
 	fi
     fi
 }
 
 restart_daemon() {
-    if systemctl daemon-reload; then
-	if systemctl status docker >/dev/null; then
-	    systemctl restart docker
+    if which systemctl >/dev/null 2>&1; then
+	if systemctl daemon-reload; then
+	    if systemctl status docker >/dev/null; then
+		systemctl restart docker
+	    fi
 	fi
     fi
 }
