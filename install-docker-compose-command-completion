@@ -21,10 +21,18 @@ BASE_URL=https://raw.githubusercontent.com/docker/compose
 
 FILENAME=docker-compose
 
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
 create_tmpfile() {
-    dir_name=$(dirname "$1")
     filename=$(basename "$1")
-    mktemp_options=$(get_mktemp_options $dir_name $filename)
+    mktemp_options=$(get_mktemp_options $filename)
     tmpfile=$(mktemp $mktemp_options)
     trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
 }
@@ -70,26 +78,15 @@ get_file_version_string() {
 }
 
 get_mktemp_options() {
-    printf '%s\n' -t "${2%${filetype+.$filetype}}-XXXXXXXXXX.tmp"
-}
-
-get_platform() {
-    uname_kernel=$(uname -s)
-
-    case "$uname_kernel" in
-	(CYGWIN*)
-	    printf '%s\n' Windows
-	    ;;
-	(MINGW64*)
-	    printf '%s\n' Windows
-	    ;;
-	(*)
-	    printf '%s\n' $uname_kernel
-	    ;;
-    esac
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf '%s\n' -t "${1%${filetype+.$filetype}}-XXXXXXXXXX.tmp"
 }
 
 get_target_mode() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
     case "$1" in
 	(*)
 	    printf '%s\n' u=rw,go=r
@@ -102,6 +99,9 @@ get_version_number() {
 }
 
 get_version_string() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
     if [ -n "$1" -a -x "$1" ]; then
 	"$1" --version || true
     fi
@@ -110,38 +110,41 @@ get_version_string() {
 get_url() {
     printf '%s/%s/%s/%s/%s/%s\n' \
 	   $BASE_URL \
-	   ${version%.0} \
+	   ${compose_version%.0} \
 	   contrib \
 	   completion \
 	   bash \
 	   $FILENAME
 }
 
-install_docker_compose() {
-    filename="$(which ${prefix:+$prefix/bin/}$FILENAME)"
+install_command_completion() {
+    target_file=$(get_compose_file)
 
-    if [ -z "$filename" ]; then
+    eval ${action}_completion
+}
+
+install_completion() {
+    compose_filename="$(which ${prefix:+$prefix/bin/}$FILENAME)"
+
+    if [ -z "$compose_filename" ]; then
 	printf '%s: Docker Compose is not installed\n' "$script"
 	exit 1
     fi
 
-    platform=$(get_platform)
-    target_file=$(get_compose_file)
+    compose_version=$(get_file_version_number $compose_filename)
     target_mode=$(get_target_mode "$target_file")
-    version=$(get_file_version_number $filename)
+    create_tmpfile "$target_file"
 
-    if [ $uninstall = true ]; then
-	uninstall_file "$target_file"
-    else
-	create_tmpfile "$target_file"
-
-	if download_file "$tmpfile"; then
-	    install_file "$tmpfile" "$target_file"
-	fi
+    if download_file "$tmpfile"; then
+	install_file "$tmpfile" "$target_file"
     fi
 }
 
 install_file() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+
     if [ $silent = false ]; then
 	print_newline
 	printf 'Installing %s as %s\n' \
@@ -157,10 +160,10 @@ install_file() {
 }
 
 parse_arguments() {
+    action=install
     bar=false
     prefix=
     silent=false
-    uninstall=false
 
     while getopts bfp:suh opt; do
 	case $opt in
@@ -168,13 +171,13 @@ parse_arguments() {
 		bar=true
 		;;
 	    (p)
-		parse_prefix $OPTARG
+		parse_prefix "$OPTARG"
 		;;
 	    (s)
 		silent=true
 		;;
 	    (u)
-		uninstall=true
+		action=uninstall
 		;;
 	    (h)
 		usage
@@ -194,16 +197,12 @@ parse_arguments() {
 }
 
 parse_prefix() {
-    case "$1" in
-	($HOME/.local|/usr/local|/usr)
-	    prefix=$1
-	    ;;
-	(*)
-	    usage_error "%s: %s: Invalid prefix\n" "$script" "$1"
-	    ;;
-    esac
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
 
-    if [ ! -d "$prefix/bin" ]; then
+    if [ -x "$prefix/bin/$FILENAME" ]; then
+	prefix="$1"
+    else
 	usage_error "%s: %s: Invalid prefix\n" "$script" "$1"
     fi
 }
@@ -212,6 +211,10 @@ print_newline() {
     if [ $silent = false ]; then
 	printf '%s\n' ''
     fi
+}
+
+uninstall_completion() {
+    uninstall_file "$target_file"
 }
 
 uninstall_file() {
@@ -241,4 +244,4 @@ usage_error() {
 
 script=$(basename "$0")
 parse_arguments "$@"
-install_docker_compose
+install_command_completion
