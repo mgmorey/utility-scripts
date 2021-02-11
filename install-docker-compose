@@ -21,6 +21,45 @@ BASE_URL=https://github.com/docker/compose/releases
 COMPOSE_VERSION=1.28.2
 FILENAME=docker-compose
 
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+compare_versions() (
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    difference=0
+    field=0
+
+    while [ $field -le 3 ]; do
+	field=$((field + 1))
+	lhs=$(printf '%s\n' "$1" | cut -d. -f $field)
+	rhs=$(printf '%s\n' "$2" | cut -d. -f $field)
+
+	if [ -z "$lhs" -a -z "$rhs" ]; then
+	    break
+	elif [ -z "$lhs" ]; then
+	    lhs=0
+	elif [ -z "$rhs" ]; then
+	    rhs=0
+	fi
+
+	difference=$((lhs - rhs))
+
+	if [ $difference -ne 0 ]; then
+	    break
+	fi
+    done
+
+    printf '%s\n' $difference
+)
+
 create_tmpfile() {
     dir_name=$(dirname "$1")
     filename=$(basename "$1")
@@ -152,28 +191,10 @@ get_url() {
 	   "${filetype:+.$filetype}"
 }
 
-install_docker_compose() {
-    hardware=$(get_hardware)
-    platform=$(get_platform)
-
-    if [ -z "$prefix" ]; then
-	if [ "$(id -u)" -eq 0 ]; then
-	    prefix=/usr/local
-	else
-	    prefix=$HOME/.local
-	fi
-    fi
-
-    filetype=$(get_filetype)
-    target_file=$(get_compose_file)
+install_compose() {
     target_mode=$(get_target_mode "$target_file")
-    version_before=$(get_file_version_number "$target_file")
-    version_after=
 
-    if [ $uninstall = true ]; then
-	uninstall_file "$target_file"
-	print_newline
-    elif [ $force = true -o "$version_before" != "$version" ]; then
+    if [ $force = true -o "$version_before" != "$version" ]; then
 	create_tmpfile "$target_file"
 
 	if download_file "$tmpfile"; then
@@ -191,6 +212,26 @@ install_docker_compose() {
     fi
 
     print_summary
+}
+
+install_docker_compose() {
+    hardware=$(get_hardware)
+    platform=$(get_platform)
+
+    if [ -z "$prefix" ]; then
+	if [ "$(id -u)" -eq 0 ]; then
+	    prefix=/usr/local
+	else
+	    prefix=$HOME/.local
+	fi
+    fi
+
+    filetype=$(get_filetype)
+    target_file=$(get_compose_file)
+    version_before=$(get_file_version_number "$target_file")
+    version_after=
+
+    eval ${action}_compose
 }
 
 install_file() {
@@ -220,14 +261,14 @@ is_valid_version() {
 }
 
 parse_arguments() {
+    action=install
     bar=false
     force=false
     prefix=
     silent=false
-    uninstall=false
     version=$COMPOSE_VERSION
 
-    while getopts bfp:suv:h opt; do
+    while getopts bfp:qsuv:h opt; do
 	case $opt in
 	    (b)
 		bar=true
@@ -238,11 +279,14 @@ parse_arguments() {
 	    (p)
 		parse_prefix $OPTARG
 		;;
+	    (q)
+		action=query
+		;;
 	    (s)
 		silent=true
 		;;
 	    (u)
-		uninstall=true
+		action=uninstall
 		;;
 	    (v)
 		parse_version $OPTARG
@@ -295,6 +339,34 @@ print_newline() {
     fi
 }
 
+print_status() {
+    version_string=$(get_file_version_string "$1")
+
+    if [ "$filename${filetype:+.$filetype}" = "$target_file" ]; then
+	if [ -z "$version_before" ]; then
+	    status=installed
+	elif [ "$version_after" = "$version_before" ]; then
+	    status=reinstalled
+	elif [ -n "$version_after" ]; then
+	    difference=$(compare_versions "$version_after" "$version_before")
+
+	    if [ $difference -gt 0 ]; then
+		status="upgraded from $version_before"
+	    else
+		status="downgraded from $version_before"
+	    fi
+	else
+	    status=unchanged
+	fi
+    else
+	status=unchanged
+    fi
+
+    printf '%s: %s\n' \
+	   "$version_string" \
+	   "$1${filetype:+.$filetype}${status:+ ($status)}"
+}
+
 print_summary() {
     if [ $silent = true ]; then
 	return 0
@@ -304,27 +376,18 @@ print_summary() {
     print_newline
 
     get_installed_filenames | while read filename; do
-	version_string=$(get_file_version_string "$filename")
-
-	if [ "$filename${filetype:+.$filetype}" = "$target_file" ]; then
-	    if [ -z "$version_before" ]; then
-		status=installed
-	    elif [ "$version_after" = "$version_before" ]; then
-		status=reinstalled
-	    elif [ -n "$version_after" ]; then
-		status="upgraded from $version_before"
-	    else
-		status=unchanged
-	    fi
-	else
-	    status=unchanged
-	fi
-
-	printf '%s: %s\n' \
-	       "$version_string" \
-	       "$filename${filetype:+.$filetype}${status:+ ($status)}"
-
+	print_status "$filename"
     done | sed "s/$FILENAME version/Docker Compose/"
+}
+
+query_compose() {
+    print_summary
+}
+
+uninstall_compose() {
+    uninstall_file "$target_file"
+    print_newline
+    print_summary
 }
 
 uninstall_file() {
