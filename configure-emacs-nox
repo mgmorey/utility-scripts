@@ -101,7 +101,6 @@ configure_emacs() {
 }
 
 configure_platform() {
-    install-packages $(get-bootstrap-packages)
     emacs_version=$EMACS_VERSION
     force=false
     make=make
@@ -273,6 +272,10 @@ get_configure_options() {
     fi
 }
 
+get_dependencies() {
+    get-packages bootstrap emacs-nox-build
+}
+
 get_include_flags() {
     assert [ $# -ge 1 ]
     printf -- "-I%s\n" "$@"
@@ -337,6 +340,20 @@ include_prefix() {
     if [ -d "$libdir/pkgconfig" ]; then
 	pkgdirs="${pkgdirs+$pkgdirs }$libdir/pkgconfig"
     fi
+}
+
+install_dependencies() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (windows)
+		return 0
+		;;
+	esac
+    done
+
+    packages="$(get_dependencies | sort -u)"
+    pattern="$(get-development-pattern)"
+    install-packages ${pattern:+-p "$pattern" }$packages
 }
 
 parse_arguments() {
@@ -482,4 +499,11 @@ eval $(get-os-release -x)
 validate_platform
 configure_platform
 parse_arguments "$@"
-configure_emacs
+
+if [ "$(id -u)" -eq 0 ]; then
+    install_dependencies
+    run_unpriv "$0"
+else
+    install_dependencies
+    configure_emacs
+fi

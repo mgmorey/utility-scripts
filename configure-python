@@ -222,6 +222,10 @@ get_configure_options() {
     fi
 }
 
+get_dependencies() {
+    get-packages bootstrap python-build
+}
+
 get_include_flags() {
     assert [ $# -ge 1 ]
     printf -- "-I%s\n" "$@"
@@ -306,13 +310,9 @@ install_dependencies() {
 	esac
     done
 
-    packages="$(get_packages | sort -u)"
+    packages="$(get_dependencies | sort -u)"
     pattern="$(get-development-pattern)"
     install-packages ${pattern:+-p "$pattern" }$packages
-
-    if [ -n "${package:-}" ]; then
-	install-build-deps "$@" $package || true
-    fi
 }
 
 parse_arguments() {

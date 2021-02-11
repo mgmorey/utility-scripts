@@ -96,7 +96,6 @@ configure_git() {
 }
 
 configure_platform() {
-    install-packages $(get-bootstrap-packages)
     force=false
     make=make
     prefix=$PREFIX
@@ -228,6 +227,10 @@ get_configure_options() {
     fi
 }
 
+get_dependencies() {
+    get-packages bootstrap
+}
+
 get_include_flags() {
     assert [ $# -ge 1 ]
     printf -- "-I%s\n" "$@"
@@ -292,6 +295,20 @@ include_prefix() {
     if [ -d "$libdir/pkgconfig" ]; then
 	pkgdirs="${pkgdirs+$pkgdirs }$libdir/pkgconfig"
     fi
+}
+
+install_dependencies() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (windows)
+		return 0
+		;;
+	esac
+    done
+
+    packages="$(get_dependencies | sort -u)"
+    pattern="$(get-development-pattern)"
+    install-packages ${pattern:+-p "$pattern" }$packages
 }
 
 usage_error() {
@@ -374,11 +391,15 @@ set_user_profile "$script_dir"
 eval $(get-os-release -x)
 validate_platform
 configure_platform
-real_user=$(get_real_user)
-validate_user_name $real_user
 
 if [ $# -gt 0 ]; then
     usage_error "%s: Too many arguments\n" "$0"
 fi
 
-configure_git
+if [ "$(id -u)" -eq 0 ]; then
+    install_dependencies
+    run_unpriv "$0"
+else
+    install_dependencies
+    configure_git
+fi
