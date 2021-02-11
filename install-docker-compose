@@ -61,6 +61,8 @@ compare_versions() (
 )
 
 create_tmpfile() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
     dir_name=$(dirname "$1")
     filename=$(basename "$1")
     mktemp_options=$(get_mktemp_options $dir_name $filename)
@@ -160,6 +162,9 @@ get_platform() {
 }
 
 get_target_mode() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
     case "$1" in
 	($HOME/*)
 	    printf '%s\n' a+rx
@@ -175,6 +180,9 @@ get_version_number() {
 }
 
 get_version_string() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
     if [ -n "$1" -a -x "$1" ]; then
 	"$1" --version || true
     fi
@@ -251,6 +259,9 @@ install_file() {
 }
 
 is_valid_version() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
     if expr "$1" : '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$'; then
 	true
     elif expr "$1" : '[0-9][0-9]*\.[0-9][0-9]*$'; then
@@ -309,6 +320,9 @@ parse_arguments() {
 }
 
 parse_prefix() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
     case "$1" in
 	($HOME/.local|/usr/local)
 	    prefix=$1
@@ -326,6 +340,9 @@ parse_prefix() {
 }
 
 parse_version() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
     if is_valid_version "$1"; then
 	version="$1"
     else
@@ -340,6 +357,8 @@ print_newline() {
 }
 
 print_status() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
     version_string=$(get_file_version_string "$1")
 
     if [ "$filename${filetype:+.$filetype}" = "$target_file" ]; then
