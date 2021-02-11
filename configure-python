@@ -252,10 +252,6 @@ get_linker_flags() {
     fi
 }
 
-get_packages() {
-    get-packages bootstrap python-build
-}
-
 get_pkg_config_path() {
     for pkgdir in ${pkgdirs-}; do
 	pkg_config_path=${pkg_config_path+$pkg_config_path:}$pkgdir
