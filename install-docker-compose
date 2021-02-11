@@ -133,6 +133,10 @@ get_installed_filenames() {
 }
 
 get_mktemp_options() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+
     case "$platform" in
 	(Darwin)
 	    true
@@ -230,7 +234,7 @@ install_docker_compose() {
 	if [ "$(id -u)" -eq 0 ]; then
 	    prefix=/usr/local
 	else
-	    prefix=$HOME/.local
+	    prefix="$HOME/.local"
 	fi
     fi
 
@@ -243,6 +247,10 @@ install_docker_compose() {
 }
 
 install_file() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+
     if [ $silent = false ]; then
 	print_newline
 	printf 'Installing %s %s as %s\n' \
@@ -288,7 +296,7 @@ parse_arguments() {
 		force=true
 		;;
 	    (p)
-		parse_prefix $OPTARG
+		parse_prefix "$OPTARG"
 		;;
 	    (q)
 		action=query
@@ -324,8 +332,8 @@ parse_prefix() {
     assert [ -n "$1" ]
 
     case "$1" in
-	($HOME/.local|/usr/local)
-	    prefix=$1
+	("$HOME/.local"|/usr/local)
+	    prefix="$1"
 	    ;;
 	(*)
 	    usage_error "%s: %s: Invalid prefix\n" "$script" "$1"
