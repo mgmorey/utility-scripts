@@ -37,20 +37,20 @@ compare_versions() (
     difference=0
     field=0
 
-    while [ $field -le 3 ]; do
+    while [ $field -le 2 ]; do
 	field=$((field + 1))
-	lhs=$(printf '%s\n' "$1" | cut -d. -f $field)
-	rhs=$(printf '%s\n' "$2" | cut -d. -f $field)
+	version1=$(printf '%s\n' "$1" | cut -d. -f $field)
+	version2=$(printf '%s\n' "$2" | cut -d. -f $field)
 
-	if [ -z "$lhs" -a -z "$rhs" ]; then
+	if [ -z "$version1" -a -z "$version2" ]; then
 	    break
-	elif [ -z "$lhs" ]; then
-	    lhs=0
-	elif [ -z "$rhs" ]; then
-	    rhs=0
+	elif [ -z "$version1" ]; then
+	    version1=0
+	elif [ -z "$version2" ]; then
+	    version2=0
 	fi
 
-	difference=$((lhs - rhs))
+	difference=$((version1 - version2))
 
 	if [ $difference -ne 0 ]; then
 	    break
