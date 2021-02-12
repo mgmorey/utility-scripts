@@ -288,7 +288,6 @@ print_volume_device_and_mount() {
 
 print_volume_name_and_mount() {
     assert [ $# -eq 2 ]
-    assert [ -n "$1" ]
     assert [ -n "$2" ]
     printf '            - %s:%s\n' "${1:-$(get_default_volume_name $2)}" "$2"
 }
