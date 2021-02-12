@@ -75,6 +75,9 @@ get_packages_using() {
 		rpm --queryformat "%{NAME}\n" -qa
 	    fi
 	    ;;
+	(pacman)
+	    $1 -Q | awk '{print $1}'
+	    ;;
 	(pkg)
 	    case "$ID" in
 		(freebsd)

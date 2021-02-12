@@ -35,7 +35,7 @@ configure_platform() {
     fi
 
     case "$(uname -s)" in
-	(CYGWIN_NT-10.0|MINGW64_NT-10.0-*)
+	(CYGWIN_NT-*|MINGW64_NT-*)
 	    method=install
 	    ;;
 	(*)

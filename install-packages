@@ -366,7 +366,7 @@ validate_platform() {
 		;;
 	    (windows)
 		case "$kernel_name" in
-		    (MINGW64)
+		    (MINGW64_NT)
 			return
 			;;
 		    (*)

@@ -92,7 +92,7 @@ run_pip() {
     case $ID in
 	(windows)
 	    case "$kernel_name" in
-		(MINGW64)
+		(MINGW64_NT)
 		    pip3 "$@"
 		    return 0
 		    ;;

@@ -81,7 +81,7 @@ get_entry() {
 	(Darwin)
 	    get_entry_macos "$@"
 	    ;;
-	(MINGW64*)
+	(MINGW64_NT-*)
 	    get_entry_mingw "$@"
 	    ;;
 	(*)
@@ -199,7 +199,7 @@ get_home() {
 	(Darwin)
 	    printf "/Users/%s\n" $1
 	    ;;
-	(MINGW64-*)
+	(MINGW64_NT-*)
 	    printf "/c/Users/%s\n" ${1#*+}
 	    ;;
 	(*)
@@ -273,7 +273,7 @@ get_shell() {
 	(Darwin)
 	    printf '%s\n' /bin/bash
 	    ;;
-	(MINGW64*)
+	(MINGW64_NT-*)
 	    printf '%s\n' /bin/bash
 	    ;;
 	(*)
@@ -352,10 +352,10 @@ run_unpriv() (
 
 set_user_profile() {
     case "${uname_kernel=$(uname -s)}" in
-	(CYGWIN*)
+	(CYGWIN_NT-*)
 	    return 0
 	    ;;
-	(MINGW64*)
+	(MINGW64_NT-*)
 	    return 0
 	    ;;
     esac

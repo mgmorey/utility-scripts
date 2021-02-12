@@ -153,10 +153,10 @@ get_platform() {
     uname_kernel=$(uname -s)
 
     case "$uname_kernel" in
-	(CYGWIN*)
+	(CYGWIN_NT-*)
 	    printf '%s\n' Windows
 	    ;;
-	(MINGW64*)
+	(MINGW64_NT-*)
 	    printf '%s\n' Windows
 	    ;;
 	(*)

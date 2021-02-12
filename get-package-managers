@@ -90,7 +90,7 @@ get_package_managers() {
 		;;
 	    (windows)
 		case "$kernel_name" in
-		    (MINGW64)
+		    (MINGW64_NT)
 			managers="/usr/bin/pacman"
 			;;
 		esac
