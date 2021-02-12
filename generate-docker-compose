@@ -19,6 +19,8 @@
 FILE_VERSION=3.3
 NAMED_VOLUMES=true
 
+AWK_VERSION=4.0.0
+
 ENV_FILE=docker-environment.txt
 PORT_FILE=docker-ports.txt
 SERVICE_FILE=docker-service.txt
@@ -36,13 +38,58 @@ VOLUME_NAME_RE='[a-z][0-9_a-z-]*'
 VOLUME_PATH_RE="([/]${VOLUME_NAME_RE})+"
 VOLUME_RE="[.]?(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(|:${VOLUME_NAME_RE})"
 
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
 check_device() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
     if [ ! -d "$1" ]; then
 	printf '%s: WARNING: %s: No such directory\n' "$script" "$1" >&2
     fi
 }
 
+compare_versions() (
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    difference=0
+    field=0
+
+    while [ $field -le 2 ]; do
+	field=$((field + 1))
+	version1=$(printf '%s\n' "$1" | cut -d. -f $field)
+	version2=$(printf '%s\n' "$2" | cut -d. -f $field)
+
+	if [ -z "$version1" -a -z "$version2" ]; then
+	    break
+	elif [ -z "$version1" ]; then
+	    version1=0
+	elif [ -z "$version2" ]; then
+	    version2=0
+	fi
+
+	difference=$((version1 - version2))
+
+	if [ $difference -ne 0 ]; then
+	    break
+	fi
+    done
+
+    printf '%s\n' $difference
+)
+
 find_file() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
     for dir in . .. "$HOME"; do
 	file="$dir/$1"
 
@@ -56,6 +103,7 @@ find_file() {
 }
 
 generate_docker_compose() {
+    validate_platform
     env_file=$(find_file $ENV_FILE)
     port_file=$(find_file $PORT_FILE)
     service_file=$(find_file $SERVICE_FILE)
@@ -63,6 +111,10 @@ generate_docker_compose() {
     print_file_version
     print_services
     print_volumes
+}
+
+get_awk_version() {
+    awk --version | awk 'NR == 1 {print $3}'
 }
 
 get_default_service_name() {
@@ -76,6 +128,8 @@ get_default_service_name() {
 }
 
 get_default_volume_name() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
     printf '%s\n' "$1" | awk -F/ '{printf("%s-%s\n", $(NF - 1), $NF)}'
 }
 
@@ -100,6 +154,8 @@ get_ports() {
 }
 
 get_service_param_value() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
     awk -F= '$1 == "'"$1"'" {print $2}' $service_file
 }
 
@@ -224,10 +280,16 @@ print_volume() {
 }
 
 print_volume_device_and_mount() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
     printf '            - %s:%s\n' "$1" "$2"
 }
 
 print_volume_name_and_mount() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
     printf '            - %s:%s\n' "${1:-$(get_default_volume_name $2)}" "$2"
 }
 
@@ -247,6 +309,19 @@ print_volumes() {
 	check_device "$device"
 	print_volume "$device" "$mount" "$name"
     done
+}
+
+validate_platform() {
+    awk_version=$(get_awk_version)
+    difference=$(compare_versions "${awk_version:-0}" "$AWK_VERSION")
+
+    if [ "$difference" -ge 0 ]; then
+	return 0
+    fi
+
+    abort '%s: GNU AWK version %s or greater is required\n' \
+	  "$script" \
+	  $AWK_VERSION
 }
 
 usage() {
