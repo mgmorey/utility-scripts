@@ -313,7 +313,7 @@ print_volumes() {
 
 validate_platform() {
     awk_version=$(get_awk_version)
-    difference=$(compare_versions "${awk_version:-0}" "$AWK_VERSION")
+    difference=$(compare_versions "${awk_version:-0.0.0}" "$AWK_VERSION")
 
     if [ "$difference" -ge 0 ]; then
 	return 0
