@@ -30,10 +30,19 @@ assert() {
 
 configure_platform() {
     user=$(get_real_user)
+
+    case "$(uname -s)" in
+	(MINGW64_NT-*)
+	    winpty=winpty
+	    ;;
+	(*)
+	    winpty=
+	    ;;
+    esac
 }
 
 exec_sql_command() {
-    eval ${1+$1 }$(get_cli_command)
+    eval "$@" $(get_cli_command)
 }
 
 format_pathname() {
@@ -228,7 +237,7 @@ run_sql() {
 	for script in $scripts; do
 	    if [ -f $script ]; then
 		exec <$script
-		exec_sql_command
+		exec_sql_command $winpty
 	    elif [ -d $script ]; then
 		abort "%s: %s: Is a directory\n" "$0" "$script"
 	    else
@@ -236,7 +245,7 @@ run_sql() {
 	    fi
 	done
     else
-	exec_sql_command exec
+	exec_sql_command exec $winpty
     fi
 }
 
