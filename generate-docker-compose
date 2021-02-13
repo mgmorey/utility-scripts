@@ -105,9 +105,8 @@ generate_docker_compose() {
 
 get_awk_version_number() {
     assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
 
-    if is_valid_awk_string "$1"; then
+    if [ -n "$1" ] && is_valid_awk_string "$1"; then
 	printf '%s\n' "$1" | sed "$(printf "$AWK_FORMAT\n" "$AWK_STRING")"
     fi
 }
@@ -173,7 +172,7 @@ get_volumes() {
 }
 
 is_valid_awk_string() {
-    expr "$1" : "$AWK_STRING"' [1-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*' >/dev/null
+    expr "${1-}" : "$AWK_STRING"' [1-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*' >/dev/null
 }
 
 parse_arguments() {
@@ -315,11 +314,17 @@ print_volumes() {
 
 validate_platform() {
     awk_version_string=$(get_awk_version_string)
-    awk_version=$(get_awk_version_number "$awk_version_string")
-    delta=$(compare_versions "${awk_version:-0.0.0}" "$AWK_VERSION" 3)
 
-    if [ "$delta" -ge 0 ]; then
-	return 0
+    if [ -n "$awk_version_string" ]; then
+	awk_version=$(get_awk_version_number "$awk_version_string")
+
+	if [ -n "$awk_version" ]; then
+	    delta=$(compare_versions "${awk_version:-0.0.0}" "$AWK_VERSION" 3)
+
+	    if [ -n "$delta" -a "$delta" -ge 0 ]; then
+		return 0
+	    fi
+	fi
     fi
 
     abort '%s: GNU AWK version %s or greater is required\n' \
