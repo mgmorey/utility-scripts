@@ -81,6 +81,9 @@ validate_platform() {
 		(32)
 		    true
 		    ;;
+		(33)
+		    true
+		    ;;
 		(*)
 		    abort_not_supported Release
 		    ;;
