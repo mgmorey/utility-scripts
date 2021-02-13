@@ -31,33 +31,22 @@ assert() {
 }
 
 compare_versions() (
-    assert [ $# -eq 2 ]
-    assert [ -n "$1" ]
-    assert [ -n "$2" ]
-    difference=0
-    field=0
+    assert [ $# -eq 3 ]
+    assert [ -n "$3" ]
 
-    while [ $field -le 2 ]; do
-	field=$((field + 1))
-	version1=$(printf '%s\n' "$1" | cut -d. -f $field)
-	version2=$(printf '%s\n' "$2" | cut -d. -f $field)
+    if [ -z "$1" -a -z "$2" -o "$3" -le 0 ]; then
+	printf '%s\n' 0
+    else
+	m=$(printf '%s\n' "${1:-0}" | cut -d. -f1)
+	n=$(printf '%s\n' "${2:-0}" | cut -d. -f1)
+	delta=$((m - n))
 
-	if [ -z "$version1" -a -z "$version2" ]; then
-	    break
-	elif [ -z "$version1" ]; then
-	    version1=0
-	elif [ -z "$version2" ]; then
-	    version2=0
+	if [ "$delta" -ne 0 ]; then
+	    printf '%s\n' $delta
+	else
+	    printf '%s\n' "$(compare_versions ${1#*.} ${2#*.} $(($3 - 1)))"
 	fi
-
-	difference=$((version1 - version2))
-
-	if [ $difference -ne 0 ]; then
-	    break
-	fi
-    done
-
-    printf '%s\n' $difference
+    fi
 )
 
 create_tmpfile() {
@@ -375,9 +364,9 @@ print_status() {
 	elif [ "$version_after" = "$version_before" ]; then
 	    status=reinstalled
 	elif [ -n "$version_after" ]; then
-	    difference=$(compare_versions "$version_after" "$version_before")
+	    delta=$(compare_versions "$version_after" "$version_before" 3)
 
-	    if [ $difference -gt 0 ]; then
+	    if [ $delta -gt 0 ]; then
 		status="upgraded from $version_before"
 	    else
 		status="downgraded from $version_before"
