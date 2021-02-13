@@ -102,10 +102,6 @@ generate_docker_compose() {
     print_volumes
 }
 
-get_awk_version() {
-    awk --version | awk 'NR == 1 {print $3}'
-}
-
 get_default_service_name() {
     image=$(get_service_param_value image | sed 's/:.*$//')
 
@@ -130,6 +126,19 @@ get_environment_vars() {
     if [ -f $env_file ]; then
 	awk -F= '/^'"$ENV_RE"'$/ {print $1, $2}' $env_file
     fi
+}
+
+get_gnu_awk_version_number() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    if is_valid_gnu_awk_string "$1"; then
+	printf '%s\n' "$1" | cut -d, -f1 | cut -d' ' -f3
+    fi
+}
+
+get_gnu_awk_version_string() {
+    awk --version 2>/dev/null | head -n 1
 }
 
 get_port_count() {
@@ -160,6 +169,10 @@ get_volumes() {
     if [ -f $volume_file ]; then
 	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2, $3}' $volume_file
     fi
+}
+
+is_valid_gnu_awk_string() {
+    expr "$1" : 'GNU Awk [1-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*' >/dev/null 2>&1
 }
 
 parse_arguments() {
@@ -300,7 +313,8 @@ print_volumes() {
 }
 
 validate_platform() {
-    awk_version=$(get_awk_version)
+    awk_version_string=$(get_gnu_awk_version_string)
+    awk_version=$(get_gnu_awk_version_number "$awk_version_string")
     delta=$(compare_versions "${awk_version:-0.0.0}" "$AWK_VERSION" 3)
 
     if [ "$delta" -ge 0 ]; then
