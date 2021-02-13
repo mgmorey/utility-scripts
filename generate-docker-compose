@@ -16,7 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-AWK_FORMAT='s/^%s \\([1-9][0-9]*\\(\\.[0-9][0-9]*\\)*\\)*.*$/\\1/'
+AWK_EXPR_FORMAT='%s [1-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*'
+AWK_SED_FORMAT='s/^%s \\([1-9][0-9]*\\(\\.[0-9][0-9]*\\)*\\)*.*$/\\1/'
 AWK_STRING='GNU Awk'
 AWK_VERSION=4.0.0
 FILE_VERSION=3.3
@@ -107,7 +108,7 @@ get_awk_version_number() {
     assert [ $# -eq 1 ]
 
     if [ -n "$1" ] && is_valid_awk_string "$1"; then
-	printf '%s\n' "$1" | sed "$(printf "$AWK_FORMAT\n" "$AWK_STRING")"
+	printf '%s\n' "$1" | sed "$(printf "$AWK_SED_FORMAT\n" "$AWK_STRING")"
     fi
 }
 
@@ -172,7 +173,7 @@ get_volumes() {
 }
 
 is_valid_awk_string() {
-    expr "${1-}" : "$AWK_STRING"' [1-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*' >/dev/null
+    expr "${1-}" : "$(printf "$AWK_EXPR_FORMAT\n" "$AWK_STRING")" >/dev/null
 }
 
 parse_arguments() {
