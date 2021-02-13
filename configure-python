@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 BASE_URL=https://www.python.org/ftp
-PYTHON_VERSION=3.6.10
+PYTHON_VERSION=3.6.12
 
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
