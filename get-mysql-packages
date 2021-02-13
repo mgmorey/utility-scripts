@@ -69,7 +69,7 @@ parse_arguments() {
     done
 
     if [ -z "$categories" ]; then
-	categories="client python server"
+	categories="mysql-client mysql-server python-mysql"
     fi
 }
 
