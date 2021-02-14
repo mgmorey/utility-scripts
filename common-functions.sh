@@ -29,27 +29,17 @@ clean_up() {
 }
 
 create_tmpdir() {
-    tmpdir=$(mktemp -d)
+    tmpdir=$(mktemp -d "$@")
     assert [ -n "${tmpdir}" ]
     tmpdirs="${tmpdirs+$tmpdirs }'$tmpdir'"
-
-    if [ $# -gt 0 ]; then
-	trap "$@"
-    else
-	trap clean_up EXIT INT QUIT TERM
-    fi
+    trap clean_up EXIT INT QUIT TERM
 }
 
 create_tmpfile() {
-    tmpfile=$(mktemp)
+    tmpfile=$(mktemp "$@")
     assert [ -n "${tmpfile}" ]
     tmpfiles="${tmpfiles+$tmpfiles }'$tmpfile'"
-
-    if [ $# -gt 0 ]; then
-	trap "$@"
-    else
-	trap clean_up EXIT INT QUIT TERM
-    fi
+    trap clean_up EXIT INT QUIT TERM
 }
 
 get_bin_directory() (
