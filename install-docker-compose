@@ -106,11 +106,19 @@ get_filetype() {
 }
 
 get_file_version_number() {
-    get_version_number "$(get_file_version_string "$1")"
+    assert [ $# -eq 1 ]
+
+    if [ -n "$1" -a -x "$1" ]; then
+	get_version_number "$(get_file_version_string "$1")"
+    fi
 }
 
 get_file_version_string() {
-    get_version_string "$1"
+    assert [ $# -eq 1 ]
+
+    if [ -n "$1" -a -x "$1" ]; then
+	get_version_string "$1"
+    fi
 }
 
 get_hardware() {
@@ -174,7 +182,6 @@ get_version_number() {
 
 get_version_string() {
     assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
 
     if [ -n "$1" -a -x "$1" ]; then
 	"$1" --version || true
@@ -356,7 +363,7 @@ print_newline() {
 print_status() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    version_string=$(get_file_version_string "$1")
+    version_string=$(get_file_version_string "$1" | cut -d, -f1)
 
     if [ "$filename${filetype:+.$filetype}" = "$target_file" ]; then
 	if [ -z "$version_before" ]; then
