@@ -27,11 +27,15 @@ check_dirs() {
     done
 }
 
+clean_up() {
+    eval rm -rf ${tmpdirs-}
+}
+
 create_tmpfile() {
-    tmpfile=$(mktemp)
+    tmpfile=$(mktemp "$@")
     assert [ -n "${tmpfile}" ]
-    tmpfiles="${tmpfiles+$tmpfiles }$tmpfile"
-    trap "/bin/rm -f $tmpfiles" EXIT INT QUIT TERM
+    tmpfiles="${tmpfiles+$tmpfiles }'$tmpfile'"
+    trap clean_up EXIT INT QUIT TERM
 }
 
 filter_db_name() {
