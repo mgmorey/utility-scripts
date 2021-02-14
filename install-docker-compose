@@ -53,7 +53,7 @@ compare_versions() (
     fi
 )
 
-create_temporary_file() {
+create_file() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     dir_name=$(dirname "$1")
@@ -69,7 +69,6 @@ create_tmpfile() {
     tmpfile=$(mktemp "$@")
     assert [ -n "${tmpfile}" ]
     tmpfiles="${tmpfiles+$tmpfiles }'$tmpfile'"
-    trap clean_up EXIT INT QUIT TERM
 }
 
 download_file() {
@@ -142,7 +141,6 @@ get_home_prefix() {
 get_installed_filenames() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-
     PATH=$(normalize_path) which -a $FILENAME
 }
 
@@ -235,7 +233,7 @@ install_compose() {
     target_mode=$(get_target_mode "$target_file")
 
     if [ $force = true -o "$version_before" != "$version" ]; then
-	create_temporary_file "$target_file"
+	create_file "$target_file"
 
 	if download_file "$tmpfile"; then
 	    if install_file "$tmpfile" "$target_file"; then
@@ -306,8 +304,6 @@ is_valid_version() {
 }
 
 normalize_path() {
-    create_tmpfile
-
     printf "%s\n" "${1-$PATH}" | tr ':' '\n' | while read dir; do
 	if [ -d "$dir" ]; then
 	    dir=$(get_realpath "$dir")
@@ -450,6 +446,7 @@ print_summary() {
 
     printf '%s\n' 'Installation Summary:'
     print_newline
+    create_tmpfile
 
     get_installed_filenames "$prefix" | while read filename; do
 	print_status "$filename"
@@ -490,19 +487,7 @@ usage_error() {
     exit 2
 }
 
-script=$(basename "$0")
-
-case "$0" in
-    (*/*)
-	script_dir=$(get_realpath "$(dirname "$0")")
-	;;
-    (*)
-	script_dir=
-	;;
-esac
-
-script_prefix=${script_dir:+$script_dir/}
-
+trap clean_up EXIT INT QUIT TERM
 script=$(basename "$0")
 parse_arguments "$@"
 install_docker_compose
