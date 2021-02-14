@@ -25,6 +25,24 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
 }
 
+clean_up() {
+    cd
+    eval rm -f ${tmpfiles-}
+    eval rm -rf ${tmpdirs-}
+}
+
+create_tmpfile() {
+    tmpfile=$(mktemp)
+    assert [ -n "${tmpfile}" ]
+    tmpfiles="${tmpfiles+$tmpfiles }'$tmpfile'"
+
+    if [ $# -gt 0 ]; then
+	trap "$@"
+    else
+	trap clean_up EXIT INT QUIT TERM
+    fi
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath || true)
@@ -43,8 +61,7 @@ get_realpath() (
 )
 
 normalize_path() {
-    tmpfile=$(mktemp)
-    trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
+    create_tmpfile
 
     printf "%s\n" "${1-$PATH}" | tr ':' '\n' | while read dir; do
 	if [ -d "$dir" ]; then
@@ -61,4 +78,3 @@ normalize_path() {
 }
 
 normalize_path "$@"
-

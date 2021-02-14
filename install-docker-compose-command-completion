@@ -30,11 +30,21 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
 }
 
+clean_up() {
+    eval rm -f ${tmpfiles-}
+}
+
+create_temporary_file() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    create_tmpfile $(get_mktemp_options "$(basename "$1")")
+}
+
 create_tmpfile() {
-    filename=$(basename "$1")
-    mktemp_options=$(get_mktemp_options $filename)
-    tmpfile=$(mktemp $mktemp_options)
-    trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
+    tmpfile=$(mktemp "$@")
+    assert [ -n "${tmpfile}" ]
+    tmpfiles="${tmpfiles+$tmpfiles }'$tmpfile'"
+    trap clean_up EXIT INT QUIT TERM
 }
 
 download_file() {
@@ -139,9 +149,9 @@ install_completion() {
 	exit 1
     fi
 
-    compose_version=$(get_file_version_number $compose_filename)
+    compose_version=$(get_file_version_number "$compose_filename")
     target_mode=$(get_target_mode "$target_file")
-    create_tmpfile "$target_file"
+    create_temporary_file "$target_file"
 
     if download_file "$tmpfile"; then
 	install_file "$tmpfile" "$target_file"

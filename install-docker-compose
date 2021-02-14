@@ -30,6 +30,10 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
 }
 
+clean_up() {
+    eval rm -f ${tmpfiles-}
+}
+
 compare_versions() (
     assert [ $# -eq 3 ]
     assert [ -n "$3" ]
@@ -49,19 +53,23 @@ compare_versions() (
     fi
 )
 
-create_tmpfile() {
+create_temporary_file() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     dir_name=$(dirname "$1")
-    filename=$(basename "$1")
-    mktemp_options=$(get_mktemp_options $dir_name $filename)
 
     if [ ! -d "$dir_name" ]; then
 	mkdir ${target_mode:+-m $target_mode }-p "$dir_name"
     fi
 
-    tmpfile=$(mktemp $mktemp_options)
-    trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
+    create_tmpfile $(get_mktemp_options "$dir_name" "$(basename "$1")")
+}
+
+create_tmpfile() {
+    tmpfile=$(mktemp "$@")
+    assert [ -n "${tmpfile}" ]
+    tmpfiles="${tmpfiles+$tmpfiles }'$tmpfile'"
+    trap clean_up EXIT INT QUIT TERM
 }
 
 download_file() {
@@ -232,7 +240,7 @@ install_compose() {
     target_mode=$(get_target_mode "$target_file")
 
     if [ $force = true -o "$version_before" != "$version" ]; then
-	create_tmpfile "$target_file"
+	create_temporary_file "$target_file"
 
 	if download_file "$tmpfile"; then
 	    if install_file "$tmpfile" "$target_file"; then
