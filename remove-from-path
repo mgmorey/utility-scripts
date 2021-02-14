@@ -26,8 +26,6 @@ assert() {
 }
 
 print_parameter() {
-    eval value=\${$var-}
-
     case "$(basename $shell)" in
 	(*bash|ksh*|zsh)
 	    printf 'export %s="%s"\n' "$var" "$value"
@@ -47,8 +45,12 @@ print_parameter() {
 
 remove_directory() {
     assert [ $# -eq 2 ]
-    printf '%s\n' "$2" | \
-	sed -e 's|^'"$1"':||;s|:'"$1"':|:|g;s|:'"$1"'$||;s|^'"$1"'$||'
+    printf '%s\n' "$2" | sed -e '
+s|:'"$1"':|:|g
+s|^'"$1"':||
+s|:'"$1"'$||
+s|^'"$1"'$||
+'
 }
 
 remove_from_path() {
@@ -94,13 +96,12 @@ remove_from_path() {
     var="$1"
     shift
 
-    eval value=\${$var-}
+    eval value="\${$var-}"
 
     for dir; do
 	value=$(remove_directory "$dir" "$value")
     done
 
-    eval $var=$value
     print_parameter
 }
 
