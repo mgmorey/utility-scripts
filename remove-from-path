@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# remove-from-path: remove directories from PATH parameter
+# remove-from-path: remove directories from path parameter
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -15,8 +15,6 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-SED_EXPR='s|^%s:||g;s|:%s:|:|g;s|:%s$||g\n'
 
 abort() {
     printf "$@" >&2
@@ -33,28 +31,107 @@ filter_path() {
     sed -e "$(printf "$SED_EXPR" "$1" "$1" "$1")"
 }
 
-remove_from_path() {
-    path="$PATH"
+parse_arguments() {
+    shell=$SHELL
 
-    for dir; do
-	path="$(printf "%s\n" "$path" | filter_path "$dir")"
+    while getopts s:h opt; do
+	case $opt in
+	    (s)
+		case $(basename $OPTARG) in
+		    (*bash|ksh*|zsh)
+			shell=$OPTARG
+			;;
+		    (csh|tcsh)
+			shell=$OPTARG
+			;;
+		    (fish)
+			shell=$OPTARG
+			;;
+		    (sh)
+			shell=$OPTARG
+			;;
+		    (*)
+			usage_error "%s: %s: Unsupported shell\n" "$0" "$OPTARG"
+			;;
+		esac
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
     done
 
-    case $(basename $SHELL) in
-	(bash|fish|ksh|ksh93|rbash|zsh)
-	    printf "export %s='%s'\n" PATH "$path"
-	    ;;
-	(csh|tcsh)
-	    printf "setenv %s '%s';\n" PATH "$path"
-	    ;;
-	(sh)
-	    printf "%s='%s'\n" PATH "$path"
-	    printf "export %s\n" PATH
-	    ;;
-	(*)
-	    abort "%s: %s: Shell not supported\n" "$0" "$SHELL"
-	    ;;
-    esac
+    shift $(($OPTIND - 1))
+    var="$1"
+    shift
 }
 
+print_parameters() {
+    assert [ $# -gt 0 ]
+
+    for var; do
+	eval value=\${$var-}
+
+	if [ -z "$value" ]; then
+	    continue
+	fi
+
+	case "$(basename $shell)" in
+	    (*bash|ksh*|zsh)
+		printf 'export %s="%s"\n' "$var" "$value"
+		;;
+	    (csh|tcsh)
+		printf 'setenv %s "%s";\n' "$var" "$value"
+		;;
+	    (fish)
+		printf 'set -x %s "%s";\n' "$var" "$value"
+		;;
+	    (*)
+		printf '%s="%s"\n' "$var" "$value"
+		printf 'export %s\n' "$var"
+		;;
+	esac
+    done
+}
+
+remove_directory() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    printf '%s\n' "$2" | \
+	sed -e 's|^'"$1"':||;s|:'"$1"':|:|g;s|:'"$1"'$||;s|^'"$1"'$||'
+}
+
+remove_from_path() {
+    eval value=\${$var-}
+
+    for dir; do
+	value=$(remove_directory $dir $value)
+    done
+
+    eval $var=$value
+    print_parameters $var
+}
+
+usage() {
+    cat <<-EOF >&2
+Usage: $0: [-s SHELL] PARAMETER [DIRECTORY [...]]
+       $0: -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+parse_arguments "$@"
 remove_from_path "$@"

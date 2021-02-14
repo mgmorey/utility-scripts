@@ -55,7 +55,7 @@ configure_platform() {
 get_homebrew_binary() (
     for dir in $HOME/.linuxbrew $LINUXBREW_DIRS /usr/local; do
 	if [ -x $dir/bin/brew ]; then
-	    printf "%s\n" "$dir/bin/brew"
+	    printf '%s\n' "$dir/bin/brew"
 	fi
     done
 )
@@ -70,7 +70,7 @@ get_homebrew_prefix() (
     dir="$(get_realpath "$(dirname "$brew")/../opt")"
 
     if [ -d "$dir" ]; then
-	printf "%s\n" "$dir"
+	printf '%s\n' "$dir"
 	break
     fi
 )
@@ -84,9 +84,9 @@ get_realpath() (
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
+		printf '%s\n' "$file"
 	    else
-		printf "%s\n" "$PWD/${file#./}"
+		printf '%s\n' "$PWD/${file#./}"
 	    fi
 	done
     fi
@@ -265,7 +265,7 @@ include_profile_directories() {
 is_included() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
-    printf "%s\n" "$2" | egrep '(^|:)'$1'(:|$)' >/dev/null
+    printf '%s\n' "$2" | egrep '(^|:)'$1'(:|$)' >/dev/null
 }
 
 is_to_be_included() {
@@ -342,7 +342,8 @@ print_parameters() {
 remove_directory() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
-    printf "%s\n" "$2" | sed -e 's|^'"$1"':||g;s|:'"$1"':|:|g;s|:'"$1"'$||g'
+    printf '%s\n' "$2" | \
+	sed -e 's|^'"$1"':||;s|:'"$1"':|:|g;s|:'"$1"'$||;s|^'"$1"'$||'
 }
 
 set_profile_parameters() {
@@ -365,7 +366,7 @@ usage_error() {
 	printf "$@" >&2
     fi
 
-    printf "%s\n" '' >&2
+    printf '%s\n' '' >&2
     usage
     exit 2
 }
