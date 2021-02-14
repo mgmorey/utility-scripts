@@ -27,7 +27,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
 }
 
 compare_versions() (

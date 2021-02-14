@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
 }
 
 print_parameter() {
@@ -71,7 +71,7 @@ remove_from_path() {
 			shell=$OPTARG
 			;;
 		    (*)
-			usage_error "%s: %s: Unsupported shell\n" "$0" "$OPTARG"
+			usage_error "%s: %s: Unsupported shell\n" "$script" "$OPTARG"
 			;;
 		esac
 		;;
@@ -88,7 +88,7 @@ remove_from_path() {
     shift $(($OPTIND - 1))
 
     if [ $# -lt 2 ]; then
-	usage_error "%s: Not enough arguments\n" "$0"
+	usage_error "%s: Not enough arguments\n" "$script"
     fi
 
     var="$1"
@@ -106,8 +106,8 @@ remove_from_path() {
 
 usage() {
     cat <<-EOF >&2
-Usage: $0: [-s SHELL] PARAMETER [DIRECTORY [...]]
-       $0: -h
+Usage: $script: [-s SHELL] PARAMETER [DIRECTORY [...]]
+       $script: -h
 EOF
 }
 
@@ -121,4 +121,5 @@ usage_error() {
     exit 2
 }
 
+script=$(basename "$0")
 remove_from_path "$@"

@@ -43,7 +43,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
 }
 
 check_device() {
@@ -340,6 +340,6 @@ usage_error() {
     exit 2
 }
 
-script="$0"
+script=$(basename "$0")
 parse_arguments "$@"
 generate_docker_compose
