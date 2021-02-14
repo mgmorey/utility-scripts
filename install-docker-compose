@@ -80,11 +80,13 @@ download_file() {
 }
 
 get_compose_file() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
     printf '%s/%s/%s%s\n' \
-	   "$prefix" \
+	   "$1" \
 	   bin \
 	   $FILENAME \
-	   "${filetype:+.$filetype}"
+	   "${2:+.$2}"
 }
 
 get_curl_options() {
@@ -125,6 +127,10 @@ get_hardware() {
     uname -m
 }
 
+get_home_prefix() {
+    printf '%s\n' "$HOME/.local"
+}
+
 get_installed_filenames() {
     PATH="$prefix/bin:$PATH" which -a $FILENAME | sort -u
 }
@@ -162,18 +168,33 @@ get_platform() {
     esac
 }
 
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath || true)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
 get_target_mode() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    case "$1" in
-	($HOME/*)
-	    printf '%s\n' a+rx
-	    ;;
-	(*)
-	    printf '%s\n' u=rwx,go=rx
-	    ;;
-    esac
+    if expr "$(get_realpath "$1")" : \
+	    "$(get_realpath "$HOME")/" >/dev/null; then
+	printf '%s\n' u=rwx,g=rx
+    else
+	printf '%s\n' u=rwx,go=rx
+    fi
 }
 
 get_version_number() {
@@ -230,12 +251,12 @@ install_docker_compose() {
 	if [ "$(id -u)" -eq 0 ]; then
 	    prefix=/usr/local
 	else
-	    prefix="$HOME/.local"
+	    prefix=$(get_home_prefix)
 	fi
     fi
 
     filetype=$(get_filetype)
-    target_file=$(get_compose_file)
+    target_file=$(get_compose_file "$prefix" "$filetype")
     version_before=$(get_file_version_number "$target_file")
     version_after=
 
