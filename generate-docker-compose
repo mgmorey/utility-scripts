@@ -16,9 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-AWK_EXPR_FORMAT='%s [1-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*'
-AWK_SED_FORMAT='s/^%s \\([1-9][0-9]*\\(\\.[0-9][0-9]*\\)*\\)*.*$/\\1/'
-AWK_STRING='GNU Awk'
 AWK_VERSION=4.0.0
 FILE_VERSION=3.3
 NAMED_VOLUMES=true
@@ -105,11 +102,7 @@ generate_docker_compose() {
 }
 
 get_awk_version_number() {
-    assert [ $# -eq 1 ]
-
-    if [ -n "$1" ] && is_valid_awk_string "$1"; then
-	printf '%s\n' "$1" | sed "$(printf "$AWK_SED_FORMAT\n" "$AWK_STRING")"
-    fi
+    expr "${1-}" : 'GNU Awk \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
 }
 
 get_awk_version_string() {
@@ -170,10 +163,6 @@ get_volumes() {
     if [ -f $volume_file ]; then
 	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2, $3}' $volume_file
     fi
-}
-
-is_valid_awk_string() {
-    expr "${1-}" : "$(printf "$AWK_EXPR_FORMAT\n" "$AWK_STRING")" >/dev/null
 }
 
 parse_arguments() {
