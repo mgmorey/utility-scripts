@@ -134,7 +134,13 @@ get_home_prefix() {
 get_installed_filenames() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    PATH="$1/bin:$PATH" which -a $FILENAME | sort -u
+    normalize_path="${script_prefix}normalize-path"
+
+    if [ -x  ]; then
+	PATH=$("$normalize_path") which -a $FILENAME
+    else
+	PATH="$1/bin:$PATH" which -a $FILENAME | sort -u
+    fi
 }
 
 get_mktemp_options() {
@@ -231,7 +237,6 @@ install_compose() {
 	if download_file "$tmpfile"; then
 	    if install_file "$tmpfile" "$target_file"; then
 		version_after=$(get_file_version_number "$target_file")
-		print_newline
 	    fi
 	fi
     elif [ $silent = false ]; then
@@ -239,7 +244,6 @@ install_compose() {
 	       "Docker Compose" \
 	       "$version" \
 	       "$target_file"
-	print_newline
     fi
 
     print_summary
@@ -416,6 +420,12 @@ print_status() {
 print_summary() {
     if [ $silent = true ]; then
 	return 0
+    elif [ "$(id -u)" -eq 0 ]; then
+	return 0
+    fi
+
+    if [ $action != query ]; then
+	print_newline
     fi
 
     printf '%s\n' 'Installation Summary:'
@@ -432,7 +442,6 @@ query_compose() {
 
 uninstall_compose() {
     uninstall_file "$target_file"
-    print_newline
     print_summary
 }
 
@@ -460,6 +469,19 @@ usage_error() {
     usage
     exit 2
 }
+
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
 
 script=$(basename "$0")
 parse_arguments "$@"
