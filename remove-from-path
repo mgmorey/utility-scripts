@@ -119,4 +119,4 @@ usage_error() {
 }
 
 parse_arguments "$@"
-remove_from_path "$@"
+remove_from_path
