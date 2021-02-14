@@ -64,32 +64,24 @@ parse_arguments() {
     shift
 }
 
-print_parameters() {
-    assert [ $# -gt 0 ]
+print_parameter() {
+    eval value=\${$var-}
 
-    for var; do
-	eval value=\${$var-}
-
-	if [ -z "$value" ]; then
-	    continue
-	fi
-
-	case "$(basename $shell)" in
-	    (*bash|ksh*|zsh)
-		printf 'export %s="%s"\n' "$var" "$value"
-		;;
-	    (csh|tcsh)
-		printf 'setenv %s "%s";\n' "$var" "$value"
-		;;
-	    (fish)
-		printf 'set -x %s "%s";\n' "$var" "$value"
-		;;
-	    (*)
-		printf '%s="%s"\n' "$var" "$value"
-		printf 'export %s\n' "$var"
-		;;
-	esac
-    done
+    case "$(basename $shell)" in
+	(*bash|ksh*|zsh)
+	    printf 'export %s="%s"\n' "$var" "$value"
+	    ;;
+	(csh|tcsh)
+	    printf 'setenv %s "%s";\n' "$var" "$value"
+	    ;;
+	(fish)
+	    printf 'set -x %s "%s";\n' "$var" "$value"
+	    ;;
+	(*)
+	    printf '%s="%s"\n' "$var" "$value"
+	    printf 'export %s\n' "$var"
+	    ;;
+    esac
 }
 
 remove_directory() {
@@ -106,7 +98,7 @@ remove_from_path() {
     done
 
     eval $var=$value
-    print_parameters $var
+    print_parameter
 }
 
 usage() {
