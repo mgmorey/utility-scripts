@@ -24,14 +24,14 @@ assert() {
 
 clean_up() {
     cd
-    rm -f ${tmpfiles-}
-    rm -rf ${tmpdirs-}
+    eval rm -f ${tmpfiles-}
+    eval rm -rf ${tmpdirs-}
 }
 
 create_tmpdir() {
     tmpdir=$(mktemp -d)
     assert [ -n "${tmpdir}" ]
-    tmpdirs="${tmpdirs+$tmpdirs }$tmpdir"
+    tmpdirs="${tmpdirs+$tmpdirs }'$tmpdir'"
 
     if [ $# -gt 0 ]; then
 	trap "$@"
@@ -43,7 +43,7 @@ create_tmpdir() {
 create_tmpfile() {
     tmpfile=$(mktemp)
     assert [ -n "${tmpfile}" ]
-    tmpfiles="${tmpfiles+$tmpfiles }$tmpfile"
+    tmpfiles="${tmpfiles+$tmpfiles }'$tmpfile'"
 
     if [ $# -gt 0 ]; then
 	trap "$@"
