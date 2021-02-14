@@ -25,12 +25,6 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-filter_path() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    sed -e "$(printf "$SED_EXPR" "$1" "$1" "$1")"
-}
-
 parse_arguments() {
     shell=$SHELL
 
@@ -100,7 +94,6 @@ print_parameters() {
 
 remove_directory() {
     assert [ $# -eq 2 ]
-    assert [ -n "$1" ]
     printf '%s\n' "$2" | \
 	sed -e 's|^'"$1"':||;s|:'"$1"':|:|g;s|:'"$1"'$||;s|^'"$1"'$||'
 }
@@ -109,7 +102,7 @@ remove_from_path() {
     eval value=\${$var-}
 
     for dir; do
-	value=$(remove_directory $dir $value)
+	value=$(remove_directory "$dir" "$value")
     done
 
     eval $var=$value
