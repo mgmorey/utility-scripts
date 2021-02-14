@@ -46,22 +46,19 @@ normalize_path() {
     tmpfile=$(mktemp)
     trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
 
-    printf "%s\n" "$PATH" | tr ':' '\n' | while read dir; do
+    printf "%s\n" "${1-$PATH}" | tr ':' '\n' | while read dir; do
 	if [ -d "$dir" ]; then
 	    dir=$(get_realpath "$dir")
 	fi
 
-	if ! grep -E '^'"$dir"'$' $tmpfile; then
-	    if [ -s "$tmpfile" ]; then
-		printf ':%s' "$dir" >>$tmpfile
-	    else
-		printf '%s' "$dir" >>$tmpfile
-	    fi
+	if ! grep -E '^'"$dir"'$' $tmpfile >/dev/null; then
+	    printf '%s\n' "$dir" >>$tmpfile
 	fi
     done
 
-    tr '\n' ':' <$tmpfile
+    tr '\n' ':' <$tmpfile | sed 's/:$//'
     printf '%s\n' ''
 }
 
-normalize_path
+normalize_path "$@"
+
