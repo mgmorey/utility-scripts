@@ -21,8 +21,8 @@ PROJECT_NAME=startup-files
 
 PROJECT_URL=$BASE_URL/$PROJECT_NAME.git
 
-STARTUP_FILES=".editorconfig .profile"
-STARTUP_FILES_LEGACY=".bash_profile .emacs"
+LEGACY_FILES=".emacs"
+STARTUP_FILES=".bash_profile .editorconfig .profile"
 
 abort() {
     printf "$@" >&2
@@ -134,7 +134,7 @@ install_startup_files() (
 
     cd
 
-    for file in $STARTUP_FILES_LEGACY; do
+    for file in $LEGACY_FILES; do
 	if [ -e $file ]; then
 	    printf "Renaming %s to %s\n" $file $file.orig
 	    /bin/mv -f $file $file.orig
