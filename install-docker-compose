@@ -142,13 +142,8 @@ get_home_prefix() {
 get_installed_filenames() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    normalize_path="${script_prefix}normalize-path"
 
-    if [ -x  ]; then
-	PATH=$("$normalize_path") which -a $FILENAME
-    else
-	PATH="$1/bin:$PATH" which -a $FILENAME | sort -u
-    fi
+    PATH=$(normalize_path) which -a $FILENAME
 }
 
 get_mktemp_options() {
@@ -308,6 +303,23 @@ is_valid_version() {
     else
 	false
     fi >/dev/null
+}
+
+normalize_path() {
+    create_tmpfile
+
+    printf "%s\n" "${1-$PATH}" | tr ':' '\n' | while read dir; do
+	if [ -d "$dir" ]; then
+	    dir=$(get_realpath "$dir")
+	fi
+
+	if ! grep -E '^'"$dir"'$' $tmpfile >/dev/null; then
+	    printf '%s\n' "$dir" >>$tmpfile
+	fi
+    done
+
+    tr '\n' ':' <$tmpfile | sed 's/:$//'
+    printf '%s\n' ''
 }
 
 parse_arguments() {
