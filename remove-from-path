@@ -25,7 +25,33 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
-parse_arguments() {
+print_parameter() {
+    eval value=\${$var-}
+
+    case "$(basename $shell)" in
+	(*bash|ksh*|zsh)
+	    printf 'export %s="%s"\n' "$var" "$value"
+	    ;;
+	(csh|tcsh)
+	    printf 'setenv %s "%s";\n' "$var" "$value"
+	    ;;
+	(fish)
+	    printf 'set -x %s "%s";\n' "$var" "$value"
+	    ;;
+	(*)
+	    printf '%s="%s"\n' "$var" "$value"
+	    printf 'export %s\n' "$var"
+	    ;;
+    esac
+}
+
+remove_directory() {
+    assert [ $# -eq 2 ]
+    printf '%s\n' "$2" | \
+	sed -e 's|^'"$1"':||;s|:'"$1"':|:|g;s|:'"$1"'$||;s|^'"$1"'$||'
+}
+
+remove_from_path() {
     shell=$SHELL
 
     while getopts s:h opt; do
@@ -60,37 +86,14 @@ parse_arguments() {
     done
 
     shift $(($OPTIND - 1))
+
+    if [ $# -lt 2 ]; then
+	usage_error "%s: Not enough arguments\n" "$0"
+    fi
+
     var="$1"
     shift
-}
 
-print_parameter() {
-    eval value=\${$var-}
-
-    case "$(basename $shell)" in
-	(*bash|ksh*|zsh)
-	    printf 'export %s="%s"\n' "$var" "$value"
-	    ;;
-	(csh|tcsh)
-	    printf 'setenv %s "%s";\n' "$var" "$value"
-	    ;;
-	(fish)
-	    printf 'set -x %s "%s";\n' "$var" "$value"
-	    ;;
-	(*)
-	    printf '%s="%s"\n' "$var" "$value"
-	    printf 'export %s\n' "$var"
-	    ;;
-    esac
-}
-
-remove_directory() {
-    assert [ $# -eq 2 ]
-    printf '%s\n' "$2" | \
-	sed -e 's|^'"$1"':||;s|:'"$1"':|:|g;s|:'"$1"'$||;s|^'"$1"'$||'
-}
-
-remove_from_path() {
     eval value=\${$var-}
 
     for dir; do
@@ -118,5 +121,4 @@ usage_error() {
     exit 2
 }
 
-parse_arguments "$@"
-remove_from_path
+remove_from_path "$@"
