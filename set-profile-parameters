@@ -265,13 +265,13 @@ include_profile_directories() {
 is_included() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
-    printf '%s\n' "$2" | egrep '(^|:)'$1'(:|$)' >/dev/null
+    printf '%s\n' "$2" | egrep '(^|:)'"$1"'(:|$)' >/dev/null
 }
 
 is_to_be_included() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
-    test -d $1 && ! is_included $1 "$2"
+    test -d "$1" && ! is_included "$1" "$2"
 }
 
 parse_arguments() {
@@ -341,9 +341,12 @@ print_parameters() {
 
 remove_directory() {
     assert [ $# -eq 2 ]
-    assert [ -n "$1" ]
-    printf '%s\n' "$2" | \
-	sed -e 's|^'"$1"':||;s|:'"$1"':|:|g;s|:'"$1"'$||;s|^'"$1"'$||'
+    printf '%s\n' "$2" | sed -e '
+s|:'"$1"':|:|g
+s|^'"$1"':||
+s|:'"$1"'$||
+s|^'"$1"'$||
+'
 }
 
 set_profile_parameters() {
