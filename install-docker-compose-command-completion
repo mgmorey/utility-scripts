@@ -37,7 +37,7 @@ clean_up() {
 create_file() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    create_tmpfile $(get_mktemp_options "$(basename "$1")")
+    create_tmpfile $(get_mktemp_options "$(dirname "$1")" "$(basename "$1")")
 }
 
 create_tmpfile() {
@@ -95,9 +95,36 @@ get_file_version_string() {
 }
 
 get_mktemp_options() {
-    assert [ $# -eq 1 ]
+    assert [ $# -eq 2 ]
     assert [ -n "$1" ]
-    printf '%s\n' -t "${1%${filetype+.$filetype}}-XXXXXXXXXX.tmp"
+    assert [ -n "$2" ]
+
+    case "$platform" in
+	(Darwin)
+	    true
+	    ;;
+	(*)
+	    printf '%s\n' -p "$1"
+	    ;;
+    esac
+
+    printf '%s\n' -t "${2%${filetype+.$filetype}}-XXXXXXXXXX.tmp"
+}
+
+get_platform() {
+    uname_kernel=$(uname -s)
+
+    case "$uname_kernel" in
+	(CYGWIN_NT-*)
+	    printf '%s\n' Windows
+	    ;;
+	(MINGW64_NT-*)
+	    printf '%s\n' Windows
+	    ;;
+	(*)
+	    printf '%s\n' $uname_kernel
+	    ;;
+    esac
 }
 
 get_target_mode() {
@@ -136,25 +163,37 @@ get_url() {
 
 install_command_completion() {
     target_file=$(get_compose_file)
+    target_dir=$(dirname "$target_file")
+
+    if [ ! -d "$target_dir" ]; then
+	abort "%s: %s: No such directory\n" "$script" "$target_dir"
+    fi
 
     eval ${action}_completion
 }
 
 install_completion() {
+    platform=$(get_platform)
     compose_filename="$(which ${prefix:+$prefix/bin/}$FILENAME)"
 
     if [ -z "$compose_filename" ]; then
-	printf '%s: Docker Compose is not installed\n' "$script"
-	exit 1
+	abort '%s: Docker Compose is not installed\n' "$script"
     fi
 
     compose_version=$(get_file_version_number "$compose_filename")
     target_mode=$(get_target_mode "$target_file")
-    create_file "$target_file"
 
-    if download_file "$tmpfile"; then
-	install_file "$tmpfile" "$target_file"
+    if [ $force = true -o ! -f "$target_file" ]; then
+	create_file "$target_file"
+
+	if download_file "$tmpfile"; then
+	    install_file "$tmpfile" "$target_file"
+	fi
+    elif [ $silent = false ]; then
+	printf 'Installed as %s\n' "$target_file"
     fi
+
+    print_summary
 }
 
 install_file() {
@@ -179,16 +218,23 @@ install_file() {
 parse_arguments() {
     action=install
     bar=false
+    force=false
     prefix=
     silent=false
 
-    while getopts bfp:suh opt; do
+    while getopts bfp:qsuh opt; do
 	case $opt in
 	    (b)
 		bar=true
 		;;
+	    (f)
+		force=true
+		;;
 	    (p)
 		parse_prefix "$OPTARG"
+		;;
+	    (q)
+		action=query
 		;;
 	    (s)
 		silent=true
@@ -230,6 +276,35 @@ print_newline() {
     fi
 }
 
+print_status() {
+    if [ -f "$target_file" ]; then
+	status=installed
+    else
+	status=uninstalled
+    fi
+
+    printf '%s\n' "$target_file${status:+ ($status)}"
+}
+
+print_summary() {
+    if [ $silent = true ]; then
+	return 0
+    fi
+
+    if [ $action != query ]; then
+	print_newline
+    fi
+
+    printf '%s\n' 'Installation Summary:'
+    print_newline
+
+    print_status "$target_file"
+}
+
+query_completion() {
+    print_summary
+}
+
 uninstall_completion() {
     uninstall_file "$target_file"
 }
@@ -244,7 +319,9 @@ uninstall_file() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-p PREFIX] [-s] [-u]
+Usage: $script [-b] [-f] [-p PREFIX] [-s]
+       $script -u [-p PREFIX] [-s]
+       $script -q
        $script -h
 EOF
 }
