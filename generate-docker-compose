@@ -320,15 +320,16 @@ validate_platform() {
 	fi
     fi
 
-    abort '%s: GNU AWK version %s or greater is required\n' \
+    abort '%s: GNU Awk version %s or greater is required\n' \
 	  "$script" \
 	  $AWK_VERSION
 }
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-n]
-       $script [-u]
+Usage: $script
+       $script -n
+       $script -u
        $script -h
 EOF
 }
