@@ -16,9 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-egrep -e '^(catatonit|container-selinux|containerd)([0-9]*|-[0-9\.]+)?$' \
-      -e '^(containerd.io|containernetworking-plugins)([0-9]*|-[0-9\.]+)?$' \
-      -e '^(containers-common|docker-ce|docker-ce-cli)([0-9]*|-[0-9\.]+)?$' \
-      -e '^(docker-libnetwork|docker-runc|docker)([0-9]*|-[0-9\.]+)?$' \
-      -e '^(docker.io|moby-engine|podman|podman-docker)([0-9]*|-[0-9\.]+)?$' \
-      -e '^(runc|tini)([0-9]*|-[0-9\.]+)?$'
+grep -E '
+^(catatonit|container-selinux|containerd)([0-9]*|-[0-9\.]+)?$
+^(containerd.io|containernetworking-plugins)([0-9]*|-[0-9\.]+)?$
+^(containers-common|docker-ce|docker-ce-cli)([0-9]*|-[0-9\.]+)?$
+^(docker-libnetwork|docker-runc|docker)([0-9]*|-[0-9\.]+)?$
+^(docker.io|moby-engine|podman|podman-docker)([0-9]*|-[0-9\.]+)?$
+^(runc|tini)([0-9]*|-[0-9\.]+)?$
+'

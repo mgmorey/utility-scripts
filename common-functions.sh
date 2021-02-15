@@ -304,7 +304,7 @@ get_user_name() {
 is_included() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
-    printf '%s\n' "${2-}" | egrep '(^|:)'"$1"'(:|$)' >/dev/null
+    printf '%s\n' "${2-}" | grep -E '(^|:)'"$1"'(:|$)' >/dev/null
 }
 
 is_to_be_included() {

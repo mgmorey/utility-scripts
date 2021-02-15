@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 if [ $# -gt 0 ]; then
-    egrep "^(database/)?(mariadb|mysql)([0-9]+-$1|-[0-9]+/$1|-$1(-[0-9\.]+)?)\$"
+    grep -E "^(database/)?(mariadb|mysql)([0-9]+-$1|-[0-9]+/$1|-$1(-[0-9\.]+)?)\$"
 else
-    egrep "^(database/)?(mariadb|mysql)([0-9]*|-[0-9\.]+)?\$"
+    grep -E "^(database/)?(mariadb|mysql)([0-9]*|-[0-9\.]+)?\$"
 fi

@@ -415,7 +415,7 @@ grep_version() {
     assert [ $# -le 1 ]
 
     if [ $# -eq 1 ]; then
-	egrep '^'"$1"'(\.[0-9]+){0,2}$'
+	grep -E '^'"$1"'(\.[0-9]+){0,2}$'
     else
 	cat
     fi
@@ -452,7 +452,7 @@ install_python_version() (
     set_flags
 
     if [ "${pyenv_install_verbose-$PYENV_INSTALL_VERBOSE}" = true ]; then
-	printenv | egrep '^(CC|CFLAGS|CPPFLAGS|LDFLAGS|PATH)=' | sort
+	printenv | grep -E '^(CC|CFLAGS|CPPFLAGS|LDFLAGS|PATH)=' | sort
     fi
 
     pyenv install -s $python
@@ -482,7 +482,7 @@ install_via_pip() (
     set_flags
 
     if [ "${pip_install_verbose-$PIP_INSTALL_VERBOSE}" = true ]; then
-	printenv | egrep '^(CC|CFLAGS|CPPFLAGS|LDFLAGS|PATH)=' | sort
+	printenv | grep -E '^(CC|CFLAGS|CPPFLAGS|LDFLAGS|PATH)=' | sort
     fi
 
     if [ "$PIP_INSTALL_VERBOSE" = true ]; then
