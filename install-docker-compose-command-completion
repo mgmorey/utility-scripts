@@ -154,7 +154,7 @@ get_version_string() {
 get_url() {
     printf '%s/%s/%s/%s/%s/%s\n' \
 	   $BASE_URL \
-	   ${compose_version%.0} \
+	   $compose_version \
 	   contrib \
 	   completion \
 	   bash \
