@@ -158,7 +158,7 @@ install_docker() {
 	printf "Docker is not installed.\n"
     fi
 
-    selected_packages=$(get-docker-packages)
+    selected_packages=$(get-packages docker)
     packages=$(get_difference "$installed_packages" "$selected_packages")
 
     if [ -n "$packages" ]; then
