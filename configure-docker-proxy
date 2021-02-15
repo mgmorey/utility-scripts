@@ -29,6 +29,10 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
 }
 
+clean_up() {
+    eval rm -f ${tmpfiles-}
+}
+
 configure_docker_proxy()
 {
     if [ "$action" = query -o "$(id -u)" -eq 0 ]; then
@@ -38,6 +42,12 @@ configure_docker_proxy()
     fi
 
     eval ${action}_proxy
+}
+
+create_tmpfile() {
+    tmpfile=$(mktemp "$@")
+    assert [ -n "${tmpfile}" ]
+    tmpfiles="${tmpfiles+$tmpfiles }'$tmpfile'"
 }
 
 filter_proxy_parameters() {
@@ -70,8 +80,7 @@ install_file() {
 }
 
 install_proxy() {
-    tmpfile=$(mktemp)
-    trap "/bin/rm -f $tmpfile" EXIT INT QUIT TERM
+    create_tmpfile
     read_proxy_parameters | \
 	filter_proxy_parameters | \
 	print_proxy_configuration >$tmpfile
@@ -245,5 +254,6 @@ esac
 
 script_prefix=${script_dir:+$script_dir/}
 
+trap clean_up EXIT INT QUIT TERM
 parse_arguments "$@"
 configure_docker_proxy
