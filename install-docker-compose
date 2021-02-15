@@ -434,9 +434,11 @@ print_status() {
 	status=unchanged
     fi
 
-    printf '%s: %s\n' \
+    printf '%s: %s%s%s\n' \
 	   "$version_string" \
-	   "$1${filetype:+.$filetype}${status:+ ($status)}"
+	   "$1" \
+	   "${filetype:+.$filetype}" \
+	   "${status:+ ($status)}"
 }
 
 print_summary() {
