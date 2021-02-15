@@ -23,23 +23,22 @@ assert() {
 }
 
 clean_up() {
-    cd
-    eval rm -f ${tmpfiles-}
     eval rm -rf ${tmpdirs-}
+    eval rm -f ${tmpfiles-}
 }
 
 create_tmpdir() {
+    trap clean_up EXIT INT QUIT TERM
     tmpdir=$(mktemp -d "$@")
     assert [ -n "${tmpdir}" ]
     tmpdirs="${tmpdirs+$tmpdirs }'$tmpdir'"
-    trap clean_up EXIT INT QUIT TERM
 }
 
 create_tmpfile() {
+    trap clean_up EXIT INT QUIT TERM
     tmpfile=$(mktemp "$@")
     assert [ -n "${tmpfile}" ]
     tmpfiles="${tmpfiles+$tmpfiles }'$tmpfile'"
-    trap clean_up EXIT INT QUIT TERM
 }
 
 get_bin_directory() (

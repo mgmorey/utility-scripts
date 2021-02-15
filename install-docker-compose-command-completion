@@ -41,6 +41,7 @@ create_file() {
 }
 
 create_tmpfile() {
+    trap clean_up EXIT INT QUIT TERM
     tmpfile=$(mktemp "$@")
     assert [ -n "${tmpfile}" ]
     tmpfiles="${tmpfiles+$tmpfiles }'$tmpfile'"
@@ -342,7 +343,6 @@ usage_error() {
     exit 2
 }
 
-trap clean_up EXIT INT QUIT TERM
 script=$(basename "$0")
 parse_arguments "$@"
 install_command_completion

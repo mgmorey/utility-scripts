@@ -45,6 +45,7 @@ configure_docker_proxy()
 }
 
 create_tmpfile() {
+    trap clean_up EXIT INT QUIT TERM
     tmpfile=$(mktemp "$@")
     assert [ -n "${tmpfile}" ]
     tmpfiles="${tmpfiles+$tmpfiles }'$tmpfile'"
@@ -254,6 +255,5 @@ esac
 
 script_prefix=${script_dir:+$script_dir/}
 
-trap clean_up EXIT INT QUIT TERM
 parse_arguments "$@"
 configure_docker_proxy

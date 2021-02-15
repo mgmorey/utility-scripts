@@ -30,10 +30,10 @@ clean_up() {
 }
 
 create_tmpfile() {
+    trap clean_up EXIT INT QUIT TERM
     tmpfile=$(mktemp)
     assert [ -n "${tmpfile}" ]
     tmpfiles="${tmpfiles+$tmpfiles }'$tmpfile'"
-    trap clean_up EXIT INT QUIT TERM
 }
 
 get_realpath() (
