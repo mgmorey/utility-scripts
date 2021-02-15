@@ -1,0 +1,135 @@
+#!/bin/sh -eu
+
+# get-dependencies: get package names for dependencies
+# Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+}
+
+get_os_configuration() {
+    "${script_prefix}get-os-configuration" -i $ID -l "$ID_LIKE" -v $VERSION_ID
+}
+
+get_packages() {
+    configuration=$(get_os_configuration)
+
+    if [ -n "$configuration" ] ; then
+	eval $configuration
+
+	for category in $categories; do
+	    parameter=$(get_parameter "$category")
+	    eval packages="\${$parameter-}"
+
+	    if [ -n "$packages" ]; then
+		printf "%s\n" $packages
+	    fi
+	done | sort -u
+    fi
+}
+
+get_parameter() {
+    printf "%s-dependencies\n" "$1" | sed 's/-/_/g' | tr '[:lower:]' '[:upper:]'
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath || true)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+parse_arguments() {
+    while getopts i:l:v:h opt; do
+	case $opt in
+	    (i)
+		ID="$OPTARG"
+		;;
+	    (l)
+		ID_LIKE="$OPTARG"
+		;;
+	    (v)
+		VERSION_ID="$OPTARG"
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -lt 1 ]; then
+	usage_error "%s: Not enough arguments\n" "$0"
+    fi
+
+    categories="$@"
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $0 [-i ID] [-l ID_LIKE] [-v VERSION_ID] CATEGORY [CATEGORY [...]]
+       $0 -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf "%s\n" '' >&2
+    usage
+    exit 2
+}
+
+case "$0" in
+    (*/*)
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+eval $("${script_prefix}get-os-release" -x)
+parse_arguments "$@"
+get_packages
