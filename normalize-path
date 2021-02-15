@@ -64,7 +64,7 @@ normalize_path() {
 	if [ -d "$dir" ]; then
 	    dir=$($realpath "$dir")
 
-	    if ! grep '^'"$dir"'$' $tmpfile >/dev/null; then
+	    if ! grep -q '^'"$dir"'$' $tmpfile; then
 		printf '%s\n' "$dir" >>$tmpfile
 	    fi
 	fi

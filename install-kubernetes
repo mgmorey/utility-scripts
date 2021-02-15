@@ -74,7 +74,7 @@ assert() {
 }
 
 configure_network() {
-    lsmod | if ! grep $MODULE >/dev/null; then
+    lsmod | if ! grep -q $MODULE; then
 	abort "%s: %s module not present\n" "$0" "$MODULE"
     fi
 

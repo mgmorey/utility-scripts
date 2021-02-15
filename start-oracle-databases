@@ -58,7 +58,7 @@ start_database() {
     cat_sql_startup | sqlplus /nolog | \
 	tee $logfile | filter_sqlplus
 
-    if grep "^Database opened." $logfile >/dev/null 2>&1; then
+    if grep -q "^Database opened." $logfile; then
 	print_info "SID $ORACLE_SID started"
 	status=0
     else

@@ -408,7 +408,7 @@ get_versions_passed() (
 )
 
 grep_path() {
-    printf "%s\n" "$1" | awk 'BEGIN {RS=":"} {print $0}' | grep "$2" >/dev/null
+    printf "%s\n" "$1" | awk 'BEGIN {RS=":"} {print $0}' | grep -q "$2"
 }
 
 grep_version() {

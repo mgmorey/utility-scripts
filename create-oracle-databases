@@ -110,7 +110,7 @@ create_database() {
     cat_sql_create $db_name "$ORACLE_PWD" | sqlplus /nolog | \
 	tee $logfile | filter_sqlplus
 
-    if grep "^Database created." $logfile >/dev/null 2>&1; then
+    if grep -q "^Database created." $logfile; then
 	print_info "Database $db_name created"
 	print_info "Building data dictionary views"
 	cat_sql_sysdba | sqlplus /nolog >>$logfile

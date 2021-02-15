@@ -70,7 +70,7 @@ get_realpath() (
 )
 
 install_odbc_driver() {
-    if grep '^[PostgreSQL .+]$' $ODBC_INIFILE >/dev/null 2>&1; then
+    if grep -q '^[PostgreSQL .+]$' $ODBC_INIFILE; then
 	return 0
     fi
 

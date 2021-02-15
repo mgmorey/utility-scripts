@@ -148,7 +148,7 @@ install_platform() {
 	    ;;
     esac
 
-    if ! grep "\[$DRIVER_NAME\]" $DRIVER_FILE >/dev/null 2>&1; then
+    if ! grep -q "\[$DRIVER_NAME\]" $DRIVER_FILE; then
 	cat_odbc_driver_entry >$DRIVER_FILE
     fi
 }

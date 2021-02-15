@@ -57,7 +57,7 @@ stop_database() {
     cat_sql_shutdown | sqlplus /nolog | \
 	tee $logfile | filter_sqlplus
 
-    if grep "^Database dismounted." $logfile >/dev/null 2>&1; then
+    if grep -q "^Database dismounted." $logfile; then
 	print_info "SID $ORACLE_SID stopped"
 	status=0
     else
