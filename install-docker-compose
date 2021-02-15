@@ -304,13 +304,19 @@ is_valid_version() {
 }
 
 normalize_path() {
+    realpath=$(which realpath || true)
+
+    if [ -z "$realpath" ]; then
+	realpath=get_realpath
+    fi
+
     printf "%s\n" "${1-$PATH}" | tr ':' '\n' | while read dir; do
 	if [ -d "$dir" ]; then
-	    dir=$(get_realpath "$dir")
-	fi
+	    dir=$($realpath "$dir")
 
-	if ! grep -E '^'"$dir"'$' $tmpfile >/dev/null; then
-	    printf '%s\n' "$dir" >>$tmpfile
+	    if ! grep -E '^'"$dir"'$' $tmpfile >/dev/null; then
+		printf '%s\n' "$dir" >>$tmpfile
+	    fi
 	fi
     done
 
