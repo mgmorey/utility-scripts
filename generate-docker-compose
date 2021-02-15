@@ -122,7 +122,10 @@ get_default_service_name() {
 get_default_volume_name() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    printf '%s\n' "$1" | awk -F/ '{printf("%s-%s\n", $(NF - 1), $NF)}'
+    printf '%s\n' "$1" | awk -F/ '
+NF >= 3 {printf("%s-%s\n", $(NF - 1), $NF)}
+NF <= 2 {printf("%s\n", $NF)}
+'
 }
 
 get_environment_var_count() {
