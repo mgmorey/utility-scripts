@@ -54,11 +54,15 @@ get_realpath() (
 )
 
 normalize_path() {
-    create_tmpfile
+    realpath=$(which realpath || true)
+
+    if [ -z "$realpath" ]; then
+	realpath=get_realpath
+    fi
 
     printf "%s\n" "${1-$PATH}" | tr ':' '\n' | while read dir; do
 	if [ -d "$dir" ]; then
-	    dir=$(get_realpath "$dir")
+	    dir=$($realpath "$dir")
 
 	    if ! grep -E '^'"$dir"'$' $tmpfile >/dev/null; then
 		printf '%s\n' "$dir" >>$tmpfile
@@ -70,4 +74,5 @@ normalize_path() {
     printf '%s\n' ''
 }
 
+create_tmpfile
 normalize_path "$@"
