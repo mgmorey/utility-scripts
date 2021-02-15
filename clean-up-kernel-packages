@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-KERNEL_REGEX='(kernel(|-core|-default|-default-devel|-devel|-modules)|linux-image)-[0-9]+\.[0-9]+'
+KERNEL_RE='(kernel(|-core|-default|-default-devel|-devel|-modules)|linux-image)-[0-9]+\.[0-9]+'
 
 abort() {
     printf "$@" >&2
@@ -61,8 +61,7 @@ clean_up_kernel_packages() {
 }
 
 get_installed_kernel_packages() {
-    "${script_prefix}get-installed-packages" -f | \
-	egrep "$KERNEL_REGEX"
+    "${script_prefix}get-installed-packages" -f | grep -E "$KERNEL_RE"
 }
 
 get_kernel_dumps() {
