@@ -25,7 +25,7 @@ abort() {
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+    abort "%s: %s: %s not supported\n" "$script" "$PRETTY_NAME" "$*"
 }
 
 add_gpg_key() {
@@ -68,7 +68,7 @@ add_repositories() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
 }
 
 configure_daemon_group() {
@@ -217,7 +217,7 @@ get_repository_data() {
 }
 
 install_dependencies() {
-    dependencies=$(get-docker-ce-dependencies)
+    dependencies=$(get-dependencies docker-ce)
 
     if [ -n "$dependencies" ]; then
 	install-packages $dependencies
@@ -247,7 +247,7 @@ install_docker_ce() {
 	printf "Docker is not installed.\n"
     fi
 
-    selected_packages=$(get-docker-ce-packages)
+    selected_packages=$(get-packages docker-ce)
     packages=$(get_difference "$installed_packages" "$selected_packages")
 
     if [ -n "$packages" ]; then
@@ -286,7 +286,7 @@ modify_user() (
     members="$(getent group $1 | awk -F: '{print $4}')"
 
     if ! printf "%s\n" "$members" | grep -q "\<$SUDO_USER\>"; then
-	usermod -a -G $1 $SUDO_USER
+	usermod -aG $1 $SUDO_USER
     fi
 )
 
@@ -352,10 +352,10 @@ validate_platform() {
 
     case "$arch" in
 	(amd64)
-	    :
+	    true
 	    ;;
 	(*)
-	    abort "%s: %s: Architecture not supported" "$0" "$arch"
+	    abort "%s: %s: Architecture not supported" "$script" "$arch"
 	    ;;
     esac
 
@@ -406,8 +406,10 @@ validate_platform() {
 }
 
 if [ $# -gt 0 ]; then
-    usage_error "%s: Too many arguments\n" "$0"
+    usage_error "%s: Too many arguments\n" "$script"
 fi
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
