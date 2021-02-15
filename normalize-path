@@ -26,21 +26,14 @@ assert() {
 }
 
 clean_up() {
-    cd
     eval rm -f ${tmpfiles-}
-    eval rm -rf ${tmpdirs-}
 }
 
 create_tmpfile() {
     tmpfile=$(mktemp)
     assert [ -n "${tmpfile}" ]
     tmpfiles="${tmpfiles+$tmpfiles }'$tmpfile'"
-
-    if [ $# -gt 0 ]; then
-	trap "$@"
-    else
-	trap clean_up EXIT INT QUIT TERM
-    fi
+    trap clean_up EXIT INT QUIT TERM
 }
 
 get_realpath() (
@@ -66,10 +59,10 @@ normalize_path() {
     printf "%s\n" "${1-$PATH}" | tr ':' '\n' | while read dir; do
 	if [ -d "$dir" ]; then
 	    dir=$(get_realpath "$dir")
-	fi
 
-	if ! grep -E '^'"$dir"'$' $tmpfile >/dev/null; then
-	    printf '%s\n' "$dir" >>$tmpfile
+	    if ! grep -E '^'"$dir"'$' $tmpfile >/dev/null; then
+		printf '%s\n' "$dir" >>$tmpfile
+	    fi
 	fi
     done
 
