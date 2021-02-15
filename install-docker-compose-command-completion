@@ -169,6 +169,7 @@ install_command_completion() {
 	abort "%s: %s: No such directory\n" "$script" "$target_dir"
     fi
 
+    target_status=unchanged
     eval ${action}_completion
 }
 
@@ -212,7 +213,9 @@ install_file() {
 	chmod $target_mode "$1"
     fi
 
-    /bin/mv -f "$1" "$2"
+    if /bin/mv -f "$1" "$2"; then
+	target_status=installed
+    fi
 }
 
 parse_arguments() {
@@ -277,13 +280,14 @@ print_newline() {
 }
 
 print_status() {
+    status=$target_status
+
     if [ -f "$target_file" ]; then
-	status=installed
+	printf '%s%s\n' "$target_file" "${status:+ ($status)}"
     else
-	status=uninstalled
+	printf '%s: %s\n' "$target_file" "Not installed"
     fi
 
-    printf '%s\n' "$target_file${status:+ ($status)}"
 }
 
 print_summary() {
@@ -314,7 +318,9 @@ uninstall_file() {
 	printf 'Uninstalling %s\n' "$1"
     fi
 
-    /bin/rm -f "$1"
+    if /bin/rm -f "$1"; then
+	target_status=uninstalled
+    fi
 }
 
 usage() {
