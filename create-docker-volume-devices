@@ -16,50 +16,36 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-VOLUME_ARCHIVE=docker-volumes.tar
+VOLUME_GID=500
+VOLUME_UID=500
+
 VOLUME_COMMENT='Docker Volume Account'
 VOLUME_FILE=docker-volumes.txt
-VOLUME_GID=500
 VOLUME_HOME=/local/volumes
 VOLUME_SHELL=/sbin/nologin
-VOLUME_UID=500
 VOLUME_USER=docker-volume
 
 VOLUME_NAME_RE='[a-z][0-9_a-z-]+'
 VOLUME_PATH_RE="([/]${VOLUME_NAME_RE})+"
-VOLUME_RE="[.]?(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(|:${VOLUME_NAME_RE})"
+VOLUME_RE="\\.{,2}(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(:${VOLUME_NAME_RE})?"
 
 create_volume_devices() {
-    if [ -z "$template_dir" ]; then
-	template_dir=$(get_template_dir)
+    volume_file=$(find_file $VOLUME_FILE)
+    mkdir -m ug=rwx,o=rx -p "$volume_home"
+
+    if [ -n "$template_dir" -a -d "$template_dir" ]; then
+	/bin/cp -R $template_dir/* "$volume_home"
     fi
 
-    volume_file=$(find_file $VOLUME_FILE)
-
     get_volumes | while read device mount name; do
-	if ! expr "$device" : "$volume_home"'/' >/dev/null; then
-	    continue
-	elif [ -d $device ]; then
-	    continue
-	fi
-
-	mkdir -m u=rwx,go=rx -p $device
-	sub_dir=$(basename $device)
-
-	if [ -d $template_dir/$sub_dir ]; then
-	    /bin/cp -f $template_dir/$sub_dir/* $device
-	fi
+	mkdir -m ug=rwx,o=rx -p $device
     done
 
     create_volume_group
     create_volume_user
 
-    if [ -d $volume_home -a -w $volume_home ]; then
-	chown -R $VOLUME_UID:$VOLUME_GID $volume_home
-	chmod -R go+r $volume_home
-    fi
-
-    usermod -aG $volume_user ${SUDO_USER-$USER}
+    chown -R $VOLUME_UID:$VOLUME_GID "$volume_home"
+    usermod -aG $VOLUME_GID ${SUDO_USER-$USER}
 }
 
 create_volume_group() {
@@ -97,9 +83,8 @@ find_file() {
     printf '%s\n' "$1"
 }
 
-get_template_dir() {
-    user_home=$(getent passwd ${SUDO_USER-$USER} | cut -d: -f 6)
-    printf '%s\n' $user_home/docker-volumes
+get_length() {
+    printf '%s\n' "${1-}" | wc -c
 }
 
 get_volume_group_data() {
@@ -111,8 +96,16 @@ get_volume_user_data() {
 }
 
 get_volumes() {
-    sed 's|^\.\./volumes/|'"$volume_home"'/|' $volume_file | \
-	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2, $3}'
+    if [ -n "$volume_home" ]; then
+	sed -e 's|^\.\./volumes/|'"$volume_home"'/|' \
+	    -e 's|^~/|'"$volume_home"'/|' $volume_file
+    else
+	cat $volume_file
+    fi | awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2, $3}'
+}
+
+is_valid_name() {
+    expr "${1-}" : '[a-z][0-9_a-z-]*$' >/dev/null
 }
 
 parse_arguments() {
@@ -127,13 +120,13 @@ parse_arguments() {
 		volume_comment="$OPTARG"
 		;;
 	    (d)
-		volume_home=$OPTARG
+		volume_home="$OPTARG"
 		;;
 	    (n)
-		volume_user=$OPTARG
+		parse_volume_user "$OPTARG"
 		;;
 	    (t)
-		template_dir=$OPTARG
+		parse_template_dir "$OPTARG"
 		;;
 	    (h)
 		usage
@@ -152,10 +145,26 @@ parse_arguments() {
     fi
 }
 
+parse_template_dir() {
+    if [ -d "$1" ]; then
+	template_dir="$1"
+    else
+	usage_error "%s: %s: No such directory\n" "$script" "$1"
+    fi
+}
+
+parse_volume_user() {
+    if is_valid_name "$1" && [ "$(get_length "$1")" -le 16 ]; then
+	volume_user="$1"
+    else
+	usage_error "%s: %s: Invalid user name\n" "$script" "$1"
+    fi
+}
+
 print_volume_group_args() {
     printf '%s\n' \
 	   -g $VOLUME_GID \
-	   $volume_user
+	   "$volume_user"
 }
 
 print_volume_group_data() {
@@ -168,11 +177,11 @@ print_volume_group_data() {
 print_volume_user_args() {
     printf '%s\n' \
 	   -c '"'"$volume_comment"'"' \
-	   -d $volume_home \
+	   -d "$volume_home" \
 	   -g $VOLUME_GID \
 	   -s $VOLUME_SHELL \
 	   -u $VOLUME_UID \
-	   $volume_user
+	   "$volume_user"
 }
 
 print_volume_user_data() {
