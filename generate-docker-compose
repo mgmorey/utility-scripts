@@ -19,6 +19,7 @@
 AWK_VERSION=4.0.0
 FILE_VERSION=3.3
 NAMED_VOLUMES=true
+VOLUME_UID=500
 
 ENV_FILE=docker-environment.txt
 PORT_FILE=docker-ports.txt
@@ -35,7 +36,7 @@ SERVICE_NAME_RE="[a-z][0-9_a-z]*"
 SERVICE_RE="${SERVICE_NAME_RE}=.+"
 VOLUME_NAME_RE='[a-z][0-9_a-z-]*'
 VOLUME_PATH_RE="([/]${VOLUME_NAME_RE})+"
-VOLUME_RE="\\.?(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(|:${VOLUME_NAME_RE})"
+VOLUME_RE="(|\\.|\\.\\.)(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(|:${VOLUME_NAME_RE})"
 
 abort() {
     printf "$@" >&2
@@ -96,6 +97,11 @@ generate_docker_compose() {
     port_file=$(find_file $PORT_FILE)
     service_file=$(find_file $SERVICE_FILE)
     volume_file=$(find_file $VOLUME_FILE)
+
+    if [ -z "$volume_home" ]; then
+	volume_home="$(get_default_volume_home)"
+    fi
+
     print_file_version
     print_services
     print_volumes
@@ -117,6 +123,18 @@ get_default_service_name() {
     else
 	printf '%s\n' app
     fi
+}
+
+get_default_volume_home() {
+    volume_user=$(get_volume_user $VOLUME_UID)
+    volume_gid=$(get_volume_gid $volume_user)
+
+    if [ -z "$volume_gid" ]; then
+	volume_gid=$VOLUME_GID
+    fi
+
+    volume_group=$(get_volume_group $volume_gid)
+    get_volume_home $VOLUME_UID
 }
 
 get_default_volume_name() {
@@ -162,17 +180,46 @@ get_volume_count() {
     get_volumes | wc -l
 }
 
+get_volume_gid() {
+    if [ -n "${1-}" ]; then
+	getent passwd $1 | cut -d: -f 4
+    fi
+}
+
+get_volume_group() {
+    if [ -n "${1-}" ]; then
+	getent group $1 | cut -d: -f 1
+    fi
+}
+
+get_volume_home() {
+    if [ -n "${1-}" ]; then
+	getent passwd $1 | cut -d: -f 6
+    fi
+}
+
+get_volume_user() {
+    if [ -n "${1-}" ]; then
+	getent passwd $1 | cut -d: -f 1
+    fi
+}
+
 get_volumes() {
     if [ -f $volume_file ]; then
-	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2, $3}' $volume_file
+	sed 's|^\.\./volumes/|'"$volume_home"'/|' $volume_file | \
+	    awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2, $3}'
     fi
 }
 
 parse_arguments() {
     named_volumes=$NAMED_VOLUMES
+    volume_home=
 
-    while getopts nuh opt; do
+    while getopts d:nuh opt; do
 	case $opt in
+	    (d)
+		volume_home=$OPTARG
+		;;
 	    (n)
 		named_volumes=true
 		;;
@@ -327,9 +374,9 @@ validate_platform() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script
-       $script -n
-       $script -u
+Usage: $script [-d VOLUME-HOME]
+       $script -n [-d VOLUME-HOME]
+       $script -u [-d VOLUME-HOME]
        $script -h
 EOF
 }
