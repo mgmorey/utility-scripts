@@ -16,14 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-VOLUME_FILE=docker-volumes.txt
 VOLUME_GID=500
-VOLUME_HOME=/local/volumes
 VOLUME_UID=500
 
-VOLUME_NAME_RE='[a-z][0-9_a-z-]+'
-VOLUME_PATH_RE="([/]${VOLUME_NAME_RE})+"
-VOLUME_RE="[.]?(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(|:${VOLUME_NAME_RE})"
+VOLUME_HOME=/local/volumes
+
+get_length() {
+    printf '%s\n' "${1-}" | wc -c
+}
 
 get_volume_gid() {
     if [ -n "${1-}" ]; then
@@ -49,10 +49,8 @@ get_volume_user() {
     fi
 }
 
-get_volumes() {
-    if [ -e $VOLUME_FILE ]; then
-	awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2, $3}' $VOLUME_FILE
-    fi
+is_valid_name() {
+    expr "${1-}" : '[a-z][0-9_a-z-]*$' >/dev/null
 }
 
 parse_arguments() {
@@ -69,7 +67,7 @@ parse_arguments() {
 		keep_files=true
 		;;
 	    (n)
-		volume_user=$OPTARG
+		parse_volume_user "$OPTARG"
 		;;
 	    (h)
 		usage
@@ -85,6 +83,14 @@ parse_arguments() {
 
     if [ $# -gt 0 ]; then
 	usage_error "%s: Too many arguments\n" "$script"
+    fi
+}
+
+parse_volume_user() {
+    if is_valid_name "$1" && [ "$(get_length "$1")" -le 16 ]; then
+	volume_user="$1"
+    else
+	usage_error "%s: %s: Invalid user name\n" "$script" "$1"
     fi
 }
 
@@ -109,17 +115,9 @@ remove_volume_devices() {
     remove_volume_user $volume_user
     remove_volume_group $volume_group
 
-    if [ "$keep_files" = true ]; then
-	return 0
+    if [ "$keep_files" = false ]; then
+	/bin/rm -rf ${volume_home-$VOLUME_HOME}
     fi
-
-    get_volumes | while read device mount name; do
-	if expr "$device" : "$volume_home"'/' >/dev/null; then
-	    /bin/rm -rf $device
-	fi
-    done
-
-    /bin/rm -rf ${volume_home-$VOLUME_HOME}
 }
 
 remove_volume_group() {

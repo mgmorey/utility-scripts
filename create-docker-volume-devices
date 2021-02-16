@@ -31,14 +31,16 @@ VOLUME_RE="\\.{,2}(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(:${VOLUME_NAME_RE})?"
 
 create_volume_devices() {
     volume_file=$(find_file $VOLUME_FILE)
-    mkdir -m ug=rwx,o=rx -p "$volume_home"
+    mkdir -p "$volume_home"
 
     if [ -n "$template_dir" -a -d "$template_dir" ]; then
 	/bin/cp -R $template_dir/* "$volume_home"
     fi
 
     get_volumes | while read device mount name; do
-	mkdir -m ug=rwx,o=rx -p $device
+	if expr "$device" : "$volume_home"'/' >/dev/null; then
+	    mkdir -p $device
+	fi
     done
 
     create_volume_group
