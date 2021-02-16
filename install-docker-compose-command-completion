@@ -56,10 +56,7 @@ download_file() {
 	print_newline
     fi
 
-    if ! curl $curl_options "$url" -o "$1" || [ ! -s "$1" ]; then
-	print_newline
-	return 1
-    fi
+    curl $curl_options "$url" -o "$1" && [ -s "$1" ]
 }
 
 get_compose_file() {
@@ -163,8 +160,8 @@ get_url() {
 }
 
 install_command_completion() {
-    target_file=$(get_compose_file)
-    target_dir=$(dirname "$target_file")
+    target_file="${output:-$(get_compose_file)}"
+    target_dir="${output_dir:-$(dirname "$target_file")}"
 
     if [ ! -d "$target_dir" ]; then
 	abort "%s: %s: No such directory\n" "$script" "$target_dir"
@@ -190,12 +187,12 @@ install_completion() {
 
 	if download_file "$tmpfile"; then
 	    install_file "$tmpfile" "$target_file"
+	    print_summary
 	fi
     elif [ $silent = false ]; then
 	printf 'Installed as %s\n' "$target_file"
+	print_summary
     fi
-
-    print_summary
 }
 
 install_file() {
@@ -223,16 +220,20 @@ parse_arguments() {
     action=install
     bar=false
     force=false
+    output=
     prefix=
     silent=false
 
-    while getopts bfp:qsuh opt; do
+    while getopts bfo:p:qsuh opt; do
 	case $opt in
 	    (b)
 		bar=true
 		;;
 	    (f)
 		force=true
+		;;
+	    (o)
+		parse_output "$OPTARG"
 		;;
 	    (p)
 		parse_prefix "$OPTARG"
@@ -260,6 +261,18 @@ parse_arguments() {
 
     if [ $# -gt 0 ]; then
 	usage_error "%s: Too many arguments\n" "$script"
+    fi
+}
+
+parse_output() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    output_dir="$(dirname "$1")"
+
+    if [ -d "$output_dir" -a -x "$output_dir" ]; then
+	output="$1"
+    else
+	usage_error "%s: %s: Invalid output\n" "$script" "$1"
     fi
 }
 
@@ -326,8 +339,12 @@ uninstall_file() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-f] [-p PREFIX] [-s]
-       $script -u [-p PREFIX] [-s]
+Usage: $script [-b] [-f] [-s]
+       $script [-b] [-f] [-s] -o OUTPUT
+       $script [-b] [-f] [-s] -p PREFIX
+       $script -u [-s]
+       $script -u -o OUTPUT [-s]
+       $script -u -p PREFIX [-s]
        $script -q
        $script -h
 EOF

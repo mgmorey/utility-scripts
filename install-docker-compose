@@ -81,10 +81,7 @@ download_file() {
 	print_newline
     fi
 
-    if ! curl $curl_options "$url" -o "$1" || [ ! -s "$1" ]; then
-	print_newline
-	return 1
-    fi
+    curl $curl_options "$url" -o "$1" && [ -s "$1" ]
 }
 
 get_compose_file() {
@@ -239,6 +236,7 @@ install_compose() {
 	if download_file "$tmpfile"; then
 	    if install_file "$tmpfile" "$target_file"; then
 		version_after=$(get_file_version_number "$target_file")
+		print_summary
 	    fi
 	fi
     elif [ $silent = false ]; then
@@ -246,9 +244,8 @@ install_compose() {
 	       "Docker Compose" \
 	       "$version" \
 	       "$target_file"
+		print_summary
     fi
-
-    print_summary
 }
 
 install_docker_compose() {
