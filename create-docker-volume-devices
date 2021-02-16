@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+AWK_VERSION=4.0.0
 VOLUME_GID=500
 VOLUME_UID=500
 
@@ -29,9 +30,42 @@ VOLUME_NAME_RE='[a-z][0-9_a-z-]+'
 VOLUME_PATH_RE="([/]${VOLUME_NAME_RE})+"
 VOLUME_RE="\\.{,2}(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(:${VOLUME_NAME_RE})?"
 
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+}
+
+compare_versions() (
+    assert [ $# -eq 3 ]
+    assert [ -n "$3" ]
+
+    if [ -z "$1" -a -z "$2" -o "$3" -le 0 ]; then
+	printf '%s\n' 0
+    else
+	m=$(printf '%s\n' "${1:-0}" | cut -d. -f1)
+	n=$(printf '%s\n' "${2:-0}" | cut -d. -f1)
+	delta=$((m - n))
+
+	if [ "$delta" -ne 0 ]; then
+	    printf '%s\n' $delta
+	else
+	    printf '%s\n' "$(compare_versions ${1#*.} ${2#*.} $(($3 - 1)))"
+	fi
+    fi
+)
+
 create_volume_devices() {
-    volume_file=$(find_file $VOLUME_FILE)
+    validate_platform
     mkdir -p "$volume_home"
+    volume_file=$(find_file $VOLUME_FILE)
+
+    if [ ! -f $volume_file ]; then
+	abort '%s: %s: No such volume file\n' "$script" "$volume_file"
+    fi
 
     if [ -n "$template_dir" -a -d "$template_dir" ]; then
 	/bin/cp -R $template_dir/* "$volume_home"
@@ -83,6 +117,14 @@ find_file() {
     done
 
     printf '%s\n' "$1"
+}
+
+get_awk_version_number() {
+    expr "${1-}" : 'GNU Awk \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
+}
+
+get_awk_version_string() {
+    awk --version 2>/dev/null | head -n 1
 }
 
 get_length() {
@@ -195,6 +237,26 @@ print_volume_user_data() {
 	   "$volume_comment" \
 	   "$volume_home" \
 	   "$VOLUME_SHELL"
+}
+
+validate_platform() {
+    awk_version_string=$(get_awk_version_string)
+
+    if [ -n "$awk_version_string" ]; then
+	awk_version=$(get_awk_version_number "$awk_version_string")
+
+	if [ -n "$awk_version" ]; then
+	    delta=$(compare_versions "${awk_version:-0.0.0}" "$AWK_VERSION" 3)
+
+	    if [ -n "$delta" -a "$delta" -ge 0 ]; then
+		return 0
+	    fi
+	fi
+    fi
+
+    abort '%s: GNU Awk version %s or greater is required\n' \
+	  "$script" \
+	  $AWK_VERSION
 }
 
 usage() {
