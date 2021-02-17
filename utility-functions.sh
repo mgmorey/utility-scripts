@@ -22,7 +22,7 @@ activate_virtualenv() {
     assert [ -d $1/bin -a -r $1/bin/activate ]
 
     if [ "${VENV_VERBOSE-false}" = true ]; then
-	printf "%s\n" "Activating virtual environment" >&2
+	printf '%s\n' "Activating virtual environment" >&2
     fi
 
     set +u
@@ -112,7 +112,7 @@ create_virtualenv() (
 	fi
 
 	if [ "$VENV_VERBOSE" = true ]; then
-	    pathname=$(printf "%s\n" "$command" | awk '{print $1}')
+	    pathname=$(printf '%s\n' "$command" | awk '{print $1}')
 	    version=$($pathname --version)
 	    printf "Using %s %s from %s\n" "$utility" \
 		   "${version#Python }" \
@@ -150,7 +150,7 @@ find_python() (
 	abort "%s\n" "No suitable Python interpreter found"
     fi
 
-    printf "%s\n" "$python"
+    printf '%s\n' "$python"
 )
 
 find_system_python() (
@@ -214,7 +214,7 @@ find_user_python() (
 	    fi
 
 	    if [ -n "$python" ]; then
-		printf "%s\n" "$python"
+		printf '%s\n' "$python"
 		return 0
 	    fi
 	done
@@ -224,7 +224,7 @@ find_user_python() (
 	python=$($which python$version 2>/dev/null || true)
 
 	if [ -n "$python" ]; then
-	    printf "%s\n" "$python"
+	    printf '%s\n' "$python"
 	    return 0
 	fi
     done
@@ -241,7 +241,7 @@ find_user_python_installed() (
 
     for python in $pythons; do
 	if "$python" --version >/dev/null 2>&1; then
-	    printf "%s\n" "$python"
+	    printf '%s\n' "$python"
 	    return 0
 	fi
     done
@@ -346,7 +346,7 @@ get_command_helper() (
 
     for command in $scripts "${1:+$1/}python${3-} -m $module"; do
 	if $command $option >/dev/null 2>&1; then
-	    printf "%s\n" "$command"
+	    printf '%s\n' "$command"
 	    return 0
 	fi
     done
@@ -378,7 +378,7 @@ get_pip_command() {
     if [ -n "${1-}" ]; then
 	get_command -p $1 pip
     elif [ -x $HOME/.local/bin/pip ]; then
-	printf "%s\n" "$HOME/.local/bin/pip"
+	printf '%s\n' "$HOME/.local/bin/pip"
     else
 	get_command -v "$PYTHON_VERSIONS" pip
     fi
@@ -403,10 +403,10 @@ get_python_version() {
 get_sort_command() {
     case "${uname_kernel=$(uname -s)}" in
 	(NetBSD|SunOS)
-	    printf "%s\n" "sort -nrt."
+	    printf '%s\n' "sort -nrt."
 	    ;;
 	(*)
-	    printf "%s\n" "sort -Vr"
+	    printf '%s\n' "sort -Vr"
 	    ;;
     esac
 }
@@ -429,7 +429,7 @@ get_versions_passed() (
 )
 
 grep_path() {
-    printf "%s\n" "$1" | awk 'BEGIN {RS=":"} {print $0}' | grep -q "$2"
+    printf '%s\n' "$1" | awk 'BEGIN {RS=":"} {print $0}' | grep -q "$2"
 }
 
 grep_version() {
@@ -487,11 +487,11 @@ install_requirements_via_pip() (
     fi
 
     if [ "$PIP_UPGRADE_VENV" = true ]; then
-	printf "%s\n" "Upgrading virtual environment packages via pip" >&2
+	printf '%s\n' "Upgrading virtual environment packages via pip" >&2
 	install_via_pip "$pip" --upgrade pip || true
     fi
 
-    printf "%s\n" "Installing virtual environment packages via pip" >&2
+    printf '%s\n' "Installing virtual environment packages via pip" >&2
     install_via_pip "$pip" $(get_pip_requirements)
 )
 
@@ -615,6 +615,6 @@ upgrade_via_pip() (
 	abort "%s: No pip command found in PATH\n" "$0"
     fi
 
-    printf "%s\n" "Upgrading user packages via pip" >&2
+    printf '%s\n' "Upgrading user packages via pip" >&2
     install_via_pip "$pip" --upgrade --user "$@"
 )
