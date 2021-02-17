@@ -377,7 +377,7 @@ get_file_metadata() {
 get_pip_command() {
     if [ -n "${1-}" ]; then
 	get_command -p $1 pip
-    elif [ -x $HOME/.local/bin/pip ]; then
+    elif [ -x "$HOME/.local/bin/pip" ]; then
 	printf '%s\n' "$HOME/.local/bin/pip"
     else
 	get_command -v "$PYTHON_VERSIONS" pip
