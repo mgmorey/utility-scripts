@@ -43,6 +43,25 @@ check_python() {
     return 0
 }
 
+compare_versions() (
+    assert [ $# -eq 3 ]
+    assert [ -n "$3" ]
+
+    if [ -z "$1" -a -z "$2" -o "$3" -le 0 ]; then
+	printf '%s\n' 0
+    else
+	m=$(printf '%s\n' "${1:-0}" | cut -d. -f1)
+	n=$(printf '%s\n' "${2:-0}" | cut -d. -f1)
+	delta=$((m - n))
+
+	if [ "$delta" -ne 0 ]; then
+	    printf '%s\n' $delta
+	else
+	    printf '%s\n' "$(compare_versions ${1#*.} ${2#*.} $(($3 - 1)))"
+	fi
+    fi
+)
+
 create_virtualenv() (
     assert [ $# -ge 1 ]
     assert [ -n "$1" ]
@@ -235,7 +254,9 @@ generate_requirements() (
     assert [ -n "$1" ]
     pipenv=$1
     shift
-    pipenv_version=$($pipenv --version | awk '{print $3}')
+    pipenv_version_string=$(get_pipenv_version_string $pipenv)
+    pipenv_version=$(get_pipenv_version_number "$pipenv_version_string")
+    pipenv_delta=$(compare_versions "${pipenv_version:-0.0.0}" 2020.5.28 3)
 
     for file; do
 	case "$file" in
@@ -243,17 +264,11 @@ generate_requirements() (
 		options=--dev
 		;;
 	    (dev-requirements.txt)
-		case "$pipenv_version" in
-		    (2020.*.*)
-			options=--dev-only
-			;;
-		    (2018.*.*)
-			options=--dev
-			;;
-		    (*)
-			options=--dev
-			;;
-		esac
+		if [ "${pipenv_delta:-0}" -ge 0 ]; then
+		    options=--dev-only
+		else
+		    options=--dev
+		fi
 		;;
 	    (requirements.txt)
 		options=
@@ -367,8 +382,20 @@ get_pip_requirements() {
     printf -- "--requirement %s\n" ${pip_install_files:-$PIP_INSTALL_MAIN}
 }
 
-get_pip_version() {
-    "$@" --version | awk '{print $2}'
+get_pip_version_number() {
+    expr "${1-}" : 'pip \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
+}
+
+get_pip_version_string() {
+    "$1" --version 2>/dev/null
+}
+
+get_pipenv_version_number() {
+    expr "${1-}" : 'pipenv, version \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
+}
+
+get_pipenv_version_string() {
+    "$1" --version 2>/dev/null
 }
 
 get_python_version() (
@@ -495,11 +522,13 @@ install_via_pip() (
 	options=
     fi
 
-    case "$(get_pip_version $pip)" in
-	(19.3.1)
-	    options="${options:+$options }--no-warn-script-location"
-	    ;;
-    esac
+    pip_version_string=$(get_pip_version_string $pip)
+    pip_version=$(get_pip_version_number "$pip_version_string")
+    pip_delta=$(compare_versions "${pip_version:-0.0.0}" 19.3.1 3)
+
+    if [ "${pip_delta:-0}" -gt 0 ]; then
+	options="${options:+$options }--no-warn-script-location"
+    fi
 
     if [ "$PIP_INSTALL_QUIET" = true ]; then
 	options="${options:+$options }--quiet"
