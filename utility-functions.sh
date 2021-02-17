@@ -74,13 +74,13 @@ create_virtualenv() (
 	    abort "%s\n" "No suitable system Python interpreter found"
 	fi
 
-	python="$(find_user_python "$python")"
+	python=$(find_user_python "$python")
 
 	if [ -z "${python-}" ]; then
 	    abort "%s\n" "No suitable user Python interpreter found"
 	fi
 
-	version="$(get_python_version "$python")"
+	version=$(get_python_version "$python")
 
 	if ! check_python "$python" "$version"; then
 	    abort "%s\n" "No suitable Python interpreter found"
@@ -144,7 +144,7 @@ create_virtualenv_via_pipenv() (
 find_python() (
     python=$(find_system_python | awk '{print $1}')
     python=$(find_user_python "$python")
-    version="$(get_python_version "$python")"
+    version=$(get_python_version "$python")
 
     if ! check_python "$python" "$version" >&2; then
 	abort "%s\n" "No suitable Python interpreter found"
@@ -155,7 +155,7 @@ find_python() (
 
 find_system_python() (
     if [ -n "${SYSTEM_PYTHON-}" -a -n "${SYSTEM_PYTHON_VERSION-}" ]; then
-	basename="$(basename "$SYSTEM_PYTHON")"
+	basename=$(basename "$SYSTEM_PYTHON")
 	python="$SYSTEM_PYTHON"
 	suffix="${basename#python}"
 	version="$SYSTEM_PYTHON_VERSION"
@@ -170,7 +170,7 @@ find_system_pythons() (
 	for system_prefix in $SYSTEM_PREFIXES; do
 	    if [ -x $system_prefix/bin/python$suffix ]; then
 		python=$system_prefix/bin/python$suffix
-		version="$(get_python_version $python 2>/dev/null || true)"
+		version=$(get_python_version $python 2>/dev/null || true)
 
 		if [ -n "$version" ]; then
 		    printf "%s %s %s\n" "$python" "$suffix" "$version"
@@ -185,7 +185,7 @@ find_user_python() (
     python_versions=$($1 "$(which test-python-version)")
 
     if pyenv --version >/dev/null 2>&1; then
-	pyenv_root="$(pyenv root)"
+	pyenv_root=$(pyenv root)
 	which="pyenv which"
     else
 	pyenv_root=
@@ -197,7 +197,7 @@ find_user_python() (
 	    python=$(find_user_python_installed $pyenv_root $version || true)
 
 	    if [ -z "$python" -a -n "${SYSTEM_PYTHON-}" ]; then
-		basename="$(basename "$SYSTEM_PYTHON")"
+		basename=$(basename "$SYSTEM_PYTHON")
 		suffix="${basename#python}"
 
 		if [ "$suffix" = "$version" ]; then
@@ -207,7 +207,7 @@ find_user_python() (
 
 	    if [ -z "$python" ]; then
 		if install_python_version >&2; then
-		    python="$(find_user_python_installed $pyenv_root $version)"
+		    python=$(find_user_python_installed $pyenv_root $version)
 		else
 		    break
 		fi
@@ -221,7 +221,7 @@ find_user_python() (
     fi
 
     for version in $python_versions; do
-	python="$($which python$version 2>/dev/null || true)"
+	python=$($which python$version 2>/dev/null || true)
 
 	if [ -n "$python" ]; then
 	    printf "%s\n" "$python"
@@ -237,7 +237,7 @@ find_user_python_installed() (
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     sort_versions=$(get_sort_command)
-    pythons="$(ls $1/versions/$2.*/bin/python 2>/dev/null | $sort_versions)"
+    pythons=$(ls $1/versions/$2.*/bin/python 2>/dev/null | $sort_versions)
 
     for python in $pythons; do
 	if "$python" --version >/dev/null 2>&1; then
@@ -254,8 +254,7 @@ generate_requirements() (
     assert [ -n "$1" ]
     pipenv=$1
     shift
-    pipenv_version_string=$(get_pipenv_version_string $pipenv)
-    pipenv_version=$(get_pipenv_version_number "$pipenv_version_string")
+    pipenv_version=$(get_pipenv_version $pipenv 'pipenv, version ')
     pipenv_delta=$(compare_versions "${pipenv_version:-0.0.0}" 2020.5.28 3)
 
     for file; do
@@ -295,7 +294,7 @@ get_command() (
     assert [ $# -ge 1 ]
 
     if [ $# -ge 1 ] && [ "$1" = -p ]; then
-	dirname="$(dirname "$2")"
+	dirname=$(dirname "$2")
 	versions="${2#*python}"
 	shift 2
     else
@@ -355,6 +354,13 @@ get_command_helper() (
     return 1
 )
 
+get_command_version() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    "$1" --version | sed 's/^'"$2"' \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/'
+}
+
 get_file_metadata() {
     assert [ $# -eq 2 ]
 
@@ -382,29 +388,17 @@ get_pip_requirements() {
     printf -- "--requirement %s\n" ${pip_install_files:-$PIP_INSTALL_MAIN}
 }
 
-get_pip_version_number() {
-    expr "${1-}" : 'pip \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
+get_pip_version() {
+    get_command_version "${1-}" 'pip'
 }
 
-get_pip_version_string() {
-    "$1" --version 2>/dev/null
+get_pipenv_version() {
+    get_command_version "${1-}" 'pipenv, version'
 }
 
-get_pipenv_version_number() {
-    expr "${1-}" : 'pipenv, version \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
+get_python_version() {
+    get_command_version "${1-}" 'Python'
 }
-
-get_pipenv_version_string() {
-    "$1" --version 2>/dev/null
-}
-
-get_python_version() (
-    output="$("$1" --version)"
-
-    if [ -n "$output" ]; then
-	printf "%s\n" "${output#Python }"
-    fi
-)
 
 get_sort_command() {
     case "${uname_kernel=$(uname -s)}" in
@@ -449,8 +443,8 @@ grep_version() {
 }
 
 have_same_device_and_inode() (
-    stats_1="$(get_file_metadata %d:%i "$1")"
-    stats_2="$(get_file_metadata %d:%i "$2")"
+    stats_1=$(get_file_metadata %d:%i "$1")
+    stats_2=$(get_file_metadata %d:%i "$2")
 
     if [ "$stats_1" = "$stats_2" ]; then
 	return 0
@@ -522,8 +516,7 @@ install_via_pip() (
 	options=
     fi
 
-    pip_version_string=$(get_pip_version_string $pip)
-    pip_version=$(get_pip_version_number "$pip_version_string")
+    pip_version=$(get_pip_version $pip)
     pip_delta=$(compare_versions "${pip_version:-0.0.0}" 19.3.1 3)
 
     if [ "${pip_delta:-0}" -gt 0 ]; then
