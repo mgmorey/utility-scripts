@@ -359,7 +359,7 @@ get_command_version() {
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     bre=$(printf "$2\n" '\([0-9][0-9]*\(\.[0-9][0-9]*\)*\)')
-    "$1" --version | sed 's/^'"$bre"'/\1/'
+    "$1" --version | sed 's/^'"$bre"'$/\1/'
 }
 
 get_file_metadata() {
