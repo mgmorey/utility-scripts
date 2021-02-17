@@ -358,7 +358,8 @@ get_command_version() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
     assert [ -n "$2" ]
-    "$1" --version | sed 's/^'"$2"' \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/'
+    bre=$(printf "$2\n" '\([0-9][0-9]*\(\.[0-9][0-9]*\)*\)')
+    "$1" --version | sed 's/^'"$bre"'/\1/'
 }
 
 get_file_metadata() {
@@ -389,15 +390,15 @@ get_pip_requirements() {
 }
 
 get_pip_version() {
-    get_command_version "${1-}" 'pip'
+    get_command_version "${1-}" 'pip %s from .*'
 }
 
 get_pipenv_version() {
-    get_command_version "${1-}" 'pipenv, version'
+    get_command_version "${1-}" 'pipenv, version %s'
 }
 
 get_python_version() {
-    get_command_version "${1-}" 'Python'
+    get_command_version "${1-}" 'Python %s'
 }
 
 get_sort_command() {
