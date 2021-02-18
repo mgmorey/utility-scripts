@@ -269,7 +269,7 @@ get_configure_options() {
 }
 
 get_dependencies() {
-    get-packages bootstrap emacs-nox-build
+    get-packages bootstrap emacs-x11-build
 }
 
 get_include_flags() {
