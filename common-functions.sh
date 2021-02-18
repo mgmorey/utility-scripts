@@ -389,6 +389,7 @@ set_user_profile() {
 	    shell_state=$(set +o)
 	    set +eu
     	    . "$HOME/$profile"
+	    set +vx
 	    eval "$shell_state"
 	    return 0
 	fi
