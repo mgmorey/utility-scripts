@@ -1,0 +1,112 @@
+#!/bin/sh -eu
+
+# set-display-parameters: print shell commands to set display parameters
+# Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+ALL_PARAMETERS="DISPLAY LIBGL_ALWAYS_INDIRECT"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+}
+
+parse_arguments() {
+    display=
+    shell=$SHELL
+
+    while getopts d:s:h opt; do
+	case $opt in
+	    (d)
+		desktop_name=$OPTARG
+		;;
+	    (s)
+		case $(basename $OPTARG) in
+		    (*bash|ksh*|zsh)
+			shell=$OPTARG
+			;;
+		    (csh|tcsh)
+			shell=$OPTARG
+			;;
+		    (fish)
+			shell=$OPTARG
+			;;
+		    (sh)
+			shell=$OPTARG
+			;;
+		    (*)
+			usage_error "%s: %s: Unsupported shell\n" "$0" "$OPTARG"
+			;;
+		esac
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+    display="${1-}"
+}
+
+print_parameters() {
+    assert [ $# -gt 0 ]
+
+    for var; do
+	eval value=\${$var-}
+
+	if [ -z "$value" ]; then
+	    continue
+	fi
+
+	case "$(basename $shell)" in
+	    (*bash|ksh*|zsh)
+		printf 'export %s="%s"\n' "$var" "$value"
+		;;
+	    (csh|tcsh)
+		printf 'setenv %s "%s";\n' "$var" "$value"
+		;;
+	    (fish)
+		printf 'set -x %s "%s";\n' "$var" "$value"
+		;;
+	    (*)
+		printf '%s="%s"\n' "$var" "$value"
+		printf 'export %s\n' "$var"
+		;;
+	esac
+    done
+}
+
+set_display_parameters() {
+    if [ -n "WSL_DISTRO_NAME" ]; then
+	DISPLAY=$($HOME/bin/get-nameserver /etc/resolv.conf)${display:-:0.0}
+    else
+	DISPLAY=${display:-:0.0}
+    fi
+
+    LIBGL_ALWAYS_INDIRECT=1
+    print_parameters $ALL_PARAMETERS
+}
+
+parse_arguments "$@"
+set_display_parameters
