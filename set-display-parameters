@@ -101,7 +101,7 @@ print_parameters() {
 }
 
 set_display_parameters() {
-    if [ -n "WSL_DISTRO_NAME" ]; then
+    if [ -n "${WSL_DISTRO_NAME-}" ]; then
 	DISPLAY=$($HOME/bin/get-nameserver /etc/resolv.conf)
     else
 	DISPLAY=localhost
