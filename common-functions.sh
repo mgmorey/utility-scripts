@@ -386,7 +386,10 @@ set_user_profile() {
 
     for profile in $profiles; do
 	if [ -r "$HOME/$profile" ]; then
+	    shell_state=$(set +o)
+	    set +eu
     	    . "$HOME/$profile"
+	    eval "$shell_state"
 	    return 0
 	fi
     done
