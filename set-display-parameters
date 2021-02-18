@@ -29,12 +29,16 @@ assert() {
 
 parse_arguments() {
     display=
+    indirect=
     shell=$SHELL
 
-    while getopts d:s:h opt; do
+    while getopts d:i:s:h opt; do
 	case $opt in
 	    (d)
-		desktop_name=$OPTARG
+		display=$OPTARG
+		;;
+	    (i)
+		indirect=$OPTARG
 		;;
 	    (s)
 		case $(basename $OPTARG) in
@@ -66,7 +70,6 @@ parse_arguments() {
     done
 
     shift $(($OPTIND - 1))
-    display="${1-}"
 }
 
 print_parameters() {
@@ -99,12 +102,13 @@ print_parameters() {
 
 set_display_parameters() {
     if [ -n "WSL_DISTRO_NAME" ]; then
-	DISPLAY=$($HOME/bin/get-nameserver /etc/resolv.conf)${display:-:0.0}
+	DISPLAY=$($HOME/bin/get-nameserver -f /etc/resolv.conf)
     else
-	DISPLAY=${display:-:0.0}
+	DISPLAY=localhost
     fi
 
-    LIBGL_ALWAYS_INDIRECT=1
+    DISPLAY=${DISPLAY-}${display:-:0.0}
+    LIBGL_ALWAYS_INDIRECT=${indirect:-1}
     print_parameters $ALL_PARAMETERS
 }
 
