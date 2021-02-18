@@ -372,10 +372,29 @@ set_user_profile() {
 	export SHELL=$shell
     fi
 
-    profile=$("${1:+$1/}set-profile-parameters" -s ${shell:-/bin/sh})
+    case ${shell:-/bin/sh} in
+	(*/bash)
+	    profiles=".bash_profile .profile"
+	    ;;
+	(*/sh)
+	    profiles=".profile"
+	    ;;
+	(*)
+	    profiles=
+	    ;;
+    esac
 
-    if [ -n "$profile" ]; then
-	eval "$profile"
+    for profile in $profiles; do
+	if [ -r "$HOME/$profile" ]; then
+    	    . "$HOME/$profile"
+	    return 0
+	fi
+    done
+
+    params=$("${1:+$1/}set-profile-parameters" -s ${shell:-/bin/sh})
+
+    if [ -n "$params" ]; then
+	eval "$params"
     elif [ -n "$home" ]; then
 	export PATH=$(get_profile_path "$home" "$1")
     fi
