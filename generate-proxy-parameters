@@ -102,7 +102,7 @@ is_valid_middle() {
     fi
 }
 
-is_valid_no_proxy() {
+is_valid_no_proxy() (
     for word in $(split_string "$1" ","); do
 	if is_valid_fqdn_pattern "$word"; then
 	    continue
@@ -114,7 +114,7 @@ is_valid_no_proxy() {
 	    return 1
 	fi
     done
-}
+)
 
 is_valid_port() {
     if expr "${1-}" : '[1-9][0-9][0-9][0-9][0-9]$'; then
