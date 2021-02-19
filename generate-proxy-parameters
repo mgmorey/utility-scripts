@@ -20,15 +20,20 @@ KEYS="all ftp http https no"
 NO_PROXY="localhost,127.0.0.0/8"
 
 get_proxy_parameters() {
-    for key in $(printf '%s\n' $KEYS | to_upper) $KEYS; do
+    for key in $KEYS; do
 	case "$key" in
-	    (NO|no)
-		printf '%s_PROXY=%s\n' "$key" "$no_proxy"
+	    (no)
+		value=$no_proxy
 		;;
 	    (*)
-		printf '%s_PROXY=%s\n' "$key" "$proxy"
+		value=$proxy
 		;;
 	esac
+
+	var_lower=$(printf '%s_proxy' "$key" | to_lower)
+	var_upper=$(printf '%s_proxy' "$key" | to_upper)
+	printf '%s=%s\n' "$var_upper" "$value"
+	printf '%s=%s\n' "$var_lower" "$value"
     done
 }
 
@@ -40,15 +45,15 @@ is_valid_name() {
     expr "${1-}" : '[a-z][0-9a-z-]*$' >/dev/null
 }
 
-is_valid_fqdn() {
+is_valid_fqdn() (
     for word in $(split_string "$1" "."); do
 	if ! is_valid_name "$word"; then
 	    return 1
 	fi
     done
-}
+)
 
-is_valid_fqdn_pattern() {
+is_valid_fqdn_pattern() (
     index=0
     words=$(split_string "$1" ".")
 
@@ -67,7 +72,7 @@ is_valid_fqdn_pattern() {
 	    return 1
 	fi
     done
-}
+)
 
 is_valid_local_host() {
     if expr "${1-}" : 'localhost$'; then
@@ -197,6 +202,10 @@ split_string() {
     printf '%s\n' "$1" | awk -v rs="$2" '
 BEGIN {RS=rs}
 {print $0}'
+}
+
+to_lower() {
+    tr '[:upper:]' '[:lower:]'
 }
 
 to_upper() {
