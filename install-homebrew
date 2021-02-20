@@ -167,7 +167,7 @@ preinstall_homebrew() {
     case "$kernel_name" in
 	(Linux)
 	    packages="$(get-homebrew-packages)"
-	    pattern="$(get-development-pattern)"
+	    pattern="$(get-packages -s pattern development)"
 	    install-packages ${pattern:+-p "$pattern" }$packages
 	    ;;
 	(Darwin)

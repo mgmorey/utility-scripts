@@ -217,7 +217,7 @@ get_repository_data() {
 }
 
 install_dependencies() {
-    dependencies=$(get-dependencies docker-ce)
+    dependencies=$(get-packages -s dependencies docker-ce)
 
     if [ -n "$dependencies" ]; then
 	install-packages $dependencies

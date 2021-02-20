@@ -63,7 +63,7 @@ install_python_development_tools() {
     validate_platform
     configure_platform
     packages=$("${script_prefix}get-packages" python-development)
-    pattern=$("${script_prefix}get-development-pattern")
+    pattern=$("${script_prefix}get-packages" -s pattern development)
     "${script_prefix}install-packages" ${pattern:+-p "$pattern" }$packages
 
     if [ -n "${package:-}" ]; then

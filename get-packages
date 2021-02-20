@@ -22,11 +22,11 @@ abort() {
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+    abort "%s: %s: %s not supported\n" "$script" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
 }
 
 get_os_configuration() {
@@ -40,18 +40,18 @@ get_packages() {
 	eval $configuration
 
 	for category in $categories; do
-	    parameter=$(get_parameter "$category")
-	    eval packages="\${$parameter-}"
+	    parameter=$(get_parameter "$category" "${suffix:-packages}")
+	    eval packages=\${$parameter-}
 
 	    if [ -n "$packages" ]; then
-		printf "%s\n" $packages
+		printf '%s\n' $packages
 	    fi
 	done | sort -u
     fi
 }
 
 get_parameter() {
-    printf "%s-packages\n" "$1" | sed 's/-/_/g' | tr '[:lower:]' '[:upper:]'
+    printf "%s-%s\n" "$1" "$2" | tr '[:lower:]' '[:upper:]' | tr '-' '_'
 }
 
 get_realpath() (
@@ -63,25 +63,30 @@ get_realpath() (
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
+		printf '%s\n' "$file"
 	    else
-		printf "%s\n" "$PWD/${file#./}"
+		printf '%s\n' "$PWD/${file#./}"
 	    fi
 	done
     fi
 )
 
 parse_arguments() {
-    while getopts i:l:v:h opt; do
+    suffix=
+
+    while getopts i:l:d:s:v:h opt; do
 	case $opt in
 	    (i)
-		ID="$OPTARG"
+		ID=$OPTARG
 		;;
 	    (l)
-		ID_LIKE="$OPTARG"
+		ID_LIKE=$OPTARG
+		;;
+	    (s)
+		suffix=$OPTARG
 		;;
 	    (v)
-		VERSION_ID="$OPTARG"
+		VERSION_ID=$OPTARG
 		;;
 	    (h)
 		usage
@@ -96,7 +101,7 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -lt 1 ]; then
-	usage_error "%s: Not enough arguments\n" "$0"
+	usage_error "%s: Not enough arguments\n" "$script"
     fi
 
     categories="$@"
@@ -104,8 +109,8 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $0 [-i ID] [-l ID_LIKE] [-v VERSION_ID] CATEGORY [CATEGORY [...]]
-       $0 -h
+Usage: $script [-i ID] [-l LIKE] [-s SUFFIX] [-v VERSION] CATEGORY [...]
+       $script -h
 EOF
 }
 
@@ -114,10 +119,12 @@ usage_error() {
 	printf "$@" >&2
     fi
 
-    printf "%s\n" '' >&2
+    printf '%s\n' '' >&2
     usage
     exit 2
 }
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
