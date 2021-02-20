@@ -372,11 +372,14 @@ set_user_profile() {
 	export SHELL=$shell
     fi
 
-    case ${shell:-/bin/sh} in
-	(*/bash)
+    case "$(basename ${shell:-/bin/sh})" in
+	(bash)
 	    profiles=".bash_profile .profile"
 	    ;;
-	(*/sh)
+	(zsh)
+	    profiles=".zprofile"
+	    ;;
+	([k]sh)
 	    profiles=".profile"
 	    ;;
 	(*)

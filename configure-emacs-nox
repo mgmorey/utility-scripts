@@ -466,6 +466,9 @@ validate_platform() {
 	(illumos)
 	    return
 	    ;;
+	(macos)
+	    return
+	    ;;
 	(netbsd)
 	    return
 	    ;;
