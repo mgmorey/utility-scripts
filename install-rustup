@@ -47,7 +47,7 @@ install_rustup() {
 	return
     fi
 
-    install-packages $(get-bootstrap-packages)
+    install-packages $(get-packages bootstrap)
     run_unpriv curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 }
 

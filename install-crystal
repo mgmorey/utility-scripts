@@ -73,7 +73,7 @@ install_crystal() {
 }
 
 preinstall_crystal() {
-    install-packages $(get-bootstrap-packages)
+    install-packages $(get-packages bootstrap)
 
     for id in $ID $ID_LIKE; do
 	case "$id" in

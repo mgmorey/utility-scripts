@@ -37,7 +37,7 @@ assert() {
 }
 
 get_homebrew_packages() {
-    get-bootstrap-packages
+    get-packages bootstrap
     packages=
 
     case "$ID" in
