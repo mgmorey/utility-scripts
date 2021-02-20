@@ -163,10 +163,10 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
-	(illumos)
+	(freebsd)
 	    return
 	    ;;
-	(freebsd)
+	(illumos)
 	    return
 	    ;;
 	(solaris)
