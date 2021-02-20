@@ -58,20 +58,7 @@ get_configuration_basename() {
 		basename=$ID-$VERSION_ID
 		;;
 	    (ubuntu)
-		case "$VERSION_ID" in
-		    (18.04)
-			basename=$ID-$VERSION_ID
-			;;
-		    (20.04)
-			basename=$ID-$VERSION_ID
-			;;
-		    (20.10)
-			basename=$ID-$VERSION_ID
-			;;
-		    (*)
-			break
-			;;
-		esac
+		basename=$ID-$VERSION_ID
 		;;
 	    (freebsd)
 		basename=$ID-${VERSION_ID%-p*}
