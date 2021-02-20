@@ -173,14 +173,14 @@ configure_baseline() {
 	    configure_unix_bsd
 
 	    case "$VERSION_ID" in
-		(11.3-*)
+		(11.*)
 		    configure_unix_freebsd_11
 		    ;;
-		(12.1-*)
+		(12.*)
 		    configure_unix_freebsd_12
 		    ;;
-		(12.2-*)
-		    configure_unix_freebsd_12
+		(13.*)
+		    configure_unix_freebsd_13
 		    ;;
 		(*)
 		    abort_not_supported Release
@@ -580,6 +580,10 @@ configure_unix_freebsd_11() {
 }
 
 configure_unix_freebsd_12() {
+    configure_unix_freebsd
+}
+
+configure_unix_freebsd_13() {
     configure_unix_freebsd
 }
 

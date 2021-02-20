@@ -184,10 +184,13 @@ validate_platform() {
 	    ;;
 	(freebsd)
 	    case "$VERSION_ID" in
-		(11.3-*)
+		(11.*)
 		    true
 		    ;;
-		(12.1-*)
+		(12.*)
+		    true
+		    ;;
+		(13.*)
 		    true
 		    ;;
 		(*)
