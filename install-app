@@ -130,6 +130,7 @@ get_realpath() (
 )
 
 install_app() {
+    umask 0022
     configure_baseline
 
     if [ "$(is_uwsgi_packaged)" = false ]; then
