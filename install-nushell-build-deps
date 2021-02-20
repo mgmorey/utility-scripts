@@ -48,7 +48,7 @@ get_realpath() (
 
 install_nushell_build_deps() {
     validate_platform
-    install-packages $(get-development-packages) $(get-nushell-build-packages)
+    install-packages $(get-packages development) $(get-nushell-build-packages)
 }
 
 validate_platform() {
