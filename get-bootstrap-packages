@@ -20,8 +20,7 @@ DEBIAN_10_PKGS="bash curl wget"
 
 FEDORA_PKGS="bash curl wget"
 
-FREEBSD_11_PKGS="bash curl wget"
-FREEBSD_12_PKGS="bash curl wget"
+FREEBSD_PKGS="bash curl wget"
 
 ILLUMOS_PKGS="shell/bash"
 
@@ -99,14 +98,7 @@ get_bootstrap_packages() {
 	    esac
 	    ;;
 	(freebsd)
-	    case "$VERSION_ID" in
-		(11.3-*)
-		    packages=$FREEBSD_11_PKGS
-		    ;;
-		(12.1-*)
-		    packages=$FREEBSD_12_PKGS
-		    ;;
-	    esac
+	    packages=$FREEBSD_PKGS
 	    ;;
 	(illumos)
 	    packages=$ILLUMOS_PKGS
