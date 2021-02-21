@@ -1,0 +1,184 @@
+#!/bin/sh -eu
+
+# export-parameters: print shell commands to export parameters
+# Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+}
+
+export_parameters() {
+    print_parameters $parameters
+}
+
+get_realpath() (
+    assert [ $# -ge 1 ]
+    realpath=$(which realpath || true)
+
+    if [ -n "$realpath" ]; then
+	$realpath "$@"
+    else
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf '%s\n' "$file"
+	    else
+		printf '%s\n' "$PWD/${file#./}"
+	    fi
+	done
+    fi
+)
+
+is_valid_parameter() {
+    expr "${1-}" : '[A-Z_a-z][0-9A-Z_a-z]*$' >/dev/null
+}
+
+parse_arguments() {
+    shell=$SHELL
+
+    while getopts s:nh opt; do
+	case $opt in
+	    (s)
+		parse_shell "$OPTARG"
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    for parameter; do
+	parse_parameter "$parameter"
+    done
+}
+
+parse_parameter() {
+    if is_valid_parameter "$1"; then
+	parameters=${parameters:+$parameters }"$1"
+    else
+	usage_error "%s: %s: Invalid parameter name\n" "$script" "$1"
+    fi
+}
+
+parse_shell() {
+    case $(basename "${1%.exe}") in
+	(*bash|ksh*|zsh)
+	    shell=${1%.exe}
+	    ;;
+	(csh|tcsh)
+	    shell=${1%.exe}
+	    ;;
+	(fish)
+	    shell=${1%.exe}
+	    ;;
+	(sh)
+	    shell=${1%.exe}
+	    ;;
+	(*)
+	    usage_error "%s: %s: Unsupported shell\n" "$script" "$1"
+	    ;;
+    esac
+}
+
+print_parameter() {
+    assert [ $# -gt 0 ]
+    assert [ -n "$1" ]
+
+    if [ -z "${2-}" ]; then
+	continue
+    else
+	case "$(basename ${shell%.exe})" in
+	    (*bash|ksh*|zsh)
+		printf 'export %s="%s"\n' "$1" "$2"
+		;;
+	    (csh|tcsh)
+		printf 'setenv %s "%s";\n' "$1" "$2"
+		;;
+	    (fish)
+		printf 'set -x %s "%s";\n' "$1" "$2"
+		;;
+	    (*)
+		printf '%s="%s"\n' "$1" "$2"
+		printf 'export %s\n' "$1"
+		;;
+	esac
+    fi
+}
+
+print_parameters() {
+    if [ $# -gt 0 ]; then
+	for var; do
+	    eval value=\${$var-}
+	    print_parameter "$var" "$value"
+	done
+    else
+	print_prompt
+
+	while IFS='=' read var value; do
+	    print_parameter "$var" "$value"
+	done
+    fi
+}
+
+print_prompt() {
+    cat <<EOF >&2
+Enter parameters, one per line, in the form VARIABLE=VALUE.
+Type ^D to submit or ^C to quit:
+EOF
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script: [-s SHELL] [PARAMETER [...]]
+       $script: -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+parse_arguments "$@"
+export_parameters
