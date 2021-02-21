@@ -48,7 +48,7 @@ get_package_install_options() {
             (centos)
                 add_option_confirm
 
-                if [ "$VERSION_ID" -ge 8 ]; then
+                if [ "${VERSION_ID%.*}" -ge 8 ]; then
                     add_options --nobest
                 else
                     add_options --skip-broken
@@ -73,7 +73,7 @@ get_package_install_options() {
             (rhel|ol)
                 add_option_confirm
 
-                if [ "$VERSION_ID" -ge 8 ]; then
+                if [ "${VERSION_ID%.*}" -ge 8 ]; then
                     add_options --nobest
                 else
                     add_options --skip-broken
