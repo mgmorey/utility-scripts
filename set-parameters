@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
 }
 
 get_realpath() (
@@ -34,9 +34,9 @@ get_realpath() (
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
+		printf '%s\n' "$file"
 	    else
-		printf "%s\n" "$PWD/${file#./}"
+		printf '%s\n' "$PWD/${file#./}"
 	    fi
 	done
     fi
@@ -48,7 +48,7 @@ parse_arguments() {
     while getopts s:h opt; do
 	case $opt in
 	    (s)
-		shell=$OPTARG
+		parse_shell "$OPTARG"
 		;;
 	    (h)
 		usage
@@ -61,12 +61,35 @@ parse_arguments() {
     done
 
     shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error "%s: Too many arguments\n" "$script"
+    fi
+}
+
+parse_shell() {
+    case $(basename "${1%.exe}") in
+	(*bash|ksh*|zsh)
+	    shell=${1%.exe}
+	    ;;
+	(csh|tcsh)
+	    shell=${1%.exe}
+	    ;;
+	(fish)
+	    shell=${1%.exe}
+	    ;;
+	(sh)
+	    shell=${1%.exe}
+	    ;;
+	(*)
+	    usage_error "%s: %s: Unsupported shell\n" "$script" "$1"
+	    ;;
+    esac
 }
 
 set_parameters() {
-    validate_arguments
-    "${script_prefix}set-askpass-parameters" -s $shell || true
     "${script_prefix}set-profile-parameters" -s $shell || true
+    "${script_prefix}set-askpass-parameters" -s $shell || true
     "${script_prefix}set-proxy-parameters" -s $shell || true
 }
 
@@ -82,30 +105,12 @@ usage_error() {
 	printf "$@" >&2
     fi
 
-    printf "%s\n" '' >&2
+    printf '%s\n' '' >&2
     usage
     exit 2
 }
 
-validate_arguments() {
-    case $(basename ${shell%.exe}) in
-	(*bash|ksh*|zsh)
-	    true
-	    ;;
-	(csh|tcsh)
-	    true
-	    ;;
-	(fish)
-	    true
-	    ;;
-	(sh)
-	    true
-	    ;;
-	(*)
-	    abort "%s: %s: Shell not supported\n" "$0" "$shell"
-	    ;;
-    esac
-}
+script=$(basename "$0")
 
 case "$0" in
     (*/*)

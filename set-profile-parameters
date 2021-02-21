@@ -213,11 +213,11 @@ include_pkgconf_directories() {
     if is_to_be_included $pkgdir "${PKG_CONFIG_PATH-}"; then
 	case "$1" in
 	    (/opt/csw)
-	    	true
-	    	;;
+		true
+		;;
 	    (/opt/local)
-	    	PKG_CONFIG_PATH="${PKG_CONFIG_PATH:+$PKG_CONFIG_PATH:}$pkgdir"
-	    	;;
+		PKG_CONFIG_PATH="${PKG_CONFIG_PATH:+$PKG_CONFIG_PATH:}$pkgdir"
+		;;
 	    (*)
 		PKG_CONFIG_PATH="$pkgdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 		;;
@@ -275,30 +275,16 @@ is_to_be_included() {
 }
 
 parse_arguments() {
+    no_export=false
     shell=$SHELL
 
-    while getopts s:h opt; do
+    while getopts ns:h opt; do
 	case $opt in
+	    (n)
+		no_export=true
+		;;
 	    (s)
-		case $(basename $OPTARG) in
-		    (*bash|ksh*|zsh)
-			shell=$OPTARG
-			;;
-		    (csh|tcsh)
-			shell=$OPTARG
-			;;
-		    (fish)
-			shell=$OPTARG
-			;;
-		    (sh)
-			shell=$OPTARG
-			;;
-		    (*)
-			usage_error "%s: %s: Unsupported shell\n" \
-				    "$script" \
-				    "$OPTARG"
-			;;
-		esac
+		parse_shell "$OPTARG"
 		;;
 	    (h)
 		usage
@@ -311,6 +297,57 @@ parse_arguments() {
     done
 
     shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error "%s: Too many arguments\n" "$script"
+    fi
+}
+
+parse_shell() {
+    case $(basename "${1%.exe}") in
+	(*bash|ksh*|zsh)
+	    shell=${1%.exe}
+	    ;;
+	(csh|tcsh)
+	    shell=${1%.exe}
+	    ;;
+	(fish)
+	    shell=${1%.exe}
+	    ;;
+	(sh)
+	    shell=${1%.exe}
+	    ;;
+	(*)
+	    usage_error "%s: %s: Unsupported shell\n" "$script" "$1"
+	    ;;
+    esac
+}
+
+print_parameter() {
+    assert [ $# -gt 0 ]
+    assert [ -n "$1" ]
+
+    if [ -z "${2-}" ]; then
+	continue
+    elif [ "$no_export" = true ]; then
+	printf '%s=%s\n' "$1" "$2"
+    else
+	case "$(basename ${shell%.exe})" in
+	    (*bash|ksh*|zsh)
+		printf 'export %s="%s"\n' "$1" "$2"
+		;;
+	    (csh|tcsh)
+		printf 'setenv %s "%s";\n' "$1" "$2"
+		;;
+	    (fish)
+		printf 'set -x %s "%s";\n' "$1" "$2"
+		;;
+	    (*)
+		printf '%s="%s"\n' "$1" "$2"
+		printf 'export %s\n' "$1"
+		;;
+	esac
+    fi
 }
 
 print_parameters() {
@@ -318,26 +355,7 @@ print_parameters() {
 
     for var; do
 	eval value=\${$var-}
-
-	if [ -z "$value" ]; then
-	    continue
-	fi
-
-	case "$(basename $shell)" in
-	    (*bash|ksh*|zsh)
-		printf 'export %s="%s"\n' "$var" "$value"
-		;;
-	    (csh|tcsh)
-		printf 'setenv %s "%s";\n' "$var" "$value"
-		;;
-	    (fish)
-		printf 'set -x %s "%s";\n' "$var" "$value"
-		;;
-	    (*)
-		printf '%s="%s"\n' "$var" "$value"
-		printf 'export %s\n' "$var"
-		;;
-	esac
+	print_parameter "$var" "$value"
     done
 }
 
@@ -362,6 +380,7 @@ set_profile_parameters() {
 usage() {
     cat <<-EOF >&2
 Usage: $script: [-s SHELL]
+       $script: -n
        $script: -h
 EOF
 }

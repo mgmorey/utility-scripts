@@ -24,7 +24,17 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+}
+
+configure_platform() {
+    askpass_helper=$(get_askpass_helper | awk '! /^#/')
+}
+
+get_all_parameters() {
+    for command in ${commands:-$COMMANDS}; do
+	printf '%s\n' ${command}_askpass | to_upper
+    done
 }
 
 get_askpass_helper() {
@@ -41,41 +51,30 @@ get_realpath() (
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
+		printf '%s\n' "$file"
 	    else
-		printf "%s\n" "$PWD/${file#./}"
+		printf '%s\n' "$PWD/${file#./}"
 	    fi
 	done
     fi
 )
 
 parse_arguments() {
+    commands=
     desktop_name=
+    no_export=false
     shell=$SHELL
 
-    while getopts d:s:h opt; do
+    while getopts d:ns:h opt; do
 	case $opt in
 	    (d)
 		desktop_name=$OPTARG
 		;;
+	    (n)
+		no_export=true
+		;;
 	    (s)
-		case $(basename $OPTARG) in
-		    (*bash|ksh*|zsh)
-			shell=$OPTARG
-			;;
-		    (csh|tcsh)
-			shell=$OPTARG
-			;;
-		    (fish)
-			shell=$OPTARG
-			;;
-		    (sh)
-			shell=$OPTARG
-			;;
-		    (*)
-			usage_error "%s: %s: Unsupported shell\n" "$0" "$OPTARG"
-			;;
-		esac
+		parse_shell "$OPTARG"
 		;;
 	    (h)
 		usage
@@ -90,20 +89,75 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     for command; do
-	case "$command" in
-	    (git|ssh|sudo)
-		true
+	parse_command "$command"
+    done
+}
+
+parse_command() {
+    case "$1" in
+	(git|ssh|sudo)
+	    commands=${commands:+$commands }"$1"
+	    ;;
+	(*)
+	    usage_error "%s: %s: Unsupported command\n" "$script" "$1"
+    esac
+}
+
+parse_shell() {
+    case $(basename "${1%.exe}") in
+	(*bash|ksh*|zsh)
+	    shell=${1%.exe}
+	    ;;
+	(csh|tcsh)
+	    shell=${1%.exe}
+	    ;;
+	(fish)
+	    shell=${1%.exe}
+	    ;;
+	(sh)
+	    shell=${1%.exe}
+	    ;;
+	(*)
+	    usage_error "%s: %s: Unsupported shell\n" "$script" "$1"
+	    ;;
+    esac
+}
+
+print_parameter() {
+    assert [ $# -gt 0 ]
+    assert [ -n "$1" ]
+
+    if [ -z "${2-}" ]; then
+	continue
+    elif [ "$no_export" = true ]; then
+	printf '%s=%s\n' "$1" "$2"
+    else
+	case "$(basename ${shell%.exe})" in
+	    (*bash|ksh*|zsh)
+		printf 'export %s="%s"\n' "$1" "$2"
+		;;
+	    (csh|tcsh)
+		printf 'setenv %s "%s";\n' "$1" "$2"
+		;;
+	    (fish)
+		printf 'set -x %s "%s";\n' "$1" "$2"
 		;;
 	    (*)
-		usage_error "%s: %s: Unsupported command\n" "$0" "$command"
+		printf '%s="%s"\n' "$1" "$2"
+		printf 'export %s\n' "$1"
+		;;
 	esac
-    done
+    fi
+}
 
-    commands="$*"
+print_parameters() {
+    for var in $(get_all_parameters); do
+	print_parameter "$var" "$askpass_helper"
+    done
 }
 
 set_askpass_parameters() {
-    askpass_helper=$(get_askpass_helper | awk '! /^#/')
+    configure_platform
 
     if [ -z "$askpass_helper" ]; then
 	exit 0
@@ -111,34 +165,7 @@ set_askpass_parameters() {
 	exit 0
     fi
 
-    for command in ${commands:-$COMMANDS}; do
-	case "$command" in
-	    (git|ssh|sudo)
-		var=$(printf "%s\n" ${command}_askpass | to_upper)
-
-		case $(basename ${shell:-${SHELL%.exe}}) in
-		    (*bash|ksh*|zsh)
-			printf 'export %s="%s"\n' "$var" "$askpass_helper"
-			;;
-		    (csh|tcsh)
-			printf 'setenv %s "%s";\n' "$var" "$askpass_helper"
-			;;
-		    (fish)
-			printf 'set -x %s "%s"\n' "$var" "$askpass_helper"
-			;;
-		    (sh)
-			printf '%s="%s"\n' "$var" "$askpass_helper"
-			printf 'export %s\n' "$var"
-			;;
-		    (*)
-			true
-			;;
-		esac
-		;;
-	    (*)
-		abort "%s: %s: Unsupported command\n" "$0" "$command"
-	esac
-    done
+    print_parameters $(get_all_parameters)
 }
 
 to_upper() {
@@ -147,8 +174,9 @@ to_upper() {
 
 usage() {
     cat <<EOF >&2
-Usage: $0: [-s SHELL]
-       $0: -h
+Usage: $script: [-s SHELL] [COMMAND [...]]
+       $script: -n [COMMAND [...]]
+       $script: -h
 EOF
 }
 
@@ -157,10 +185,12 @@ usage_error() {
 	printf "$@" >&2
     fi
 
-    printf "%s\n" '' >&2
+    printf '%s\n' '' >&2
     usage
     exit 2
 }
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)

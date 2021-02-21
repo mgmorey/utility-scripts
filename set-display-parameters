@@ -30,9 +30,10 @@ assert() {
 parse_arguments() {
     display=
     indirect=
+    no_export=false
     shell=$SHELL
 
-    while getopts d:i:s:h opt; do
+    while getopts d:i:ns:h opt; do
 	case $opt in
 	    (d)
 		display=$OPTARG
@@ -40,24 +41,11 @@ parse_arguments() {
 	    (i)
 		indirect=$OPTARG
 		;;
+	    (n)
+		no_export=true
+		;;
 	    (s)
-		case $(basename $OPTARG) in
-		    (*bash|ksh*|zsh)
-			shell=$OPTARG
-			;;
-		    (csh|tcsh)
-			shell=$OPTARG
-			;;
-		    (fish)
-			shell=$OPTARG
-			;;
-		    (sh)
-			shell=$OPTARG
-			;;
-		    (*)
-			usage_error "%s: %s: Unsupported shell\n" "$0" "$OPTARG"
-			;;
-		esac
+		parse_shell "$OPTARG"
 		;;
 	    (h)
 		usage
@@ -70,6 +58,57 @@ parse_arguments() {
     done
 
     shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error "%s: Too many arguments\n" "$script"
+    fi
+}
+
+parse_shell() {
+    case $(basename "${1%.exe}") in
+	(*bash|ksh*|zsh)
+	    shell=${1%.exe}
+	    ;;
+	(csh|tcsh)
+	    shell=${1%.exe}
+	    ;;
+	(fish)
+	    shell=${1%.exe}
+	    ;;
+	(sh)
+	    shell=${1%.exe}
+	    ;;
+	(*)
+	    usage_error "%s: %s: Unsupported shell\n" "$script" "$1"
+	    ;;
+    esac
+}
+
+print_parameter() {
+    assert [ $# -gt 0 ]
+    assert [ -n "$1" ]
+
+    if [ -z "${2-}" ]; then
+	continue
+    elif [ "$no_export" = true ]; then
+	printf '%s=%s\n' "$1" "$2"
+    else
+	case "$(basename ${shell%.exe})" in
+	    (*bash|ksh*|zsh)
+		printf 'export %s="%s"\n' "$1" "$2"
+		;;
+	    (csh|tcsh)
+		printf 'setenv %s "%s";\n' "$1" "$2"
+		;;
+	    (fish)
+		printf 'set -x %s "%s";\n' "$1" "$2"
+		;;
+	    (*)
+		printf '%s="%s"\n' "$1" "$2"
+		printf 'export %s\n' "$1"
+		;;
+	esac
+    fi
 }
 
 print_parameters() {
@@ -77,40 +116,40 @@ print_parameters() {
 
     for var; do
 	eval value=\${$var-}
-
-	if [ -z "$value" ]; then
-	    continue
-	fi
-
-	case "$(basename $shell)" in
-	    (*bash|ksh*|zsh)
-		printf 'export %s="%s"\n' "$var" "$value"
-		;;
-	    (csh|tcsh)
-		printf 'setenv %s "%s";\n' "$var" "$value"
-		;;
-	    (fish)
-		printf 'set -x %s "%s";\n' "$var" "$value"
-		;;
-	    (*)
-		printf '%s="%s"\n' "$var" "$value"
-		printf 'export %s\n' "$var"
-		;;
-	esac
+	print_parameter "$var" "$value"
     done
 }
 
 set_display_parameters() {
     if [ -n "${WSL_DISTRO_NAME-}" ]; then
-	DISPLAY=$($HOME/bin/get-nameserver /etc/resolv.conf)
+	host=$($HOME/bin/get-nameserver /etc/resolv.conf)
     else
-	DISPLAY=localhost
+	host=localhost
     fi
 
-    DISPLAY=${DISPLAY-}${display:-:0.0}
+    DISPLAY=${display_host-}${display:-:0.0}
     LIBGL_ALWAYS_INDIRECT=${indirect:-1}
     print_parameters $ALL_PARAMETERS
 }
 
+usage() {
+    cat <<EOF >&2
+Usage: $script: [-d DISPLAY] [-i] [-s SHELL]
+       $script: -n [-d DISPLAY] [-i]
+       $script: -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+script=$(basename "$0")
 parse_arguments "$@"
 set_display_parameters
