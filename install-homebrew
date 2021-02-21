@@ -26,11 +26,11 @@ abort() {
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+    abort "%s: %s: %s not supported\n" "$script" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
 }
 
 configure_platform() {
@@ -45,6 +45,11 @@ configure_platform() {
     done
 }
 
+get_packages() {
+    get-packages bootstrap
+    get-packages -s dependencies homebrew
+}
+
 get_realpath() (
     assert [ $# -ge 1 ]
     realpath=$(which realpath || true)
@@ -54,9 +59,9 @@ get_realpath() (
     else
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
+		printf '%s\n' "$file"
 	    else
-		printf "%s\n" "$PWD/${file#./}"
+		printf '%s\n' "$PWD/${file#./}"
 	    fi
 	done
     fi
@@ -70,12 +75,12 @@ install_homebrew() {
     if [ -n "$brew" ]; then
 	if [ "$kernel_name" = Linux -a "$brew" = /usr/bin/brew ]; then
 	    if [ -x $HOME/.linuxbrew ]; then
-		return
+		return 0
 	    elif [ -x /home/linuxbrew ]; then
-		return
+		return 0
 	    fi
 	else
-	    return
+	    return 0
 	fi
     fi
 
@@ -166,8 +171,8 @@ install_linuxbrew() {
 preinstall_homebrew() {
     case "$kernel_name" in
 	(Linux)
-	    packages="$(get-homebrew-packages)"
-	    pattern="$(get-packages -s pattern development)"
+	    packages=$(get_packages | sort -u)
+	    pattern=$(get-packages -s pattern development)
 	    install-packages ${pattern:+-p "$pattern" }$packages
 	    ;;
 	(Darwin)
@@ -245,8 +250,10 @@ validate_platform() {
     abort_not_supported "Operating system"
 }
 
+script=$(basename "$0")
+
 if [ $# -gt 0 ]; then
-    usage_error "%s: Too many arguments\n" "$0"
+    usage_error "%s: Too many arguments\n" "$script"
 fi
 
 case "$0" in
