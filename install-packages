@@ -298,7 +298,7 @@ parse_arguments() {
 }
 
 parse_pattern() {
-    pattern=$(printf '%s\n' "$1" | sed 's/@development/Development Tools/')
+    pattern=$(printf '%s\n' "$1" | sed 's/^@development$/Development Tools/')
 }
 
 usage() {
