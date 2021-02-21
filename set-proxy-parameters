@@ -124,9 +124,8 @@ set_proxy_parameters() {
     configure_platform
 
     if [ -n "$all_proxy" ]; then
-	("${script_prefix}generate-proxy-parameters" \
-	     ${no_proxy:+-n $no_proxy} \
-	     $all_proxy || true) | \
+	"${script_prefix}generate-proxy-parameters" \
+	    ${no_proxy:+-n $no_proxy} $all_proxy | \
 	    print_parameters
     fi
 }
