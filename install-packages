@@ -281,7 +281,7 @@ parse_arguments() {
 		options=$OPTARG
 		;;
 	    (p)
-		pattern=$OPTARG
+		parse_pattern "$OPTARG"
 		;;
 	    (h)
 		usage
@@ -295,6 +295,10 @@ parse_arguments() {
 
     shift $(($OPTIND - 1))
     packages="$@"
+}
+
+parse_pattern() {
+    pattern=$(printf '%s\n' "$1" | sed 's/@development/Development Tools/')
 }
 
 usage() {
