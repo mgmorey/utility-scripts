@@ -16,10 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-ALL_FILES="$HOME/.proxy $HOME/.no-proxy"
-
-LOWER_PARAMETERS="ftp_proxy http_proxy https_proxy no_proxy"
-UPPER_PARAMETERS="FTP_PROXY HTTP_PROXY HTTPS_PROXY NO_PROXY"
+ALL_PROXY_FILE="$HOME/.proxy"
+NO_PROXY_FILE="$HOME/.no-proxy"
 
 abort() {
     printf "$@" >&2
@@ -31,37 +29,16 @@ assert() {
 }
 
 configure_platform() {
-    for file in $ALL_FILES; do
-	contents=$(get_file_contents "$file")
-
-	if [ -z "$contents" ]; then
-	    continue
-	fi
-
-	case "$(basename "$file")" in
-	    (.proxy)
-		FTP_PROXY=$contents
-		HTTP_PROXY=$contents
-		HTTPS_PROXY=$contents
-		ftp_proxy=$contents
-		http_proxy=$contents
-		https_proxy=$contents
-		;;
-	    (.no-proxy)
-		NO_PROXY=$contents
-		no_proxy=$contents
-		;;
-	esac
-    done
-}
-
-get_all_parameters() {
-    printf "%s\n" $UPPER_PARAMETERS $LOWER_PARAMETERS
+    all_proxy=$(get_file_contents "$ALL_PROXY_FILE")
+    no_proxy=$(get_file_contents "$NO_PROXY_FILE")
 }
 
 get_file_contents() {
-    if [ -r "$file" ]; then
-	cat "$file"
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    if [ -r "$1" ]; then
+	cat "$1"
     fi
 }
 
@@ -120,18 +97,14 @@ parse_arguments() {
 }
 
 print_parameters() {
-    assert [ $# -gt 0 ]
-
-    for var; do
-	eval value=\${$var-}
-
+    while IFS='=' read var value; do
 	if [ -z "$value" ]; then
 	    continue
 	fi
 
 	case "$(basename $shell)" in
 	    (*bash|ksh*|zsh)
-		printf 'export %s="%s"\n' "$var" "$value"
+		printf 'export %s=%s"\n' "$var" "$value"
 		;;
 	    (csh|tcsh)
 		printf 'setenv %s "%s";\n' "$var" "$value"
@@ -149,7 +122,13 @@ print_parameters() {
 
 set_proxy_parameters() {
     configure_platform
-    print_parameters $(get_all_parameters)
+
+    if [ -n "$all_proxy" ]; then
+	"${script_prefix}generate-proxy-parameters" \
+	    ${no_proxy:+-n $no_proxy} \
+	    $all_proxy || true | \
+	    print_parameters
+    fi
 }
 
 usage() {
