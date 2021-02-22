@@ -25,9 +25,10 @@ activate_virtualenv() {
 	printf '%s\n' "Activating virtual environment" >&2
     fi
 
-    set +u
+    shell_state=$(set +o)
+    set +euvx
     . "$1/bin/activate"
-    set -u
+    eval "$shell_state"
 }
 
 check_python() {
@@ -50,8 +51,8 @@ compare_versions() (
     if [ -z "$1" -a -z "$2" -o "$3" -le 0 ]; then
 	printf '%s\n' 0
     else
-	m=$(printf '%s\n' "${1:-0}" | cut -d. -f1)
-	n=$(printf '%s\n' "${2:-0}" | cut -d. -f1)
+	m=$(printf '%s\n' "${1:-0}" | cut -d. -f 1 -s)
+	n=$(printf '%s\n' "${2:-0}" | cut -d. -f 1 -s)
 	delta=$((m - n))
 
 	if [ "$delta" -ne 0 ]; then

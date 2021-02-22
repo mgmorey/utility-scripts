@@ -112,7 +112,7 @@ get_field() {
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     assert [ -n "$3" ]
-    get_entry $1 "$2" | cut -d: -f $3
+    get_entry $1 "$2" | cut -d: -f $3 -s
 }
 
 get_gecos() {
@@ -390,9 +390,8 @@ set_user_profile() {
     for profile in $profiles; do
 	if [ -r "$HOME/$profile" ]; then
 	    shell_state=$(set +o)
-	    set +eu
+	    set +euvx
     	    . "$HOME/$profile"
-	    set +vx
 	    eval "$shell_state"
 	    return 0
 	fi
