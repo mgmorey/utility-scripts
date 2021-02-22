@@ -179,7 +179,7 @@ is_valid_name() {
 
 modify_permissions() {
     chown -R $VOLUME_UID:$VOLUME_GID "$volume_home"
-    chmod a+rx "$volume_home"
+    find "$volume_home" -type d | xargs chmod a+rx
 }
 
 modify_user() {
