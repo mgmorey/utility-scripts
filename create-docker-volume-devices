@@ -67,6 +67,7 @@ create_docker_volume_devices() {
 	abort '%s: %s: No such volume file\n' "$script" "$volume_file"
     fi
 
+    umask 0022
     create_home_directory
 
     get_volumes | while read device mount name; do
