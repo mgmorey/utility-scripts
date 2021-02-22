@@ -51,8 +51,8 @@ compare_versions() (
     if [ -z "$1" -a -z "$2" -o "$3" -le 0 ]; then
 	printf '%s\n' 0
     else
-	m=$(printf '%s\n' "${1:-0}" | cut -d. -f 1 -s)
-	n=$(printf '%s\n' "${2:-0}" | cut -d. -f 1 -s)
+	m=$(printf '%s\n' "${1:-0}" | cut -d. -f 1)
+	n=$(printf '%s\n' "${2:-0}" | cut -d. -f 1)
 	delta=$((m - n))
 
 	if [ "$delta" -ne 0 ]; then
