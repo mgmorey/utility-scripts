@@ -384,6 +384,13 @@ Usage: $script [-d VOLUME-HOME]
        $script -n [-d VOLUME-HOME]
        $script -u [-d VOLUME-HOME]
        $script -h
+
+Generate Docker Compose YAML.
+
+  -d VOLUME-HOME  substitute VOLUME-HOME for tilde ("~") in volume devices
+  -h              print this help text (all other options are ignored)
+  -n              define named volumes
+  -u              define unnamed volumes
 EOF
 }
 

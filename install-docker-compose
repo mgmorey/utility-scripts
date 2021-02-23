@@ -482,6 +482,17 @@ Usage: $script [-b] [-f] [-p PREFIX] [-s] [-v VERSION]
        $script -u [-p PREFIX] [-s]
        $script -q
        $script -h
+
+Install a Docker Compose release from GitHub via cURL.
+
+  -b          print a progress bar graph using hash marks ("#")
+  -f          force a reinstallation of the same version
+  -h          print this help text (all other options are ignored)
+  -p PREFIX   use PREFIX as a the program prefix directory
+  -q          print only the installation summary (query)
+  -s          silence all output except for diagnostics
+  -u          uninstall Docker Compose
+  -v VERSION  set the VERSION to be downloaded and installed
 EOF
 }
 

@@ -216,6 +216,19 @@ usage() {
     cat <<EOF >&2
 Usage: $script [-n NO-PROXY] PROXY-URL
        $script -h
+
+Generate FTP/HTTP/HTTPS proxy parameter list.
+
+  -h           print this help text (all other options are ignored)
+  -n NO-PROXY  interpret NO-PROXY as a comma-separated list of exceptions
+
+Example NO-PROXY:
+
+  localhost,127.0.0.0/8
+
+Example PROXY-URL:
+
+  http://proxy.com:80
 EOF
 }
 

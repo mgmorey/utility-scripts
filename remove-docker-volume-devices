@@ -136,6 +136,13 @@ usage() {
     cat <<EOF >&2
 Usage: $script [-d VOLUME-HOME] [-k] [-n VOLUME-USER]
        $script -h
+
+Remove Docker volume account and device directories.
+
+  -d VOLUME-HOME  use VOLUME-HOME as the account home directory
+  -h              print this help text (all other options are ignored)
+  -k              keep account home directory and files
+  -n VOLUME-USER  use VOLUME-USER as the account name
 EOF
 }
 

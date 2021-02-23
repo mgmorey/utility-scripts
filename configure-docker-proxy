@@ -229,6 +229,28 @@ Usage: $script [-n NO-PROXY] [-o OUTPUT] PROXY-URL
        $script -q [-o OUTPUT]
        $script -r [-o OUTPUT]
        $script -h
+
+Configure Docker Engine HTTP/HTTPS proxy parameters.
+
+  -h           print this help text (all other options are ignored)
+  -i INPUT     read parameters from file INPUT
+  -n NO-PROXY  interpret NO-PROXY as a comma-separated list of exceptions
+  -o OUTPUT    write to configuration file OUTPUT
+  -q           query proxy configuration
+  -r           remove query configuration
+
+Example input parameters:
+
+  HTTP_PROXY=http://proxy.com:80
+  NO_PROXY=localhost,127.0.0.0/8
+
+Example NO-PROXY:
+
+  localhost,127.0.0.0/8
+
+Example PROXY-URL:
+
+  http://proxy.com:80
 EOF
 }
 
