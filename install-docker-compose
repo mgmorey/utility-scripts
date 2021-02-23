@@ -115,7 +115,7 @@ get_filetype() {
 get_file_version_number() (
     assert [ $# -eq 1 ]
 
-    for file in "${1%$suffix}$suffix" "${1%$suffix}"; do
+    for file in ${suffix:+"${1%$suffix}$suffix" }"${1%$suffix}"; do
 	if [ -n "$file" -a -x "$file" ]; then
 	    if get_version_number "$(get_file_version_string "$file")"; then
 		break
@@ -127,7 +127,7 @@ get_file_version_number() (
 get_file_version_string() (
     assert [ $# -eq 1 ]
 
-    for file in "${1%$suffix}$suffix" "${1%$suffix}"; do
+    for file in ${suffix:+"${1%$suffix}$suffix" }"${1%$suffix}"; do
 	if [ -n "$file" -a -x "$file" ]; then
 	    if get_version_string "$file"; then
 		break
