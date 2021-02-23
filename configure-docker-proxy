@@ -236,7 +236,7 @@ Configure Docker Engine HTTP/HTTPS proxy parameters.
   -i INPUT     read parameters from file INPUT
   -n NO-PROXY  interpret NO-PROXY as a comma-separated list of exceptions
   -o OUTPUT    write to configuration file OUTPUT
-               (default value is $OUTPUT)
+	       (default value is $OUTPUT)
   -q           query proxy configuration
   -r           remove query configuration
 

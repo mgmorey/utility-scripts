@@ -496,12 +496,12 @@ Download and install a Docker Compose release from GitHub via cURL.
   -f          force a reinstallation of the same version
   -h          print this help text (all other options are ignored)
   -p PREFIX   use PREFIX as a the program prefix directory
-              (default value is $(get_prefix))
+	      (default value is $(get_prefix))
   -q          print only the installation summary (query)
   -s          silence all output except for diagnostics
   -u          uninstall Docker Compose
   -v VERSION  set the VERSION to be downloaded and installed
-              (default value is $COMPOSE_VERSION)
+	      (default value is $COMPOSE_VERSION)
 EOF
 }
 
