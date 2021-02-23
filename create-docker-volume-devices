@@ -307,10 +307,10 @@ Usage: $script [-d VOLUME-HOME] [-n VOLUME-USER] [-t TEMPLATE-DIR]
 Create and populate Docker volume account and device directories.
 
   -d VOLUME-HOME   use VOLUME-HOME as the account home directory
-                   (defalt value is $VOLUME_HOME)
+                   (default value is $VOLUME_HOME)
   -h               print this help text (all other options are ignored)
   -n VOLUME-USER   use VOLUME-USER as the account name
-                   (defalt value is $VOLUME_USER)
+                   (default value is $VOLUME_USER)
   -t TEMPLATE-DIR  populate home directory from TEMPLATE-DIR
 EOF
 }
