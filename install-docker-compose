@@ -18,7 +18,7 @@
 
 BASE_URL=https://github.com/docker/compose/releases
 
-COMPOSE_VERSION=1.28.2
+COMPOSE_VERSION=1.28.4
 FILENAME=docker-compose
 
 abort() {
@@ -132,10 +132,6 @@ get_hardware() {
     uname -m
 }
 
-get_home_prefix() {
-    printf '%s\n' "$HOME/.local"
-}
-
 get_installed_filenames() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
@@ -173,6 +169,14 @@ get_platform() {
 	    printf '%s\n' $uname_kernel
 	    ;;
     esac
+}
+
+get_prefix() {
+    if [ "$(id -u)" -eq 0 ]; then
+	printf '%s\n' /usr/local
+    else
+	printf '%s\n' "$HOME/.local"
+    fi
 }
 
 get_realpath() (
@@ -253,11 +257,7 @@ install_docker_compose() {
     platform=$(get_platform)
 
     if [ -z "$prefix" ]; then
-	if [ "$(id -u)" -eq 0 ]; then
-	    prefix=/usr/local
-	else
-	    prefix=$(get_home_prefix)
-	fi
+	prefix=$(get_prefix)
     fi
 
     filetype=$(get_filetype)
@@ -483,16 +483,18 @@ Usage: $script [-b] [-f] [-p PREFIX] [-s] [-v VERSION]
        $script -q
        $script -h
 
-Install a Docker Compose release from GitHub via cURL.
+Download and install a Docker Compose release from GitHub via cURL.
 
   -b          print a progress bar graph using hash marks ("#")
   -f          force a reinstallation of the same version
   -h          print this help text (all other options are ignored)
   -p PREFIX   use PREFIX as a the program prefix directory
+              (default value is $(get_prefix))
   -q          print only the installation summary (query)
   -s          silence all output except for diagnostics
   -u          uninstall Docker Compose
   -v VERSION  set the VERSION to be downloaded and installed
+              (default value is $COMPOSE_VERSION)
 EOF
 }
 
