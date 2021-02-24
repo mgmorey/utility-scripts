@@ -144,6 +144,35 @@ get_installed_filenames() {
     PATH=$(normalize_path) which -a $FILENAME
 }
 
+get_installation_status() (
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    if [ "$action" = query ]; then
+	status=
+    elif [ "${filename%$suffix}" = "${target_file%$suffix}" ]; then
+	if [ -z "$version_before" ]; then
+	    status=installed
+	elif [ "$version_after" = "$version_before" ]; then
+	    status=reinstalled
+	elif [ -n "$version_after" ]; then
+	    delta=$(compare_versions "$version_after" "$version_before" 3)
+
+	    if [ $delta -gt 0 ]; then
+		status="upgraded from $version_before"
+	    else
+		status="downgraded from $version_before"
+	    fi
+	else
+	    status=unchanged
+	fi
+    else
+	status=unchanged
+    fi
+
+    printf '%s\n' "$status"
+)
+
 get_mktemp_options() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
@@ -383,7 +412,7 @@ parse_prefix() {
 
     case "$1" in
 	("$HOME/.local"|/usr/local)
-	    prefix="$1"
+	    prefix=$1
 	    ;;
 	(*)
 	    usage_error "%s: %s: Invalid prefix\n" "$script" "$1"
@@ -402,49 +431,38 @@ parse_version() {
     assert [ -n "$1" ]
 
     if is_valid_version "$1"; then
-	version="$1"
+	version=$1
     else
 	usage_error "%s: %s: Invalid version\n" "$script" "$1"
     fi
 }
 
-print_newline() {
-    if [ $silent = false ]; then
-	printf '%s\n' ''
-    fi
-}
-
-print_status() (
+print_file_status() (
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
+
+    case "$action" in
+	(install)
+	    status=$(get_installation_status "$1")
+	    ;;
+	(*)
+	    status=
+	    ;;
+    esac
+
     version=$(get_file_version_string "$1" | cut -d, -f 1)
-
-    if [ "${filename%$suffix}" = "${target_file%$suffix}" ]; then
-	if [ -z "$version_before" ]; then
-	    status=installed
-	elif [ "$version_after" = "$version_before" ]; then
-	    status=reinstalled
-	elif [ -n "$version_after" ]; then
-	    delta=$(compare_versions "$version_after" "$version_before" 3)
-
-	    if [ $delta -gt 0 ]; then
-		status="upgraded from $version_before"
-	    else
-		status="downgraded from $version_before"
-	    fi
-	else
-	    status=unchanged
-	fi
-    else
-	status=unchanged
-    fi
-
     printf '%s: %s%s%s\n' \
 	   "$version" \
 	   "$1" \
 	   "$suffix" \
 	   "${status:+ ($status)}"
 )
+
+print_newline() {
+    if [ $silent = false ]; then
+	printf '%s\n' ''
+    fi
+}
 
 print_summary() {
     if [ $silent = true ]; then
@@ -457,12 +475,22 @@ print_summary() {
 	print_newline
     fi
 
-    printf '%s\n' 'Installation Summary:'
-    print_newline
+    case "$action" in
+	(install)
+	    printf '%s\n\n' 'Installation Summary:'
+	    ;;
+	(uninstall)
+	    printf '%s\n\n' 'Uninstallation Summary:'
+	    ;;
+	(*)
+	    true
+	    ;;
+    esac
+
     create_tmpfile
 
     get_installed_filenames | while read filename; do
-	print_status "$filename"
+	print_file_status "$filename"
     done | sed "s/$FILENAME version/Docker Compose/"
 }
 
@@ -480,7 +508,7 @@ uninstall_file() {
 	printf 'Uninstalling %s\n' "$1"
     fi
 
-    /bin/rm -f "$1" "${1%$suffix}"
+    /bin/rm -f ${suffix:+"${1%$suffix}$suffix" }"${1%$suffix}"
 }
 
 usage() {
