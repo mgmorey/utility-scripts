@@ -148,9 +148,7 @@ get_installation_status() (
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if [ "$action" = query ]; then
-	status=
-    elif [ "${filename%$suffix}" = "${target_file%$suffix}" ]; then
+    if [ "${filename%$suffix}" = "${target_file%$suffix}" ]; then
 	if [ -z "$version_before" ]; then
 	    status=installed
 	elif [ "$version_after" = "$version_before" ]; then
