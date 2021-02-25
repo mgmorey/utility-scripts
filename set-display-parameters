@@ -127,7 +127,7 @@ set_display_parameters() {
 	host=localhost
     fi
 
-    DISPLAY=${display_host-}${display:-:0.0}
+    DISPLAY=$host${display:-:0.0}
     LIBGL_ALWAYS_INDIRECT=${indirect:-1}
     print_parameters $ALL_PARAMETERS
 }
