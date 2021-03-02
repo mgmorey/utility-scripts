@@ -21,6 +21,26 @@ VOLUME_UID=500
 
 VOLUME_HOME=/local/volumes
 
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+}
+
+configure_platform() {
+    case "${uname_kernel=$(uname -s)}" in
+	(FreeBSD)
+	    pw=pw
+	    ;;
+	(*)
+	    pw=
+	    ;;
+    esac
+}
+
 get_length() {
     printf '%s\n' "${1-}" | wc -c
 }
@@ -94,7 +114,42 @@ parse_volume_user() {
     fi
 }
 
-remove_volume_devices() {
+print_volume_group_args() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "${uname_kernel=$(uname -s)}" in
+	(FreeBSD)
+	    printf '%s\n' \
+		   -n "$1"
+	    ;;
+	(*)
+	    printf '%s\n' \
+		   "$1"
+	    ;;
+    esac
+}
+
+print_volume_user_args() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "${uname_kernel=$(uname -s)}" in
+	(FreeBSD)
+	    printf '%s\n' \
+		   -n "$1"
+	    ;;
+	(*)
+	    printf '%s\n' \
+		   "$1"
+	    ;;
+    esac
+}
+
+remove_docker_volume_devices() {
+    validate_platform
+    configure_platform
+
     if [ -z "$volume_user" ]; then
 	volume_user=$(get_volume_user $VOLUME_UID)
     fi
@@ -122,13 +177,15 @@ remove_volume_devices() {
 
 remove_volume_group() {
     if [ -n "${1-}" ]; then
-	groupdel $1
+	volume_group_args=$(print_volume_group_args "$1")
+	${pw:+pw }groupdel $volume_group_args
     fi
 }
 
 remove_volume_user() {
     if [ -n "${1-}" ]; then
-	userdel $1
+	volume_user_args=$(print_volume_user_args "$1")
+	${pw:+pw }userdel $volume_user_args
     fi
 }
 
@@ -157,6 +214,22 @@ usage_error() {
     exit 2
 }
 
+validate_platform() {
+    case "${uname_kernel=$(uname -s)}" in
+	(FreeBSD)
+	    true
+	    ;;
+	(Linux)
+	    true
+	    ;;
+	(*)
+	    abort '%s: %s: Operating system not supported\n' \
+	    	  "$script" \
+		  "$uname_kernel"
+	    ;;
+    esac
+}
+
 script=$(basename "$0")
 parse_arguments "$@"
-remove_volume_devices
+remove_docker_volume_devices
