@@ -25,9 +25,11 @@ VOLUME_HOME=/local/volumes
 VOLUME_SHELL=/sbin/nologin
 VOLUME_USER=docker-volume
 
+VOLUME_MODE_RE='(ro|rw)?'
 VOLUME_NAME_RE='[a-z][0-9_a-z-]+'
 VOLUME_PATH_RE="(\\/${VOLUME_NAME_RE})+"
-VOLUME_RE="\\.{,2}(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(:${VOLUME_NAME_RE})?"
+VOLUME_RE="\\.{,2}${VOLUME_PATH_RE}:${VOLUME_PATH_RE}\
+(:${VOLUME_MODE_RE}(:${VOLUME_NAME_RE})?)?"
 
 BSD_AWK_RE='awk version \([1-9][0-9]*\)'
 BSD_AWK_VERSION=20190529
