@@ -119,17 +119,6 @@ generate_docker_compose() {
     print_volumes
 }
 
-get_awk_version_number() {
-    assert [ $# -eq 2 ]
-    assert [ -n "$1" ]
-    assert [ -n "$2" ]
-    expr "$2" : "$1"
-}
-
-get_awk_version_string() {
-    awk --version 2>/dev/null | head -n 1
-}
-
 get_default_service_name() {
     image=$(get_service_param_value image | sed 's/:.*$//')
 
@@ -189,6 +178,12 @@ get_service_param_value() {
 
 get_service_params() {
     awk -F= '/^'"$SERVICE_RE"'$/ {print $1, $2}' $service_file
+}
+
+get_version_string() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    "$1" --version 2>/dev/null | head -n 1
 }
 
 get_volume_count() {
@@ -397,38 +392,6 @@ print_volumes() {
     done
 }
 
-validate_awk() {
-    awk_version=$(get_awk_version_number "$2" "$1")
-
-    if [ -n "$awk_version" ]; then
-	delta=$(compare_versions "$awk_version" "$3" "$4")
-
-	if [ -n "$delta" -a "$delta" -ge 0 ]; then
-	    return 0
-	fi
-    fi
-
-    abort '%s: Awk version %s or greater is required\n' \
-	  "$script" \
-	  $3
-}
-
-validate_platform() {
-    string=$(get_awk_version_string)
-
-    case "$string" in
-	(GNU*)
-	    validate_awk "$string" "$GNU_AWK_RE" $GNU_AWK_VERSION 3
-	    ;;
-	(awk*)
-	    validate_awk "$string" "$BSD_AWK_RE" $BSD_AWK_VERSION 1
-	    ;;
-	(*)
-	    abort '%s: BSD/GNU Awk is required\n' "$script"
-	    ;;
-    esac
-}
-
 usage() {
     cat <<EOF >&2
 Usage: $script [-d VOLUME-HOME]
@@ -453,6 +416,63 @@ usage_error() {
     printf '%s\n' '' >&2
     usage
     exit 2
+}
+
+validate_bsd_awk() {
+    validate_version "$1" "$BSD_AWK_RE" $BSD_AWK_VERSION 'BSD Awk'
+}
+
+validate_gnu_awk() {
+    validate_version "$1" "$GNU_AWK_RE" $GNU_AWK_VERSION 'GNU Awk'
+}
+
+validate_platform() {
+    case "${uname_kernel=$(uname -s)}" in
+	(FreeBSD)
+	    true
+	    ;;
+	(Linux)
+	    true
+	    ;;
+	(*)
+	    abort '%s: %s: Operating system not supported\n' \
+	    	  "$script" \
+		  "$uname_kernel"
+	    ;;
+    esac
+
+    version_string=$(get_version_string awk)
+
+    if expr "$version_string" : "$GNU_AWK_RE" >/dev/null; then
+	validate_gnu_awk "$version_string"
+    elif expr "$version_string" : "$BSD_AWK_RE" >/dev/null; then
+	validate_bsd_awk "$version_string"
+    else
+	abort '%s: BSD/GNU Awk is required\n' "$script"
+    fi
+}
+
+validate_version() {
+    assert [ $# -eq 4 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    assert [ -n "$3" ]
+    assert [ -n "$4" ]
+    version=$(expr "$1" : "$2" || true)
+
+    if [ -n "$version" ]; then
+	nf=$(printf '%s\n' "$3" | awk -F. '{print NF}')
+	delta=$(compare_versions "$version" "$3" "$nf")
+
+	if [ -n "$delta" -a "$delta" -ge 0 ]; then
+	    return 0
+	fi
+    fi
+
+    abort '%s: %s version %s or greater is required\n' \
+	  "$script" \
+	  "$4" \
+	  "$3"
 }
 
 script=$(basename "$0")
