@@ -18,7 +18,7 @@
 
 BASE_URL=https://github.com/docker/compose/releases
 
-COMPOSE_VERSION=1.28.4
+COMPOSE_VERSION=1.28.5
 FILENAME=docker-compose
 
 abort() {
