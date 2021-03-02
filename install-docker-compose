@@ -180,6 +180,9 @@ get_mktemp_options() {
 	(Darwin)
 	    true
 	    ;;
+	(FreeBSD)
+	    true
+	    ;;
 	(*)
 	    printf '%s\n' -p "$1"
 	    ;;
@@ -233,8 +236,7 @@ get_target_mode() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if expr "$(get_realpath "$1")" : \
-	    "$(get_realpath "$HOME")/" >/dev/null; then
+    if expr "$1" : "$HOME/" >/dev/null; then
 	printf '%s\n' u=rwx,g=rx
     else
 	printf '%s\n' u=rwx,go=rx
@@ -265,10 +267,9 @@ get_url() {
 }
 
 install_compose() {
-    target_mode=$(get_target_mode "$target_file")
-
     if [ $force = true -o "$version_before" != "$version" ]; then
 	create_file "$target_file"
+	target_mode=$(get_target_mode "$target_file")
 
 	if download_file "$tmpfile"; then
 	    if install_file "$tmpfile" "$target_file"; then

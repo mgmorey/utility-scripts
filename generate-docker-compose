@@ -16,7 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-AWK_VERSION=4.0.0
 FILE_VERSION=3.3
 NAMED_VOLUMES=true
 
@@ -45,6 +44,11 @@ VOLUME_NAME_RE='[a-z][0-9_a-z-]*'
 VOLUME_PATH_RE="([/]${VOLUME_NAME_RE})+"
 VOLUME_RE="\\.{,2}${VOLUME_PATH_RE}:${VOLUME_PATH_RE}\
 (:${VOLUME_MODE_RE}(:${VOLUME_NAME_RE})?)?"
+
+BSD_AWK_RE='awk version \([1-9][0-9]*\)'
+BSD_AWK_VERSION=20190529
+GNU_AWK_RE='GNU Awk \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
+GNU_AWK_VERSION=4.0.0
 
 abort() {
     printf "$@" >&2
@@ -116,7 +120,10 @@ generate_docker_compose() {
 }
 
 get_awk_version_number() {
-    expr "${1-}" : 'GNU Awk \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    expr "$2" : "$1"
 }
 
 get_awk_version_string() {
@@ -390,24 +397,36 @@ print_volumes() {
     done
 }
 
-validate_platform() {
-    awk_version_string=$(get_awk_version_string)
+validate_awk() {
+    awk_version=$(get_awk_version_number "$2" "$1")
 
-    if [ -n "$awk_version_string" ]; then
-	awk_version=$(get_awk_version_number "$awk_version_string")
+    if [ -n "$awk_version" ]; then
+	delta=$(compare_versions "$awk_version" "$3" "$4")
 
-	if [ -n "$awk_version" ]; then
-	    delta=$(compare_versions "${awk_version:-0.0.0}" "$AWK_VERSION" 3)
-
-	    if [ -n "$delta" -a "$delta" -ge 0 ]; then
-		return 0
-	    fi
+	if [ -n "$delta" -a "$delta" -ge 0 ]; then
+	    return 0
 	fi
     fi
 
-    abort '%s: GNU Awk version %s or greater is required\n' \
+    abort '%s: Awk version %s or greater is required\n' \
 	  "$script" \
-	  $AWK_VERSION
+	  $3
+}
+
+validate_platform() {
+    string=$(get_awk_version_string)
+
+    case "$string" in
+	(GNU*)
+	    validate_awk "$string" "$GNU_AWK_RE" $GNU_AWK_VERSION 3
+	    ;;
+	(awk*)
+	    validate_awk "$string" "$BSD_AWK_RE" $BSD_AWK_VERSION 1
+	    ;;
+	(*)
+	    abort '%s: BSD/GNU Awk is required\n' "$script"
+	    ;;
+    esac
 }
 
 usage() {

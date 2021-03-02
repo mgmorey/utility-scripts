@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-AWK_VERSION=4.0.0
-
 VOLUME_GID=500
 VOLUME_UID=500
 
@@ -28,8 +26,13 @@ VOLUME_SHELL=/sbin/nologin
 VOLUME_USER=docker-volume
 
 VOLUME_NAME_RE='[a-z][0-9_a-z-]+'
-VOLUME_PATH_RE="([/]${VOLUME_NAME_RE})+"
+VOLUME_PATH_RE="([\\/]${VOLUME_NAME_RE})+"
 VOLUME_RE="\\.{,2}(${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}(:${VOLUME_NAME_RE})?"
+
+BSD_AWK_RE='awk version \([1-9][0-9]*\)'
+BSD_AWK_VERSION=20190529
+GNU_AWK_RE='GNU Awk \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
+GNU_AWK_VERSION=4.0.0
 
 abort() {
     printf "$@" >&2
@@ -59,8 +62,20 @@ compare_versions() (
     fi
 )
 
+configure_platform() {
+    case "$(uname -s)" in
+	(FreeBSD)
+	    pw=pw
+	    ;;
+	(Linux)
+	    pw=
+	    ;;
+    esac
+}
+
 create_docker_volume_devices() {
     validate_platform
+    configure_platform
     volume_file=$(find_file $VOLUME_FILE)
 
     if [ ! -f $volume_file ]; then
@@ -110,20 +125,21 @@ create_volume_group() {
     volume_group_data=$(get_volume_group_data || true)
 
     if [ -z "$volume_group_data" ]; then
-	eval groupadd $volume_group_args
+	eval ${pw:+pw }groupadd $volume_group_args
     elif [ "$volume_group_data" != "$(print_volume_group_data)" ]; then
-	eval groupmod $volume_group_args
+	eval ${pw:+pw }groupmod $volume_group_args
     fi
 }
 
 create_volume_user() {
-    volume_user_args=$(print_volume_user_args)
+    volume_useradd_args=$(print_volume_useradd_args)
+    volume_usermod_args=$(print_volume_usermod_args)
     volume_user_data=$(get_volume_user_data || true)
 
     if [ -z "$volume_user_data" ]; then
-	eval useradd -Nr $volume_user_args
+	eval ${pw:+pw }useradd $volume_useradd_args
     elif [ "$volume_user_data" != "$(print_volume_user_data)" ]; then
-	eval usermod $volume_user_args
+	eval ${pw:+pw }usermod $volume_usermod_args
     fi
 }
 
@@ -141,7 +157,10 @@ find_file() {
 }
 
 get_awk_version_number() {
-    expr "${1-}" : 'GNU Awk \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    expr "$2" : "$1"
 }
 
 get_awk_version_string() {
@@ -186,9 +205,15 @@ modify_user() {
     volume_group_name=$(get_volume_group_name)
 
     if [ "$(id -u)" -eq 0 -a -n "$SUDO_USER" ]; then
-	usermod -aG "$volume_group_name" $SUDO_USER
+	user=$SUDO_USER
     elif [ -n "$USER" ]; then
-	usermod -aG "$volume_group_name" $USER
+	user=$USER
+    fi
+
+    usermod_args=$(print_usermod_args $volume_group_name $user)
+
+    if [ -n "$usermod_args" ]; then
+	${pw:+pw }usermod $usermod_args
     fi
 }
 
@@ -245,58 +270,157 @@ parse_volume_user() {
     fi
 }
 
+print_usermod_args() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+
+    case "$(uname -s)" in
+	(FreeBSD)
+	    true
+	    ;;
+	(Linux)
+	    printf '%s\n' \
+		   -aG "$1" \
+		   "$2"
+	    ;;
+    esac
+}
+
 print_volume_group_args() {
-    printf '%s\n' \
-	   -g $VOLUME_GID \
-	   "$volume_user"
+    case "$(uname -s)" in
+	(FreeBSD)
+	    printf '%s\n' \
+		   -g $VOLUME_GID \
+		   -n "$volume_user"
+	    ;;
+	(Linux)
+	    printf '%s\n' \
+		   -g $VOLUME_GID \
+		   "$volume_user"
+	    ;;
+    esac
 }
 
 print_volume_group_data() {
-    printf '%s:%s:%s\n' \
-	   "$volume_user" \
-	   "x" \
-	   "$VOLUME_GID"
+    case "$(uname -s)" in
+	(FreeBSD)
+	    printf '%s:%s:%s\n' \
+		   "$volume_user" \
+		   "*" \
+		   "$VOLUME_GID"
+	    ;;
+	(Linux)
+	    printf '%s:%s:%s\n' \
+		   "$volume_user" \
+		   "x" \
+		   "$VOLUME_GID"
+	    ;;
+    esac
 }
 
-print_volume_user_args() {
-    printf '%s\n' \
-	   -c '"'"$volume_comment"'"' \
-	   -d "$volume_home" \
-	   -g $VOLUME_GID \
-	   -s $VOLUME_SHELL \
-	   -u $VOLUME_UID \
-	   "$volume_user"
+print_volume_useradd_args() {
+    case "$(uname -s)" in
+	(FreeBSD)
+	    printf '%s\n' \
+		   -c '"'"$volume_comment"'"' \
+		   -d "$volume_home" \
+		   -g $VOLUME_GID \
+		   -s $VOLUME_SHELL \
+		   -u $VOLUME_UID \
+		   -n "$volume_user"
+	    ;;
+	(Linux)
+	    printf '%s\n' \
+		   -Nr \
+		   -c '"'"$volume_comment"'"' \
+		   -d "$volume_home" \
+		   -g $VOLUME_GID \
+		   -s $VOLUME_SHELL \
+		   -u $VOLUME_UID \
+		   "$volume_user"
+	    ;;
+    esac
+}
+
+print_volume_usermod_args() {
+    case "$(uname -s)" in
+	(FreeBSD)
+	    printf '%s\n' \
+		   -c '"'"$volume_comment"'"' \
+		   -d "$volume_home" \
+		   -g $VOLUME_GID \
+		   -s $VOLUME_SHELL \
+		   -u $VOLUME_UID \
+		   -n "$volume_user"
+	    ;;
+	(Linux)
+	    printf '%s\n' \
+		   -c '"'"$volume_comment"'"' \
+		   -d "$volume_home" \
+		   -g $VOLUME_GID \
+		   -s $VOLUME_SHELL \
+		   -u $VOLUME_UID \
+		   "$volume_user"
+	    ;;
+    esac
 }
 
 print_volume_user_data() {
-    printf '%s:%s:%s:%s:%s:%s:%s\n' \
-	   "$volume_user" \
-	   "x" \
-	   "$VOLUME_UID" \
-	   "$VOLUME_GID" \
-	   "$volume_comment" \
-	   "$volume_home" \
-	   "$VOLUME_SHELL"
+    case "$(uname -s)" in
+	(FreeBSD)
+	    printf '%s:%s:%s:%s:%s:%s:%s\n' \
+		   "$volume_user" \
+		   "*" \
+		   "$VOLUME_UID" \
+		   "$VOLUME_GID" \
+		   "$volume_comment" \
+		   "$volume_home" \
+		   "$VOLUME_SHELL"
+	    ;;
+	(Linux)
+	    printf '%s:%s:%s:%s:%s:%s:%s\n' \
+		   "$volume_user" \
+		   "x" \
+		   "$VOLUME_UID" \
+		   "$VOLUME_GID" \
+		   "$volume_comment" \
+		   "$volume_home" \
+		   "$VOLUME_SHELL"
+	    ;;
+    esac
 }
 
-validate_platform() {
-    awk_version_string=$(get_awk_version_string)
+validate_awk() {
+    awk_version=$(get_awk_version_number "$2" "$1")
 
-    if [ -n "$awk_version_string" ]; then
-	awk_version=$(get_awk_version_number "$awk_version_string")
+    if [ -n "$awk_version" ]; then
+	delta=$(compare_versions "$awk_version" "$3" "$4")
 
-	if [ -n "$awk_version" ]; then
-	    delta=$(compare_versions "${awk_version:-0.0.0}" "$AWK_VERSION" 3)
-
-	    if [ -n "$delta" -a "$delta" -ge 0 ]; then
-		return 0
-	    fi
+	if [ -n "$delta" -a "$delta" -ge 0 ]; then
+	    return 0
 	fi
     fi
 
-    abort '%s: GNU Awk version %s or greater is required\n' \
+    abort '%s: Awk version %s or greater is required\n' \
 	  "$script" \
-	  $AWK_VERSION
+	  $3
+}
+
+validate_platform() {
+    string=$(get_awk_version_string)
+
+    case "$string" in
+	(GNU*)
+	    validate_awk "$string" "$GNU_AWK_RE" $GNU_AWK_VERSION 3
+	    ;;
+	(awk*)
+	    validate_awk "$string" "$BSD_AWK_RE" $BSD_AWK_VERSION 1
+	    ;;
+	(*)
+	    abort '%s: BSD/GNU Awk is required\n' "$script"
+	    ;;
+    esac
 }
 
 usage() {
