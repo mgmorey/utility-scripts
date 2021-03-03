@@ -71,7 +71,7 @@ is_valid_name() {
 }
 
 manage_pw() {
-    eval ${pw_command:+pw_command }"$@"
+    eval ${pw_command:+$pw_command }"$@"
 }
 
 parse_arguments() {
