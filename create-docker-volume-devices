@@ -21,6 +21,7 @@ VOLUME_UID=500
 
 VOLUME_COMMENT='Docker Volume Account'
 VOLUME_FILE=docker-volumes.txt
+VOLUME_GROUP=docker-volume
 VOLUME_HOME=/local/volumes
 VOLUME_SHELL=/sbin/nologin
 VOLUME_USER=docker-volume
@@ -42,7 +43,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 compare_versions() (
@@ -67,11 +68,11 @@ compare_versions() (
 configure_platform() {
     case "${uname_kernel=$(uname -s)}" in
 	(FreeBSD)
-	    pw=pw
+	    pw_command=pw
 	    pw_mask='*'
 	    ;;
 	(*)
-	    pw=
+	    pw_command=
 	    pw_mask='x'
 	    ;;
     esac
@@ -80,6 +81,7 @@ configure_platform() {
 create_docker_volume_devices() {
     validate_platform
     configure_platform
+    real_user=$(get_real_user)
     volume_file=$(find_file $VOLUME_FILE)
 
     if [ ! -f $volume_file ]; then
@@ -125,25 +127,22 @@ create_volume_device() {
 }
 
 create_volume_group() {
-    volume_group_args=$(print_volume_group_args)
-    volume_group_data=$(get_volume_group_data || true)
+    entry=$(get_volume_group_entry $volume_group || true)
 
-    if [ -z "$volume_group_data" ]; then
-	eval ${pw:+pw }groupadd $volume_group_args
-    elif [ "$volume_group_data" != "$(print_volume_group_data)" ]; then
-	eval ${pw:+pw }groupmod $volume_group_args
+    if [ -z "$entry" ]; then
+	manage_pw groupadd $(print_volume_groupadd_args "$volume_user")
+    elif [ "$entry" != "$(print_volume_group)" ]; then
+	manage_pw groupmod $(print_volume_groupmod_args "$volume_user")
     fi
 }
 
 create_volume_user() {
-    volume_passwd_data=$(get_volume_passwd_data || true)
-    volume_useradd_args=$(print_volume_useradd_args)
-    volume_usermod_args=$(print_volume_usermod_args)
+    entry=$(get_volume_passwd_entry $volume_user || true)
 
-    if [ -z "$volume_passwd_data" ]; then
-	eval ${pw:+pw }useradd $volume_useradd_args
-    elif [ "$volume_passwd_data" != "$(print_volume_passwd_data)" ]; then
-	eval ${pw:+pw }usermod $volume_usermod_args
+    if [ -z "$entry" ]; then
+	manage_pw useradd $(print_volume_useradd_args "$volume_user")
+    elif [ "$entry" != "$(print_volume_passwd)" ]; then
+	manage_pw usermod $(print_volume_usermod_args "$volume_user")
     fi
 }
 
@@ -164,22 +163,36 @@ get_length() {
     printf '%s\n' "${1-}" | wc -c
 }
 
+get_real_user() {
+    if [ "$(id -u)" -eq 0 -a -n "$SUDO_USER" ]; then
+	printf '%s\n' "$SUDO_USER"
+    elif [ -n "$USER" ]; then
+	printf '%s\n' "$USER"
+    fi
+}
+
 get_version_string() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     "$1" --version 2>/dev/null | head -n 1
 }
 
-get_volume_group_data() {
-    getent group $VOLUME_GID | cut -d: -f 1-3
+get_volume_group() {
+    if [ -n "${1-}" ]; then
+	getent group $1 | cut -d: -f 1
+    fi
 }
 
-get_volume_group_name() {
-    getent group $VOLUME_GID | cut -d: -f 1
+get_volume_group_entry() {
+    if [ -n "${1-}" ]; then
+	getent group $1 | cut -d: -f 1-3
+    fi
 }
 
-get_volume_passwd_data() {
-    getent passwd $VOLUME_UID
+get_volume_passwd_entry() {
+    if [ -n "${1-}" ]; then
+	getent passwd $1
+    fi
 }
 
 get_volumes() {
@@ -195,40 +208,40 @@ is_valid_name() {
     expr "${1-}" : '[a-z][0-9_a-z-]*$' >/dev/null
 }
 
+manage_pw() {
+    eval ${pw_command:+pw_command }"$@"
+}
+
 modify_permissions() {
     chown -R $VOLUME_UID:$VOLUME_GID "$volume_home"
     find "$volume_home" -type d | xargs chmod a+rx
 }
 
 modify_user() {
-    volume_group_name=$(get_volume_group_name)
+    args=$(print_usermod_args "$volume_group" "$real_user")
 
-    if [ "$(id -u)" -eq 0 -a -n "$SUDO_USER" ]; then
-	user=$SUDO_USER
-    elif [ -n "$USER" ]; then
-	user=$USER
-    fi
-
-    usermod_args=$(print_usermod_args $volume_group_name $user)
-
-    if [ -n "$usermod_args" ]; then
-	${pw:+pw }usermod $usermod_args
+    if [ -n "$args" ]; then
+	manage_pw usermod $args
     fi
 }
 
 parse_arguments() {
     template_dir=
     volume_comment=$VOLUME_COMMENT
+    volume_group=$VOLUME_GROUP
     volume_home=$VOLUME_HOME
     volume_user=$VOLUME_USER
 
-    while getopts c:d:n:t:h opt; do
+    while getopts c:d:g:n:t:h opt; do
 	case $opt in
 	    (c)
 		volume_comment=$OPTARG
 		;;
 	    (d)
 		volume_home=$OPTARG
+		;;
+	    (g)
+		parse_volume_group "$OPTARG"
 		;;
 	    (n)
 		parse_volume_user "$OPTARG"
@@ -261,6 +274,14 @@ parse_template_dir() {
     fi
 }
 
+parse_volume_group() {
+    if is_valid_name "$1" && [ "$(get_length "$1")" -le 16 ]; then
+	volume_group=$1
+    else
+	usage_error "%s: %s: Invalid group name\n" "$script" "$1"
+    fi
+}
+
 parse_volume_user() {
     if is_valid_name "$1" && [ "$(get_length "$1")" -le 16 ]; then
 	volume_user=$1
@@ -286,29 +307,50 @@ print_usermod_args() {
     esac
 }
 
-print_volume_group_args() {
-    case "${uname_kernel=$(uname -s)}" in
-	(FreeBSD)
-	    printf '%s\n' \
-		   -g $VOLUME_GID \
-		   -n "$volume_user"
-	    ;;
-	(*)
-	    printf '%s\n' \
-		   -g $VOLUME_GID \
-		   "$volume_user"
-	    ;;
-    esac
-}
-
-print_volume_group_data() {
+print_volume_group() {
     printf '%s:%s:%s\n' \
-	   "$volume_user" \
+	   "$volume_group" \
 	   "$pw_mask" \
 	   "$VOLUME_GID"
 }
 
-print_volume_passwd_data() {
+print_volume_groupadd_args() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "${uname_kernel=$(uname -s)}" in
+	(FreeBSD)
+	    printf '%s\n' \
+		   -g $VOLUME_GID \
+		   -n "$1"
+	    ;;
+	(*)
+	    printf '%s\n' \
+		   -g $VOLUME_GID \
+		   "$1"
+	    ;;
+    esac
+}
+
+print_volume_groupmod_args() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "${uname_kernel=$(uname -s)}" in
+	(FreeBSD)
+	    printf '%s\n' \
+		   -g $VOLUME_GID \
+		   -n "$1"
+	    ;;
+	(*)
+	    printf '%s\n' \
+		   -g $VOLUME_GID \
+		   "$1"
+	    ;;
+    esac
+}
+
+print_volume_passwd() {
     printf '%s:%s:%s:%s:%s:%s:%s\n' \
 	   "$volume_user" \
 	   "$pw_mask" \
@@ -368,13 +410,16 @@ print_volume_usermod_args() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-d VOLUME-HOME] [-n VOLUME-USER] [-t TEMPLATE-DIR]
+Usage: $script [-d VOLUME-HOME] [-n VOLUME-GROUP] [-n VOLUME-USER] \
+[-t TEMPLATE-DIR]
        $script -h
 
 Create and populate Docker volume account and device directories.
 
   -d VOLUME-HOME   use VOLUME-HOME as the account home directory
 		   (default value is $VOLUME_HOME)
+  -g VOLUME-GROUP  use VOLUME-GROUP as the account group
+		   (default value is $VOLUME_GROUP)
   -h               print this help text (all other options are ignored)
   -n VOLUME-USER   use VOLUME-USER as the account name
 		   (default value is $VOLUME_USER)
@@ -410,7 +455,7 @@ validate_platform() {
 	    ;;
 	(*)
 	    abort '%s: %s: Operating system not supported\n' \
-	    	  "$script" \
+		  "$script" \
 		  "$uname_kernel"
 	    ;;
     esac

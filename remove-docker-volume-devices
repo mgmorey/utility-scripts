@@ -20,6 +20,7 @@ VOLUME_GID=500
 VOLUME_UID=500
 
 VOLUME_HOME=/local/volumes
+VOLUME_USER=docker-volume
 
 abort() {
     printf "$@" >&2
@@ -27,16 +28,18 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 configure_platform() {
     case "${uname_kernel=$(uname -s)}" in
 	(FreeBSD)
-	    pw=pw
+	    pw_command=pw
+	    pw_mask='*'
 	    ;;
 	(*)
-	    pw=
+	    pw_command=
+	    pw_mask='x'
 	    ;;
     esac
 }
@@ -63,20 +66,18 @@ get_volume_home() {
     fi
 }
 
-get_volume_user() {
-    if [ -n "${1-}" ]; then
-	getent passwd $1 | cut -d: -f 1
-    fi
-}
-
 is_valid_name() {
     expr "${1-}" : '[a-z][0-9_a-z-]*$' >/dev/null
 }
 
+manage_pw() {
+    eval ${pw_command:+pw_command }"$@"
+}
+
 parse_arguments() {
     keep_files=false
-    volume_home=
-    volume_user=
+    volume_home=$VOLUME_HOME
+    volume_user=$VOLUME_USER
 
     while getopts d:kn:h opt; do
 	case $opt in
@@ -108,13 +109,13 @@ parse_arguments() {
 
 parse_volume_user() {
     if is_valid_name "$1" && [ "$(get_length "$1")" -le 16 ]; then
-	volume_user="$1"
+	volume_user=$1
     else
 	usage_error "%s: %s: Invalid user name\n" "$script" "$1"
     fi
 }
 
-print_volume_group_args() {
+print_volume_groupdel_args() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
@@ -130,7 +131,7 @@ print_volume_group_args() {
     esac
 }
 
-print_volume_user_args() {
+print_volume_userdel_args() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
@@ -149,24 +150,9 @@ print_volume_user_args() {
 remove_docker_volume_devices() {
     validate_platform
     configure_platform
-
-    if [ -z "$volume_user" ]; then
-	volume_user=$(get_volume_user $VOLUME_UID)
-    fi
-
     volume_gid=$(get_volume_gid $volume_user)
-
-    if [ -z "$volume_gid" ]; then
-	volume_gid=$VOLUME_GID
-    fi
-
-    volume_group=$(get_volume_group $volume_gid)
-    volume_home=$(get_volume_home $VOLUME_UID)
-
-    if [ -z "$volume_home" ]; then
-	volume_home=$VOLUME_HOME
-    fi
-
+    volume_home=$(get_volume_home $volume_user)
+    volume_group=$(get_volume_group ${volume_gid:-$VOLUME_GID})
     remove_volume_user $volume_user
     remove_volume_group $volume_group
 
@@ -177,15 +163,13 @@ remove_docker_volume_devices() {
 
 remove_volume_group() {
     if [ -n "${1-}" ]; then
-	volume_group_args=$(print_volume_group_args "$1")
-	${pw:+pw }groupdel $volume_group_args
+	manage_pw groupdel $(print_volume_groupdel_args "$1")
     fi
 }
 
 remove_volume_user() {
     if [ -n "${1-}" ]; then
-	volume_user_args=$(print_volume_user_args "$1")
-	${pw:+pw }userdel $volume_user_args
+	manage_pw userdel $(print_volume_userdel_args "$1")
     fi
 }
 
@@ -224,7 +208,7 @@ validate_platform() {
 	    ;;
 	(*)
 	    abort '%s: %s: Operating system not supported\n' \
-	    	  "$script" \
+		  "$script" \
 		  "$uname_kernel"
 	    ;;
     esac
