@@ -431,7 +431,7 @@ validate_platform() {
 	    ;;
 	(*)
 	    abort '%s: %s: Operating system not supported\n' \
-	    	  "$script" \
+		  "$script" \
 		  "$uname_kernel"
 	    ;;
     esac
