@@ -47,22 +47,17 @@ assert() {
 }
 
 compare_versions() (
-    assert [ $# -eq 3 ]
-    assert [ -n "$3" ]
+    m=$(printf '%s\n' ${1:-0} | cut -d. -f 1)
+    n=$(printf '%s\n' ${2:-0} | cut -d. -f 1)
+    delta=$((m - n))
+    nfields=${3:-1}
 
-    if [ -z "$1" -a -z "$2" -o "$3" -le 0 ]; then
-	printf '%s\n' 0
-    else
-	m=$(printf '%s\n' "${1:-0}" | cut -d. -f 1)
-	n=$(printf '%s\n' "${2:-0}" | cut -d. -f 1)
-	delta=$((m - n))
-
-	if [ "$delta" -ne 0 ]; then
-	    printf '%s\n' $delta
-	else
-	    printf '%s\n' "$(compare_versions ${1#*.} ${2#*.} $(($3 - 1)))"
-	fi
+    if [ $nfields -le 1 -o $delta -ne 0 ]; then
+	printf '%s\n' $delta
+	return 0
     fi
+
+    compare_versions "${1#*.}" "${2#*.}" $((nfields - 1))
 )
 
 configure_platform() {
