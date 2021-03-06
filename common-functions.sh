@@ -44,7 +44,7 @@ create_tmpfile() {
 get_bin_directory() (
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    dir="$1"
+    dir=$1
 
     if [ $dir != . ]; then
 	while [ "$(dirname "$dir")" != / ]; do
@@ -419,7 +419,7 @@ set_user_profile() {
 	    printf 'Changing HOME to: %s\n' "$home" >&2
 	fi
 
-	export HOME="$home"
+	export HOME=$home
     fi
 
     shell=$(get_shell "$user")
