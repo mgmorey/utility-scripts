@@ -329,15 +329,7 @@ get_setpriv_options() (
 get_shell() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-
-    case "${uname_kernel=$(uname -s)}" in
-	(MINGW64_NT-*)
-	    printf '%s\n' /bin/bash
-	    ;;
-	(*)
-	    get_field passwd $1 7
-	    ;;
-    esac
+    get_field passwd $1 7
 }
 
 get_su_command() (
