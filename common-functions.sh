@@ -51,7 +51,7 @@ get_bin_directory() (
 	    dir=$(dirname "$dir")
 
 	    if [ -d "$dir/bin" ]; then
-		printf "$dir/bin"
+		printf '%s\n' "$dir/bin"
 		return
 	    fi
 	done
@@ -269,7 +269,7 @@ get_home() {
 
     case "${uname_kernel=$(uname -s)}" in
 	(MINGW64_NT-*)
-	    printf "/c/Users/%s\n" ${1#*+}
+	    printf '/c/Users/%s\n' "${1#*+}"
 	    ;;
 	(*)
 	    get_field passwd $1 6
@@ -431,8 +431,8 @@ set_user_profile() {
 
     if [ -n "$home" -a "$HOME" != "$home" ]; then
 	if [ "${ENV_VERBOSE-false}" = true ]; then
-	    printf "Changing HOME from: %s\n" "$HOME" >&2
-	    printf "Changing HOME to: %s\n" "$home" >&2
+	    printf 'Changing HOME from: %s\n' "$HOME" >&2
+	    printf 'Changing HOME to: %s\n' "$home" >&2
 	fi
 
 	export HOME="$home"
@@ -442,8 +442,8 @@ set_user_profile() {
 
     if [ -n "$shell" -a $(basename ${SHELL%.exe}) != $(basename $shell) ]; then
 	if [ "${ENV_VERBOSE-false}" = true ]; then
-	    printf "Changing SHELL from: %s\n" "$SHELL" >&2
-	    printf "Changing SHELL to: %s\n" "$shell" >&2
+	    printf 'Changing SHELL from: %s\n' "$SHELL" >&2
+	    printf 'Changing SHELL to: %s\n' "$shell" >&2
 	fi
 
 	export SHELL=$shell
