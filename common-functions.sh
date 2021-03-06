@@ -52,7 +52,7 @@ get_bin_directory() (
 
 	    if [ -d "$dir/bin" ]; then
 		printf '%s\n' "$dir/bin"
-		return
+		return 0
 	    fi
 	done
     fi
@@ -209,7 +209,7 @@ get_gnu_diff_command() {
 	case "$id" in
 	    (solaris)
 		printf '%s\n' gdiff
-		return
+		return 0
 		;;
 	esac
     done
@@ -222,7 +222,7 @@ get_gnu_grep_command() {
 	case "$id" in
 	    (solaris)
 		printf '%s\n' ggrep
-		return
+		return 0
 		;;
 	esac
     done
@@ -235,7 +235,7 @@ get_gnu_install_command() {
 	case "$id" in
 	    (solaris)
 		printf '%s\n' ginstall
-		return
+		return 0
 		;;
 	esac
     done
@@ -344,7 +344,7 @@ get_su_command() (
     case "${uname_kernel=$(uname -s)}" in
 	(GNU|Linux)
 	    if get_setpriv_command; then
-		return
+		return 0
 	    fi
 	    ;;
     esac
