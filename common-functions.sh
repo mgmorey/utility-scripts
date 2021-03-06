@@ -80,8 +80,19 @@ get_entry() {
 }
 
 get_entry_macos() {
-    if [ $1 = passwd -a -n "${2-}" ]; then
-	printf '%s\n' $2
+    case "$1" in
+	(group)
+	    category=group
+	    ;;
+	(passwd)
+	    category=user
+	    ;;
+	(*)
+	    category=
+    esac
+
+    if [ -n "$category" ]; then
+	dscacheutil -q $category -a name "$2"
     fi
 }
 
@@ -108,6 +119,78 @@ get_entry_posix() {
 }
 
 get_field() {
+    assert [ $# -eq 3 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    assert [ -n "$3" ]
+
+    case "${uname_kernel=$(uname -s)}" in
+	(Darwin)
+	    get_field_macos "$@"
+	    ;;
+	(*)
+	    get_field_posix "$@"
+	    ;;
+    esac
+}
+
+get_field_macos() {
+    assert [ $# -eq 3 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    assert [ -n "$3" ]
+    field=
+
+    case "$1" in
+	(group)
+	    case "$3" in
+		(1)
+		    field=name
+		    ;;
+		(2)
+		    field=password
+		    ;;
+		(3)
+		    field=gid
+		    ;;
+		(4)
+		    field=users
+		    ;;
+	    esac
+	    ;;
+	(passwd)
+	    case "$3" in
+		(1)
+		    field=name
+		    ;;
+		(2)
+		    field=password
+		    ;;
+		(3)
+		    field=uid
+		    ;;
+		(4)
+		    field=gid
+		    ;;
+		(5)
+		    field=gecos
+		    ;;
+		(6)
+		    field=dir
+		    ;;
+		(7)
+		    field=shell
+		    ;;
+	    esac
+	    ;;
+    esac
+
+    if [ -n "$field" ]; then
+	get_entry_macos $1 "$2" | awk -F': ' '$1 == "'$field'" {print $2}'
+    fi
+}
+
+get_field_posix() {
     assert [ $# -eq 3 ]
     assert [ -n "$1" ]
     assert [ -n "$2" ]
@@ -185,9 +268,6 @@ get_home() {
     assert [ -n "$1" ]
 
     case "${uname_kernel=$(uname -s)}" in
-	(Darwin)
-	    printf "/Users/%s\n" $1
-	    ;;
 	(MINGW64_NT-*)
 	    printf "/c/Users/%s\n" ${1#*+}
 	    ;;
@@ -259,9 +339,6 @@ get_shell() {
     assert [ -n "$1" ]
 
     case "${uname_kernel=$(uname -s)}" in
-	(Darwin)
-	    printf '%s\n' /bin/bash
-	    ;;
 	(MINGW64_NT-*)
 	    printf '%s\n' /bin/bash
 	    ;;
