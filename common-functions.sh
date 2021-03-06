@@ -468,7 +468,7 @@ set_user_profile() {
 	if [ -r "$HOME/$profile" ]; then
 	    shell_state=$(set +o)
 	    set +euvx
-    	    . "$HOME/$profile"
+	    . "$HOME/$profile"
 	    eval "$shell_state"
 	    return 0
 	fi
