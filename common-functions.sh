@@ -266,15 +266,7 @@ get_group_id() {
 get_home() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-
-    case "${uname_kernel=$(uname -s)}" in
-	(MINGW64_NT-*)
-	    printf '/c/Users/%s\n' "${1#*+}"
-	    ;;
-	(*)
-	    get_field passwd $1 6
-	    ;;
-    esac
+    get_field passwd $1 6
 }
 
 get_profile_path() (
