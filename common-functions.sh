@@ -112,7 +112,7 @@ get_field() {
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     assert [ -n "$3" ]
-    get_entry $1 "$2" | cut -d: -f $3 -s
+    get_entry $1 "$2" | cut -d: -f $3
 }
 
 get_gecos() {
