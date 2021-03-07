@@ -35,11 +35,12 @@ compare_command_versions() {
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     assert [ -n "$3" ]
-    compare_versions $(get_command_version "$1" "$2") \
-		     "$3" $(get_field_count "$3" '.')
+    compare_versions "$(get_command_version "$1" "$2")" \
+		     "$3" "$(get_field_count "$3" '.')"
 }
 
 compare_versions() (
+    assert [ $# -eq 3 ]
     m=$(printf '%s\n' ${1:-0} | cut -d. -f 1)
     n=$(printf '%s\n' ${2:-0} | cut -d. -f 1)
     delta=$((m - n))
