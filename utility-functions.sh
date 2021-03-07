@@ -502,7 +502,7 @@ install_via_pip() (
 	options=
     fi
 
-    delta=$(compare_pipenv_versions $pip)
+    delta=$(compare_pip_versions $pip)
 
     if [ ${delta:-0} -gt 0 ]; then
 	options="${options:+$options }--no-warn-script-location"
