@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-SETPRIV_RE='setpriv from util-linux \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
+SETPRIV_RE='setpriv from util-linux \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)'
 SETPRIV_VERSION=2.33
 
 abort() {
@@ -28,6 +28,15 @@ assert() {
 clean_up() {
     eval rm -rf ${tmpdirs-}
     eval rm -f ${tmpfiles-}
+}
+
+compare_command_versions() {
+    assert [ $# -eq 3 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    assert [ -n "$3" ]
+    compare_versions $(get_command_version "$1" "$2") \
+		     "$3" $(get_field_count "$3" '.')
 }
 
 compare_versions() (
@@ -75,28 +84,31 @@ get_bin_directory() (
     fi
 )
 
-get_effective_user() (
-    get_user_name ${LOGNAME-${USER-${USERNAME}}}
-)
+get_command_version() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    expr "$("$1" --version 2>/dev/null)" : "$2"
+}
 
-get_entry() {
+get_ds_entry() {
     assert [ $# -ge 1 -a $# -le 2 ]
     assert [ -n "$1" ]
 
     case "${uname_kernel=$(uname -s)}" in
 	(Darwin)
-	    get_entry_macos "$@"
+	    get_ds_entry_macos "$@"
 	    ;;
 	(MINGW64_NT-*)
-	    get_entry_mingw "$@"
+	    get_ds_entry_mingw "$@"
 	    ;;
 	(*)
-	    get_entry_posix "$@"
+	    get_ds_entry_posix "$@"
 	    ;;
     esac
 }
 
-get_entry_macos() {
+get_ds_entry_macos() (
     case "$1" in
 	(group)
 	    category=group
@@ -111,9 +123,9 @@ get_entry_macos() {
     if [ -n "$category" ]; then
 	dscacheutil -q $category -a name "$2"
     fi
-}
+)
 
-get_entry_mingw() {
+get_ds_entry_mingw() {
     if which getent >/dev/null 2>&1; then
 	if [ -n "${2-}" ]; then
 	    getent $1 | awk -F: '$1 ~ /(^|+)'"${2#*+}"'$/ {print}'
@@ -123,7 +135,7 @@ get_entry_mingw() {
     fi
 }
 
-get_entry_posix() {
+get_ds_entry_posix() {
     if which getent >/dev/null 2>&1; then
 	getent $1 ${2-}
     elif [ -r /etc/$1 ]; then
@@ -135,7 +147,7 @@ get_entry_posix() {
     fi
 }
 
-get_field() {
+get_ds_field() {
     assert [ $# -eq 3 ]
     assert [ -n "$1" ]
     assert [ -n "$2" ]
@@ -143,24 +155,35 @@ get_field() {
 
     case "${uname_kernel=$(uname -s)}" in
 	(Darwin)
-	    get_field_macos "$@"
+	    get_ds_field_macos "$@"
 	    ;;
 	(*)
-	    get_field_posix "$@"
+	    get_ds_field_posix "$@"
 	    ;;
     esac
 }
 
-get_field_macos() {
+get_ds_field_macos() (
     assert [ $# -eq 3 ]
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     assert [ -n "$3" ]
+    field=$(get_ds_field_name "$1" "$3")
+
+    if [ -n "$field" ]; then
+	get_ds_entry_macos $1 "$2" | awk -F': ' '$1 == "'$field'" {print $2}'
+    fi
+)
+
+get_ds_field_name() (
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
     field=
 
     case "$1" in
 	(group)
-	    case "$3" in
+	    case "$2" in
 		(1)
 		    field=name
 		    ;;
@@ -176,7 +199,7 @@ get_field_macos() {
 	    esac
 	    ;;
 	(passwd)
-	    case "$3" in
+	    case "$2" in
 		(1)
 		    field=name
 		    ;;
@@ -202,23 +225,29 @@ get_field_macos() {
 	    ;;
     esac
 
-    if [ -n "$field" ]; then
-	get_entry_macos $1 "$2" | awk -F': ' '$1 == "'$field'" {print $2}'
-    fi
-}
+    printf '%s\n' "$field"
+)
 
-get_field_posix() {
+get_ds_field_posix() {
     assert [ $# -eq 3 ]
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     assert [ -n "$3" ]
-    get_entry $1 "$2" | cut -d: -f $3
+    get_ds_entry $1 "$2" | cut -d: -f $3
+}
+
+get_effective_user() {
+    get_user_name ${LOGNAME-${USER-${USERNAME}}}
+}
+
+get_field_count() {
+    printf '%s\n' "${1-}" | awk ${2:+-F$2 }'{print NF}'
 }
 
 get_gecos() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    get_field passwd $1 5
+    get_ds_field passwd $1 5
 }
 
 get_gnu_diff_command() {
@@ -276,14 +305,14 @@ get_group_id() {
     if which id >/dev/null 2>&1; then
 	id -g $1
     else
-	get_field passwd $1 4
+	get_ds_field passwd $1 4
     fi
 }
 
 get_home() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    get_field passwd $1 6
+    get_ds_field passwd $1 6
 }
 
 get_profile_path() (
@@ -306,16 +335,14 @@ get_real_user() {
     fi
 }
 
-get_setpriv_command() (
-    version_string=$(get_version_string setpriv)
-
-    if is_valid_setpriv_version "$version_string"; then
+get_setpriv_command() {
+    if is_valid_setpriv_version setpriv; then
 	printf '%s\n' setpriv
 	return 0
     fi
 
     return 1
-)
+}
 
 get_setpriv_options() (
     assert [ $# -eq 1 ]
@@ -333,7 +360,7 @@ get_setpriv_options() (
 get_shell() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    get_field passwd $1 7
+    get_ds_field passwd $1 7
 }
 
 get_su_command() (
@@ -355,20 +382,14 @@ get_user_id() {
     if which id >/dev/null 2>&1; then
 	id -u $1
     else
-	get_field passwd $1 3
+	get_ds_field passwd $1 3
     fi
 }
 
 get_user_name() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    get_field passwd $1 1
-}
-
-get_version_string() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    "$1" --version 2>/dev/null | head -n 1
+    get_ds_field passwd $1 1
 }
 
 is_included() {
@@ -383,27 +404,22 @@ is_to_be_included() {
     test -d $1 && ! is_included $1 "$2"
 }
 
-is_valid_setpriv_version() {
-    is_valid_version "$1" "$SETPRIV_RE" $SETPRIV_VERSION
-}
-
-is_valid_version() {
+is_valid_command_version() (
     assert [ $# -eq 3 ]
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     assert [ -n "$3" ]
-    version=$(expr "$1" : "$2" || true)
+    delta=$(compare_command_versions "$1" "$2" "$3")
 
-    if [ -n "$version" ]; then
-	nf=$(printf '%s\n' "$3" | awk -F. '{print NF}')
-	delta=$(compare_versions "$version" "$3" "$nf")
-
-	if [ -n "$delta" -a "$delta" -ge 0 ]; then
-	    return 0
-	fi
+    if [ -n "$delta" ] && [ "$delta" -ge 0 ]; then
+	return 0
     fi
 
     return 1
+)
+
+is_valid_setpriv_version() {
+    is_valid_command_version "$1" "$SETPRIV_RE" $SETPRIV_VERSION
 }
 
 run_unpriv() (

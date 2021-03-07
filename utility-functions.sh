@@ -15,6 +15,11 @@
 
 PIP_VERSION=19.3.1
 PIPENV_VERSION=2020.5.28
+
+PIP_RE='pip \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)'
+PIPENV_RE='pipenv, version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)'
+PYTHON_RE='Python \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)'
+
 PKGSRC_PREFIXES=$(ls -d /opt/local /opt/pkg /usr/pkg 2>/dev/null || true)
 SYSTEM_PREFIXES="$HOME/.local /usr/local $PKGSRC_PREFIXES /usr"
 
@@ -44,6 +49,18 @@ check_python() {
     fi
 
     return 0
+}
+
+compare_pip_versions() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    compare_command_versions "$1" "$PIP_RE" $PIP_VERSION
+}
+
+compare_pipenv_versions() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    compare_command_versions "$1" "$PIPENV_RE" $PIPENV_VERSION
 }
 
 create_virtualenv() (
@@ -238,7 +255,6 @@ generate_requirements() (
     assert [ -n "$1" ]
     pipenv=$1
     shift
-    pipenv_delta=$(get_pipenv_version_delta $pipenv)
 
     for file; do
 	case "$file" in
@@ -246,7 +262,9 @@ generate_requirements() (
 		options=--dev
 		;;
 	    (dev-requirements.txt)
-		if [ "${pipenv_delta:-0}" -ge 0 ]; then
+		delta=$(compare_pipenv_versions $pipenv)
+
+		if [ ${delta:-0} -ge 0 ]; then
 		    options=--dev-only
 		else
 		    options=--dev
@@ -259,9 +277,9 @@ generate_requirements() (
 		abort "%s: %s: Invalid filename\n" "$0" "$file"
 	esac
 
+	options="${options:+$options }--requirements"
 	printf "Generating %s\n" "$file"
 	create_tmpfile
-	options="${options:+$options }--requirements"
 
 	if $pipenv lock $options >$tmpfile; then
 	    /bin/mv -f $tmpfile "$file"
@@ -320,7 +338,6 @@ get_command() (
     return 1
 )
 
-
 get_command_helper() (
     if ! expr "$2" : pyvenv >/dev/null; then
 	scripts="${1:+$1/}$2${3-}${3+ ${1:+$1/}$2-$3}"
@@ -337,24 +354,6 @@ get_command_helper() (
 
     return 1
 )
-
-get_command_version() {
-    assert [ $# -eq 2 ]
-    assert [ -n "$1" ]
-    assert [ -n "$2" ]
-    bre=$(printf "$2\n" '\([0-9][0-9]*\(\.[0-9][0-9]*\)*\)')
-    get_version_string "$1" | sed 's/^'"$bre"'$/\1/'
-}
-
-get_command_version_delta() {
-    assert [ $# -eq 3 ]
-    assert [ -n "$1" ]
-    assert [ -n "$2" ]
-    assert [ -n "$3" ]
-    version=$(get_command_version "$1" "$2")
-    nf=$(printf '%s\n' "$3" | awk -F. '{print NF}')
-    compare_versions "$version" "$3" "$nf"
-}
 
 get_file_metadata() {
     assert [ $# -eq 2 ]
@@ -383,16 +382,8 @@ get_pip_requirements() {
     printf -- "--requirement %s\n" ${pip_install_files:-$PIP_INSTALL_MAIN}
 }
 
-get_pip_version_delta() {
-    get_command_version_delta "$1" 'pip %s from .*' $PIP_VERSION
-}
-
-get_pipenv_version_delta() {
-    get_command_version_delta "$1" 'pipenv, version %s' $PIPENV_VERSION
-}
-
 get_python_version() {
-    get_command_version "$1" 'Python %s'
+    get_command_version "$1" "$PYTHON_RE"
 }
 
 get_sort_command() {
@@ -511,9 +502,9 @@ install_via_pip() (
 	options=
     fi
 
-    pip_delta=$(get_pip_version_delta $pip)
+    delta=$(compare_pipenv_versions $pip)
 
-    if [ "${pip_delta:-0}" -gt 0 ]; then
+    if [ ${delta:-0} -gt 0 ]; then
 	options="${options:+$options }--no-warn-script-location"
     fi
 
