@@ -108,6 +108,7 @@ esac
 
 script_prefix=${script_dir:+$script_dir/}
 
+. "${script_prefix}commmon-functions.sh"
 . "${script_prefix}utility-functions.sh"
 . "${script_prefix}restapi-functions.sh"
 . "${script_prefix}restapi-parameters.sh"
