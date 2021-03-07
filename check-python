@@ -50,7 +50,7 @@ elif [ $# -gt 1 ]; then
     usage_error "%s: Too many arguments\n" "$0"
 fi
 
-. commmon-functions.sh
+. common-functions.sh
 . utility-functions.sh
 
 version="$("$1" --version | awk '{print $2'})"
