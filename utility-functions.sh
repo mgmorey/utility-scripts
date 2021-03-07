@@ -46,20 +46,6 @@ check_python() {
     return 0
 }
 
-compare_versions() (
-    m=$(printf '%s\n' ${1:-0} | cut -d. -f 1)
-    n=$(printf '%s\n' ${2:-0} | cut -d. -f 1)
-    delta=$((m - n))
-    nfields=${3:-1}
-
-    if [ $nfields -le 1 -o $delta -ne 0 ]; then
-	printf '%s\n' $delta
-	return 0
-    fi
-
-    compare_versions "${1#*.}" "${2#*.}" $((nfields - 1))
-)
-
 create_virtualenv() (
     assert [ $# -ge 1 ]
     assert [ -n "$1" ]
@@ -418,12 +404,6 @@ get_sort_command() {
 	    printf '%s\n' "sort -Vr"
 	    ;;
     esac
-}
-
-get_version_string() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    "$1" --version 2>/dev/null | head -n 1
 }
 
 get_versions_all() {
