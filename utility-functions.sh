@@ -13,6 +13,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+PIP_VERSION=19.3.1
+PIPENV_VERSION=2020.5.28
 PKGSRC_PREFIXES=$(ls -d /opt/local /opt/pkg /usr/pkg 2>/dev/null || true)
 SYSTEM_PREFIXES="$HOME/.local /usr/local $PKGSRC_PREFIXES /usr"
 
@@ -250,8 +252,7 @@ generate_requirements() (
     assert [ -n "$1" ]
     pipenv=$1
     shift
-    pipenv_version=$(get_pipenv_version $pipenv 'pipenv, version ')
-    pipenv_delta=$(compare_versions "${pipenv_version:-0.0.0}" 2020.5.28 3)
+    pipenv_delta=$(get_pipenv_version_delta $pipenv)
 
     for file; do
 	case "$file" in
@@ -333,6 +334,7 @@ get_command() (
     return 1
 )
 
+
 get_command_helper() (
     if ! expr "$2" : pyvenv >/dev/null; then
 	scripts="${1:+$1/}$2${3-}${3+ ${1:+$1/}$2-$3}"
@@ -355,7 +357,17 @@ get_command_version() {
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     bre=$(printf "$2\n" '\([0-9][0-9]*\(\.[0-9][0-9]*\)*\)')
-    "$1" --version | sed 's/^'"$bre"'$/\1/'
+    get_version_string "$1" | sed 's/^'"$bre"'$/\1/'
+}
+
+get_command_version_delta() {
+    assert [ $# -eq 3 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    assert [ -n "$3" ]
+    version=$(get_command_version "$1" "$2")
+    nf=$(printf '%s\n' "$3" | awk -F. '{print NF}')
+    compare_versions "$version" "$3" "$nf"
 }
 
 get_file_metadata() {
@@ -385,16 +397,16 @@ get_pip_requirements() {
     printf -- "--requirement %s\n" ${pip_install_files:-$PIP_INSTALL_MAIN}
 }
 
-get_pip_version() {
-    get_command_version "${1-}" 'pip %s from .*'
+get_pip_version_delta() {
+    get_command_version_delta "$1" 'pip %s from .*' $PIP_VERSION
 }
 
-get_pipenv_version() {
-    get_command_version "${1-}" 'pipenv, version %s'
+get_pipenv_version_delta() {
+    get_command_version_delta "$1" 'pipenv, version %s' $PIPENV_VERSION
 }
 
 get_python_version() {
-    get_command_version "${1-}" 'Python %s'
+    get_command_version "$1" 'Python %s'
 }
 
 get_sort_command() {
@@ -406,6 +418,12 @@ get_sort_command() {
 	    printf '%s\n' "sort -Vr"
 	    ;;
     esac
+}
+
+get_version_string() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    "$1" --version 2>/dev/null | head -n 1
 }
 
 get_versions_all() {
@@ -513,8 +531,7 @@ install_via_pip() (
 	options=
     fi
 
-    pip_version=$(get_pip_version $pip)
-    pip_delta=$(compare_versions "${pip_version:-0.0.0}" 19.3.1 3)
+    pip_delta=$(get_pip_version_delta $pip)
 
     if [ "${pip_delta:-0}" -gt 0 ]; then
 	options="${options:+$options }--no-warn-script-location"

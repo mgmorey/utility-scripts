@@ -13,6 +13,9 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+SETPRIV_RE='setpriv from util-linux \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
+SETPRIV_VERSION=2.33
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -26,6 +29,20 @@ clean_up() {
     eval rm -rf ${tmpdirs-}
     eval rm -f ${tmpfiles-}
 }
+
+compare_versions() (
+    m=$(printf '%s\n' ${1:-0} | cut -d. -f 1)
+    n=$(printf '%s\n' ${2:-0} | cut -d. -f 1)
+    delta=$((m - n))
+    nfields=${3:-1}
+
+    if [ $nfields -le 1 -o $delta -ne 0 ]; then
+	printf '%s\n' $delta
+	return 0
+    fi
+
+    compare_versions "${1#*.}" "${2#*.}" $((nfields - 1))
+)
 
 create_tmpdir() {
     trap clean_up EXIT INT QUIT TERM
@@ -290,27 +307,14 @@ get_real_user() {
 }
 
 get_setpriv_command() (
-    version=$(setpriv --version 2>/dev/null)
+    version_string=$(get_version_string setpriv)
 
-    case "${version##* }" in
-	('')
-	    return 1
-	    ;;
-	([01].*)
-	    return 1
-	    ;;
-	(2.[0-9].*)
-	    return 1
-	    ;;
-	(2.[12][0-9].*)
-	    return 1
-	    ;;
-	(2.3[012].*)
-	    return 1
-	    ;;
-    esac
+    if is_valid_setpriv_version "$version_string"; then
+	printf '%s\n' setpriv
+	return 0
+    fi
 
-    printf '%s\n' setpriv
+    return 1
 )
 
 get_setpriv_options() (
@@ -361,6 +365,12 @@ get_user_name() {
     get_field passwd $1 1
 }
 
+get_version_string() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    "$1" --version 2>/dev/null | head -n 1
+}
+
 is_included() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
@@ -371,6 +381,29 @@ is_to_be_included() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
     test -d $1 && ! is_included $1 "$2"
+}
+
+is_valid_setpriv_version() {
+    is_valid_version "$1" "$SETPRIV_RE" $SETPRIV_VERSION
+}
+
+is_valid_version() {
+    assert [ $# -eq 3 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    assert [ -n "$3" ]
+    version=$(expr "$1" : "$2" || true)
+
+    if [ -n "$version" ]; then
+	nf=$(printf '%s\n' "$3" | awk -F. '{print NF}')
+	delta=$(compare_versions "$version" "$3" "$nf")
+
+	if [ -n "$delta" -a "$delta" -ge 0 ]; then
+	    return 0
+	fi
+    fi
+
+    return 1
 }
 
 run_unpriv() (
