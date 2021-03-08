@@ -487,11 +487,11 @@ set_user_profile() {
 	(bash)
 	    profiles=".bash_profile .profile"
 	    ;;
+	(ksh|sh)
+	    profiles=".profile"
+	    ;;
 	(zsh)
 	    profiles=".zprofile"
-	    ;;
-	([k]sh)
-	    profiles=".profile"
 	    ;;
 	(*)
 	    profiles=
