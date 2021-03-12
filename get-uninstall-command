@@ -30,6 +30,9 @@ get_uninstall_command() {
     assert [ -n "$1" ]
 
     case "$(basename $1)" in
+	(pacman)
+	    uninstall=--remove
+	    ;;
 	(pkg)
 	    uninstall=remove
 	    ;;

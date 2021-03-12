@@ -172,6 +172,16 @@ validate_platform() {
 	    (solaris)
 		return
 		;;
+	    (windows)
+		case "$kernel_name" in
+		    (MINGW64_NT)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
 	esac
     done
 
