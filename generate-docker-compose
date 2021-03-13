@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-FILE_VERSION=3.3
+COMPOSE_FILE_VERSION=3.3
 NAMED_VOLUMES=true
 
 VOLUME_GID=500
@@ -27,6 +27,12 @@ NETWORK_FILE=docker-networks.txt
 PORT_FILE=docker-ports.txt
 SERVICE_FILE=docker-service.txt
 VOLUME_FILE=docker-volumes.txt
+
+BSD_AWK_VERSION=20190529
+GNU_AWK_VERSION=4.0.0
+
+BSD_AWK_RE='awk version \([1-9][0-9]*\)'
+GNU_AWK_RE='GNU Awk \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
 
 ENV_NAME_RE='[A-Za-z][0-9A-Z_a-z]+'
 ENV_RE="${ENV_NAME_RE}=.+"
@@ -52,12 +58,6 @@ VOLUME_MODE_RE='(ro|rw)?'
 VOLUME_NAME_RE='[a-z][0-9_a-z-]*'
 VOLUME_RE="(${PATH_NAME_REL_RE})?:${PATH_NAME_ABS_RE}\
 (:${VOLUME_MODE_RE}(:${VOLUME_NAME_RE})?)?"
-
-BSD_AWK_VERSION=20190529
-GNU_AWK_VERSION=4.0.0
-
-BSD_AWK_RE='awk version \([1-9][0-9]*\)'
-GNU_AWK_RE='GNU Awk \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
 
 abort() {
     printf "$@" >&2
@@ -285,7 +285,7 @@ parse_arguments() {
 }
 
 print_file_version() {
-    printf '%s: "%s"\n' "version" "$FILE_VERSION"
+    printf '%s: "%s"\n' "version" "$COMPOSE_FILE_VERSION"
 }
 
 print_network() {
