@@ -26,16 +26,20 @@ VOLUME_HOME=/local/volumes
 VOLUME_SHELL=/sbin/nologin
 VOLUME_USER=docker-volume
 
+PATH_ELEMENT_RE='[a-z][0-9_a-z-]*'
+PATH_NAME_ABS_RE="(\\/${PATH_ELEMENT_RE})+"
+PATH_NAME_REL_RE="\\.{,2}${PATH_NAME_ABS_RE}"
+
 VOLUME_MODE_RE='(ro|rw)?'
-VOLUME_NAME_RE='[a-z][0-9_a-z-]+'
-VOLUME_PATH_RE="(\\/${VOLUME_NAME_RE})+"
-VOLUME_RE="\\.{,2}${VOLUME_PATH_RE}:${VOLUME_PATH_RE}\
+VOLUME_NAME_RE='[a-z][0-9_a-z-]*'
+VOLUME_RE="(${PATH_NAME_REL_RE})?:${PATH_NAME_ABS_RE}\
 (:${VOLUME_MODE_RE}(:${VOLUME_NAME_RE})?)?"
 
-BSD_AWK_RE='awk version \([1-9][0-9]*\)'
 BSD_AWK_VERSION=20190529
-GNU_AWK_RE='GNU Awk \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
 GNU_AWK_VERSION=4.0.0
+
+BSD_AWK_RE='awk version \([1-9][0-9]*\)'
+GNU_AWK_RE='GNU Awk \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
 
 abort() {
     printf "$@" >&2
