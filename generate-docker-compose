@@ -47,7 +47,7 @@ SERVICE_RE="${SERVICE_PARAM_RE}=.+"
 VOLUME_MODE_RE='(ro|rw)?'
 VOLUME_NAME_RE='[a-z][0-9_a-z-]*'
 VOLUME_PATH_RE="(\\/${VOLUME_NAME_RE})+"
-VOLUME_RE="\\.{,2}${VOLUME_PATH_RE}:${VOLUME_PATH_RE}\
+VOLUME_RE="(\\.{,2}${VOLUME_PATH_RE})?:${VOLUME_PATH_RE}\
 (:${VOLUME_MODE_RE}(:${VOLUME_NAME_RE})?)?"
 
 BSD_AWK_RE='awk version \([1-9][0-9]*\)'
@@ -374,7 +374,10 @@ print_service_volume_mount() (
     mount="$2"
     mode="$3"
     name="$4"
-    check_device "$device"
+
+    if [ -n "$device" ]; then
+	check_device "$device"
+    fi
 
     if [ "$named_volumes" = true ]; then
 	if [ -z "$name" ]; then
@@ -382,7 +385,7 @@ print_service_volume_mount() (
 	fi
 
 	print_service_volume_item "$name" "$mount" "$mode"
-    else
+    elif [ -n "$device" ]; then
 	print_service_volume_item "$device" "$mount" "$mode"
     fi
 )
@@ -430,11 +433,16 @@ print_services() {
 print_volume() {
     printf '%s\n' ''
     printf '    %s:\n' "${4:-$(get_default_volume_name $2)}"
-    printf '        %s: %s\n' "driver" "local"
-    printf '        %s:\n' "driver_opts"
-    printf '            %s: %s\n' "o" "bind"
-    printf '            %s: %s\n' "type" "none"
-    printf '            %s: %s\n' "device" "$1"
+
+    if [ -n "${1-}" ]; then
+	printf '        %s: %s\n' "driver" "local"
+	printf '        %s:\n' "driver_opts"
+	printf '            %s: %s\n' "o" "bind"
+	printf '            %s: %s\n' "type" "none"
+	printf '            %s: %s\n' "device" "$1"
+    else
+	printf '        %s: %s\n' "external" "true"
+    fi
 }
 
 print_volumes() {
@@ -450,7 +458,10 @@ print_volumes() {
     printf '%s:\n' "volumes"
 
     get_volumes | while IFS=':' read device mount mode name; do
-	check_device "$device"
+	if [ -n "$device" ]; then
+	    check_device "$device"
+	fi
+
 	print_volume "$device" "$mount" "$mode" "$name"
     done
 }
