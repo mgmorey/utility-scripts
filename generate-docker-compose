@@ -245,8 +245,7 @@ get_volume_user() {
 
 get_volumes() {
     if [ -n "$volume_home" ]; then
-	sed -e 's|^\.\./volumes/|'"$volume_home"'/|' \
-	    -e 's|^~/|'"$volume_home"'/|' $volume_file
+	sed 's|^~/|'"$volume_home"'/|' $volume_file
     else
 	cat $volume_file
     fi | awk -F: -v OFS=':' '/^'"$VOLUME_RE"'$/ {print $1, $2, $3, $4}'
