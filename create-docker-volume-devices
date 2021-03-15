@@ -127,9 +127,8 @@ create_home_directory() {
 
 create_volume_device() {
     assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
 
-    if expr "$1" : "$volume_home"'/' >/dev/null; then
+    if [ -n "$1" ] && expr "$1" : "$volume_home"'/' >/dev/null; then
 	mkdir -p $1
     fi
 }
