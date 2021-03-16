@@ -29,7 +29,7 @@ chown_real_user() {
     user_name=$(get_real_user)
 
     if [ -n "$user_name" ]; then
-        user_id=$(get_user_id $user_name)
+	user_id=$(get_user_id $user_name)
 	group_id=$(get_group_id $user_name)
 	chown "$user_id${group_id:+:$group_id}" "$@"
     fi
@@ -40,25 +40,25 @@ get_realpath() (
     realpath=$(which realpath || true)
 
     if [ -n "$realpath" ]; then
-        $realpath "$@"
+	$realpath "$@"
     else
-        for file; do
-            if expr "$file" : '/.*' >/dev/null; then
-                printf "%s\n" "$file"
-            else
-                printf "%s\n" "$PWD/${file#./}"
-            fi
-        done
+	for file; do
+	    if expr "$file" : '/.*' >/dev/null; then
+		printf "%s\n" "$file"
+	    else
+		printf "%s\n" "$PWD/${file#./}"
+	    fi
+	done
     fi
 )
 
 case "$0" in
     (*/*)
-        script_dir=$(get_realpath "$(dirname "$0")")
-        ;;
+	script_dir=$(get_realpath "$(dirname "$0")")
+	;;
     (*)
-        script_dir=
-        ;;
+	script_dir=
+	;;
 esac
 
 script_prefix=${script_dir:+$script_dir/}

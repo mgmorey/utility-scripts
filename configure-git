@@ -43,6 +43,16 @@ assert() {
     "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
 }
 
+chown_real_user() {
+    user_name=$(get_real_user)
+
+    if [ -n "$user_name" ]; then
+	user_id=$(get_user_id $user_name)
+	group_id=$(get_group_id $user_name)
+	chown "$user_id${group_id:+:$group_id}" "$@"
+    fi
+}
+
 clean_build() {
     if [ -r Makefile ]; then
 	$make distclean
@@ -68,15 +78,9 @@ configure_compiler() {
 
 configure_git() {
     basename=master
-
-    archive_dir="$HOME/Downloads/Git"
-    src_dir="$HOME/Documents/src/Git/git-master"
-
     command=$(get_configure_command $src_dir)
     filename=$basename.zip
-
     pathname=$archive_dir/$filename
-
     mkdir -p "$(dirname "$src_dir")" "$archive_dir"
     download_archive
     extract_files
@@ -93,12 +97,18 @@ configure_git() {
     $make configure
     printf "%s\n" "$command"
     eval $command
+
+    if [ "$build" = true ]; then
+	$make ${ncpu:+-j $ncpu }all doc
+    fi
 }
 
 configure_platform() {
-    force=false
+    archive_dir="$HOME/Downloads/Git"
     make=make
+    ncpu=$(lscpu | awk '$1 == "CPU(s):" {print $2}')
     prefix=$PREFIX
+    src_dir="$HOME/Documents/src/Git/git-master"
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -312,10 +322,34 @@ install_dependencies() {
 }
 
 parse_arguments() {
-    while getopts fh opt; do
+    build=true
+    force=false
+    prefix=$PREFIX
+
+    while getopts bfnp:h opt; do
 	case $opt in
+	    (b)
+		build=true
+		;;
 	    (f)
 		force=true
+		;;
+	    (n)
+		build=false
+		;;
+	    (p)
+		case $OPTARG in
+		    ($HOME|/opt/*|/usr|/usr/local)
+			if [ -d $OPTARG ]; then
+			    prefix=$OPTARG
+			else
+			    abort_invalid_prefix $OPTARG
+			fi
+			;;
+		    (*)
+			abort_invalid_prefix $OPTARG
+			;;
+		esac
 		;;
 	    (h)
 		usage
@@ -336,7 +370,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $0 [-f]
+Usage: $0 [-b] [-f] [-n] [-p PREFIX]
        $0 -h
 EOF
 }
@@ -431,6 +465,12 @@ parse_arguments "$@"
 if [ "$(id -u)" -eq 0 ]; then
     install_dependencies
     run_unpriv "$0"
+    cd "$src_dir"
+
+    if [ "$build" = true ]; then
+	$make ${ncpu:+-j $ncpu }install install-doc install-html
+	find . -user root -type f | xargs chown-real-user
+    fi
 else
     install_dependencies
     configure_git
