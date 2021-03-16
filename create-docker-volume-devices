@@ -99,7 +99,7 @@ create_docker_volume_devices() {
     umask 0022
     create_home_directory
 
-    get_volumes | while read device mount name; do
+    get_volumes | while IFS=':' read device mount mode name; do
 	create_volume_device "$device"
     done
 
@@ -127,9 +127,8 @@ create_home_directory() {
 
 create_volume_device() {
     assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
 
-    if expr "$1" : "$volume_home"'/' >/dev/null; then
+    if [ -n "$1" ] && expr "$1" : "$volume_home"'/' >/dev/null; then
 	mkdir -p $1
     fi
 }
@@ -209,11 +208,10 @@ get_volume_passwd_entry() {
 
 get_volumes() {
     if [ -n "$volume_home" ]; then
-	sed -e 's|^\.\./volumes/|'"$volume_home"'/|' \
-	    -e 's|^~/|'"$volume_home"'/|' $volume_file
+	sed 's|^~/|'"$volume_home"'/|' $volume_file
     else
 	cat $volume_file
-    fi | awk -F: '/^'"$VOLUME_RE"'$/ {print $1, $2, $3}'
+    fi | awk -F: -v OFS=':' '/^'"$VOLUME_RE"'$/ {print $1, $2, $3, $4}'
 }
 
 is_valid_name() {
