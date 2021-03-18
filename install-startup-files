@@ -51,13 +51,13 @@ format_project_url() {
     printf "$PROJECT_URL\n" "$1"
 }
 
-get_project_directory() {
+get_project_directory() (
     user=$(get_real_user)
 
     for root_dir in "$HOME/Documents" "$HOME"; do
-	git_dir=$(format_git_directory $root_dir)
+	dir=$(format_git_directory $root_dir)
 
-	for parent_dir in "$git_dir/$user" "$git_dir"; do
+	for parent_dir in "$dir/$user" "$dir"; do
 	    project_dir=$(format_project_directory "$parent_dir")
 
 	    if [ -d "$project_dir" ]; then
@@ -67,9 +67,8 @@ get_project_directory() {
 	done
     done
 
-    create_tmpdir INT QUIT TERM
     format_project_directory "$tmpdir"
-}
+)
 
 get_realpath() {
     assert [ $# -ge 1 ]
@@ -89,6 +88,7 @@ get_realpath() {
 }
 
 install_startup_files() (
+    create_tmpdir
     real_user=$(get_real_user)
     validate_user_name $real_user
     git_dir=$(get_project_directory)
