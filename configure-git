@@ -238,7 +238,7 @@ get_configure_options() {
 }
 
 get_dependencies() {
-    get-packages bootstrap
+    get-packages bootstrap git-build
 }
 
 get_include_flags() {
