@@ -26,6 +26,10 @@ assert() {
 }
 
 chown_real_user() {
+    if [ $# -eq 0 ]; then
+	return 0
+    fi
+
     user_name=$(get_real_user)
 
     if [ -n "$user_name" ]; then
