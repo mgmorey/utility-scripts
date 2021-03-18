@@ -469,6 +469,7 @@ if [ "$(id -u)" -eq 0 ]; then
 
     if [ "$build" = true ]; then
 	$make ${ncpu:+-j $ncpu }install install-doc install-html
+	find . -user root -type d | xargs chown-real-user
 	find . -user root -type f | xargs chown-real-user
     fi
 else
