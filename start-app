@@ -91,7 +91,13 @@ get_realpath() (
     fi
 )
 
-get_run_command() {
+get_run_command() (
+    version=$(get_command_version setpriv "$SETPRIV_RE")
+
+    if get_setpriv_command "$version" 2.32 2; then
+	get_setpriv_options "$APP_UID" "$version"
+    fi
+
     get_uwsgi_binary_path
 
     if [ -d "${UWSGI_PLUGIN_DIR-}" ]; then
@@ -99,7 +105,7 @@ get_run_command() {
     fi
 
     printf '%s\n' --ini "$APP_CONFIG"
-}
+)
 
 print_status() (
     status=$1
