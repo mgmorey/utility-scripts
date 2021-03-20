@@ -14,7 +14,6 @@
 # GNU General Public License for more details.
 
 SETPRIV_RE='setpriv from util-linux \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)'
-SETPRIV_VERSION=2.33
 
 abort() {
     printf "$@" >&2
@@ -127,7 +126,7 @@ get_ds_entry_macos() (
 )
 
 get_ds_entry_mingw() {
-    if which getent >/dev/null 2>&1; then
+    if /bin/which getent >/dev/null 2>&1; then
 	if [ -n "${2-}" ]; then
 	    getent $1 | awk -F: '$1 ~ /(^|+)'"${2#*+}"'$/ {print}'
 	else
@@ -137,7 +136,7 @@ get_ds_entry_mingw() {
 }
 
 get_ds_entry_posix() {
-    if which getent >/dev/null 2>&1; then
+    if /bin/which getent >/dev/null 2>&1; then
 	getent $1 ${2-}
     elif [ -r /etc/$1 ]; then
 	if [ -n "${2-}" ]; then
@@ -294,7 +293,7 @@ get_group() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if which id >/dev/null 2>&1; then
+    if /bin/which id >/dev/null 2>&1; then
 	id -ng $1
     fi
 }
@@ -303,7 +302,7 @@ get_group_id() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if which id >/dev/null 2>&1; then
+    if /bin/which id >/dev/null 2>&1; then
 	id -g $1
     else
 	get_ds_field passwd $1 4
@@ -337,7 +336,9 @@ get_real_user() {
 }
 
 get_setpriv_command() {
-    if is_valid_setpriv_version setpriv; then
+    assert [ $# -eq 3 ]
+
+    if [ -n "${1-}" ] && is_valid_command_version "$1" "${2-}" "${3-}"; then
 	printf '%s\n' setpriv
 	return 0
     fi
@@ -346,16 +347,19 @@ get_setpriv_command() {
 }
 
 get_setpriv_options() (
-    assert [ $# -eq 1 ]
+    assert [ $# -eq 2 ]
     assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    printf '%s\n' --init-groups
+    delta=$(compare_versions $2 2.33 2)
 
-    if which id >/dev/null 2>&1; then
-	printf '%s\n' \
-	       --init-groups \
-	       --reset-env \
-	       --reuid $(id -u $1) \
-	       --regid $(id -g $1)
+    if [ "$delta" -ge 0 ]; then
+	printf '%s\n' --reset-env
     fi
+
+    printf '%s\n' \
+	   --reuid $(get_user_id $1) \
+	   --regid $(get_group_id $1)
 )
 
 get_shell() {
@@ -365,22 +369,18 @@ get_shell() {
 }
 
 get_su_command() (
-    case "${uname_kernel=$(uname -s)}" in
-	(GNU|Linux)
-	    if get_setpriv_command; then
-		return 0
-	    fi
-	    ;;
-    esac
+    assert [ $# -eq 3 ]
 
-    printf '%s\n' su
+    if ! get_setpriv_command "${1-}" "${2-}" "${3-}"; then
+	printf '%s\n' su
+    fi
 )
 
 get_user_id() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if which id >/dev/null 2>&1; then
+    if /bin/which id >/dev/null 2>&1; then
 	id -u $1
     else
 	get_ds_field passwd $1 3
@@ -409,8 +409,7 @@ is_valid_command_version() (
     assert [ $# -eq 3 ]
     assert [ -n "$1" ]
     assert [ -n "$2" ]
-    assert [ -n "$3" ]
-    delta=$(compare_command_versions "$1" "$2" "$3")
+    delta=$(compare_versions $1 $2 ${3:-$(get_field_count $2 '.')})
 
     if [ -n "$delta" ] && [ "$delta" -ge 0 ]; then
 	return 0
@@ -419,19 +418,17 @@ is_valid_command_version() (
     return 1
 )
 
-is_valid_setpriv_version() {
-    is_valid_command_version "$1" "$SETPRIV_RE" $SETPRIV_VERSION
-}
-
 run_unpriv() (
     assert [ $# -ge 1 ]
 
     if [ -n "${SUDO_USER-}" ] && [ "$(id -u)" -eq 0 ]; then
-	command=$(get_su_command $SUDO_USER)
+	version=$(get_command_version setpriv "$SETPRIV_RE" || true)
+	command=$(get_su_command "$version" 2.32 2)
 
 	case "$command" in
 	    (setpriv)
-		command="$command $(get_setpriv_options $SUDO_USER)"
+		options=$(get_setpriv_options $SUDO_USER "$version")
+		command="$command $options"
 		;;
 	    (su)
 		command="$command $SUDO_USER"
@@ -527,7 +524,7 @@ validate_group_id() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if which id >/dev/null 2>&1; then
+    if /bin/which id >/dev/null 2>&1; then
 	if [ "$(id -g)" != $1 ]; then
 	    abort "%s: Please try again with group GID %s\n" "$0" "$1"
 	fi
@@ -538,7 +535,7 @@ validate_group_name() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if which id >/dev/null 2>&1; then
+    if /bin/which id >/dev/null 2>&1; then
 	if [ "$(id -ng)" != $1 ]; then
 	    abort "%s: Please try again with group %s\n" "$0" "$1"
 	fi
@@ -549,7 +546,7 @@ validate_user_id() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if which id >/dev/null 2>&1; then
+    if /bin/which id >/dev/null 2>&1; then
 	if [ "$(id -u)" != $1 ]; then
 	    abort "%s: Please try again as user UID %s\n" "$0" "$1"
 	fi
@@ -560,7 +557,7 @@ validate_user_name() (
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if which id >/dev/null 2>&1; then
+    if /bin/which id >/dev/null 2>&1; then
 	user_name=$(id -nu)
 
 	if [ ${user_name#*+} != ${1#*+} ]; then
