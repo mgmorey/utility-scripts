@@ -91,6 +91,16 @@ get_realpath() (
     fi
 )
 
+get_run_command() {
+    get_uwsgi_binary_path
+
+    if [ -d "${UWSGI_PLUGIN_DIR-}" ]; then
+	printf '%s\n' --plugin-dir "$UWSGI_PLUGIN_DIR"
+    fi
+
+    printf '%s\n' --ini "$APP_CONFIG"
+}
+
 print_status() (
     status=$1
 
@@ -116,16 +126,12 @@ print_status() (
 )
 
 run_service() {
+    umask 0002
     configure_defaults
     validate_parameters_preinstallation
     validate_parameters_postinstallation
-    command=$(get_uwsgi_binary_path)
-
-    if [ -d "${UWSGI_PLUGIN_DIR-}" ]; then
-	command="$command --plugin-dir $UWSGI_PLUGIN_DIR"
-    fi
-
-    $command --ini $APP_CONFIG
+    command=$(get_run_command)
+    $command
 }
 
 start_app() {
