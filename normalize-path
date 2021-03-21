@@ -27,7 +27,7 @@ get_realpath() (
 )
 
 join_dirnames() {
-    tr '\n' ':' | sed 's/:$/\n/'
+    awk -v ORS=: '{print}' | sed 's/:$/\n/'
 }
 
 normalize_path() {
@@ -46,7 +46,7 @@ quote_lines() {
 }
 
 split_path() {
-    tr ':' '\n'
+    awk -v RS=: '{print}' | sed '/^$/d'
 }
 
 normalize_path "$@"
