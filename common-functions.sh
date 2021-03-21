@@ -126,7 +126,7 @@ get_ds_entry_macos() (
 )
 
 get_ds_entry_mingw() {
-    if /bin/which getent >/dev/null 2>&1; then
+    if /usr/bin/which getent >/dev/null 2>&1; then
 	if [ -n "${2-}" ]; then
 	    getent $1 | awk -F: '$1 ~ /(^|+)'"${2#*+}"'$/ {print}'
 	else
@@ -136,7 +136,7 @@ get_ds_entry_mingw() {
 }
 
 get_ds_entry_posix() {
-    if /bin/which getent >/dev/null 2>&1; then
+    if /usr/bin/which getent >/dev/null 2>&1; then
 	getent $1 ${2-}
     elif [ -r /etc/$1 ]; then
 	if [ -n "${2-}" ]; then
@@ -293,7 +293,7 @@ get_group() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if /bin/which id >/dev/null 2>&1; then
+    if /usr/bin/which id >/dev/null 2>&1; then
 	id -ng $1
     fi
 }
@@ -302,7 +302,7 @@ get_group_id() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if /bin/which id >/dev/null 2>&1; then
+    if /usr/bin/which id >/dev/null 2>&1; then
 	id -g $1
     else
 	get_ds_field passwd $1 4
@@ -380,7 +380,7 @@ get_user_id() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if /bin/which id >/dev/null 2>&1; then
+    if /usr/bin/which id >/dev/null 2>&1; then
 	id -u $1
     else
 	get_ds_field passwd $1 3
@@ -524,7 +524,7 @@ validate_group_id() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if /bin/which id >/dev/null 2>&1; then
+    if /usr/bin/which id >/dev/null 2>&1; then
 	if [ "$(id -g)" != $1 ]; then
 	    abort "%s: Please try again with group GID %s\n" "$0" "$1"
 	fi
@@ -535,7 +535,7 @@ validate_group_name() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if /bin/which id >/dev/null 2>&1; then
+    if /usr/bin/which id >/dev/null 2>&1; then
 	if [ "$(id -ng)" != $1 ]; then
 	    abort "%s: Please try again with group %s\n" "$0" "$1"
 	fi
@@ -546,7 +546,7 @@ validate_user_id() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if /bin/which id >/dev/null 2>&1; then
+    if /usr/bin/which id >/dev/null 2>&1; then
 	if [ "$(id -u)" != $1 ]; then
 	    abort "%s: Please try again as user UID %s\n" "$0" "$1"
 	fi
@@ -557,7 +557,7 @@ validate_user_name() (
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if /bin/which id >/dev/null 2>&1; then
+    if /usr/bin/which id >/dev/null 2>&1; then
 	user_name=$(id -nu)
 
 	if [ ${user_name#*+} != ${1#*+} ]; then

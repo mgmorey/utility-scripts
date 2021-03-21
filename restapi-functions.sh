@@ -423,7 +423,7 @@ print_table() {
 	abort "No suitable awk command found\n"
     fi
 
-    $awk -f "$(which print-table)" \
+    $awk -f "$(/usr/bin/which print-table)" \
 	 -v border="${1-1}" \
 	 -v header="${2-}" \
 	 -v width="${COLUMNS-80}"

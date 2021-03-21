@@ -44,7 +44,7 @@ check_python() {
     assert [ -n "$2" ]
     printf "Python %s interpreter found: %s\n" "$2" "$1" >&2
 
-    if ! "$1" "$(which test-python-version)" $2 >&2; then
+    if ! "$1" "$(/usr/bin/which test-python-version)" $2 >&2; then
 	return 1
     fi
 
@@ -115,9 +115,10 @@ create_virtualenv() (
 	if [ "$VENV_VERBOSE" = true ]; then
 	    pathname=$(printf '%s\n' "$command" | awk '{print $1}')
 	    version=$($pathname --version)
-	    printf "Using %s %s from %s\n" "$utility" \
+	    printf "Using %s %s from %s\n" \
+		   "$utility" \
 		   "${version#Python }" \
-		   "$(which $pathname)" >&2
+		   "$(/usr/bin/which $pathname)" >&2
 	fi
 
 	if eval $command $options; then
@@ -183,14 +184,14 @@ find_system_pythons() (
 
 find_user_python() (
     assert [ $# -eq 1 ]
-    python_versions=$($1 "$(which test-python-version)")
+    python_versions=$($1 "$(/usr/bin/which test-python-version)")
 
     if pyenv --version >/dev/null 2>&1; then
 	pyenv_root=$(pyenv root)
 	which="pyenv which"
     else
 	pyenv_root=
-	which=which
+	which=/usr/bin/which
     fi
 
     if [ -n "$pyenv_root" ]; then
@@ -403,7 +404,7 @@ get_versions_all() {
 
 get_versions_passed() (
     python=$(find_system_python | awk '{print $1}')
-    python_versions=$($python "$(which test-python-version)" --delim '\.')
+    python_versions=$($python "$(/usr/bin/which test-python-version)" --delim '\.')
 
     for python_version in ${python_versions-$PYTHON_VERSIONS}; do
 	if get_versions_all $python_version; then
