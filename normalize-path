@@ -30,10 +30,6 @@ join_dirs() {
     tr '\n' ':' | sed 's/:$/\n/'
 }
 
-normalize_dirs() {
-    sort -u | sed 's/^\(.*\)$/"\1"/'
-}
-
 normalize_path() {
     if [ -x /bin/realpath ]; then
 	realpath=/bin/realpath
@@ -41,8 +37,12 @@ normalize_path() {
 	realpath=get_realpath
     fi
 
-    dirs=$(printf '%s\n' "${1-$PATH}" | split_path | normalize_dirs)
-    eval $realpath $dirs 2>/dev/null | join_dirs
+    dirs=$(printf '%s\n' "${1-$PATH}" | split_path | quote_lines)
+    eval $realpath $dirs 2>/dev/null | sort -u | join_dirs
+}
+
+quote_lines() {
+    sed 's/^\(.*\)$/"\1"/'
 }
 
 split_path() {
