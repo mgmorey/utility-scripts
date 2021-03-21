@@ -144,7 +144,7 @@ get_installed_filenames() {
     fi
 
     files=$(/usr/bin/which -a $FILENAME | quote_lines)
-    eval $realpath $files 2>/dev/null | sort -u
+    eval $realpath $files 2>/dev/null | awk '!visited[$0]++'
 }
 
 get_installation_status() (
