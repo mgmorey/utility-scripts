@@ -199,9 +199,7 @@ parse_proxy() {
 }
 
 split_string() {
-    printf '%s\n' "$1" | awk -v rs="$2" '
-BEGIN {RS=rs}
-{print $0}'
+    printf '%s\n' "$1" | awk -v RS="$2" '{print}'
 }
 
 to_lower() {
