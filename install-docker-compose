@@ -212,8 +212,6 @@ get_prefix() {
 }
 
 get_realpath() (
-    assert [ $# -ge 1 ]
-
     for file; do
 	if expr "$file" : '/.*' >/dev/null; then
 	    printf "%s\n" "$file"
@@ -234,6 +232,17 @@ get_target_mode() {
     fi
 }
 
+get_url() {
+    printf '%s/%s/%s/%s-%s-%s%s\n' \
+	   $BASE_URL \
+	   download \
+	   $version \
+	   $FILENAME \
+	   $platform \
+	   $hardware \
+	   "${filetype:+.$filetype}"
+}
+
 get_version_number() {
     expr "${1-}" : 'docker-compose version \([1-9][0-9]*\(\.[0-9][0-9]*\)*\)'
 }
@@ -244,17 +253,6 @@ get_version_string() {
     if [ -n "$1" -a -x "$1" ]; then
 	"$1" --version || true
     fi
-}
-
-get_url() {
-    printf '%s/%s/%s/%s-%s-%s%s\n' \
-	   $BASE_URL \
-	   download \
-	   $version \
-	   $FILENAME \
-	   $platform \
-	   $hardware \
-	   "${filetype:+.$filetype}"
 }
 
 install_compose() {
@@ -327,6 +325,14 @@ is_valid_version() {
     fi >/dev/null
 }
 
+join_dirs() {
+    tr '\n' ':' | sed 's/:$/\n/'
+}
+
+normalize_dirs() {
+    sort -u | sed 's/^\(.*\)$/"\1"/'
+}
+
 normalize_path() {
     if [ -x /bin/realpath ]; then
 	realpath=/bin/realpath
@@ -334,18 +340,8 @@ normalize_path() {
 	realpath=get_realpath
     fi
 
-    printf "%s\n" "${1-$PATH}" | tr ':' '\n' | while read dir; do
-	if [ -d "$dir" ]; then
-	    dir=$($realpath "$dir")
-
-	    if ! grep -q '^'"$dir"'$' $tmpfile; then
-		printf '%s\n' "$dir" >>$tmpfile
-	    fi
-	fi
-    done
-
-    tr '\n' ':' <$tmpfile | sed 's/:$//'
-    printf '%s\n' ''
+    dirs=$(printf '%s\n' "${1-$PATH}" | split_path | normalize_dirs)
+    eval $realpath $dirs 2>/dev/null | join_dirs
 }
 
 parse_arguments() {
@@ -477,8 +473,6 @@ print_summary() {
 	    ;;
     esac
 
-    create_tmpfile
-
     get_installed_filenames | while read filename; do
 	print_file_status "$filename"
     done | sed "s/$FILENAME version/Docker Compose/"
@@ -486,6 +480,10 @@ print_summary() {
 
 query_compose() {
     print_summary
+}
+
+split_path() {
+    tr ':' '\n'
 }
 
 uninstall_compose() {

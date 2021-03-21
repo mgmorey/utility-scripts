@@ -16,29 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-abort() {
-    printf "$@" >&2
-    exit 1
-}
-
-assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
-}
-
-clean_up() {
-    eval rm -f ${tmpfiles-}
-}
-
-create_tmpfile() {
-    trap clean_up EXIT INT QUIT TERM
-    tmpfile=$(mktemp)
-    assert [ -n "${tmpfile}" ]
-    tmpfiles="${tmpfiles+$tmpfiles }'$tmpfile'"
-}
-
 get_realpath() (
-    assert [ $# -ge 1 ]
-
     for file; do
 	if expr "$file" : '/.*' >/dev/null; then
 	    printf "%s\n" "$file"
@@ -48,6 +26,14 @@ get_realpath() (
     done
 )
 
+join_dirs() {
+    tr '\n' ':' | sed 's/:$/\n/'
+}
+
+normalize_dirs() {
+    sort -u | sed 's/^\(.*\)$/"\1"/'
+}
+
 normalize_path() {
     if [ -x /bin/realpath ]; then
 	realpath=/bin/realpath
@@ -55,19 +41,12 @@ normalize_path() {
 	realpath=get_realpath
     fi
 
-    printf "%s\n" "${1-$PATH}" | tr ':' '\n' | while read dir; do
-	if [ -d "$dir" ]; then
-	    dir=$($realpath "$dir")
-
-	    if ! grep -q '^'"$dir"'$' $tmpfile; then
-		printf '%s\n' "$dir" >>$tmpfile
-	    fi
-	fi
-    done
-
-    tr '\n' ':' <$tmpfile | sed 's/:$//'
-    printf '%s\n' ''
+    dirs=$(printf '%s\n' "${1-$PATH}" | split_path | normalize_dirs)
+    eval $realpath $dirs 2>/dev/null | join_dirs
 }
 
-create_tmpfile
+split_path() {
+    tr ':' '\n'
+}
+
 normalize_path "$@"
