@@ -138,13 +138,13 @@ get_hardware() {
 
 get_installed_filenames() {
     if [ -x /bin/realpath ]; then
-	realpath=/bin/realpath
+	realpath="/bin/realpath -q"
     else
 	realpath=get_realpath
     fi
 
-    files=$(/usr/bin/which -a $FILENAME | quote_lines)
-    eval $realpath $files 2>/dev/null | awk '!visited[$0]++'
+    filenames=$(/usr/bin/which -a $FILENAME | quote_lines)
+    eval $realpath $filenames | awk '!_[$0]++'
 }
 
 get_installation_status() (
