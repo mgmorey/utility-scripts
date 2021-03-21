@@ -33,23 +33,6 @@ get_packages() {
     "${script_prefix}get-python3-packages"
 }
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath || true)
-
-    if [ -n "$realpath" ]; then
-	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 install_pip() {
     validate_platform
     "${script_prefix}install-packages" $(get_packages)

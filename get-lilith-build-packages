@@ -37,23 +37,6 @@ get_lilith_build_packages() {
     get_packages_in $CATEGORIES | sort -u
 }
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath || true)
-
-    if [ -n "$realpath" ]; then
-	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 case "$0" in
     (*/*)
 	script_dir=$(cd "$(dirname "$0")" && pwd)

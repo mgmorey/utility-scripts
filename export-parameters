@@ -29,23 +29,6 @@ export_parameters() {
     print_parameters $parameters
 }
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath || true)
-
-    if [ -n "$realpath" ]; then
-	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf '%s\n' "$file"
-	    else
-		printf '%s\n' "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 is_valid_parameter() {
     expr "${1-}" : '[A-Z_a-z][0-9A-Z_a-z]*$' >/dev/null
 }

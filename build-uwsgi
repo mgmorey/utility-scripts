@@ -86,23 +86,6 @@ get_options() {
     printf "%s\n" "$options"
 }
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath || true)
-
-    if [ -n "$realpath" ]; then
-	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 usage_error() {
     printf "$@" >&2
     exit 2

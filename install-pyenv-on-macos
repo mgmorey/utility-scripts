@@ -36,23 +36,6 @@ get_darwin_sdkroot() {
     printf "%s/$DARWIN_SDK_BASENAME\n" $DARWIN_SDK_DIRNAME $VERSION_ID
 }
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath || true)
-
-    if [ -n "$realpath" ]; then
-	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 install_pyenv_on_macos() {
     case "$kernel_name" in
 	(Darwin)

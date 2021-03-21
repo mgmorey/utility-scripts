@@ -117,23 +117,6 @@ get_hypervisor_vendor() (
     lscpu 2>/dev/null | $awk -f "${script_prefix}get-hypervisor-vendor"
 )
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath || true)
-
-    if [ -n "$realpath" ]; then
-	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 get_sed_expr() {
     assert [ $# -eq 2 ]
     assert [ -n "$2" ]

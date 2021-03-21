@@ -57,23 +57,6 @@ get_data_files() {
     find . -maxdepth 1 '(' -name '*.csv' -o -name '*.data' ')' -type f
 }
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath || true)
-
-    if [ -n "$realpath" ]; then
-    	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 import_database() (
     assert [ $# -eq 4 ]
     assert [ -n "$1" ]

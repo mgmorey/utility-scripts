@@ -55,23 +55,6 @@ filter_proxy_parameters() {
     grep -E "$PROXY_PARAMETER_RE"
 }
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath || true)
-
-    if [ -n "$realpath" ]; then
-	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 install_file() {
     if mkdir -p "$(dirname "$2")"; then
 	if chmod a+r $"$1"; then

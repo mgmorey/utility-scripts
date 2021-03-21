@@ -199,23 +199,6 @@ get_insecure_builder() {
     docker buildx ls | awk 'NR > 1 && $1 == "insecure-builder" { print $1 }'
 }
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath || true)
-
-    if [ -n "$realpath" ]; then
-	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 parse_arguments() {
     dockerfiles=
     method=

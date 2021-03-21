@@ -143,23 +143,6 @@ get_package_manager_basename() {
     printf "%s\n" $manager_basename
 }
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath || true)
-
-    if [ -n "$realpath" ]; then
-	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 install_dependencies() {
     dependencies=$(get-kubernetes-dependencies)
 

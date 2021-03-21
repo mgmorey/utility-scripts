@@ -37,23 +37,6 @@ get_package_manager() {
     "${script_prefix}get-package-managers" | awk 'NR == 1 {print $0}'
 }
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath || true)
-
-    if [ -n "$realpath" ]; then
-	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 install_build_deps() {
     validate_platform
     install_options=$(get_install_options)

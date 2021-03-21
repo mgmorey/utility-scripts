@@ -45,23 +45,6 @@ export_parameters() {
     done
 }
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath || true)
-
-    if [ -n "$realpath" ]; then
-	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 run_in_virtualenv() {
     eval $(get-os-release -x)
     eval $("${script_prefix}get-configuration" app.ini)

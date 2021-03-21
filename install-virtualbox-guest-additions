@@ -101,23 +101,6 @@ get_package_directory() {
     ls -drv $mount_dir 2>/dev/null | head -n 1
 }
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath || true)
-
-    if [ -n "$realpath" ]; then
-	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 install_kernel_packages() {
     if [ -n "${packages-}" ]; then
 	"${script_prefix}install-packages" $packages

@@ -36,23 +36,6 @@ get_darwin_pkg_pathname() {
     printf "%s/$DARWIN_PKG_BASENAME\n" $DARWIN_PKG_DIRNAME $VERSION_ID
 }
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath || true)
-
-    if [ -n "$realpath" ]; then
-	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 install_macos_sdk_headers() {
     case "$kernel_name" in
 	(Darwin)

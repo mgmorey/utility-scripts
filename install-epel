@@ -46,23 +46,6 @@ configure_platform() {
     esac
 }
 
-get_realpath() (
-    assert [ $# -ge 1 ]
-    realpath=$(which realpath || true)
-
-    if [ -n "$realpath" ]; then
-	$realpath "$@"
-    else
-	for file; do
-	    if expr "$file" : '/.*' >/dev/null; then
-		printf "%s\n" "$file"
-	    else
-		printf "%s\n" "$PWD/${file#./}"
-	    fi
-	done
-    fi
-)
-
 get_url() {
     printf "%s\n" "$EPEL_BASE_URL/epel-release-latest-$version.noarch.rpm"
 }
