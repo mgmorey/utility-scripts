@@ -67,7 +67,7 @@ get_homebrew_prefix() (
 	return
     fi
 
-    dir="$(get_realpath "$(dirname "$brew")/../opt")"
+    dir="$(cd "$(dirname "$brew")/../opt" && pwd)"
 
     if [ -d "$dir" ]; then
 	printf '%s\n' "$dir"
@@ -399,7 +399,7 @@ script=$(basename "$0")
 
 case "$0" in
     (*/*)
-	script_dir=$(get_realpath "$(dirname "$0")")
+	script_dir=$(cd "$(dirname "$0")" && pwd)
 	;;
     (*)
 	script_dir=

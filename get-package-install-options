@@ -120,7 +120,7 @@ get_realpath() (
 
 case "$0" in
     (*/*)
-        script_dir=$(get_realpath "$(dirname "$0")")
+        script_dir=$(cd "$(dirname "$0")" && pwd)
         ;;
     (*)
         script_dir=

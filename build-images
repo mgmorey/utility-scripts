@@ -29,7 +29,7 @@ assert() {
 
 build_images() {
     for dockerfile; do
-	build_image $(get_realpath "$(dirname "$dockerfile")")
+	build_image $(cd "$(dirname "$dockerfile")" && pwd)
     done
 }
 
@@ -171,7 +171,7 @@ get_image_dir_prefix() {
 }
 
 get_image_dir_root() {
-    printf "%s\n" "$(get_realpath "${IMAGE_DIR_ROOT-$HOME}")"
+    printf "%s\n" "$(cd "${IMAGE_DIR_ROOT-$HOME}" && pwd)"
 }
 
 get_image_method() {
@@ -315,7 +315,7 @@ usage_error() {
 
 case "$0" in
     (*/*)
-	script_dir=$(get_realpath "$(dirname "$0")")
+	script_dir=$(cd "$(dirname "$0")" && pwd)
 	;;
     (*)
 	script_dir=

@@ -48,7 +48,7 @@ get_sudo_user_home() {
 
 case "$0" in
     (*/*)
-	script_dir=$(get_realpath "$(dirname "$0")")
+	script_dir=$(cd "$(dirname "$0")" && pwd)
 	;;
     (*)
 	script_dir=

@@ -154,7 +154,7 @@ usage_error() {
 }
 
 script_basename="$(basename "$0")"
-script_dirname="$(get_realpath "$(dirname "$0")")"
+script_dirname="$(cd "$(dirname "$0")" && pwd)"
 
 . "$script_dirname/sap-hana-config.sh"
 
