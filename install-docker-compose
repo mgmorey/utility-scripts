@@ -137,7 +137,14 @@ get_hardware() {
 }
 
 get_installed_filenames() {
-    PATH=$(normalize_path) which -a $FILENAME || true
+    if [ -x /bin/realpath ]; then
+	realpath=/bin/realpath
+    else
+	realpath=get_realpath
+    fi
+
+    files=$(/usr/bin/which -a $FILENAME | quote_lines)
+    eval $realpath $files 2>/dev/null | sort -u
 }
 
 get_installation_status() (
@@ -325,25 +332,6 @@ is_valid_version() {
     fi >/dev/null
 }
 
-join_dirs() {
-    tr '\n' ':' | sed 's/:$/\n/'
-}
-
-normalize_dirs() {
-    sort -u | sed 's/^\(.*\)$/"\1"/'
-}
-
-normalize_path() {
-    if [ -x /bin/realpath ]; then
-	realpath=/bin/realpath
-    else
-	realpath=get_realpath
-    fi
-
-    dirs=$(printf '%s\n' "${1-$PATH}" | split_path | normalize_dirs)
-    eval $realpath $dirs 2>/dev/null | join_dirs
-}
-
 parse_arguments() {
     action=install
     bar=false
@@ -482,8 +470,8 @@ query_compose() {
     print_summary
 }
 
-split_path() {
-    tr ':' '\n'
+quote_lines() {
+    sed 's/^\(.*\)$/"\1"/'
 }
 
 uninstall_compose() {
