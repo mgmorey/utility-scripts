@@ -137,7 +137,7 @@ get_hardware() {
 }
 
 get_installed_filenames() {
-    PATH=$(normalize_path) which -a $FILENAME
+    PATH=$(normalize_path) which -a $FILENAME || true
 }
 
 get_installation_status() (
