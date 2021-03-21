@@ -82,8 +82,8 @@ start_databases() {
     done
 }
 
-script_basename="$(basename "$0")"
-script_dirname="$(realpath "$(dirname "$0")")"
+script_basename=$(basename "$0")
+script_dirname=$(realpath "$(dirname "$0")")
 
 . "$script_dirname/oracle-config.sh"
 . "$script_dirname/oracle-library.sh"

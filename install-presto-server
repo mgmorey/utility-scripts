@@ -167,8 +167,8 @@ if [ $# -gt 0 ]; then
     usage_error "%s: Too many arguments\n" "$0"
 fi
 
-script_basename="$(basename "$0")"
-script_dirname="$(cd "$(dirname "$0")" && pwd)"
+script_basename=$(basename "$0")
+script_dirname=$(cd "$(dirname "$0")" && pwd)
 
 . "$script_dirname/common-functions.sh"
 

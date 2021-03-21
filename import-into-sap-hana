@@ -136,8 +136,8 @@ usage_error() {
     exit 2
 }
 
-script_basename="$(basename "$0")"
-script_dirname="$(cd "$(dirname "$0")" && pwd)"
+script_basename=$(basename "$0")
+script_dirname=$(cd "$(dirname "$0")" && pwd)
 
 . "$script_dirname/sap-hana-config.sh"
 
