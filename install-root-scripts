@@ -40,8 +40,6 @@ get_install_command() {
 }
 
 get_realpath() (
-    assert [ $# -ge 1 ]
-
     for file; do
 	if expr "$file" : '/.*' >/dev/null; then
 	    printf "%s\n" "$file"
