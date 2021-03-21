@@ -328,8 +328,8 @@ is_valid_version() {
 }
 
 normalize_path() {
-    if [ -x /usr/bin/realpath ]; then
-	realpath=/usr/bin/realpath
+    if [ -x /bin/realpath ]; then
+	realpath=/bin/realpath
     else
 	realpath=get_realpath
     fi
