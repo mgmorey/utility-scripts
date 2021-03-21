@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-if [ $# -gt 0 ]; then
-    printf '%s\n' "$@"
+if [ $# -ge 1 ]; then
+    printf '%s\n' "$1"
 else
     cat
 fi | awk -v RS=: '{print}' | sed '/^$/d'
