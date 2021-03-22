@@ -86,7 +86,13 @@ install_root_scripts() {
 }
 
 is_valid_script_dirname() {
-    expr "${1-}" : '/..*/\(scripts\|..*-scripts\)$' >/dev/null
+    if expr "${1-}" : '..*/..*-scripts$'; then
+	true
+    elif expr "${1-}" : '..*/scripts$'; then
+	true
+    else
+	false
+    fi >/dev/null
 }
 
 parse_arguments() {
