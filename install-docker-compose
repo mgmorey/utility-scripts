@@ -144,7 +144,7 @@ get_installed_filenames() {
     fi
 
     filenames=$(/usr/bin/which -a $FILENAME | quote_lines)
-    eval $realpath $filenames | awk '!_[$0]++'
+    eval $realpath $filenames | remove_duplicate_lines
 }
 
 get_installation_status() (
@@ -472,6 +472,10 @@ query_compose() {
 
 quote_lines() {
     sed 's/^\(.*\)$/"\1"/'
+}
+
+remove_duplicate_lines() {
+    awk '!_[$0]++'
 }
 
 uninstall_compose() {
