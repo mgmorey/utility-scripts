@@ -25,7 +25,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
 }
 
 get_install_command() {
@@ -38,16 +38,6 @@ get_install_command() {
 	    ;;
     esac
 }
-
-get_realpath() (
-    for file; do
-	if expr "$file" : '/.*' >/dev/null; then
-	    printf "%s\n" "$file"
-	else
-	    printf "%s\n" "$PWD/${file#./}"
-	fi
-    done
-)
 
 get_script_files() {
     assert [ $# -eq 1 ]
@@ -82,23 +72,26 @@ install_script_files() {
 }
 
 install_root_scripts() {
-    source_dir=$(get_realpath "$(pwd)")
+    source_dir=$(pwd)
 
-    case "$(basename "$source_dir")" in
-	(scripts|*-scripts)
-	    true
-	    ;;
-	(*)
-	    abort "%s: Please change to the source directory and try again\n" "$0"
-	    ;;
-    esac
+    if ! is_valid_script_dirname "$source_dir"; then
+	abort "%s: %s\n" \
+	      "Please change to the source directory and try again" \
+	      "$script"
+    fi
 
+    target_dir=$(cd "$target_dir" && pwd)
+    mkdir -p "$target_dir"
     install_script_files
+}
+
+is_valid_script_dirname() {
+    expr "${1-}" : '/..*/\(scripts\|..*-scripts\)$' >/dev/null
 }
 
 parse_arguments() {
     if [ $# -gt 1 ]; then
-	usage_error "%s: Too many arguments\n" "$0"
+	usage_error "%s: Too many arguments\n" "$script"
     fi
 
     if [ $# -gt 0 ]; then
@@ -112,6 +105,8 @@ usage_error() {
     printf "$@" >&2
     exit 2
 }
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
