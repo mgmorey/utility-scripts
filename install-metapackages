@@ -1,0 +1,147 @@
+#!/bin/sh -eu
+
+# install-metapackages: install packages for given metapackages
+# Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_not_supported() {
+    abort "%s: %s: %s not supported\n" "$script" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+}
+
+get_packages() {
+    "${script_prefix}get-packages" "$@"
+}
+
+install_package_categories() {
+    validate_platform
+    install-packages $(get_packages "$@")
+}
+
+validate_platform() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			return
+			;;
+		    (8)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (debian)
+		case "$VERSION_ID" in
+		    (10)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (fedora)
+		return
+		;;
+	    (opensuse)
+		return
+		;;
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		    (7|7.*)
+			return
+			;;
+		    (8|8.*)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.*)
+			return
+			;;
+		    (19.*)
+			return
+			;;
+		    (20.*)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (freebsd)
+		return
+		;;
+	    (macos)
+		return
+		;;
+	    (netbsd)
+		return
+		;;
+	    (solaris)
+		return
+		;;
+	    (windows)
+		case "$kernel_name" in
+		    (MINGW64_NT)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	esac
+    done
+
+    abort_not_supported "Operating system"
+}
+
+script=$0
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+install_package_categories "$@"
