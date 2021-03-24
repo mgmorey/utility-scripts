@@ -54,7 +54,12 @@ get_parameter() {
     printf "%s-%s\n" "$1" "$2" | tr '[:lower:]' '[:upper:]' | tr '-' '_'
 }
 
+is_valid_category() {
+    expr "${1-}" : '[a-z][0-9a-z-]*$' >/dev/null
+}
+
 parse_arguments() {
+    categories=
     suffix=
 
     while getopts i:l:d:s:v:h opt; do
@@ -87,7 +92,17 @@ parse_arguments() {
 	usage_error "%s: Not enough arguments\n" "$script"
     fi
 
-    categories="$@"
+    for category; do
+	parse_category "$category"
+    done
+}
+
+parse_category() {
+    if is_valid_category "$1"; then
+	categories="${categories:+$categories }$1"
+    else
+	usage_error '%s: %s: Invalid category\n' "$script" "$1"
+    fi
 }
 
 usage() {
