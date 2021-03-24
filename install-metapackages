@@ -33,9 +33,64 @@ get_packages() {
     "${script_prefix}get-packages" "$@"
 }
 
-install_package_categories() {
+install_metapackages() {
     validate_platform
-    install-packages $(get_packages "$@")
+    install-packages $(get_packages $categories)
+}
+
+is_valid_category() {
+    expr "${1-}" : '[a-z][0-9a-z-]*$' >/dev/null
+}
+
+parse_arguments() {
+    categories=
+
+    while getopts h opt; do
+	case $opt in
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -lt 1 ]; then
+	usage_error "%s: Not enough arguments\n" "$script"
+    fi
+
+    for category; do
+	parse_category "$category"
+    done
+}
+
+parse_category() {
+    if is_valid_category "$1"; then
+	categories="${categories:+$categories }$1"
+    else
+	usage_error '%s: %s: Invalid category\n' "$script" "$1"
+    fi
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script CATEGORY [...]
+       $script -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
 }
 
 validate_platform() {
@@ -127,7 +182,7 @@ validate_platform() {
     abort_not_supported "Operating system"
 }
 
-script=$0
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
@@ -144,4 +199,5 @@ script_prefix=${script_dir:+$script_dir/}
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-install_package_categories "$@"
+parse_arguments "$@"
+install_metapackages
