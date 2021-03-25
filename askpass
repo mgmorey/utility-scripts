@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
 }
 
 parse_arguments() {
@@ -50,7 +50,7 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $is_query = true -a $# -gt 0 ]; then
-	usage_error "%s: Too many arguments\n" "$0"
+	usage_error "%s: Too many arguments\n" "$script"
     elif [ $# -gt 0 ]; then
 	commands="$*"
     else
@@ -60,9 +60,9 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $0 [-s SHELL] [COMMAND [COMMAND] ...]
-       $0 -q
-       $0 -h
+Usage: $script [-s SHELL] [COMMAND [COMMAND] ...]
+       $script -q
+       $script -h
 EOF
 }
 
@@ -75,6 +75,8 @@ usage_error() {
     usage
     exit 2
 }
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
