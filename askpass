@@ -96,5 +96,3 @@ if [ $is_query = true ]; then
 else
     "${script_prefix}set-askpass-parameters" -s $shell ${commands-}
 fi
-
-pwd
