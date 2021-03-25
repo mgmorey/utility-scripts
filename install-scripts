@@ -120,8 +120,14 @@ install_scripts() {
 	      "$script"
     fi
 
-    target_dir=$(cd "$target_dir" && pwd)
-    mkdir -p "$target_dir"
+    if [ -n "$target_dir" ]; then
+	target_dir=$(cd "$target_dir" && pwd)
+    else
+	target_dir="$HOME/bin"
+	mkdir -p "$target_dir"
+	target_dir=$(cd "$target_dir" && pwd)
+    fi
+
     install_library_files
     install_script_files
     remove_broken_links
@@ -139,6 +145,7 @@ is_valid_script_dirname() {
 
 parse_arguments() {
     method=
+    target_dir=
 
     while getopts cish opt; do
 	case $opt in
@@ -169,8 +176,6 @@ parse_arguments() {
 
     if [ $# -gt 0 ]; then
 	target_dir="$1"
-    else
-	target_dir="$HOME/bin"
     fi
 }
 
