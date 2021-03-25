@@ -16,19 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-abort() {
-    printf "$@" >&2
-    exit 1
-}
-
-assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
-}
-
 install_askpass_helper() {
     "${script_prefix}install-packages" \
 	$("${script_prefix}get-askpass-package" "$@")
 }
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
