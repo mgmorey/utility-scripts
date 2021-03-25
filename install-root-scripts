@@ -81,7 +81,6 @@ install_root_scripts() {
     fi
 
     target_dir=$(cd "$target_dir" && pwd)
-    mkdir -p "$target_dir"
     install_script_files
 }
 
