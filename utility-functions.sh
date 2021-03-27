@@ -27,13 +27,12 @@ activate_virtualenv() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     assert [ -d $1/bin -a -r $1/bin/activate ]
+    shell_state=$(set +o)
 
     if [ "${VENV_VERBOSE-false}" = true ]; then
 	printf '%s\n' "Activating virtual environment" >&2
     fi
 
-    shell_state=$(set +o)
-    set +euvx
     . "$1/bin/activate"
     eval "$shell_state"
 }
@@ -42,7 +41,7 @@ check_python() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
     assert [ -n "$2" ]
-    printf "Python %s interpreter found: %s\n" "$2" "$1" >&2
+    printf 'Python %s interpreter found: %s\n' "$2" "$1" >&2
 
     if ! "$1" "$(/usr/bin/which test-python-version)" $2 >&2; then
 	return 1
@@ -66,7 +65,7 @@ compare_pipenv_versions() {
 create_virtualenv() (
     assert [ $# -ge 1 ]
     assert [ -n "$1" ]
-    python="${2-}"
+    python=${2-}
 
     if [ -z "${python-}" ]; then
 	python=$(find_system_python | awk '{print $1}')
@@ -89,7 +88,7 @@ create_virtualenv() (
     fi
 
     if [ "$VENV_VERBOSE" = true ]; then
-	printf "Creating virtual environment in %s\n" "$1" >&2
+	printf 'Creating virtual environment in %s\n' "$1" >&2
     fi
 
     for utility in ${venv_utilities-$VENV_UTILITIES}; do
@@ -115,7 +114,7 @@ create_virtualenv() (
 	if [ "$VENV_VERBOSE" = true ]; then
 	    pathname=$(printf '%s\n' "$command" | awk '{print $1}')
 	    version=$($pathname --version)
-	    printf "Using %s %s from %s\n" \
+	    printf 'Using %s %s from %s\n' \
 		   "$utility" \
 		   "${version#Python }" \
 		   "$(/usr/bin/which $pathname)" >&2
@@ -158,10 +157,10 @@ find_python() (
 find_system_python() (
     if [ -n "${SYSTEM_PYTHON-}" -a -n "${SYSTEM_PYTHON_VERSION-}" ]; then
 	basename=$(basename "$SYSTEM_PYTHON")
-	python="$SYSTEM_PYTHON"
-	suffix="${basename#python}"
-	version="$SYSTEM_PYTHON_VERSION"
-	printf "%s %s %s\n" "$python" "$suffix" "$version"
+	python=$SYSTEM_PYTHON
+	suffix=${basename#python}
+	version=$SYSTEM_PYTHON_VERSION
+	printf '%s %s %s\n' "$python" "$suffix" "$version"
     else
 	find_system_pythons | head -n 1
     fi
@@ -175,7 +174,7 @@ find_system_pythons() (
 		version=$(get_python_version $python 2>/dev/null || true)
 
 		if [ -n "$version" ]; then
-		    printf "%s %s %s\n" "$python" "$suffix" "$version"
+		    printf '%s %s %s\n' "$python" "$suffix" "$version"
 		fi
 	    fi
 	done
@@ -200,7 +199,7 @@ find_user_python() (
 
 	    if [ -z "$python" -a -n "${SYSTEM_PYTHON-}" ]; then
 		basename=$(basename "$SYSTEM_PYTHON")
-		suffix="${basename#python}"
+		suffix=${basename#python}
 
 		if [ "$suffix" = "$version" ]; then
 		    python="$SYSTEM_PYTHON"
@@ -279,7 +278,7 @@ generate_requirements() (
 	esac
 
 	options="${options:+$options }--requirements"
-	printf "Generating %s\n" "$file"
+	printf 'Generating %s\n' "$file"
 	create_tmpfile
 
 	if $pipenv lock $options >$tmpfile; then
@@ -297,7 +296,7 @@ get_command() (
 
     if [ $# -ge 1 ] && [ "$1" = -p ]; then
 	dirname=$(dirname "$2")
-	versions="${2#*python}"
+	versions=${2#*python}
 	shift 2
     else
 	dirname=
@@ -380,7 +379,7 @@ get_pip_command() {
 }
 
 get_pip_requirements() {
-    printf -- "--requirement %s\n" ${pip_install_files:-$PIP_INSTALL_MAIN}
+    printf -- '--requirement %s\n' ${pip_install_files:-$PIP_INSTALL_MAIN}
 }
 
 get_python_version() {
@@ -494,7 +493,7 @@ install_via_pip() (
     fi
 
     if [ "$PIP_INSTALL_VERBOSE" = true ]; then
-	printf "Using %s\n" "$("$pip" --version)" >&2
+	printf 'Using %s\n' "$("$pip" --version)" >&2
     fi
 
     if [ "$(id -u)" -eq 0 ]; then
