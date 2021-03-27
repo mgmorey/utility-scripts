@@ -262,7 +262,7 @@ generate_requirements() (
 		options=--dev
 		;;
 	    (dev-requirements.txt)
-		delta=$(compare_pipenv_versions $pipenv)
+		delta=$(compare_pipenv_versions "$pipenv")
 
 		if [ ${delta:-0} -ge 0 ]; then
 		    options=--dev-only
@@ -339,11 +339,18 @@ get_command() (
 )
 
 get_command_helper() (
-    if ! expr "$2" : pyvenv >/dev/null; then
-	scripts="${1:+$1/}$2${3-}${3+ ${1:+$1/}$2-$3}"
-    else
-	scripts=
-    fi
+    case "${uname_kernel=$(uname -s)}" in
+	(MINGW64_NT-*)
+	    scripts=
+	    ;;
+	(*)
+	    if ! expr "$2" : pyvenv >/dev/null; then
+		scripts="${1:+$1/}$2${3-}${3+ ${1:+$1/}$2-$3}"
+	    else
+		scripts=
+	    fi
+	    ;;
+    esac
 
     for command in $scripts "${1:+$1/}python${3-} -m $module"; do
 	if $command $option >/dev/null 2>&1; then
@@ -502,7 +509,7 @@ install_via_pip() (
 	options=
     fi
 
-    delta=$(compare_pip_versions $pip)
+    delta=$(compare_pip_versions "$pip")
 
     if [ ${delta:-0} -gt 0 ]; then
 	options="${options:+$options }--no-warn-script-location"
@@ -594,7 +601,7 @@ upgrade_via_pip() (
 	return
     fi
 
-    pip=$(get_pip_command)
+    pip=$(get_pip_command "$(find_python)")
 
     if [ -z "$pip" ]; then
 	abort "%s: No pip command found in PATH\n" "$0"
