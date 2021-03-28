@@ -19,7 +19,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 get_service_parameters() {
@@ -47,21 +47,21 @@ EOF
 
 print_parameter() {
     if [ -n "${1-}" ]; then
-	printf "%s\n" "$1"
+	printf '%s\n' "$1"
     else
-	printf "%s\n" "<none>"
+	printf '%s\n' "<none>"
     fi
 }
 
 print_path() {
     if [ -n "${1-}" ]; then
 	if [ -e $1 ]; then
-	    printf "%s\n" "$1"
+	    printf '%s\n' "$1"
 	else
-	    printf "%s\n" "$1 (not found)"
+	    printf '%s\n' "$1 (not found)"
 	fi
     else
-	printf "%s\n" "<none>"
+	printf '%s\n' "<none>"
     fi
 }
 
@@ -77,8 +77,10 @@ print_status() {
 	border=0
     done
 
-    printf "Service %s is %s\n" "$APP_NAME" "$1"
+    printf 'Service %s is %s\n' "$APP_NAME" "$1"
 }
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
