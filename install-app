@@ -24,18 +24,18 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 build_uwsgi_from_source() {
     if ! run_unpriv /bin/sh -c "\"build-uwsgi\" $*"; then
-	abort "%s: Unable to build uWSGI\n" "$0"
+	abort '%s: Unable to build uWSGI\n' "$script"
     fi
 }
 
 change_owner() (
     assert [ $# -ge 1 ]
-    dirs=$(printf "%s\n" "$@" | sort -u)
+    dirs=$(printf '%s\n' "$@" | sort -u)
 
     if [ "$(id -u)" -gt 0 ]; then
 	return 0
@@ -46,19 +46,19 @@ change_owner() (
     if [ $dryrun = true ]; then
 	check_permissions $dirs
     else
-	printf "Changing ownership of directory %s\n" $dirs
+	printf 'Changing ownership of directory %s\n' $dirs
 	chown -R "$APP_UID:$APP_GID" $dirs
     fi
 )
 
 create_dirs() (
     assert [ $# -ge 1 ]
-    dirs=$(printf "%s\n" "$@" | sort -u)
+    dirs=$(printf '%s\n' "$@" | sort -u)
 
     if [ $dryrun = true ]; then
 	check_permissions $dirs
     else
-	printf "Creating directory %s\n" $dirs
+	printf 'Creating directory %s\n' $dirs
 	mkdir -p $dirs
     fi
 )
@@ -176,7 +176,7 @@ install_app_files() (
 
 install_dependencies() {
     if ! install-python-build-deps; then
-	abort "%s: Unable to install dependencies\n" "$0"
+	abort '%s: Unable to install dependencies\n' "$script"
     fi
 }
 
@@ -228,7 +228,7 @@ install_virtualenv() (
     if [ $dryrun = true ]; then
 	check_permissions_single "$1"
     else
-	printf "Installing virtual environment in %s\n" "$1" >&2
+	printf 'Installing virtual environment in %s\n' "$1" >&2
 	pip_install_files=$PIP_INSTALL_MAIN
 	venv_force_sync=true
 	refresh_via_pip $1 $SYSTEM_PYTHON
@@ -270,14 +270,14 @@ print_status() {
     case "$1" in
 	(running)
 	    print_app_processes 1
-	    printf "Service %s installed and started successfully\n" "$APP_NAME"
+	    printf 'Service %s installed and started successfully\n' "$APP_NAME"
 	    print_elapsed_time started
 	    ;;
 	(stopped)
-	    printf "Service %s installed successfully\n" "$APP_NAME"
+	    printf 'Service %s installed successfully\n' "$APP_NAME"
 	    ;;
 	(*)
-	    printf "Service %s is %s\n" "$APP_NAME" "$1" >&2
+	    printf 'Service %s is %s\n' "$APP_NAME" "$1" >&2
 	    ;;
     esac
 }
@@ -291,8 +291,8 @@ run_in_virtualenv() (
 
 usage() {
     cat <<EOF >&2
-Usage: $0: [-v <VENV-UTILITIES>]
-       $0: -h
+Usage: $script: [-v <VENV-UTILITIES>]
+       $script: -h
 EOF
 }
 
@@ -301,10 +301,12 @@ usage_error() {
 	printf "$@" >&2
     fi
 
-    printf "%s\n" '' >&2
+    printf '%s\n' '' >&2
     usage
     exit 2
 }
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)

@@ -25,19 +25,19 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 get_all_parameters() {
-    printf "%s\n" $UPPER_PARAMETERS $LOWER_PARAMETERS
+    printf '%s\n' $UPPER_PARAMETERS $LOWER_PARAMETERS
 }
 
 get_default_remote_image() {
-    printf "%s\n" "${DOCKER_USERNAME-$(get_real_user)}/$APP_NAME"
+    printf '%s\n' "${DOCKER_USERNAME-$(get_real_user)}/$APP_NAME"
 }
 
 get_default_run_options() {
-    printf "%s\n" -dp $APP_PORT:$APP_PORT --rm
+    printf '%s\n' -dp $APP_PORT:$APP_PORT --rm
 }
 
 get_default_tag() {
@@ -85,7 +85,7 @@ docker_app() {
 	    docker run ${run_opts+$run_opts }$image${tag:+:$tag}
 	    ;;
 	(*)
-	    usage_error "%s: invalid argument -- %s\n" "$0" "$1"
+	    usage_error "%s: invalid argument -- %s\n" "$script" "$1"
 	    ;;
     esac
 }
@@ -117,9 +117,9 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -lt 1 ]; then
-	usage_error "%s: Not enough arguments\n" "$0"
+	usage_error '%s: Not enough arguments\n' "$script"
     elif [ $# -gt 1 ]; then
-	usage_error "%s: Too many arguments\n" "$0"
+	usage_error '%s: Too many arguments\n' "$script"
     fi
 
     action="$1"
@@ -127,9 +127,9 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $0 [-t TAG] pull
-       $0 [-t TAG] push
-       $0 [-t TAG] tag
+Usage: $script [-t TAG] pull
+       $script [-t TAG] push
+       $script [-t TAG] tag
 EOF
 }
 
@@ -138,10 +138,12 @@ usage_error() {
 	printf "$@" >&2
     fi
 
-    printf "%s\n" '' >&2
+    printf '%s\n' '' >&2
     usage
     exit 2
 }
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)

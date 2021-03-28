@@ -19,7 +19,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 control_app_enable() {
@@ -33,7 +33,7 @@ control_app_start() {
 	return 0
     fi
 
-    printf "Waiting for service %s to start\n" "$APP_NAME"
+    printf 'Waiting for service %s to start\n' "$APP_NAME"
     elapsed=$((elapsed + $(wait_for_service $((WAIT_RESTART - elapsed)))))
 
     if [ $elapsed -lt $WAIT_DEFAULT ]; then
@@ -52,7 +52,7 @@ create_symlink() {
 	assert [ -r $1 ]
 
 	if [ $1 != $2 -a ! -e $2 ]; then
-	    printf "Creating link %s\n" "$2"
+	    printf 'Creating link %s\n' "$2"
 	    mkdir -p $(dirname $2)
 	    /bin/ln -s $1 $2
 	fi
@@ -111,7 +111,7 @@ print_status() (
 	    ;;
     esac
 
-    printf "Service %s is %s\n" "$APP_NAME" "$status"
+    printf 'Service %s is %s\n' "$APP_NAME" "$status"
 )
 
 run_service() {
@@ -146,6 +146,8 @@ start_app() {
 	run_service
     fi
 }
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)

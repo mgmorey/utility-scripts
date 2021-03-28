@@ -19,7 +19,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 parse_arguments() {
@@ -43,7 +43,7 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -gt 0 ]; then
-	usage_error "%s: Too many arguments\n" "$0"
+	usage_error "%s: Too many arguments\n" "$script"
     fi
 }
 
@@ -81,12 +81,12 @@ uninstall_app() {
 	remove_service
     done
 
-    printf "Service %s uninstalled successfully\n" $APP_NAME
+    printf 'Service %s uninstalled successfully\n' $APP_NAME
 }
 
 usage() {
     cat <<EOF >&2
-Usage: $0: [-h] [-p]
+Usage: $script: [-h] [-p]
 EOF
 }
 
@@ -95,10 +95,12 @@ usage_error() {
 	printf "$@" >&2
     fi
 
-    printf "%s\n" '' >&2
+    printf '%s\n' '' >&2
     usage
     exit 2
 }
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)

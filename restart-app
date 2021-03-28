@@ -19,7 +19,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 print_status() (
@@ -39,8 +39,10 @@ print_status() (
 	    ;;
     esac
 
-    printf "Service %s is %s\n" "$APP_NAME" "$status"
+    printf 'Service %s is %s\n' "$APP_NAME" "$status"
 )
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)

@@ -33,7 +33,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 export_parameters() {
@@ -65,7 +65,7 @@ run_app() {
     elif [ -n "$pip" ]; then
 	run_via_pip "$@"
     else
-	abort "%s: Neither pip nor pipenv command found in PATH\n" "$0"
+	abort '%s: Neither pip nor pipenv command found in PATH\n' "$script"
     fi
 }
 
@@ -99,12 +99,14 @@ run_via_pipenv() {
 }
 
 if [ $# -lt 1 ]; then
-    abort "%s: Not enough arguments\n" "$0"
+    abort '%s: Not enough arguments\n' "$script"
 fi
 
 if [ "$(id -u)" -eq 0 ]; then
-    abort "%s: Must be run as a non-privileged user\n" "$0"
+    abort '%s: Must be run as a non-privileged user\n' "$script"
 fi
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
