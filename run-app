@@ -45,49 +45,9 @@ export_parameters() {
     done
 }
 
-run_in_virtualenv() {
+run_app() {
     eval $(get-os-release -x)
     eval $("${script_prefix}get-configuration" app.ini)
-
-    while getopts d:h:p: opt; do
-	case $opt in
-	    (d)
-		if [ "$OPTARG" != "$(pwd)" ]; then
-		    if [ "${ENV_VERBOSE-false}" = true ]; then
-			printf "Changing directory from: %s\n" "$(pwd)" >&2
-			printf "Changing directory to: %s\n" "$OPTARG" >&2
-		    fi
-
-		    cd "$OPTARG"
-		fi
-		;;
-	    (h)
-		if [ "$OPTARG" != "$HOME" ]; then
-		    if [ "${ENV_VERBOSE-false}" = true ]; then
-			printf "Changing HOME from: %s\n" "$HOME" >&2
-			printf "Changing HOME to: %s\n" "$OPTARG" >&2
-		    fi
-
-		    cd "$OPTARG"
-		fi
-		;;
-	    (p)
-		if [ "$OPTARG" != "$PATH" ]; then
-		    if [ "${ENV_VERBOSE-false}" = true ]; then
-			printf "Changing PATH from: %s\n" "$PATH" >&2
-			printf "Changing PATH to: %s\n" "$OPTARG" >&2
-		    fi
-
-		    export PATH="$OPTARG"
-		fi
-		;;
-	    (\?)
-		exit 2
-		;;
-	esac
-    done
-
-    shift $(($OPTIND - 1))
 
     if [ -z "${FLASK_APP-}" -a -n "${APP_MODULE-}" ]; then
 	FLASK_APP=$APP_MODULE
@@ -115,7 +75,7 @@ run_via_pip() {
 
     if [ -r .env ]; then
 	if [ "${VENV_VERBOSE-false}" = true ]; then
-	    printf "%s\n" "Loading .env environment variables" >&2
+	    printf '%s\n' "Loading .env environment variables" >&2
 	fi
 
 	. ./.env
@@ -161,4 +121,4 @@ script_prefix=${script_dir:+$script_dir/}
 . "${script_prefix}utility-functions.sh"
 
 set_user_profile "$script_dir"
-run_in_virtualenv "$@"
+run_app "$@"
