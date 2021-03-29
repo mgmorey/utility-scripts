@@ -339,16 +339,14 @@ get_command() (
 )
 
 get_command_helper() (
-    case "${uname_kernel=$(uname -s)}" in
-	(MINGW64_NT-*)
-	    scripts=
+    assert [ $# -ge 2 ]
+
+    case "$2" in
+	(pipenv)
+	    scripts="${1:+$1/}$2"
 	    ;;
 	(*)
-	    if ! expr "$2" : pyvenv >/dev/null; then
-		scripts="${1:+$1/}$2${3-}${3+ ${1:+$1/}$2-$3}"
-	    else
-		scripts=
-	    fi
+	    scripts=
 	    ;;
     esac
 
