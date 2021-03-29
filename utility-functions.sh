@@ -183,6 +183,14 @@ find_system_pythons() (
 
 find_user_python() (
     assert [ $# -eq 1 ]
+
+    case "${uname_kernel=$(uname -s)}" in
+	(MINGW64_NT-*)
+	    printf '%s\n' "$1"
+	    return 0
+	    ;;
+    esac
+
     python_versions=$($1 "$(/usr/bin/which test-python-version)")
 
     if pyenv --version >/dev/null 2>&1; then
