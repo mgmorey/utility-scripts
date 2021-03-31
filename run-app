@@ -38,6 +38,9 @@ assert() {
 
 configure_platform() {
     case "${uname_kernel=$(uname -s)}" in
+	(CYGWIN_NT-*)
+	    pypi_utilities=pip
+	    ;;
 	(MINGW64_NT-*)
 	    pypi_utilities=pip
 	    ;;
