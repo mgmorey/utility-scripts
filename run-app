@@ -23,10 +23,6 @@ FLASK_ENV_VARS="FLASK_APP FLASK_ENV"
 
 ENV_VERBOSE=false
 
-: ${LANG:=en_US.UTF-8}
-: ${LC_ALL:=en_US.UTF-8}
-export LANG LC_ALL
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -162,6 +158,11 @@ run_via_pipenv() {
     fi
 }
 
+usage_error() {
+    printf "$@" >&2
+    exit 2
+}
+
 script=$(basename "$0")
 
 case "$0" in
@@ -178,8 +179,15 @@ script_prefix=${script_dir:+$script_dir/}
 . "${script_prefix}common-functions.sh"
 . "${script_prefix}utility-functions.sh"
 
+export LANG=${LANG-en_US.UTF-8}
+export LC_ALL=${LC_ALL-en_US.UTF-8}
+
 if [ $# -lt 1 ]; then
-    abort '%s: Not enough arguments\n' "$script"
+    usage_error '%s: Not enough arguments\n' "$script"
+fi
+
+if [ -n "${VIRTUAL_ENV:-}" ]; then
+    abort '%s: Must not be run within a virtual environment\n' "$script"
 fi
 
 real_user=$(get_real_user)

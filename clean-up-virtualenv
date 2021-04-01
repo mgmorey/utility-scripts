@@ -22,22 +22,40 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 clean_up_virtualenv() {
-    run_unpriv "${script_prefix}clean-up-pipenv"
-    /bin/rm -rf ${VENV_DIRECTORY-venv}
+    for utility in ${pypi_utilities:-$PYPI_UTILITIES}; do
+	case "$utility" in
+	    (pipenv)
+		run_unpriv "${script_prefix}clean-up-pipenv"
+		;;
+	    (pip)
+		/bin/rm -rf ${VENV_DIRECTORY-venv}
+		;;
+	esac
+    done
+}
+
+configure_platform() {
+    case "${uname_kernel=$(uname -s)}" in
+	(CYGWIN_NT-*)
+	    pypi_utilities=pip
+	    ;;
+	(MINGW64_NT-*)
+	    pypi_utilities=pip
+	    ;;
+	(*)
+	    pypi_utilities=
+	    ;;
+    esac
 }
 
 usage_error() {
     printf "$@" >&2
     exit 2
 }
-
-if [ $# -gt 0 ]; then
-    usage_error "%s: Too many arguments\n" "$0"
-fi
 
 case "$0" in
     (*/*)
@@ -48,9 +66,16 @@ case "$0" in
 	;;
 esac
 
+script=$(basename "$0")
+
 script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
 
+if [ $# -gt 0 ]; then
+    usage_error "%s: Too many arguments\n" "$script"
+fi
+
 eval $("${script_prefix}get-configuration" app.ini)
+configure_platform
 clean_up_virtualenv
