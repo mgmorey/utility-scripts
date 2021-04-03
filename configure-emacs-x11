@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 BASE_URL=https://mirrors.ocf.berkeley.edu/gnu
-EMACS_VERSION=27.1
+EMACS_VERSION=27.2
 
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
@@ -109,7 +109,7 @@ configure_platform() {
     with_gif=
     with_gnutls=
     with_toolkit=true
-    with_widgets=true
+    with_widgets=false
 
     for id in $ID $ID_LIKE; do
 	case "$id" in

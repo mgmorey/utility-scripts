@@ -228,7 +228,7 @@ validate_platform() {
 		esac
 		;;
 	    (windows)
-		return
+		break
 		;;
 	esac
 
