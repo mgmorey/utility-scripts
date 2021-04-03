@@ -26,7 +26,7 @@ abort() {
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$0" "$PRETTY_NAME" "$*"
 }
 
 add_debian_apt_key() {
@@ -70,12 +70,12 @@ add_repositories() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 configure_network() {
     lsmod | if ! grep -q $MODULE; then
-	abort "%s: %s module not present\n" "$0" "$MODULE"
+	abort '%s: %s module not present\n' "$0" "$MODULE"
     fi
 
     if [ ! -d /etc/sysctl.d/k8s.conf ]; then
@@ -120,11 +120,11 @@ disable_selinux() {
 }
 
 get_google_apt_key_url() {
-    printf "%s\n" "$GOOGLE_BASE_URL/apt/doc/apt-key.gpg"
+    printf '%s\n' "$GOOGLE_BASE_URL/apt/doc/apt-key.gpg"
 }
 
 get_google_yum_url() {
-    printf "%s\n" "$GOOGLE_BASE_URL/yum"
+    printf '%s\n' "$GOOGLE_BASE_URL/yum"
 }
 
 get_kubernetes_debian_repo() {
@@ -134,13 +134,13 @@ get_kubernetes_debian_repo() {
 }
 
 get_kubernetes_url() {
-    printf "%s\n" "$KUBERNETES_BASE_URL/"
+    printf '%s\n' "$KUBERNETES_BASE_URL/"
 }
 
 get_package_manager_basename() {
     manager_pathname=$(get-package-managers | awk 'NR == 1 {print $0}')
     manager_basename=$(basename $manager_pathname)
-    printf "%s\n" $manager_basename
+    printf '%s\n' $manager_basename
 }
 
 install_dependencies() {
@@ -189,7 +189,7 @@ parse_arguments() {
 		role=$arg
 		;;
 	    (*)
-		abort "%s: %s -- invalid argument\n" "$0" "$arg"
+		abort '%s: %s -- invalid argument\n' "$0" "$arg"
 	esac
     done
 
@@ -284,7 +284,7 @@ validate_platform() {
     esac
 
     if ! docker info >/dev/null 2>&1; then
-	abort "%s: Docker not installed\n" "$0"
+	abort '%s: Docker not installed\n' "$0"
     fi
 }
 

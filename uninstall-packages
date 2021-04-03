@@ -22,11 +22,11 @@ abort() {
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$0" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_options() {
@@ -37,7 +37,7 @@ get_package_manager() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     assert [ $1 -ge 1 -a -$1 -le 2 ]
-    printf "%s\n" $package_managers | awk 'NR == '"$1"' {print $0}'
+    printf '%s\n' $package_managers | awk 'NR == '"$1"' {print $0}'
 }
 
 get_package_managers() {
@@ -58,7 +58,7 @@ get_packages() {
 	    ;;
     esac
 
-    printf "%s\n" $packages | awk -F: "$awk_expr"
+    printf '%s\n' $packages | awk -F: "$awk_expr"
 }
 
 parse_arguments() {

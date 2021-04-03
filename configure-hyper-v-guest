@@ -30,7 +30,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 configure_hyper_v_guest() {
@@ -38,7 +38,7 @@ configure_hyper_v_guest() {
     update=$(get_grub_update_command)
 
     if [ -z "$update" ]; then
-	abort "%s: No grub update command detected\n" "$0"
+	abort '%s: No grub update command detected\n' "$0"
     fi
 
     if edit_grub_defaults "$GRUB_DEFAULTS_FILE"; then
@@ -54,10 +54,10 @@ configure_platform() {
 	    true
 	    ;;
 	('')
-	    abort "%s: No hypervisor detected\n" "$0"
+	    abort '%s: No hypervisor detected\n' "$0"
 	    ;;
 	(*)
-	    abort "%s: %s hypervisor not supported\n" "$0" "$vendor"
+	    abort '%s: %s hypervisor not supported\n' "$0" "$vendor"
 	    ;;
     esac
 }
@@ -78,10 +78,10 @@ edit_grub_defaults() {
 get_awk_command() {
     case "${kernel_name=$(uname -s)}" in
 	(SunOS)
-	    printf "%s\n" /usr/gnu/bin/awk
+	    printf '%s\n' /usr/gnu/bin/awk
 	    ;;
 	(*)
-	    printf "%s\n" /usr/bin/awk
+	    printf '%s\n' /usr/bin/awk
 	    ;;
     esac
 }
@@ -89,7 +89,7 @@ get_awk_command() {
 get_grub_update_command() {
     for command in $GRUB_COMMANDS; do
 	if which $command >/dev/null 2>&1; then
-	    printf "%s\n" "$command"
+	    printf '%s\n' "$command"
 	    break
 	fi
     done
@@ -101,13 +101,13 @@ get_grub_update_options() {
 
     case "$1" in
 	(grub-mkconfig)
-	    printf "%s\n" -o /boot/grub/grub.cfg
+	    printf '%s\n' -o /boot/grub/grub.cfg
 	    ;;
 	(grub2-mkconfig)
-	    printf "%s\n" -o /boot/grub2/grub.cfg
+	    printf '%s\n' -o /boot/grub2/grub.cfg
 	    ;;
 	(grubby)
-	    printf "%s\n" --update-kernel=ALL --args="$KERNEL_ARG"
+	    printf '%s\n' --update-kernel=ALL --args="$KERNEL_ARG"
 	    ;;
     esac
 }

@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_installed_mysql_package() {
@@ -45,7 +45,7 @@ parse_arguments() {
 	    true
 	    ;;
 	(*)
-	    abort "%s: Invalid argument -- %s\n" "$0" "$1"
+	    abort '%s: Invalid argument -- %s\n' "$0" "$1"
 	    ;;
     esac
 }
@@ -56,9 +56,9 @@ usage_error() {
 }
 
 if [ $# -lt 1 ]; then
-    usage_error "%s: Not enough arguments\n" "$0"
+    usage_error '%s: Not enough arguments\n' "$0"
 elif [ $# -gt 1 ]; then
-    usage_error "%s: Too many arguments\n" "$0"
+    usage_error '%s: Too many arguments\n' "$0"
 fi
 
 case "$0" in

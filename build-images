@@ -24,7 +24,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 build_images() {
@@ -37,7 +37,7 @@ build_image() (
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     dir=$1
-    image=$(printf "%s\n" "$dir" | get_image_name)
+    image=$(printf '%s\n' "$dir" | get_image_name)
     image_method=$(get_image_method $image)
     method_command=$(get_command $image_method)
     remote_image=$(get_remote_image_name)
@@ -83,19 +83,19 @@ get_build_subcommand() {
 
     case "$1" in
 	(buildah)
-	    printf "%s\n" \
+	    printf '%s\n' \
 		   build-using-dockerfile \
 		   $(get_buildah_bud_options "$2") \
 		   -t "$2" .
 	    ;;
 	(buildx)
-	    printf "%s\n" \
+	    printf '%s\n' \
 		   buildx build \
 		   $(get_docker_buildx_options) \
 		   --load -t "$2" .
 	    ;;
 	(*)
-	    printf "%s\n" build -t "$2" .
+	    printf '%s\n' build -t "$2" .
 	    ;;
     esac
 }
@@ -116,13 +116,13 @@ get_command() {
 
     case "$1" in
 	(buildah)
-	    printf "%s\n" buildah
+	    printf '%s\n' buildah
 	    ;;
 	(podman)
-	    printf "%s\n" podman
+	    printf '%s\n' podman
 	    ;;
 	(*)
-	    printf "%s\n" docker
+	    printf '%s\n' docker
 	    ;;
     esac
 }
@@ -136,7 +136,7 @@ get_default_capabilities() {
 	    capabilities=$("${script_prefix}get-db2-capabilities")
 
 	    if [ -n "$capabilities" ]; then
-		printf "%s\n" $capabilities
+		printf '%s\n' $capabilities
 	    fi
 	    ;;
     esac
@@ -148,10 +148,10 @@ get_default_method() {
 
     case "$1" in
 	(*-ibm-db2-*)
-	    printf "%s\n" buildah
+	    printf '%s\n' buildah
 	    ;;
 	(*)
-	    printf "%s\n" docker
+	    printf '%s\n' docker
 	    ;;
     esac
 }
@@ -167,17 +167,17 @@ get_dockerfiles() {
 }
 
 get_image_dir_prefix() {
-    printf "%s\n" "${IMAGE_DIR_PREFIX-docker}-"
+    printf '%s\n' "${IMAGE_DIR_PREFIX-docker}-"
 }
 
 get_image_dir_root() {
-    printf "%s\n" "$(cd "${IMAGE_DIR_ROOT-$HOME}" && pwd)"
+    printf '%s\n' "$(cd "${IMAGE_DIR_ROOT-$HOME}" && pwd)"
 }
 
 get_image_method() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    printf "%s\n" "${method:-$(get_default_method "$1")}"
+    printf '%s\n' "${method:-$(get_default_method "$1")}"
 }
 
 get_image_name() {
@@ -188,7 +188,7 @@ get_image_name() {
 }
 
 get_remote_image_name() {
-    printf "%s%s%s:%s\n" \
+    printf '%s%s%s:%s\n' \
 	   "${IMAGE_REMOTE_BASE_URL:+${IMAGE_REMOTE_BASE_URL#*//}/}" \
 	   "${IMAGE_REMOTE_DIR:+$IMAGE_REMOTE_DIR/}" \
 	   "${image#*/}" \
@@ -225,7 +225,7 @@ parse_arguments() {
 			method="$OPTARG"
 			;;
 		    (*)
-			usage_error "%s: %s: Invalid method\n" "$0" "$OPTARG"
+			usage_error '%s: %s: Invalid method\n' "$0" "$OPTARG"
 			;;
 		esac
 		;;
@@ -268,13 +268,13 @@ parse_arguments() {
 		    dockerfiles="${dockerfiles+$dockerfiles }$file"
 		    ;;
 		(*)
-		    abort "%s: %s: Not a Dockerfile\n" "$0" "$file"
+		    abort '%s: %s: Not a Dockerfile\n' "$0" "$file"
 		    ;;
 	    esac
 	elif [ -e "$file" ]; then
-	    abort "%s: %s: Not a Dockerfile\n" "$0" "$file"
+	    abort '%s: %s: Not a Dockerfile\n' "$0" "$file"
 	else
-	    abort "%s: %s: No such file\n" "$0" "$file"
+	    abort '%s: %s: No such file\n' "$0" "$file"
 	fi
     done
 }
@@ -291,7 +291,7 @@ usage_error() {
 	printf "$@" >&2
     fi
 
-    printf "%s\n" '' >&2
+    printf '%s\n' '' >&2
     usage
     exit 2
 }

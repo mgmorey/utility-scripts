@@ -25,7 +25,7 @@ CAP_SYSLOG CAP_SYS_MODULE CAP_SYS_NICE CAP_SYS_PACCT CAP_SYS_PTRACE \
 CAP_SYS_RAWIO CAP_SYS_RESOURCE CAP_SYS_TIME"
 
 get_all_capabilities() {
-    printf "%s\n" $ALL_CAPABILITIES
+    printf '%s\n' $ALL_CAPABILITIES
 }
 
 get_all_capabilities

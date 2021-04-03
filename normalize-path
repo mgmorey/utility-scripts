@@ -19,9 +19,9 @@
 get_realpath() (
     for file; do
 	if expr "$file" : '/.*' >/dev/null; then
-	    printf "%s\n" "$file"
+	    printf '%s\n' "$file"
 	else
-	    printf "%s\n" "$PWD/${file#./}"
+	    printf '%s\n' "$PWD/${file#./}"
 	fi
     done
 )

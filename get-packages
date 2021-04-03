@@ -22,11 +22,11 @@ abort() {
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$script" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$script" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 get_os_configuration() {
@@ -51,7 +51,7 @@ get_packages() {
 }
 
 get_parameter() {
-    printf "%s-%s\n" "$1" "$2" | tr '[:lower:]' '[:upper:]' | tr '-' '_'
+    printf '%s-%s\n' "$1" "$2" | tr '[:lower:]' '[:upper:]' | tr '-' '_'
 }
 
 is_valid_category() {
@@ -89,7 +89,7 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -lt 1 ]; then
-	usage_error "%s: Not enough arguments\n" "$script"
+	usage_error '%s: Not enough arguments\n' "$script"
     fi
 
     for category; do

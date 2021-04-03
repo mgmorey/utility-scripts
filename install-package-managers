@@ -26,7 +26,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_package_manager() {
@@ -45,7 +45,7 @@ get_package_manager() {
 	    ;;
     esac
 
-    printf "%s\n" "$manager"
+    printf '%s\n' "$manager"
 }
 
 install_package_manager() {
@@ -56,7 +56,7 @@ install_package_manager() {
     if [ -n "$package_manager" ]; then
 	"${script_prefix}$package_manager"
     else
-	abort "Unable to find installer for %s\n" "$1"
+	abort 'Unable to find installer for %s\n' "$1"
     fi
 }
 

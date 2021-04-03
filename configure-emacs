@@ -29,23 +29,23 @@ abort() {
 }
 
 abort_invalid_prefix() {
-    usage_error "%s: invalid prefix -- %s\n" "$0" "$*"
+    usage_error '%s: invalid prefix -- %s\n' "$0" "$*"
 }
 
 abort_invalid_toolkit() {
-    usage_error "%s: invalid toolkit -- %s\n" "$0" "$*"
+    usage_error '%s: invalid toolkit -- %s\n' "$0" "$*"
 }
 
 abort_invalid_version() {
-    usage_error "%s: invalid version -- %s\n" "$0" "$*"
+    usage_error '%s: invalid version -- %s\n' "$0" "$*"
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$0" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 clean_build() {
@@ -96,7 +96,7 @@ configure_emacs() {
 	exit 0
     fi
 
-    printf "%s\n" "$command"
+    printf '%s\n' "$command"
     eval $command
 }
 
@@ -137,7 +137,7 @@ configure_platform() {
     done
 
     if [ -n "${cc-}" ] && [ ! -x $cc ]; then
-	abort "%s: %s: No such compiler\n" "$0" "$cc"
+	abort '%s: %s: No such compiler\n' "$0" "$cc"
     fi
 }
 
@@ -193,12 +193,12 @@ extract_files() {
 }
 
 get_compiler() {
-    printf "%s\n" "$1"
+    printf '%s\n' "$1"
 }
 
 get_compiler_flags() {
     shift
-    printf "%s\n" "$*"
+    printf '%s\n' "$*"
 }
 
 get_configure_command() {
@@ -264,7 +264,7 @@ get_configure_options() {
     fi
 
     if [ -n "${options:-}" ]; then
-	printf "%s\n" "$options"
+	printf '%s\n' "$options"
     fi
 }
 
@@ -294,7 +294,7 @@ get_linker_flags() {
     done
 
     if [ "${ldflags-}" ]; then
-	printf "%s\n" "$ldflags"
+	printf '%s\n' "$ldflags"
     fi
 }
 
@@ -304,7 +304,7 @@ get_pkg_config_path() {
     done
 
     if [ "${pkg_config_path-}" ]; then
-	printf "%s\n" "$pkg_config_path"
+	printf '%s\n' "$pkg_config_path"
     fi
 }
 
@@ -400,11 +400,11 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -gt 0 ]; then
-	usage_error "%s: Too many arguments\n" "$0"
+	usage_error '%s: Too many arguments\n' "$0"
     fi
 
     if [ "$with_gif" = true -a -n "${libgif-}" ] && [ ! -x $libgif ]; then
-	abort "%s: %s: No such shared object\n" "$0" "$libgif"
+	abort '%s: %s: No such shared object\n' "$0" "$libgif"
     fi
 }
 
@@ -420,7 +420,7 @@ usage_error() {
 	printf "$@" >&2
     fi
 
-    printf "%s\n" '' >&2
+    printf '%s\n' '' >&2
     usage
     exit 2
 }

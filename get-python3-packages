@@ -47,7 +47,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_python3_packages() {
@@ -109,7 +109,7 @@ get_python3_packages() {
     esac
 
     if [ -n "${packages-}" ]; then
-	printf "%s\n" $packages
+	printf '%s\n' $packages
     fi
 }
 

@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_mysql_packages() {
@@ -47,7 +47,7 @@ parse_arguments() {
 		categories="${categories+$categories mysql-server}"
 		;;
 	    (*)
-		abort "%s: %s -- invalid argument\n" "$0" "$arg"
+		abort '%s: %s -- invalid argument\n' "$0" "$arg"
 	esac
     done
 

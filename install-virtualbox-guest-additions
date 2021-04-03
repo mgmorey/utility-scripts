@@ -32,11 +32,11 @@ abort() {
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$0" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 configure_platform() {
@@ -126,7 +126,7 @@ install_virtualbox_guest() {
 
     if [ "$kernel_name" != SunOS ]; then
 	until mount_package_directory; do
-	    printf "Insert VirtualBox Guest Additions CD-ROM and press Enter: "
+	    printf 'Insert VirtualBox Guest Additions CD-ROM and press Enter: '
 	    read INPUT
 	done
     else
@@ -196,7 +196,7 @@ update_redhat_kernel_packages() {
     fi
 
     trap "printf '\n'; exit 0" INT QUIT
-    printf "Please reboot the machine with the new kernel (if updated).\n"
+    printf 'Please reboot the machine with the new kernel (if updated).\n'
 }
 
 usage_error() {
@@ -273,13 +273,13 @@ validate_platform() {
 	    true
 	    ;;
 	(*)
-	    abort "%s: %s hypervisor not supported\n" "$0" "$vendor"
+	    abort '%s: %s hypervisor not supported\n' "$0" "$vendor"
 	    ;;
     esac
 }
 
 if [ $# -gt 0 ]; then
-    usage_error "%s: Too many arguments\n" "$0"
+    usage_error '%s: Too many arguments\n' "$0"
 fi
 
 case "$0" in

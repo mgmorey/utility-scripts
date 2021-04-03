@@ -17,5 +17,5 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 if [ -n "${XDG_CURRENT_DESKTOP:-}" ]; then
-    printf "%s\n" "$XDG_CURRENT_DESKTOP"
+    printf '%s\n' "$XDG_CURRENT_DESKTOP"
 fi

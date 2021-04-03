@@ -33,11 +33,11 @@ abort() {
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$0" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_package_pathname() {
@@ -47,10 +47,10 @@ get_package_pathname() {
     assert [ -n "$3" ]
     case "$ID" in
 	(debian|ubuntu)
-	    printf "%s/$PREFIX_ZIP-$SUFFIX_ZIP\n" "$3" "$1" "$2"
+	    printf '%s/$PREFIX_ZIP-$SUFFIX_ZIP\n' "$3" "$1" "$2"
 	    ;;
 	(rhel|ol|centos)
-	    printf "%s/$PREFIX_RPM-$SUFFIX_RPM\n" "$3" "$2" "$1" "$2"
+	    printf '%s/$PREFIX_RPM-$SUFFIX_RPM\n' "$3" "$2" "$1" "$2"
 	    ;;
     esac
 }
@@ -201,7 +201,7 @@ validate_platform() {
 }
 
 if [ $# -gt 0 ]; then
-    usage_error "%s: Too many arguments\n" "$0"
+    usage_error '%s: Too many arguments\n' "$0"
 fi
 
 script_basename=$(basename "$0")

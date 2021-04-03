@@ -48,11 +48,11 @@ get_build_argument() {
     eval value=\${$var-}
 
     if [ -n "$value" ]; then
-	printf "%s %s\n" --build-arg "$var"
+	printf '%s %s\n' --build-arg "$var"
     else
 	case "$var" in
 	    (NO_PROXY|no_proxy)
-		printf "%s %s=%s\n" --build-arg "$var" '*'
+		printf '%s %s=%s\n' --build-arg "$var" '*'
 		;;
 	esac
     fi
@@ -85,7 +85,7 @@ docker_app() {
 	    docker run ${run_opts+$run_opts }$image${tag:+:$tag}
 	    ;;
 	(*)
-	    usage_error "%s: invalid argument -- %s\n" "$script" "$1"
+	    usage_error '%s: invalid argument -- %s\n' "$script" "$1"
 	    ;;
     esac
 }

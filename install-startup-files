@@ -30,19 +30,19 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 format_git_directory() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    printf "%s/%s\n" "$1" "git"
+    printf '%s/%s\n' "$1" "git"
 }
 
 format_project_directory() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    printf "%s/%s\n" "$1" "$PROJECT_NAME"
+    printf '%s/%s\n' "$1" "$PROJECT_NAME"
 }
 
 format_project_url() {
@@ -61,7 +61,7 @@ get_project_directory() (
 	    project_dir=$(format_project_directory "$parent_dir")
 
 	    if [ -d "$project_dir" ]; then
-		printf "%s\n" "$project_dir"
+		printf '%s\n' "$project_dir"
 		return
 	    fi
 	done
@@ -90,7 +90,7 @@ install_startup_files() (
 
     for file in $STARTUP_FILES; do
 	if is_to_be_installed $file; then
-	    printf "Installing %s\n" $file
+	    printf 'Installing %s\n' $file
 
 	    if [ -r /etc/skel/$file -a "$file" = .profile ]; then
 		$gnu_install -bm 644 /etc/skel/$file $file
@@ -110,7 +110,7 @@ install_startup_files() (
 	cd .emacs.d
 
 	if [ ! -e init.el ]; then
-	    printf "Installing %s\n" .emacs.d/init.el
+	    printf 'Installing %s\n' .emacs.d/init.el
 	    $gnu_install -bm 644 $git_dir/.emacs.d/init.el init.el
 	fi
     fi
@@ -119,12 +119,12 @@ install_startup_files() (
 
     for file in $LEGACY_FILES; do
 	if [ -e $file ]; then
-	    printf "Renaming %s to %s\n" $file $file.orig
+	    printf 'Renaming %s to %s\n' $file $file.orig
 	    /bin/mv -f $file $file.orig
 	fi
     done
 
-    printf "Please log out and back in again to activate the new environment.\n"
+    printf 'Please log out and back in again to activate the new environment.\n'
     clean_up
 )
 

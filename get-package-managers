@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_package_managers() {
@@ -103,7 +103,7 @@ get_package_managers() {
     done
 
     if [ -n "${managers-}" ]; then
-	printf "%s\n" $managers
+	printf '%s\n' $managers
     fi
 }
 

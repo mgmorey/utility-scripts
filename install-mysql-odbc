@@ -30,11 +30,11 @@ abort() {
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$0" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 install_mysql_odbc() {
@@ -104,7 +104,7 @@ parse_arguments() {
 		    prefix=/opt/$package
 		    ;;
 		(*)
-		    abort "%s: invalid argument" "$1"
+		    abort '%s: invalid argument' "$1"
 	    esac
 	    ;;
 	(rhel|ol|centos)
@@ -116,7 +116,7 @@ parse_arguments() {
 		    package=${basename%-linux-*-x86_64}
 		    ;;
 		(*)
-		    abort "%s: invalid argument" "$1"
+		    abort '%s: invalid argument' "$1"
 	    esac
 	    ;;
     esac
@@ -190,9 +190,9 @@ validate_platform() {
 }
 
 if [ $# -lt 1 ]; then
-    usage_error "%s: Not enough arguments\n" "$0"
+    usage_error '%s: Not enough arguments\n' "$0"
 elif [ $# -gt 1 ]; then
-    usage_error "%s: Too many arguments\n" "$0"
+    usage_error '%s: Too many arguments\n' "$0"
 fi
 
 case "$0" in

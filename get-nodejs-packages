@@ -38,7 +38,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_nodejs_packages() {
@@ -76,7 +76,7 @@ get_nodejs_packages() {
     done
 
     if [ -n "${packages-}" ]; then
-	printf "%s\n" $packages
+	printf '%s\n' $packages
     fi
 }
 

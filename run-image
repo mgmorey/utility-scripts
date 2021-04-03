@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_buildah_from_options() {
@@ -34,7 +34,7 @@ get_buildah_from_options() {
 	printf -- "--cap-add=%s\n" $capabilities
     fi
 
-    printf -- "%s\n" $from_options
+    printf -- '%s\n' $from_options
 }
 
 get_default_capabilities() {
@@ -46,7 +46,7 @@ get_default_capabilities() {
 	    capabilities=$("${script_prefix}get-db2-capabilities")
 
 	    if [ -n "$capabilities" ]; then
-		printf "%s\n" $capabilities
+		printf '%s\n' $capabilities
 	    fi
 	    ;;
     esac
@@ -58,26 +58,26 @@ get_default_method() {
 
     case "$1" in
 	(*-ibm-db2-*)
-	    printf "%s\n" buildah
+	    printf '%s\n' buildah
 	    ;;
 	(*)
-	    printf "%s\n" docker
+	    printf '%s\n' docker
 	    ;;
     esac
 }
 
 get_image_dir_prefix() {
-    printf "%s\n" "${IMAGE_DIR_PREFIX-docker}-"
+    printf '%s\n' "${IMAGE_DIR_PREFIX-docker}-"
 }
 
 get_image_dir_root() {
-    printf "%s\n" "$(cd "${IMAGE_DIR_ROOT-$HOME}" && pwd)"
+    printf '%s\n' "$(cd "${IMAGE_DIR_ROOT-$HOME}" && pwd)"
 }
 
 get_image_method() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    printf "%s\n" "${method:-$(get_default_method "$1")}"
+    printf '%s\n' "${method:-$(get_default_method "$1")}"
 }
 
 get_image_name() {
@@ -102,18 +102,18 @@ get_image_run_options() {
 	    ;;
     esac
 
-    printf "%s\n" $options
+    printf '%s\n' $options
 }
 
 get_remote_image_name() {
     if [ "$is_remote" = true ]; then
-	printf "%s%s%s%s\n" \
+	printf '%s%s%s%s\n' \
 	       "${IMAGE_REMOTE_BASE_URL:+${IMAGE_REMOTE_BASE_URL#*//}/}" \
 	       "${IMAGE_REMOTE_DIR:+$IMAGE_REMOTE_DIR/}" \
 	       "${image#*/}" \
 	       "${tag:+:$tag}"
     else
-	printf "%s%s\n" \
+	printf '%s%s\n' \
 	       "${image#*/}" \
 	       "${tag:+:$tag}"
     fi
@@ -142,7 +142,7 @@ parse_arguments() {
 			method="$OPTARG"
 			;;
 		    (*)
-			usage_error "%s: %s: Invalid method\n" "$0" "$OPTARG"
+			usage_error '%s: %s: Invalid method\n' "$0" "$OPTARG"
 			;;
 		esac
 		;;
@@ -174,9 +174,9 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -lt 1 ]; then
-	usage_error "%s: Not enough arguments\n" "$0"
+	usage_error '%s: Not enough arguments\n' "$0"
     elif [ $# -gt 1 ]; then
-	usage_error "%s: Too many arguments\n" "$0"
+	usage_error '%s: Too many arguments\n' "$0"
     fi
 
     file=$1
@@ -188,19 +188,19 @@ parse_arguments() {
 		dockerfile="$file"
 		;;
 	    (*)
-		abort "%s: %s: Not a Dockerfile\n" "$0" "$file"
+		abort '%s: %s: Not a Dockerfile\n' "$0" "$file"
 		;;
 	esac
     elif [ -e "$file" ]; then
-	abort "%s: %s: Not a Dockerfile\n" "$0" "$file"
+	abort '%s: %s: Not a Dockerfile\n' "$0" "$file"
     else
-	abort "%s: %s: No such file\n" "$0" "$file"
+	abort '%s: %s: No such file\n' "$0" "$file"
     fi
 }
 
 run_image() {
     dir=$(cd "$(dirname "$dockerfile")" && pwd)
-    image=$(printf "%s\n" "$dir" | get_image_name)
+    image=$(printf '%s\n' "$dir" | get_image_name)
     image_method=$(get_image_method $image)
     remote_image=$(get_remote_image_name)
 
@@ -233,7 +233,7 @@ usage_error() {
 	printf "$@" >&2
     fi
 
-    printf "%s\n" '' >&2
+    printf '%s\n' '' >&2
     usage
     exit 2
 }

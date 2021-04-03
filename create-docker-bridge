@@ -107,7 +107,7 @@ parse_arguments() {
 	    driver=macvlan
 	    ;;
 	(*)
-	    usage_error "%s: %s: Invalid network name\n" "$0" "$network" >&2
+	    usage_error '%s: %s: Invalid network name\n' "$0" "$network" >&2
 	    ;;
     esac
 }
@@ -127,7 +127,7 @@ usage_error() {
 }
 
 if [ $# -lt 1 ]; then
-    usage_error "%s: Not enough arguments\n" "$0"
+    usage_error '%s: Not enough arguments\n' "$0"
 fi
 
 parse_arguments "$@"

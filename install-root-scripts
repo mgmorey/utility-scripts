@@ -25,7 +25,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 get_install_command() {
@@ -55,10 +55,10 @@ get_script_files() {
 get_target_dir() {
     case "$ID" in
 	(rhel|ol|centos)
-	    printf "%s\n" /usr/sbin
+	    printf '%s\n' /usr/sbin
 	    ;;
 	(*)
-	    printf "%s\n" /usr/local/bin
+	    printf '%s\n' /usr/local/bin
 	    ;;
     esac
 }
@@ -75,7 +75,7 @@ install_root_scripts() {
     source_dir=$(pwd)
 
     if ! is_valid_script_dirname "$source_dir"; then
-	abort "%s: %s\n" \
+	abort '%s: %s\n' \
 	      "Please change to the source directory and try again" \
 	      "$script"
     fi
@@ -96,7 +96,7 @@ is_valid_script_dirname() {
 
 parse_arguments() {
     if [ $# -gt 1 ]; then
-	usage_error "%s: Too many arguments\n" "$script"
+	usage_error '%s: Too many arguments\n' "$script"
     fi
 
     if [ $# -gt 0 ]; then

@@ -32,11 +32,11 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 abort_conflicting_option() {
-    usage_error "%s: conflicting option -- %s\n" "$0" "$1"
+    usage_error '%s: conflicting option -- %s\n' "$0" "$1"
 }
 
 collect_data() {
@@ -112,7 +112,7 @@ collect_data_for_sunos() {
 }
 
 collect_data_for_unix() {
-    ID=$(printf "%s\n" "$system_name" | to_lower)
+    ID=$(printf '%s\n' "$system_name" | to_lower)
     NAME=$system_name
     VERSION=$system_release
     PRETTY_NAME=$system_data
@@ -122,9 +122,9 @@ collect_data_for_unix() {
 collect_data_for_windows() {
     ID=windows
     NAME="Microsoft Windows"
-    VERSION=$(printf "%s\n" "$system_name" | cut -d- -f2)
-    kernel_name=$(printf "%s\n" "$system_name" | cut -d- -f1)
-    kernel_release=$(printf "%s\n" "$system_release" | cut -d- -f1)
+    VERSION=$(printf '%s\n' "$system_name" | cut -d- -f2)
+    kernel_name=$(printf '%s\n' "$system_name" | cut -d- -f1)
+    kernel_release=$(printf '%s\n' "$system_release" | cut -d- -f1)
     os_family=ms-windows
 }
 
@@ -166,7 +166,7 @@ get_os_version_id() {
 		    cat $FILE_DEBIAN_VERSION
 		    ;;
 		(ubuntu)
-		    printf "%s\n" "$VERSION" | awk '{print $1}'
+		    printf '%s\n' "$VERSION" | awk '{print $1}'
 		    ;;
 		(rhel|ol|centos|fedora)
 		    "${script_prefix}get-redhat-version" $FILE_REDHAT_RELEASE
@@ -184,12 +184,12 @@ output_data() {
     if [ "$is_shell_format" = true ]; then
 	for var in $vars; do
 	    eval value="\${$var-}"
-	    printf "%s=\"%s\"\n" "$var" "$value"
+	    printf '%s="%s"\n' "$var" "$value"
 	done
     else
 	for var in $vars; do
 	    eval value="\${$var-}"
-	    printf "%s\n" "$value"
+	    printf '%s\n' "$value"
 	done
     fi
 }
@@ -239,7 +239,7 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -gt 0 ]; then
-	usage_error "%s: Too many arguments\n" "$0"
+	usage_error '%s: Too many arguments\n' "$0"
     fi
 }
 
@@ -278,7 +278,7 @@ usage_error() {
 	printf "$@" >&2
     fi
 
-    printf "%s\n" '' >&2
+    printf '%s\n' '' >&2
     usage
     exit 2
 }

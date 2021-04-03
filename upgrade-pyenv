@@ -23,7 +23,7 @@ abort() {
 
 upgrade_pyenv() {
     if [ ! -d $HOME/.pyenv ]; then
-	abort "%s: pyenv not installed\n" "$0"
+	abort '%s: pyenv not installed\n' "$0"
     fi
 
     cd $HOME/.pyenv/plugins/python-build/../..

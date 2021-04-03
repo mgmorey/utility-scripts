@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_install_command() {
@@ -42,7 +42,7 @@ get_install_command() {
     esac
 
     if [ "${install-}" ]; then
-	printf "%s\n" "$install"
+	printf '%s\n' "$install"
     fi
 }
 
@@ -52,9 +52,9 @@ usage_error() {
 }
 
 if [ $# -lt 1 ]; then
-    usage_error "%s: Not enough arguments\n" "$0"
+    usage_error '%s: Not enough arguments\n' "$0"
 elif [ $# -gt 1 ]; then
-    usage_error "%s: Too many arguments\n" "$0"
+    usage_error '%s: Too many arguments\n' "$0"
 fi
 
 get_install_command "$@"

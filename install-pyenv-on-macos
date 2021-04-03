@@ -25,15 +25,15 @@ abort() {
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$0" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_darwin_sdkroot() {
-    printf "%s/$DARWIN_SDK_BASENAME\n" $DARWIN_SDK_DIRNAME $VERSION_ID
+    printf '%s/$DARWIN_SDK_BASENAME\n' $DARWIN_SDK_DIRNAME $VERSION_ID
 }
 
 install_pyenv_on_macos() {
@@ -67,7 +67,7 @@ usage_error() {
 }
 
 if [ $# -gt 0 ]; then
-    usage_error "%s: Too many arguments\n" "$0"
+    usage_error '%s: Too many arguments\n' "$0"
 fi
 
 case "$0" in

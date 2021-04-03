@@ -40,6 +40,13 @@ pip_install() {
     $pip_install "$@"
 }
 
+usage_error() {
+    printf "$@" >&2
+    exit 2
+}
+
+script=$(basename "$0")
+
 case "$0" in
     (*/*)
 	script_dir=$(realpath "$(dirname "$0")")
@@ -55,7 +62,7 @@ script_prefix=${script_dir:+$script_dir/}
 . "${script_prefix}tableau-library.sh"
 
 if [ $# -lt 1 ]; then
-    usage_error "Not enough arguments"
+    usage_error '%s: Not enough arguments\n' "$script"
 fi
 
 pip_install "$@"

@@ -25,7 +25,7 @@ CAP_SYSLOG CAP_SYS_MODULE CAP_SYS_NICE CAP_SYS_PACCT CAP_SYS_PTRACE \
 CAP_SYS_RAWIO CAP_SYS_RESOURCE CAP_SYS_TIME"
 
 get_db2_capabilities() {
-    printf "%s\n" $DB2_CAPABILITIES
+    printf '%s\n' $DB2_CAPABILITIES
 }
 
 get_db2_capabilities

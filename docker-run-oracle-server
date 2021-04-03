@@ -25,7 +25,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 docker_run_oracle_server() {
@@ -75,7 +75,7 @@ usage_error() {
 }
 
 if [ $# -lt 1 ]; then
-    usage_error "%s: Not enough arguments\n" "$0"
+    usage_error '%s: Not enough arguments\n' "$0"
 fi
 
 case "$0" in

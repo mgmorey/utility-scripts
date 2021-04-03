@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 configure_platform() {
@@ -47,7 +47,7 @@ configure_platform() {
     done
 
     if [ -n "${arch-}" ]; then
-	printf "%s\n" $arch
+	printf '%s\n' $arch
     fi
 }
 

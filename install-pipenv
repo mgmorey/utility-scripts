@@ -26,7 +26,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_packages() {
@@ -46,7 +46,7 @@ get_pip_options() {
     esac
 
     options=${options:+$options }$PIP_OPTIONS
-    printf "%s\n" $options
+    printf '%s\n' $options
 }
 
 install_dependencies() {

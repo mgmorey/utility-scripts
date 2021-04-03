@@ -24,15 +24,15 @@ abort() {
 }
 
 abort_desktop_not_supported() {
-    abort "%s: %s: Desktop not supported\n" "$script" "$desktop_name"
+    abort '%s: %s: Desktop not supported\n' "$script" "$desktop_name"
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$script" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$script" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 configure_platform() {
@@ -88,10 +88,10 @@ get_askpass_helper() {
 
     if [ -n "${helper-}" ]; then
 	if [ -n "${package:-}" ]; then
-	    printf "# %s package %s:\n" "$PRETTY_NAME" $package
+	    printf '# %s package %s:\n' "$PRETTY_NAME" $package
 	fi
 
-	printf "%s\n" "${helper%.exe}"
+	printf '%s\n' "${helper%.exe}"
     fi
 }
 

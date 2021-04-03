@@ -30,19 +30,19 @@ abort() {
 }
 
 abort_invalid_prefix() {
-    usage_error "%s: invalid prefix -- %s\n" "$0" "$*"
+    usage_error '%s: invalid prefix -- %s\n' "$0" "$*"
 }
 
 abort_invalid_version() {
-    usage_error "%s: invalid version -- %s\n" "$0" "$*"
+    usage_error '%s: invalid version -- %s\n' "$0" "$*"
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$0" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 configure_giflib() {
@@ -54,7 +54,7 @@ configure_giflib() {
     pathname=$archive_dir/$filename
 
     if [ ! -f $pathname ]; then
-	abort "%s: %s: No such archive file\n" "$0" "$pathname"
+	abort '%s: %s: No such archive file\n' "$0" "$pathname"
     fi
 
     src_dir="$HOME/Documents/src/GIFLIB/$basename"
@@ -110,7 +110,7 @@ usage_error() {
 	printf "$@" >&2
     fi
 
-    printf "%s\n" '' >&2
+    printf '%s\n' '' >&2
     usage
     exit 2
 }

@@ -71,19 +71,19 @@ create_virtualenv() (
 	python=$(find_system_python | awk '{print $1}')
 
 	if [ -z "${python-}" ]; then
-	    abort "%s\n" "No suitable system Python interpreter found"
+	    abort '%s\n' "No suitable system Python interpreter found"
 	fi
 
 	python=$(find_user_python "$python")
 
 	if [ -z "${python-}" ]; then
-	    abort "%s\n" "No suitable user Python interpreter found"
+	    abort '%s\n' "No suitable user Python interpreter found"
 	fi
 
 	version=$(get_python_version "$python")
 
 	if ! check_python "$python" "$version"; then
-	    abort "%s\n" "No suitable Python interpreter found"
+	    abort '%s\n' "No suitable Python interpreter found"
 	fi
     fi
 
@@ -125,7 +125,7 @@ create_virtualenv() (
 	fi
     done
 
-    abort "%s: No virtualenv utility found\n" "$0"
+    abort '%s: No virtualenv utility found\n' "$0"
 )
 
 create_virtualenv_via_pipenv() (
@@ -148,7 +148,7 @@ find_python() (
     version=$(get_python_version "$python")
 
     if ! check_python "$python" "$version" >&2; then
-	abort "%s\n" "No suitable Python interpreter found"
+	abort '%s\n' "No suitable Python interpreter found"
     fi
 
     printf '%s\n' "$python"
@@ -282,7 +282,7 @@ generate_requirements() (
 		options=
 		;;
 	    (*)
-		abort "%s: %s: Invalid filename\n" "$0" "$file"
+		abort '%s: %s: Invalid filename\n' "$0" "$file"
 	esac
 
 	options="${options:+$options }--requirements"
@@ -292,7 +292,7 @@ generate_requirements() (
 	if $pipenv lock $options >$tmpfile; then
 	    /bin/mv -f $tmpfile "$file"
 	else
-	    abort "%s: Unable to update %s\n" "$0" "$file"
+	    abort '%s: Unable to update %s\n' "$0" "$file"
 	fi
     done
 
@@ -482,7 +482,7 @@ install_requirements_via_pip() (
     pip=$(get_pip_command ${1-${VENV_DIRECTORY-venv}}/bin/python)
 
     if [ -z "$pip" ]; then
-	abort "%s: No pip command found in PATH\n" "$0"
+	abort '%s: No pip command found in PATH\n' "$0"
     fi
 
     if [ "$PIP_UPGRADE_VENV" = true ]; then
@@ -534,7 +534,7 @@ refresh_via_pip() {
 
     if [ -n "${VIRTUAL_ENV:-}" -a -d "$1" ]; then
 	if have_same_device_and_inode "$VIRTUAL_ENV" "$1"; then
-	    abort "%s: %s: Virtual environment activated\n" "$0" "$VIRTUAL_ENV"
+	    abort '%s: %s: Virtual environment activated\n' "$0" "$VIRTUAL_ENV"
 	fi
     fi
 
@@ -564,9 +564,9 @@ refresh_via_pip() {
 	    install_requirements_via_pip $1
 	fi
     elif [ -d $1 ]; then
-	abort "%s: Unable to activate environment\n" "$0"
+	abort '%s: Unable to activate environment\n' "$0"
     else
-	abort "%s: No virtual environment\n" "$0"
+	abort '%s: No virtual environment\n' "$0"
     fi
 }
 
@@ -610,7 +610,7 @@ upgrade_via_pip() (
     pip=$(get_pip_command "$(find_python)")
 
     if [ -z "$pip" ]; then
-	abort "%s: No pip command found in PATH\n" "$0"
+	abort '%s: No pip command found in PATH\n' "$0"
     fi
 
     printf '%s\n' "Upgrading user packages via pip" >&2

@@ -25,7 +25,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_postgresql_packages() {
@@ -59,7 +59,7 @@ parse_arguments() {
 		categories="${categories+$categories postgresql-server}"
 		;;
 	    (*)
-		abort "%s: %s -- invalid argument\n" "$0" "$arg"
+		abort '%s: %s -- invalid argument\n' "$0" "$arg"
 	esac
     done
 

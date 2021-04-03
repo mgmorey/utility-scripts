@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 get_askpass_package() {
@@ -100,7 +100,7 @@ get_askpass_package() {
     done
 
     if [ -n "${package-}" ]; then
-	printf "%s\n" $package
+	printf '%s\n' $package
     fi
 }
 

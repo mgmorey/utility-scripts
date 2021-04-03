@@ -24,7 +24,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_docker_group() {
@@ -33,10 +33,10 @@ get_docker_group() {
     if [ -n "$origin" ]; then
 	case "$origin" in
 	    (docker.com)
-		printf "%s\n" "$DOCKER_GROUP"
+		printf '%s\n' "$DOCKER_GROUP"
 		;;
 	    (native)
-		printf "%s\n" "$DOCKER_GROUP"
+		printf '%s\n' "$DOCKER_GROUP"
 		;;
 	    (podman)
 		:
@@ -60,7 +60,7 @@ get_docker_origin() {
 	esac
 
 	if [ -n "${origin-}" ]; then
-	    printf "%s\n" "$origin"
+	    printf '%s\n' "$origin"
 	    return
 	fi
     done

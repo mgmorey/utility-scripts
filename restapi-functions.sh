@@ -222,19 +222,19 @@ generate_launch_agent() (
 get_app_status() {
     if is_app_installed; then
 	if is_app_running; then
-	    printf "%s\n" running
+	    printf '%s\n' running
 	else
-	    printf "%s\n" stopped
+	    printf '%s\n' stopped
 	fi
     else
-	printf "%s\n" uninstalled
+	printf '%s\n' uninstalled
     fi
 }
 
 get_awk_command() (
     for awk in /usr/gnu/bin/awk /usr/bin/gawk /usr/bin/awk; do
 	if [ -x $awk ]; then
-	    printf "%s\n" "$awk"
+	    printf '%s\n' "$awk"
 	    return 0
 	fi
     done
@@ -243,11 +243,11 @@ get_awk_command() (
 )
 
 get_launch_agent_label() {
-    printf "%s\n" "local.$APP_NAME"
+    printf '%s\n' "local.$APP_NAME"
 }
 
 get_launch_agent_target() {
-    printf "%s\n" "$HOME/Library/LaunchAgents/$(get_launch_agent_label).plist"
+    printf '%s\n' "$HOME/Library/LaunchAgents/$(get_launch_agent_label).plist"
 }
 
 get_service_status() {
@@ -260,12 +260,12 @@ get_service_status() {
 	return 0
     elif is_service_loaded $1; then
 	if is_service_running $1; then
-	    printf "%s\n" running
+	    printf '%s\n' running
 	else
-	    printf "%s\n" stopped
+	    printf '%s\n' stopped
 	fi
     else
-	printf "%s\n" uninstalled
+	printf '%s\n' uninstalled
     fi
 }
 
@@ -278,7 +278,7 @@ get_symlinks() (
 	return 0
     else
 	for dir in $UWSGI_APPDIRS; do
-	    printf "%s\n" $UWSGI_ETCDIR/$dir/$APP_NAME.ini
+	    printf '%s\n' $UWSGI_ETCDIR/$dir/$APP_NAME.ini
 	done
     fi
 )
@@ -295,9 +295,9 @@ install_file() {
 	assert [ -r $2 ]
 
 	if is_tmpfile $2; then
-	    printf "Generating file %s\n" "$3"
+	    printf 'Generating file %s\n' "$3"
 	else
-	    printf "Installing file %s as %s\n" "$2" "$3"
+	    printf 'Installing file %s as %s\n' "$2" "$3"
 	fi
 
 	install -d -m 755 "$(dirname "$3")"
@@ -405,7 +405,7 @@ is_system_running() {
 }
 
 is_tmpfile() {
-    printf "%s\n" ${tmpfiles-} | grep -q $1
+    printf '%s\n' ${tmpfiles-} | grep -q $1
 }
 
 print_elapsed_time() {
@@ -413,14 +413,14 @@ print_elapsed_time() {
 	return 0
     fi
 
-    printf "Service %s %s in %d seconds\n" "$APP_NAME" "$1" "$elapsed"
+    printf 'Service %s %s in %d seconds\n' "$APP_NAME" "$1" "$elapsed"
 }
 
 print_table() {
     awk=$(get_awk_command)
 
     if [ -z "$awk" ]; then
-	abort "No suitable awk command found\n"
+	abort 'No suitable awk command found\n'
     fi
 
     $awk -f "$(/usr/bin/which print-table)" \
@@ -437,7 +437,7 @@ remove_files() {
     if [ $dryrun = true ]; then
 	check_permissions "$@"
     else
-	printf "Removing %s\n" $(printf "%s\n" "$@" | sort -u)
+	printf 'Removing %s\n' $(printf '%s\n' "$@" | sort -u)
 	/bin/rm -rf "$@"
     fi
 }
@@ -448,7 +448,7 @@ signal_process() {
     assert [ -n "$2" ]
     assert [ -n "$3" ]
     assert [ $3 -ge 0 -a $3 -le 60 ]
-    printf "Sending SIG%s to process (PID: %s)\n" $1 $2
+    printf 'Sending SIG%s to process (PID: %s)\n' $1 $2
 
     case $1 in
 	(HUP)
@@ -470,7 +470,7 @@ signal_process_and_poll() {
 
     while kill -s $1 $2 && [ $i -lt $3 ]; do
 	if [ $i -eq 0 ]; then
-	    printf "%s\n" "Waiting for process to exit"
+	    printf '%s\n' "Waiting for process to exit"
 	fi
 
 	sleep 1
@@ -489,7 +489,7 @@ signal_process_and_wait() {
     assert [ $3 -ge 0 -a $3 -le 60 ]
 
     if kill -s $1 $2; then
-	printf "Waiting for process to handle SIG%s\n" "$1"
+	printf 'Waiting for process to handle SIG%s\n' "$1"
 	sleep $3
 	elapsed=$((elapsed + $3))
 	return 0
@@ -504,8 +504,8 @@ wait_for_timeout() {
 
     if [ $1 -gt 0 ]; then
 	sleep $1
-	printf "%s\n" "$1"
+	printf '%s\n' "$1"
     else
-	printf "%s\n" 0
+	printf '%s\n' 0
     fi
 }

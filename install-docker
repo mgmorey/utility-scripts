@@ -22,11 +22,11 @@ abort() {
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$script" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$script" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 configure_daemon_group() {
@@ -75,13 +75,13 @@ get_architecture() {
 
     case "$machine" in
 	(i86pc|x86_64)
-	    printf "%s\n" amd64
+	    printf '%s\n' amd64
 	    ;;
 	(armv7l)
-	    printf "%s\n" armhf
+	    printf '%s\n' armhf
 	    ;;
 	(*)
-	    printf "%s\n" $machine
+	    printf '%s\n' $machine
 	    ;;
     esac
 }
@@ -90,8 +90,8 @@ get_difference() (
     assert [ $# -eq 2 ]
 
     for item in $1; do
-	if ! printf "%s\n" $2 | grep -q '^'"$item"'$'; then
-	    printf "%s\n" "$item"
+	if ! printf '%s\n' $2 | grep -q '^'"$item"'$'; then
+	    printf '%s\n' "$item"
 	fi
     done
 )
@@ -113,7 +113,7 @@ get_docker_origin() {
 	esac
 
 	if [ -n "${origin-}" ]; then
-	    printf "%s\n" "$origin"
+	    printf '%s\n' "$origin"
 	    break
 	fi
     done
@@ -128,17 +128,17 @@ install_docker() {
     if [ -n "$origin" ]; then
 	case "$origin" in
 	    (docker.com)
-		printf "Docker Community Edition is installed.\n"
+		printf 'Docker Community Edition is installed.\n'
 		;;
 	    (native)
-		printf "Native Docker is installed.\n"
+		printf 'Native Docker is installed.\n'
 		;;
 	    (podman)
-		printf "Podman is installed.\n"
+		printf 'Podman is installed.\n'
 		;;
 	esac
     else
-	printf "Docker is not installed.\n"
+	printf 'Docker is not installed.\n'
     fi
 
     selected_packages=$(get-packages docker)
@@ -176,7 +176,7 @@ modify_user() (
 
     members="$(getent group $1 | awk -F: '{print $4}')"
 
-    if ! printf "%s\n" "$members" | grep -q "\<$SUDO_USER\>"; then
+    if ! printf '%s\n' "$members" | grep -q "\<$SUDO_USER\>"; then
 	usermod -a -G $1 $SUDO_USER
     fi
 )
@@ -194,7 +194,7 @@ validate_platform() {
 	    true
 	    ;;
 	(*)
-	    abort "%s: %s: Architecture not supported\n" "$script" "$arch"
+	    abort '%s: %s: Architecture not supported\n' "$script" "$arch"
 	    ;;
     esac
 
@@ -319,7 +319,7 @@ validate_platform() {
 }
 
 if [ $# -gt 0 ]; then
-    usage_error "%s: Too many arguments\n" "$script"
+    usage_error '%s: Too many arguments\n' "$script"
 fi
 
 script=$(basename "$0")

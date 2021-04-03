@@ -24,7 +24,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 configure_platform() {
@@ -82,7 +82,7 @@ parse_command() {
 	    commands=${commands:+$commands }"$1"
 	    ;;
 	(*)
-	    usage_error "%s: %s: Unsupported command\n" "$script" "$1"
+	    usage_error '%s: %s: Unsupported command\n' "$script" "$1"
     esac
 }
 
@@ -101,7 +101,7 @@ parse_shell() {
 	    shell=${1%.exe}
 	    ;;
 	(*)
-	    usage_error "%s: %s: Unsupported shell\n" "$script" "$1"
+	    usage_error '%s: %s: Unsupported shell\n' "$script" "$1"
 	    ;;
     esac
 }

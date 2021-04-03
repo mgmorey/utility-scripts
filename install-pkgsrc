@@ -39,11 +39,11 @@ abort() {
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$0" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 install_pkgsrc() {
@@ -137,7 +137,7 @@ usage_error() {
 
 verify_checksum() {
     if which shasum >/dev/null 2>&1; then
-	eval printf "%s\n" "$boot_sha $boot_tar" | shasum || true
+	eval printf '%s\n' "$boot_sha $boot_tar" | shasum || true
     fi
 }
 
@@ -151,7 +151,7 @@ verify_signature() {
 }
 
 if [ $# -gt 1 ]; then
-    usage_error "%s: Too many arguments\n" "$0"
+    usage_error '%s: Too many arguments\n' "$0"
 fi
 
 case "$0" in

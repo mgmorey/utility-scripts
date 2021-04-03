@@ -22,11 +22,11 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 format_action() {
-    printf "%s\n" "$1 database" | to_upper
+    printf '%s\n' "$1 database" | to_upper
 }
 
 format_database() {
@@ -44,7 +44,7 @@ format_database() {
 	    printf '\\"%s\\"\n' "$2"
 	    ;;
 	(*)
-	    abort "%s: Invalid SQL dialect: %s\n" "$0" "$1"
+	    abort '%s: Invalid SQL dialect: %s\n' "$0" "$1"
 	    ;;
     esac
 }
@@ -80,7 +80,7 @@ parse_arguments() {
 	    true
 	    ;;
 	(*)
-	    usage_error "%s: Invalid action: %s\n" "$0" "$1"
+	    usage_error '%s: Invalid action: %s\n' "$0" "$1"
 	    ;;
     esac
 }
@@ -102,15 +102,15 @@ usage_error() {
 	printf "$@" >&2
     fi
 
-    printf "%s\n" '' >&2
+    printf '%s\n' '' >&2
     usage
     exit 2
 }
 
 if [ $# -lt 1 ]; then
-    usage_error "%s: Not enough arguments\n" "$0"
+    usage_error '%s: Not enough arguments\n' "$0"
 elif [ $# -gt 1 ]; then
-    usage_error "%s: Too many arguments\n" "$0"
+    usage_error '%s: Too many arguments\n' "$0"
 fi
 
 case "$0" in
@@ -143,7 +143,7 @@ fi
 
 if [ -n "$env_file" ]; then
     if [ "${VENV_VERBOSE-false}" = true ]; then
-	printf "%s\n" "Loading .env environment variables" >&2
+	printf '%s\n' "Loading .env environment variables" >&2
     fi
 
     . "$env_file"

@@ -24,7 +24,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 docker_run_database_client() {
@@ -36,7 +36,7 @@ docker_run_database_client() {
 get_database_client_command() {
     case "$DATABASE_DIALECT" in
 	(mysql)
-	    printf "%s\n" mysql \
+	    printf '%s\n' mysql \
 		   --protocol=${DATABASE_PROTOCOL:-TCP} \
 		   --host=${DATABASE_HOST:-localhost} \
 		   --port=${DATABASE_PORT:-3306} \
@@ -44,11 +44,11 @@ get_database_client_command() {
 		   --password=${DATABASE_PASSWORD:-}
 	    ;;
 	(oracle)
-	    printf "%s\n" sqlplus \
+	    printf '%s\n' sqlplus \
 		   "system/${DATABASE_PASSWORD}@//localhost:5121/ORCLCDB"
 	    ;;
 	(postgresql)
-	    printf "%s\n" psql \
+	    printf '%s\n' psql \
 		   --host=${DATABASE_HOST:-localhost} \
 		   --port=${DATABASE_PORT:-5432} \
 		   --username=${DATABASE_USER:-$USER} \
@@ -60,13 +60,13 @@ get_database_client_command() {
 get_database_image_name() {
     case "$DATABASE_DIALECT" in
 	(mysql)
-	    printf "%s\n" mysql
+	    printf '%s\n' mysql
 	    ;;
 	(oracle)
-	    printf "%s\n" oracle/database:19.3.0-se2
+	    printf '%s\n' oracle/database:19.3.0-se2
 	    ;;
 	(postgresql)
-	    printf "%s\n" postgres
+	    printf '%s\n' postgres
 	    ;;
     esac
 }
@@ -80,7 +80,7 @@ parse_arguments() {
 }
 
 if [ ! -r $ENV_FILE ]; then
-    abort "%s: %s: No such environment file\n" "$0" $ENV_FILE
+    abort '%s: %s: No such environment file\n' "$0" $ENV_FILE
 fi
 
 if [ -r $HOME/${ENV_FILE-.env} ]; then

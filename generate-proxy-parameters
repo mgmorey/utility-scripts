@@ -171,14 +171,14 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -eq 0 ]; then
-	usage_error "%s: Not enough arguments\n" "$script"
+	usage_error '%s: Not enough arguments\n' "$script"
     fi
 
     parse_proxy "$1"
     shift
 
     if [ $# -gt 0 ]; then
-	usage_error "%s: Too many arguments\n" "$script"
+	usage_error '%s: Too many arguments\n' "$script"
     fi
 }
 
@@ -186,7 +186,7 @@ parse_no_proxy() {
     if is_valid_no_proxy $(printf '%s\n' "$1" | sed 's/\*/\\\*/'); then
 	no_proxy="$1"
     else
-	usage_error "%s: %s: Invalid proxy exception list\n" "$script" "$1"
+	usage_error '%s: %s: Invalid proxy exception list\n' "$script" "$1"
     fi
 }
 
@@ -194,7 +194,7 @@ parse_proxy() {
     if is_valid_proxy $(printf '%s\n' "$1" | sed 's/\*/\\\*/'); then
 	proxy="$1"
     else
-	usage_error "%s: %s: Invalid proxy URL\n" "$script" "$1"
+	usage_error '%s: %s: Invalid proxy URL\n' "$script" "$1"
     fi
 }
 

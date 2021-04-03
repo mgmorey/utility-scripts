@@ -64,8 +64,8 @@ run_app() {
 	    (d)
 		if [ "$OPTARG" != "$(pwd)" ]; then
 		    if [ "${ENV_VERBOSE-false}" = true ]; then
-			printf "Changing directory from: %s\n" "$(pwd)" >&2
-			printf "Changing directory to: %s\n" "$OPTARG" >&2
+			printf 'Changing directory from: %s\n' "$(pwd)" >&2
+			printf 'Changing directory to: %s\n' "$OPTARG" >&2
 		    fi
 
 		    cd "$OPTARG"
@@ -74,8 +74,8 @@ run_app() {
 	    (h)
 		if [ "$OPTARG" != "$HOME" ]; then
 		    if [ "${ENV_VERBOSE-false}" = true ]; then
-			printf "Changing HOME from: %s\n" "$HOME" >&2
-			printf "Changing HOME to: %s\n" "$OPTARG" >&2
+			printf 'Changing HOME from: %s\n' "$HOME" >&2
+			printf 'Changing HOME to: %s\n' "$OPTARG" >&2
 		    fi
 
 		    export HOME="$OPTARG"
@@ -84,8 +84,8 @@ run_app() {
 	    (p)
 		if [ "$OPTARG" != "$PATH" ]; then
 		    if [ "${ENV_VERBOSE-false}" = true ]; then
-			printf "Changing PATH from: %s\n" "$PATH" >&2
-			printf "Changing PATH to: %s\n" "$OPTARG" >&2
+			printf 'Changing PATH from: %s\n' "$PATH" >&2
+			printf 'Changing PATH to: %s\n' "$OPTARG" >&2
 		    fi
 
 		    export PATH="$OPTARG"

@@ -6,7 +6,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 install_google_chrome() {
@@ -62,7 +62,7 @@ set_user_profile "$script_dir"
 eval $(get-os-release -x)
 
 if [ $# -gt 1 ]; then
-    usage_error "%s: Too many arguments\n" "$0"
+    usage_error '%s: Too many arguments\n' "$0"
 fi
 
 install_google_chrome "$@"

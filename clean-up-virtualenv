@@ -73,7 +73,7 @@ script_prefix=${script_dir:+$script_dir/}
 . "${script_prefix}common-functions.sh"
 
 if [ $# -gt 0 ]; then
-    usage_error "%s: Too many arguments\n" "$script"
+    usage_error '%s: Too many arguments\n' "$script"
 fi
 
 eval $("${script_prefix}get-configuration" app.ini)

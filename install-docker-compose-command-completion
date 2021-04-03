@@ -27,7 +27,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 clean_up() {
@@ -164,7 +164,7 @@ install_command_completion() {
     target_dir="${output_dir:-$(dirname "$target_file")}"
 
     if [ ! -d "$target_dir" ]; then
-	abort "%s: %s: No such directory\n" "$script" "$target_dir"
+	abort '%s: %s: No such directory\n' "$script" "$target_dir"
     fi
 
     target_status=unchanged
@@ -260,7 +260,7 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -gt 0 ]; then
-	usage_error "%s: Too many arguments\n" "$script"
+	usage_error '%s: Too many arguments\n' "$script"
     fi
 }
 
@@ -272,7 +272,7 @@ parse_output() {
     if [ -d "$output_dir" -a -x "$output_dir" ]; then
 	output="$1"
     else
-	usage_error "%s: %s: Invalid output\n" "$script" "$1"
+	usage_error '%s: %s: Invalid output\n' "$script" "$1"
     fi
 }
 
@@ -283,7 +283,7 @@ parse_prefix() {
     if [ -x "$prefix/bin/$FILENAME" ]; then
 	prefix="$1"
     else
-	usage_error "%s: %s: Invalid prefix\n" "$script" "$1"
+	usage_error '%s: %s: Invalid prefix\n' "$script" "$1"
     fi
 }
 

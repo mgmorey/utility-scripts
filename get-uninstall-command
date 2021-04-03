@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_uninstall_command() {
@@ -45,7 +45,7 @@ get_uninstall_command() {
     esac
 
     if [ "${uninstall-}" ]; then
-	printf "%s\n" "$uninstall"
+	printf '%s\n' "$uninstall"
     fi
 }
 
@@ -55,9 +55,9 @@ usage_error() {
 }
 
 if [ $# -lt 1 ]; then
-    usage_error "%s: Not enough arguments\n" "$0"
+    usage_error '%s: Not enough arguments\n' "$0"
 elif [ $# -gt 1 ]; then
-    usage_error "%s: Too many arguments\n" "$0"
+    usage_error '%s: Too many arguments\n' "$0"
 fi
 
 get_uninstall_command "$@"

@@ -26,7 +26,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 docker_run_sap_hana() {
@@ -37,10 +37,10 @@ docker_run_sap_hana() {
 get_env_vars() {
     case ${image%:*} in
 	(*/tableau-ibm-db2-*|tableau-ibm-db2-*)
-	    printf "%s\n" $ENV_VARS_TABLEAU
+	    printf '%s\n' $ENV_VARS_TABLEAU
 	    ;;
 	(*)
-	    printf "%s\n" $ENV_VARS_VENDOR
+	    printf '%s\n' $ENV_VARS_VENDOR
 	    ;;
     esac
 }
@@ -101,7 +101,7 @@ usage_error() {
 }
 
 if [ $# -lt 1 ]; then
-    usage_error "%s: Not enough arguments\n" "$0"
+    usage_error '%s: Not enough arguments\n' "$0"
 fi
 
 case "$0" in

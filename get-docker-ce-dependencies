@@ -36,7 +36,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_docker_ce_dependencies() {
@@ -86,7 +86,7 @@ get_docker_ce_dependencies() {
     done
 
     if [ -n "${packages-}" ]; then
-	printf "%s\n" ${packages-}
+	printf '%s\n' ${packages-}
     fi
 }
 

@@ -26,7 +26,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_nushell_build_packages() {
@@ -56,7 +56,7 @@ get_nushell_build_packages() {
     done
 
     if [ -n "${packages-}" ]; then
-	printf "%s\n" $packages
+	printf '%s\n' $packages
     fi
 }
 

@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 build_binary() (
@@ -83,7 +83,7 @@ get_options() {
 	    ;;
     esac
 
-    printf "%s\n" "$options"
+    printf '%s\n' "$options"
 }
 
 usage_error() {
@@ -92,13 +92,13 @@ usage_error() {
 }
 
 if [ $# -lt 2 ]; then
-    usage_error "%s: Not enough arguments\n" "$0"
+    usage_error '%s: Not enough arguments\n' "$0"
 elif [ $# -gt 2 ]; then
-    usage_error "%s: Too many arguments\n" "$0"
+    usage_error '%s: Too many arguments\n' "$0"
 fi
 
 if [ "$(id -u)" -eq 0 ]; then
-    abort "%s: Must be run as a non-privileged user\n" "$0"
+    abort '%s: Must be run as a non-privileged user\n' "$0"
 fi
 
 case "$0" in

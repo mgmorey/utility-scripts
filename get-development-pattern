@@ -30,7 +30,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_devel_pattern() {
@@ -56,7 +56,7 @@ get_devel_pattern() {
     done
 
     if [ -n "${pattern-}" ]; then
-	printf "%s\n" "$pattern"
+	printf '%s\n' "$pattern"
     fi
 }
 

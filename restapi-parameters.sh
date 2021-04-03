@@ -23,7 +23,7 @@ UWSGI_BRANCH=uwsgi-2.0
 UWSGI_URL=https://github.com/unbit/uwsgi.git
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$0" "$PRETTY_NAME" "$*"
 }
 
 awk_uwsgi() {
@@ -323,7 +323,7 @@ configure_defaults() {
 	fi
 
 	if ! check_python $SYSTEM_PYTHON $SYSTEM_PYTHON_VERSION; then
-	    abort "%s\n" "No suitable Python interpreter found"
+	    abort '%s\n' "No suitable Python interpreter found"
 	fi
     fi
 
@@ -694,9 +694,9 @@ find_plugins() (
     installed_plugins="$(find_installed_plugins $available_plugins)"
 
     if [ -n "$installed_plugins" ]; then
-	printf "%s\n" $installed_plugins
+	printf '%s\n' $installed_plugins
     else
-	printf "%s\n" $available_plugins
+	printf '%s\n' $available_plugins
     fi
 )
 
@@ -724,26 +724,26 @@ get_service_users() {
 	(Linux)
 	    case "$ID" in
 		(opensuse-*)
-		    printf "%s\n" $1,root
+		    printf '%s\n' $1,root
 		    ;;
 		(*)
-		    printf "%s\n" $1
+		    printf '%s\n' $1
 		    ;;
 	    esac
 	    ;;
 	(*)
-	    printf "%s\n" $1
+	    printf '%s\n' $1
 	    ;;
     esac
 }
 
 get_uwsgi_binary_path() {
-    printf "%s/%s\n" "$UWSGI_BINARY_DIR" "$UWSGI_BINARY_NAME"
+    printf '%s/%s\n' "$UWSGI_BINARY_DIR" "$UWSGI_BINARY_NAME"
 }
 
 get_uwsgi_plugin_path() {
     if [ -n "${UWSGI_PLUGIN_DIR-}" -a -n "${UWSGI_PLUGIN_NAME-}" ]; then
-	printf "%s/%s\n" "$UWSGI_PLUGIN_DIR" "$UWSGI_PLUGIN_NAME"
+	printf '%s/%s\n' "$UWSGI_PLUGIN_DIR" "$UWSGI_PLUGIN_NAME"
     fi
 }
 
@@ -753,7 +753,7 @@ get_uwsgi_version() {
     if [ -n "$uwsgi" ] && [ -x $uwsgi ]; then
 	$uwsgi --version
     else
-	printf "%s\n" "<none>"
+	printf '%s\n' "<none>"
     fi
 }
 
@@ -782,7 +782,7 @@ is_uwsgi_packaged() {
 	    ;;
     esac
 
-    printf "%s\n" "$is_packaged"
+    printf '%s\n' "$is_packaged"
 }
 
 is_uwsgi_service() {
@@ -817,7 +817,7 @@ is_uwsgi_service() {
 	    ;;
     esac
 
-    printf "%s\n" "$is_service"
+    printf '%s\n' "$is_service"
 }
 
 print_app_log_file() {
@@ -828,7 +828,7 @@ print_app_log_file() {
 	header="SERVICE LOG $APP_LOGFILE (last $rows lines)"
 	tail -n "$rows" $APP_LOGFILE | print_table "${1-1}" "$header"
     elif [ -e $APP_LOGFILE ]; then
-	printf "%s: No read permission\n" "$APP_LOGFILE" >&2
+	printf '%s: No read permission\n' "$APP_LOGFILE" >&2
     fi
 }
 
@@ -892,19 +892,19 @@ signal_app_restart() {
 
 validate_parameters_postinstallation() {
     if [ ! -d $APP_ETCDIR ]; then
-	abort "%s: %s: No such configuration directory\n" "$0" "$APP_ETCDIR"
+	abort '%s: %s: No such configuration directory\n' "$0" "$APP_ETCDIR"
     elif [ ! -e $APP_CONFIG ]; then
-	abort "%s: %s: No such configuration file\n" "$0" "$APP_CONFIG"
+	abort '%s: %s: No such configuration file\n' "$0" "$APP_CONFIG"
     elif [ ! -r $APP_CONFIG ]; then
-	abort "%s: %s: No read permission\n" "$0" "$APP_CONFIG"
+	abort '%s: %s: No read permission\n' "$0" "$APP_CONFIG"
     elif [ ! -d $APP_DIR ]; then
-	abort "%s: %s: No such program directory\n" "$0" "$APP_DIR"
+	abort '%s: %s: No such program directory\n' "$0" "$APP_DIR"
     elif [ ! -d $APP_VARDIR ]; then
-	abort "%s: %s: No such working directory\n" "$0" "$APP_VARDIR"
+	abort '%s: %s: No such working directory\n' "$0" "$APP_VARDIR"
     elif [ ! -d $APP_LOGDIR ]; then
-	abort "%s: %s: No such log directory\n" "$0" "$APP_LOGDIR"
+	abort '%s: %s: No such log directory\n' "$0" "$APP_LOGDIR"
     elif [ ! -d $APP_RUNDIR ]; then
-	abort "%s: %s: No such run directory\n" "$0" "$APP_RUNDIR"
+	abort '%s: %s: No such run directory\n' "$0" "$APP_RUNDIR"
     elif [ -e $APP_LOGFILE -a ! -w $APP_LOGFILE ]; then
 	abort_insufficient_permissions "$APP_LOGFILE"
     elif [ -e $APP_PIDFILE -a ! -w $APP_PIDFILE ]; then
@@ -917,16 +917,16 @@ validate_parameters_preinstallation() {
     plugin=$(get_uwsgi_plugin_path)
 
     if [ ! -e $binary ]; then
-	abort "%s: %s: No such binary file\n" "$0" "$binary"
+	abort '%s: %s: No such binary file\n' "$0" "$binary"
     elif [ ! -x $binary ]; then
-	abort "%s: %s: No execute permission\n" "$0" "$binary"
+	abort '%s: %s: No execute permission\n' "$0" "$binary"
     elif ! $binary --version >/dev/null 2>&1; then
-	abort "%s: %s: Unable to query version\n" "$0" "$binary"
+	abort '%s: %s: Unable to query version\n' "$0" "$binary"
     elif [ $UWSGI_HAS_PLUGIN = true ]; then
 	if [ ! -e $plugin ]; then
-	    abort "%s: %s: No such plugin file\n" "$0" "$plugin"
+	    abort '%s: %s: No such plugin file\n' "$0" "$plugin"
 	elif [ ! -r $plugin ]; then
-	    abort "%s: %s: No read permission\n" "$0" "$plugin"
+	    abort '%s: %s: No read permission\n' "$0" "$plugin"
 	fi
     fi
 }
@@ -944,8 +944,8 @@ wait_for_service() {
     fi
 
     if [ $i -ge $1 ]; then
-	printf "Service failed to start within %s seconds\n" $1 >&2
+	printf 'Service failed to start within %s seconds\n' $1 >&2
     fi
 
-    printf "%s\n" "$i"
+    printf '%s\n' "$i"
 }

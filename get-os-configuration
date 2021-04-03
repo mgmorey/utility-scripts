@@ -22,11 +22,11 @@ abort() {
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$0" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_configuration_basename() {
@@ -83,7 +83,7 @@ get_configuration_basename() {
     done
 
     if [ -n "${basename-}" ]; then
-	printf "%s\n" "$basename.ini"
+	printf '%s\n' "$basename.ini"
     fi
 }
 
@@ -139,7 +139,7 @@ usage_error() {
 	printf "$@" >&2
     fi
 
-    printf "%s\n" '' >&2
+    printf '%s\n' '' >&2
     usage
     exit 2
 }

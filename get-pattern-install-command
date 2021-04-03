@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_pattern_install_command() {
@@ -41,7 +41,7 @@ get_pattern_install_command() {
 	    ;;
     esac
 
-    printf "%s\n" "$install"
+    printf '%s\n' "$install"
 }
 
 get_pattern_install_command "$@"

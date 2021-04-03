@@ -26,11 +26,11 @@ abort() {
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$script" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$script" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 configure_platform() {
@@ -236,7 +236,7 @@ validate_platform() {
 script=$(basename "$0")
 
 if [ $# -gt 0 ]; then
-    usage_error "%s: Too many arguments\n" "$script"
+    usage_error '%s: Too many arguments\n' "$script"
 fi
 
 case "$0" in

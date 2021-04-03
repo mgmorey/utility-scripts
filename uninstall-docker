@@ -22,11 +22,11 @@ abort() {
 }
 
 abort_not_supported() {
-    abort "%s: %s: %s not supported\n" "$0" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$0" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_docker_origin() {
@@ -44,7 +44,7 @@ get_docker_origin() {
 	esac
 
 	if [ -n "${origin-}" ]; then
-	    printf "%s\n" "$origin"
+	    printf '%s\n' "$origin"
 	    return
 	fi
     done
@@ -70,17 +70,17 @@ uninstall_docker() {
     if [ -n "$origin" ]; then
 	case "$origin" in
 	    (docker.com)
-		printf "Docker Community Edition is installed.\n"
+		printf 'Docker Community Edition is installed.\n'
 		;;
 	    (native)
-		printf "Native Docker is installed.\n"
+		printf 'Native Docker is installed.\n'
 		;;
 	    (podman)
-		printf "Podman is installed.\n"
+		printf 'Podman is installed.\n'
 		;;
 	esac
     else
-	printf "Docker is not installed.\n"
+	printf 'Docker is not installed.\n'
     fi
 
     if [ -n "$packages" ]; then

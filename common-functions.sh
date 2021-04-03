@@ -21,7 +21,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 clean_up() {
@@ -526,7 +526,7 @@ validate_group_id() {
 
     if /usr/bin/which id >/dev/null 2>&1; then
 	if [ "$(id -g)" != $1 ]; then
-	    abort "%s: Please try again with group GID %s\n" "$0" "$1"
+	    abort '%s: Please try again with group GID %s\n' "$0" "$1"
 	fi
     fi
 }
@@ -537,7 +537,7 @@ validate_group_name() {
 
     if /usr/bin/which id >/dev/null 2>&1; then
 	if [ "$(id -ng)" != $1 ]; then
-	    abort "%s: Please try again with group %s\n" "$0" "$1"
+	    abort '%s: Please try again with group %s\n' "$0" "$1"
 	fi
     fi
 }
@@ -548,7 +548,7 @@ validate_user_id() {
 
     if /usr/bin/which id >/dev/null 2>&1; then
 	if [ "$(id -u)" != $1 ]; then
-	    abort "%s: Please try again as user UID %s\n" "$0" "$1"
+	    abort '%s: Please try again as user UID %s\n' "$0" "$1"
 	fi
     fi
 }
@@ -561,7 +561,7 @@ validate_user_name() (
 	user_name=$(id -nu)
 
 	if [ ${user_name#*+} != ${1#*+} ]; then
-	    abort "%s: Please try again as user %s\n" "$0" "$1"
+	    abort '%s: Please try again as user %s\n' "$0" "$1"
 	fi
     fi
 )

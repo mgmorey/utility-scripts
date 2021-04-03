@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 export_parameters() {
@@ -62,7 +62,7 @@ parse_parameter() {
     if is_valid_parameter "$1"; then
 	parameters=${parameters:+$parameters }"$1"
     else
-	usage_error "%s: %s: Invalid parameter name\n" "$script" "$1"
+	usage_error '%s: %s: Invalid parameter name\n' "$script" "$1"
     fi
 }
 
@@ -81,7 +81,7 @@ parse_shell() {
 	    shell=${1%.exe}
 	    ;;
 	(*)
-	    usage_error "%s: %s: Unsupported shell\n" "$script" "$1"
+	    usage_error '%s: %s: Unsupported shell\n' "$script" "$1"
 	    ;;
     esac
 }

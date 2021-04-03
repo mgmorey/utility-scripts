@@ -29,7 +29,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 get_gcc_build_packages() {
@@ -62,7 +62,7 @@ get_gcc_build_packages() {
     esac
 
     if [ -n "${packages-}" ]; then
-	printf "%s\n" $packages
+	printf '%s\n' $packages
     fi
 }
 

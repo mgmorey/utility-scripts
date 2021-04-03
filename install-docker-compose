@@ -27,7 +27,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$script" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 clean_up() {
@@ -221,9 +221,9 @@ get_prefix() {
 get_realpath() (
     for file; do
 	if expr "$file" : '/.*' >/dev/null; then
-	    printf "%s\n" "$file"
+	    printf '%s\n' "$file"
 	else
-	    printf "%s\n" "$PWD/${file#./}"
+	    printf '%s\n' "$PWD/${file#./}"
 	fi
     done
 )
@@ -376,7 +376,7 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -gt 0 ]; then
-	usage_error "%s: Too many arguments\n" "$script"
+	usage_error '%s: Too many arguments\n' "$script"
     fi
 }
 
@@ -389,14 +389,14 @@ parse_prefix() {
 	    prefix=$1
 	    ;;
 	(*)
-	    usage_error "%s: %s: Invalid prefix\n" "$script" "$1"
+	    usage_error '%s: %s: Invalid prefix\n' "$script" "$1"
 	    ;;
     esac
 
     if [ ! -d "$prefix/bin" ]; then
-	usage_error "%s: %s: Invalid prefix\n" "$script" "$1"
+	usage_error '%s: %s: Invalid prefix\n' "$script" "$1"
     elif [ ! -w "$prefix/bin" ]; then
-	usage_error "%s: %s: Invalid prefix\n" "$script" "$1"
+	usage_error '%s: %s: Invalid prefix\n' "$script" "$1"
     fi
 }
 
@@ -407,7 +407,7 @@ parse_version() {
     if is_valid_version "$1"; then
 	version=$1
     else
-	usage_error "%s: %s: Invalid version\n" "$script" "$1"
+	usage_error '%s: %s: Invalid version\n' "$script" "$1"
     fi
 }
 

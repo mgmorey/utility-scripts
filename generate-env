@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort "%s: Assertion failed: %s\n" "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
 format_dialect() {
@@ -95,7 +95,7 @@ generate_password() {
 }
 
 get_default_dialect() {
-    printf "%s\n" sqlite
+    printf '%s\n' sqlite
 }
 
 get_default_host() {
@@ -103,15 +103,15 @@ get_default_host() {
 	(mysql)
 	    case ${protocol:=$(get_default_protocol)} in
 		(SOCKET)
-		    printf "%s\n" localhost
+		    printf '%s\n' localhost
 		    ;;
 		(TCP)
-		    printf "%s\n" 127.0.0.1
+		    printf '%s\n' 127.0.0.1
 		    ;;
 	    esac
 	    ;;
 	(postgresql)
-	    printf "%s\n" localhost
+	    printf '%s\n' localhost
 	    ;;
     esac
 }
@@ -119,10 +119,10 @@ get_default_host() {
 get_default_port() {
     case "${dialect:=$(get_default_dialect)}" in
 	(mysql)
-	    printf "%s\n" 3306
+	    printf '%s\n' 3306
 	    ;;
 	(postgresql)
-	    printf "%s\n" 5432
+	    printf '%s\n' 5432
 	    ;;
     esac
 }
@@ -130,7 +130,7 @@ get_default_port() {
 get_default_protocol() {
     case "${dialect:=$(get_default_dialect)}" in
 	(mysql)
-	    printf "%s\n" SOCKET
+	    printf '%s\n' SOCKET
 	    ;;
     esac
 }
@@ -138,13 +138,13 @@ get_default_protocol() {
 get_default_qualifier() {
     case "${dialect:=$(get_default_dialect)}" in
 	(mysql)
-	    printf "%s\n" mysql
+	    printf '%s\n' mysql
 	    ;;
 	(postgresql)
-	    printf "%s\n" postgres
+	    printf '%s\n' postgres
 	    ;;
 	(sqlite)
-	    printf "%s\n" database
+	    printf '%s\n' database
 	    ;;
     esac
 }
@@ -152,7 +152,7 @@ get_default_qualifier() {
 get_default_user() {
     case "${dialect:=$(get_default_dialect)}" in
 	(mysql|postgresql)
-	    printf "%s\n" "${SUDO_USER-${USER-$LOGIN}}"
+	    printf '%s\n' "${SUDO_USER-${USER-$LOGIN}}"
 	    ;;
     esac
 }
@@ -184,7 +184,7 @@ parse_arguments() {
 			dialect=sqlite
 			;;
 		    (*)
-			usage_error "%s: %s: Invalid argument\n" "$0" "$OPTARG"
+			usage_error '%s: %s: Invalid argument\n' "$0" "$OPTARG"
 			;;
 		esac
 		;;
@@ -206,7 +206,7 @@ parse_arguments() {
 			qualifier=postgres
 			;;
 		    (*)
-			usage_error "%s: %s: Invalid argument\n" "$0" "$OPTARG"
+			usage_error '%s: %s: Invalid argument\n' "$0" "$OPTARG"
 			;;
 		esac
 		;;
@@ -257,7 +257,7 @@ usage_error() {
 	printf "$@" >&2
     fi
 
-    printf "%s\n" '' >&2
+    printf '%s\n' '' >&2
     usage
     exit 2
 }
