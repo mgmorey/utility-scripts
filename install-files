@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 get_install_command() {
@@ -71,24 +71,25 @@ install_files() {
     shift $(($OPTIND - 1))
 
     if [ $# -lt 1 ]; then
-	usage_error '%s: Not enough arguments\n' "$0"
+	usage_error '%s: Not enough arguments\n' "$script"
     elif [ -n "$mode" -a "$method" != install ]; then
-	usage_error '%s: %s: Invalid option for method %s\n' "$0" "$mode" "$method"
+	usage_error '%s: %s: Invalid option for method %s\n' \
+		    "$script" "$mode" "$method"
     fi
 
     target_dir="$1"
     shift
 
     if [ $# -lt 1 ]; then
-	usage_error '%s: Not enough arguments\n' "$0"
+	usage_error '%s: Not enough arguments\n' "$script"
     fi
 
     if [ -d "$target_dir" ]; then
 	true
     elif [ -e "$target_dir" ]; then
-	abort '%s: %s: Not a directory\n' "$0" "$target_dir"
+	abort '%s: %s: Not a directory\n' "$script" "$target_dir"
     elif ! mkdir -p "$target_dir"; then
-	abort '%s: %s: Cannot create directory\n' "$0" "$target_dir"
+	abort '%s: %s: Cannot create directory\n' "$script" "$target_dir"
     fi
 
     case "$method" in
@@ -105,8 +106,10 @@ install_files() {
 			    $install ${mode:+-m $mode }"$@" "$target_dir"
 			    ;;
 			(/usr/sbin/install)
+			    $options="${mode:+-m $mode }-s"
+
 			    for file in "$@"; do
-				$install -f "$target_dir" -m ${mode:+-m $mode }-s $file
+				$install -f "$target_dir" $options $file
 			    done
 			    ;;
 		    esac
@@ -124,8 +127,8 @@ install_files() {
 
 usage() {
     cat <<EOF >&2
-Usage: $0 [-M METHOD] [-m MODE] TARGET FILE [FILE [...]]
-       $0 -h
+Usage: $script [-M METHOD] [-m MODE] TARGET FILE [FILE [...]]
+       $script -h
 EOF
 }
 
@@ -138,6 +141,8 @@ usage_error() {
     usage
     exit 2
 }
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)

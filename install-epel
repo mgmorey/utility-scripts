@@ -24,11 +24,11 @@ abort() {
 }
 
 abort_not_supported() {
-    abort '%s: %s: %s not supported\n' "$0" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$script" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 configure_platform() {
@@ -108,9 +108,7 @@ validate_platform() {
     esac
 }
 
-if [ $# -gt 0 ]; then
-    usage_error '%s: Too many arguments\n' "$0"
-fi
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
@@ -124,6 +122,10 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
+
+if [ $# -gt 0 ]; then
+    usage_error '%s: Too many arguments\n' "$script"
+fi
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
