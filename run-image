@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 get_buildah_from_options() {
@@ -142,7 +142,9 @@ parse_arguments() {
 			method="$OPTARG"
 			;;
 		    (*)
-			usage_error '%s: %s: Invalid method\n' "$0" "$OPTARG"
+			usage_error '%s: %s: Invalid method\n' \
+				    "$script" \
+				    "$OPTARG"
 			;;
 		esac
 		;;
@@ -174,9 +176,9 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -lt 1 ]; then
-	usage_error '%s: Not enough arguments\n' "$0"
+	usage_error '%s: Not enough arguments\n' "$script"
     elif [ $# -gt 1 ]; then
-	usage_error '%s: Too many arguments\n' "$0"
+	usage_error '%s: Too many arguments\n' "$script"
     fi
 
     file=$1
@@ -188,13 +190,13 @@ parse_arguments() {
 		dockerfile="$file"
 		;;
 	    (*)
-		abort '%s: %s: Not a Dockerfile\n' "$0" "$file"
+		abort '%s: %s: Not a Dockerfile\n' "$script" "$file"
 		;;
 	esac
     elif [ -e "$file" ]; then
-	abort '%s: %s: Not a Dockerfile\n' "$0" "$file"
+	abort '%s: %s: Not a Dockerfile\n' "$script" "$file"
     else
-	abort '%s: %s: No such file\n' "$0" "$file"
+	abort '%s: %s: No such file\n' "$script" "$file"
     fi
 }
 
@@ -222,9 +224,9 @@ run_image() {
 
 usage() {
     cat <<EOF >&2
-Usage: $0 [-M METHOD] [-c COMMAND] [-f FROM-OPTIONS] [-o OPTIONS] [-r] \
+Usage: $script [-M METHOD] [-c COMMAND] [-f FROM-OPTIONS] [-o OPTIONS] [-r] \
 [-t TAG] DOCKERFILE
-       $0 -h
+       $script -h
 EOF
 }
 
@@ -237,6 +239,8 @@ usage_error() {
     usage
     exit 2
 }
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)

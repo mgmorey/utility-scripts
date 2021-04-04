@@ -6,7 +6,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 install_google_chrome() {
@@ -45,6 +45,8 @@ usage_error() {
     exit 2
 }
 
+script=$(basename "$0")
+
 case "$0" in
     (*/*)
 	script_dir=$(cd "$(dirname "$0")" && pwd)
@@ -58,11 +60,11 @@ script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
 
+if [ $# -gt 1 ]; then
+    usage_error '%s: Too many arguments\n' "$script"
+fi
+
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-
-if [ $# -gt 1 ]; then
-    usage_error '%s: Too many arguments\n' "$0"
-fi
 
 install_google_chrome "$@"

@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 format_action() {
@@ -44,7 +44,7 @@ format_database() {
 	    printf '\\"%s\\"\n' "$2"
 	    ;;
 	(*)
-	    abort '%s: Invalid SQL dialect: %s\n' "$0" "$1"
+	    abort '%s: Invalid SQL dialect: %s\n' "$script" "$1"
 	    ;;
     esac
 }
@@ -80,7 +80,7 @@ parse_arguments() {
 	    true
 	    ;;
 	(*)
-	    usage_error '%s: Invalid action: %s\n' "$0" "$1"
+	    usage_error '%s: Invalid action: %s\n' "$script" "$1"
 	    ;;
     esac
 }
@@ -91,9 +91,9 @@ to_upper() {
 
 usage() {
     cat <<EOF >&2
-Usage: $0: create
-       $0: drop
-       $0: -h
+Usage: $script: create
+       $script: drop
+       $script: -h
 EOF
 }
 
@@ -107,11 +107,7 @@ usage_error() {
     exit 2
 }
 
-if [ $# -lt 1 ]; then
-    usage_error '%s: Not enough arguments\n' "$0"
-elif [ $# -gt 1 ]; then
-    usage_error '%s: Too many arguments\n' "$0"
-fi
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
@@ -125,6 +121,12 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
+
+if [ $# -lt 1 ]; then
+    usage_error '%s: Not enough arguments\n' "$script"
+elif [ $# -gt 1 ]; then
+    usage_error '%s: Too many arguments\n' "$script"
+fi
 
 set_user_profile "$script_dir"
 env_dir=$(pwd)
