@@ -25,13 +25,18 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
-get_install_command() {
+get_install_options() {
+    if [ -n "$mode" ]; then
+	printf '%s\n' -m $mode
+    fi
+
     case "$ID" in
 	(illumos)
-	    which install
-	    ;;
-	(*)
-	    which install
+	    case "$install" in
+		(/usr/sbin/install)
+		    printf '%s\n' -s
+		    ;;
+	    esac
 	    ;;
     esac
 }
@@ -97,17 +102,16 @@ install_files() {
 	    cp -f "$@" "$target_dir"
 	    ;;
 	(install)
-	    install=$(get_install_command)
+	    install=$(/usr/bin/which install)
+	    options=$(get_install_options)
 
 	    case "$ID" in
 		(illumos)
 		    case "$install" in
 			(/usr/gnu/bin/install)
-			    $install ${mode:+-m $mode }"$@" "$target_dir"
+			    $install $options "$@" "$target_dir"
 			    ;;
 			(/usr/sbin/install)
-			    $options="${mode:+-m $mode }-s"
-
 			    for file in "$@"; do
 				$install -f "$target_dir" $options $file
 			    done
@@ -115,7 +119,7 @@ install_files() {
 		    esac
 		    ;;
 		(*)
-		    $install ${mode:+-m $mode }"$@" "$target_dir"
+		    $install $options "$@" "$target_dir"
 		    ;;
 	    esac
 	    ;;
