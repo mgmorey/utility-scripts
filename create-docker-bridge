@@ -107,17 +107,18 @@ parse_arguments() {
 	    driver=macvlan
 	    ;;
 	(*)
-	    usage_error '%s: %s: Invalid network name\n' "$0" "$network" >&2
+	    usage_error '%s: %s: Invalid network name\n' \
+			"$script" "$network" >&2
 	    ;;
     esac
 }
 
 usage() {
     cat <<EOF >&2
-Usage: $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] [-p PARENT] bridgeN
-       $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] [-p PARENT] ipvlanN
-       $0 [-d] [-f] [-g GATEWAY] [-n SUBNET] [-p PARENT] macvlanN
-       $0 -h
+Usage: $script [-d] [-f] [-g GATEWAY] [-n SUBNET] [-p PARENT] bridgeN
+       $script [-d] [-f] [-g GATEWAY] [-n SUBNET] [-p PARENT] ipvlanN
+       $script [-d] [-f] [-g GATEWAY] [-n SUBNET] [-p PARENT] macvlanN
+       $script -h
 EOF
 }
 
@@ -126,8 +127,10 @@ usage_error() {
     exit 2
 }
 
+script=$(basename "$0")
+
 if [ $# -lt 1 ]; then
-    usage_error '%s: Not enough arguments\n' "$0"
+    usage_error '%s: Not enough arguments\n' "$script"
 fi
 
 parse_arguments "$@"

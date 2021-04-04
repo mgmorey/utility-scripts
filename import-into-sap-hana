@@ -126,16 +126,6 @@ Usage: $0 [-s SHELL] [COMMAND [COMMAND] ...]
 EOF
 }
 
-usage_error() {
-    if [ $# -gt 0 ]; then
-	printf "$@" >&2
-    fi
-
-    printf '%s\n' '' >&2
-    usage
-    exit 2
-}
-
 script_basename=$(basename "$0")
 script_dirname=$(cd "$(dirname "$0")" && pwd)
 

@@ -100,9 +100,7 @@ usage_error() {
     exit 2
 }
 
-if [ $# -lt 1 ]; then
-    usage_error '%s: Not enough arguments\n' "$0"
-fi
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
@@ -116,6 +114,10 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}ibm-db2-config.sh"
+
+if [ $# -lt 1 ]; then
+    usage_error '%s: Not enough arguments\n' "$script"
+fi
 
 if [ -r $HOME/.env-ibm-db2 ]; then
     . $HOME/.env-ibm-db2

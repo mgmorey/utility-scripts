@@ -76,19 +76,6 @@ usage_error() {
     exit 2
 }
 
-script=$(basename "$0")
-
-case "$0" in
-    (*/*)
-	script_dir=$(cd "$(dirname "$0")" && pwd)
-	;;
-    (*)
-	script_dir=
-	;;
-esac
-
-script_prefix=${script_dir:+$script_dir/}
-
 parse_arguments "$@"
 
 if [ $is_query = true ]; then

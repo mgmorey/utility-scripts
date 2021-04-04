@@ -19,7 +19,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 usage_error() {
@@ -27,14 +27,27 @@ usage_error() {
     exit 2
 }
 
-if [ $# -lt 1 ]; then
-    usage_error '%s: Not enough arguments\n' "$0"
-elif [ $# -gt 1 ]; then
-    usage_error '%s: Too many arguments\n' "$0"
-fi
+script=$(basename "$0")
 
-. common-functions.sh
-. utility-functions.sh
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+. "${script_prefix}utility-functions.sh"
+
+if [ $# -lt 1 ]; then
+    usage_error '%s: Not enough arguments\n' "$script"
+elif [ $# -gt 1 ]; then
+    usage_error '%s: Too many arguments\n' "$script"
+fi
 
 version="$("$1" --version | awk '{print $2'})"
 

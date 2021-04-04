@@ -25,7 +25,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 docker_run_oracle_server() {
@@ -74,9 +74,7 @@ usage_error() {
     exit 2
 }
 
-if [ $# -lt 1 ]; then
-    usage_error '%s: Not enough arguments\n' "$0"
-fi
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
@@ -90,6 +88,10 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}oracle-config.sh"
+
+if [ $# -lt 1 ]; then
+    usage_error '%s: Not enough arguments\n' "$script"
+fi
 
 if [ -r $HOME/.env-oracle ]; then
     . $HOME/.env-oracle

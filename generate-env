@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 format_dialect() {
@@ -184,7 +184,9 @@ parse_arguments() {
 			dialect=sqlite
 			;;
 		    (*)
-			usage_error '%s: %s: Invalid argument\n' "$0" "$OPTARG"
+			usage_error '%s: %s: Invalid argument\n' \
+				    "$script" \
+				    "$OPTARG"
 			;;
 		esac
 		;;
@@ -206,7 +208,9 @@ parse_arguments() {
 			qualifier=postgres
 			;;
 		    (*)
-			usage_error '%s: %s: Invalid argument\n' "$0" "$OPTARG"
+			usage_error '%s: %s: Invalid argument\n' \
+				    "$script" \
+				    "$OPTARG"
 			;;
 		esac
 		;;
@@ -245,10 +249,10 @@ to_upper() {
 
 usage() {
     cat <<EOF >&2
-Usage: $0 [-D] [-d DIALECT] [-H HOST] [-P PORT] [-p PASSWORD]
+Usage: $script [-D] [-d DIALECT] [-H HOST] [-P PORT] [-p PASSWORD]
        [-q QUALIFIER] [-r ROOT-PASSWORD] [-S SCHEMA] [-s|-t]
        [-u USER]
-       $0 -h
+       $script -h
 EOF
 }
 
@@ -261,6 +265,8 @@ usage_error() {
     usage
     exit 2
 }
+
+script=$(basename "$0")
 
 parse_arguments "$@"
 generate_env

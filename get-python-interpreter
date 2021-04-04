@@ -90,15 +90,5 @@ Usage: $0 [-q] [-v]
 EOF
 }
 
-usage_error() {
-    if [ $# -gt 0 ]; then
-	printf "$@" >&2
-    fi
-
-    printf '%s\n' '' >&2
-    usage
-    exit 2
-}
-
 parse_arguments "$@"
 get_python

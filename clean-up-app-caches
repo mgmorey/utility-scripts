@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 clean_up_app_caches() {
@@ -45,9 +45,7 @@ usage_error() {
     exit 2
 }
 
-if [ $# -gt 0 ]; then
-    usage_error '%s: Too many arguments\n' "$0"
-fi
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
@@ -59,6 +57,10 @@ case "$0" in
 esac
 
 script_prefix=${script_dir:+$script_dir/}
+
+if [ $# -gt 0 ]; then
+    usage_error '%s: Too many arguments\n' "$script"
+fi
 
 eval $("${script_prefix}get-configuration" app.ini)
 clean_up_app_caches

@@ -24,7 +24,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 build_images() {
@@ -225,7 +225,9 @@ parse_arguments() {
 			method="$OPTARG"
 			;;
 		    (*)
-			usage_error '%s: %s: Invalid method\n' "$0" "$OPTARG"
+			usage_error '%s: %s: Invalid method\n' \
+				    "$script" \
+				    "$OPTARG"
 			;;
 		esac
 		;;
@@ -268,21 +270,21 @@ parse_arguments() {
 		    dockerfiles="${dockerfiles+$dockerfiles }$file"
 		    ;;
 		(*)
-		    abort '%s: %s: Not a Dockerfile\n' "$0" "$file"
+		    abort '%s: %s: Not a Dockerfile\n' "$script" "$file"
 		    ;;
 	    esac
 	elif [ -e "$file" ]; then
-	    abort '%s: %s: Not a Dockerfile\n' "$0" "$file"
+	    abort '%s: %s: Not a Dockerfile\n' "$script" "$file"
 	else
-	    abort '%s: %s: No such file\n' "$0" "$file"
+	    abort '%s: %s: No such file\n' "$script" "$file"
 	fi
     done
 }
 
 usage() {
     cat <<EOF >&2
-Usage: $0 [-M METHOD] [-b] [-l] [-p] [-t TAG]
-       $0 -h
+Usage: $script [-M METHOD] [-b] [-l] [-p] [-t TAG]
+       $script -h
 EOF
 }
 
@@ -295,6 +297,8 @@ usage_error() {
     usage
     exit 2
 }
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)

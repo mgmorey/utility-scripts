@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 build_binary() (
@@ -91,15 +91,7 @@ usage_error() {
     exit 2
 }
 
-if [ $# -lt 2 ]; then
-    usage_error '%s: Not enough arguments\n' "$0"
-elif [ $# -gt 2 ]; then
-    usage_error '%s: Too many arguments\n' "$0"
-fi
-
-if [ "$(id -u)" -eq 0 ]; then
-    abort '%s: Must be run as a non-privileged user\n' "$0"
-fi
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
@@ -116,6 +108,16 @@ script_prefix=${script_dir:+$script_dir/}
 . "${script_prefix}utility-functions.sh"
 . "${script_prefix}restapi-functions.sh"
 . "${script_prefix}restapi-parameters.sh"
+
+if [ $# -lt 2 ]; then
+    usage_error '%s: Not enough arguments\n' "$script"
+elif [ $# -gt 2 ]; then
+    usage_error '%s: Too many arguments\n' "$script"
+fi
+
+if [ "$(id -u)" -eq 0 ]; then
+    abort '%s: Must be run as a non-privileged user\n' "$script"
+fi
 
 SYSTEM_PYTHON=$1
 SYSTEM_PYTHON_VERSION=$2

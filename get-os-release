@@ -32,11 +32,11 @@ abort() {
 }
 
 assert() {
-    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 abort_conflicting_option() {
-    usage_error '%s: conflicting option -- %s\n' "$0" "$1"
+    usage_error '%s: conflicting option -- %s\n' "$script" "$1"
 }
 
 collect_data() {
@@ -239,7 +239,7 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -gt 0 ]; then
-	usage_error '%s: Too many arguments\n' "$0"
+	usage_error '%s: Too many arguments\n' "$script"
     fi
 }
 
@@ -266,10 +266,10 @@ to_lower() {
 
 usage() {
     cat <<-EOF >&2
-Usage: $0: [-i] [-k] [-n] [-p] [-r] [-v]
-       $0: -x
-       $0: -X
-       $0: -h
+Usage: $script: [-i] [-k] [-n] [-p] [-r] [-v]
+       $script: -x
+       $script: -X
+       $script: -h
 EOF
 }
 
@@ -282,6 +282,8 @@ usage_error() {
     usage
     exit 2
 }
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)

@@ -22,7 +22,7 @@ abort() {
 }
 
 assert() {
-    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 usage_error() {
@@ -30,9 +30,7 @@ usage_error() {
     exit 2
 }
 
-if [ $# -gt 0 ]; then
-    usage_error '%s: Too many arguments\n' "$0"
-fi
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
@@ -46,6 +44,10 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
+
+if [ $# -gt 0 ]; then
+    usage_error '%s: Too many arguments\n' "$script"
+fi
 
 set_user_profile "$script_dir"
 manage-app-database create

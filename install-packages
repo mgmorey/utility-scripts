@@ -22,11 +22,11 @@ abort() {
 }
 
 abort_not_supported() {
-    abort '%s: %s: %s not supported\n' "$0" "$PRETTY_NAME" "$*"
+    abort '%s: %s: %s not supported\n' "$script" "$PRETTY_NAME" "$*"
 }
 
 assert() {
-    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 configure_platform() {
@@ -286,8 +286,8 @@ parse_pattern() {
 
 usage() {
     cat <<EOF >&2
-Usage: $0: [-o OPTIONS] [-p PATTERN] PACKAGE [PACKAGE [...]]
-       $0: -h
+Usage: $script: [-o OPTIONS] [-p PATTERN] PACKAGE [PACKAGE [...]]
+       $script: -h
 EOF
 }
 
@@ -366,6 +366,8 @@ validate_platform() {
 
     abort_not_supported "Operating system"
 }
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
