@@ -28,7 +28,10 @@ assert() {
 get_filenames() {
     filename="$1"
     filenames=$(/usr/bin/which -a "$filename" | quote_lines)
-    eval $realpath $filenames | remove_duplicate_lines
+
+    if [ -n "$filenames" ]; then
+	eval $realpath $filenames | remove_duplicate_lines
+    fi
 }
 
 get_md5sum() {
