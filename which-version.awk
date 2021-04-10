@@ -20,5 +20,5 @@ BEGIN {
     FS = "\t"
 }
 $1 == basename {
-    print $2
+    print $column
 }

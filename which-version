@@ -55,15 +55,28 @@ get_version() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
     assert [ -n "$2" ]
+    pathname="$1"
+    command="$2"
 
-    if string=$(get_version_string "$1"); then
-	get_version_regexp "$2" | quote_metachars | while read regexp; do
-	    if version=$(expr "$string" : "$regexp"); then
-		printf '%s\n' "$version"
-		break
-	    fi
-	done
+    if option=$(get_version_option "$pathname"); then
+	if string=$(get_version_string "$pathname" "$option"); then
+	    get_version_regexp "$command" | quote_metachars | while read re; do
+		if version=$(expr "$string" : "$re"); then
+		    printf '%s\n' "$version"
+		    break
+		fi
+	    done
+	fi
     fi
+}
+
+get_version_option() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    "$script_prefix$script.awk" \
+	basename=$(basename "$1") \
+	column=2 \
+	"$script_prefix$script.txt"
 }
 
 get_version_regexp() {
@@ -71,14 +84,17 @@ get_version_regexp() {
     assert [ -n "$1" ]
     "$script_prefix$script.awk" \
 	basename=$(basename "$1") \
+	column=3 \
 	"$script_prefix$script.txt"
 }
 
 get_version_string() {
-    assert [ $# -eq 1 ]
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
 
-    if [ -n "$1" -a -x "$1" ]; then
-	"$1" --version 2>&1
+    if [ -x "$1" ]; then
+	"$1" "$2" 2>&1
     fi
 }
 
