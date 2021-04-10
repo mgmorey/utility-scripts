@@ -48,20 +48,21 @@ get_realpath() (
 )
 
 get_version() {
-    regexp=$(get_version_regexp "$1")
     string=$(get_version_string "$1")
-    get_version_number "$string" "$regexp"
-}
 
-get_version_number() {
-    expr "${1-}" : "${2-}"
+    get_version_regexp "$1" | quote_metachars | while read regexp; do
+	if version=$(expr "$string" : "$regexp"); then
+	    printf '%s\n' "$version"
+	    break
+	fi
+    done
 }
 
 get_version_regexp() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    awk -F'\t' \
-	'$1 == "'"$(basename "$1")"'" {print $2}' \
+    "$script_prefix$script.awk" \
+	basename=$(basename "$1") \
 	"$script_prefix$script.txt"
 }
 
@@ -75,6 +76,10 @@ get_version_string() {
 
 quote_lines() {
     sed 's/^\(.*\)$/"\1"/'
+}
+
+quote_metachars() {
+    sed 's/\([\\\$]\)/\\\1/g'
 }
 
 remove_duplicate_lines() {
@@ -109,10 +114,10 @@ which_version() {
     if [ $# -lt 1 ]; then
 	usage_error '%s: Not enough arguments\n' "$0"
     fi
-    
+
     get_filenames "$1" | while read filename; do
 	md5sum=$(get_md5sum "$filename")
-	
+
 	if version=$(get_version "$filename"); then
 	    printf '%s:%s:%s\n' "$md5sum" "$version" "$filename"
 	else
