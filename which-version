@@ -1,0 +1,140 @@
+#!/bin/sh -eu
+
+# which-version: print full path and version of command
+# Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
+}
+
+get_filenames() {
+    filename="$1"
+    filenames=$(/usr/bin/which -a "$filename" | quote_lines)
+    eval $realpath $filenames | remove_duplicate_lines
+}
+
+get_md5sum() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    md5sum "$1" | awk '{print $1}'
+}
+
+get_realpath() (
+    for file; do
+	if expr "$file" : '/.*' >/dev/null; then
+	    printf '%s\n' "$file"
+	else
+	    printf '%s\n' "$PWD/${file#./}"
+	fi
+    done
+)
+
+get_version() {
+    regexp=$(get_version_regexp "$1")
+    string=$(get_version_string "$1")
+    get_version_number "$string" "$regexp"
+}
+
+get_version_number() {
+    expr "${1-}" : "${2-}"
+}
+
+get_version_regexp() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    awk -F'\t' \
+	'$1 == "'"$(basename "$1")"'" {print $2}' \
+	"$script_prefix$script.txt"
+}
+
+get_version_string() {
+    assert [ $# -eq 1 ]
+
+    if [ -n "$1" -a -x "$1" ]; then
+	"$1" --version || true
+    fi
+}
+
+quote_lines() {
+    sed 's/^\(.*\)$/"\1"/'
+}
+
+remove_duplicate_lines() {
+    awk '!_[$0]++'
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script COMMAND
+
+Print command path and version.
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+which_version() {
+    if [ -x /bin/realpath ]; then
+	realpath="/bin/realpath -q"
+    else
+	realpath=get_realpath
+    fi
+
+    if [ $# -lt 1 ]; then
+	usage_error '%s: Not enough arguments\n' "$0"
+    fi
+    
+    get_filenames "$1" | while read filename; do
+	md5sum=$(get_md5sum "$filename")
+	
+	if version=$(get_version "$filename"); then
+	    printf '%s:%s:%s\n' "$md5sum" "$version" "$filename"
+	else
+	    printf '%s: %s: %s\n' \
+		   "$script" \
+		   "$filename" \
+		   "No version available" >&2
+	fi
+    done
+}
+
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+which_version "$@"
