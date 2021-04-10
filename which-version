@@ -48,7 +48,11 @@ get_realpath() (
 )
 
 get_version() {
-    if string=$(get_version_string "$1"); then
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+
+    if string=$(get_version_string "$2"); then
 	get_version_regexp "$1" | quote_metachars | while read regexp; do
 	    if version=$(expr "$string" : "$regexp"); then
 		printf '%s\n' "$version"
@@ -118,7 +122,7 @@ which_version() {
     get_filenames "$1" | while read filename; do
 	md5sum=$(get_md5sum "$filename")
 
-	if version=$(get_version "$filename"); then
+	if version=$(get_version "$1" "$filename"); then
 	    printf '%s:%s:%s\n' "$md5sum" "$version" "$filename"
 	else
 	    printf '%s: %s: %s\n' \
