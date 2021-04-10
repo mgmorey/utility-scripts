@@ -81,6 +81,37 @@ get_version_string() {
     fi
 }
 
+parse_arguments() {
+    checksum=false
+
+    while getopts ch opt; do
+	case $opt in
+	    (c)
+		checksum=true
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -lt 1 ]; then
+	usage_error '%s: Not enough arguments\n' "$0"
+    fi
+
+    if [ $# -gt 1 ]; then
+	usage_error '%s: Too many arguments\n' "$script"
+    fi
+
+    command="$1"
+}
+
 quote_lines() {
     sed 's/^\(.*\)$/"\1"/'
 }
@@ -95,7 +126,7 @@ remove_duplicate_lines() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script COMMAND
+Usage: $script [-c] COMMAND
 
 Print command path and version.
 EOF
@@ -118,15 +149,14 @@ which_version() {
 	realpath=get_realpath
     fi
 
-    if [ $# -lt 1 ]; then
-	usage_error '%s: Not enough arguments\n' "$0"
-    fi
-
-    get_filenames "$1" | while read filename; do
-	md5sum=$(get_md5sum "$filename")
-
-	if version=$(get_version "$filename" "$1"); then
-	    printf '%s:%s:%s\n' "$md5sum" "$version" "$filename"
+    get_filenames "$command" | while read filename; do
+	if version=$(get_version "$filename" "$command"); then
+	    if [ "$checksum" = true ]; then
+		md5sum=$(get_md5sum "$filename")
+		printf '%s:%s:%s\n' "$md5sum" "$version" "$filename"
+	    else
+		printf '%s:%s\n' "$version" "$filename"
+	    fi
 	else
 	    printf '%s: %s: %s\n' \
 		   "$script" \
@@ -149,4 +179,5 @@ esac
 
 script_prefix=${script_dir:+$script_dir/}
 
-which_version "$@"
+parse_arguments "$@"
+which_version
