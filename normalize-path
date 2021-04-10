@@ -46,11 +46,29 @@ quote_lines() {
 }
 
 remove_duplicate_lines() {
-    awk '!_[$0]++'
+    if [ "$ID" = windows ]; then
+	awk '!_[tolower($0)]++'
+    else
+	awk '!_[$0]++'
+    fi
 }
 
 split_path() {
     awk -v RS=: '{print}' | sed '/^$/d'
 }
 
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+eval $("${script_prefix}get-os-release" -x)
 normalize_path "$@"
