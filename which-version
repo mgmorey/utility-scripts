@@ -122,7 +122,11 @@ quote_metachars() {
 }
 
 remove_duplicate_lines() {
-    awk '!_[$0]++'
+    if [ "$ID" = windows ]; then
+	awk '!_[tolower($0)]++'
+    else
+	awk '!_[$0]++'
+    fi
 }
 
 usage() {
@@ -180,5 +184,6 @@ esac
 
 script_prefix=${script_dir:+$script_dir/}
 
+eval $("${script_prefix}get-os-release" -x)
 parse_arguments "$@"
 which_version
