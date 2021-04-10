@@ -17,8 +17,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 BEGIN {
-    FS = "\t"
+    FS = "\t";
 }
-$1 == basename {
-    print $column
+$1 == command {
+    print $2
 }
