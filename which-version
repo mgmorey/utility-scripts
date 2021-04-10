@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# which-version: print full path and version of command
+# which-version: print full pathname and version of command
 # Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -26,8 +26,9 @@ assert() {
 }
 
 get_filenames() {
-    filename="$1"
-    filenames=$(/usr/bin/which -a "$filename" | quote_lines)
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    filenames=$(/usr/bin/which -a "$1" | quote_lines)
 
     if [ -n "$filenames" ]; then
 	eval $realpath $filenames | remove_duplicate_lines
