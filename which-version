@@ -48,14 +48,14 @@ get_realpath() (
 )
 
 get_version() {
-    string=$(get_version_string "$1")
-
-    get_version_regexp "$1" | quote_metachars | while read regexp; do
-	if version=$(expr "$string" : "$regexp"); then
-	    printf '%s\n' "$version"
-	    break
-	fi
-    done
+    if string=$(get_version_string "$1"); then
+	get_version_regexp "$1" | quote_metachars | while read regexp; do
+	    if version=$(expr "$string" : "$regexp"); then
+		printf '%s\n' "$version"
+		break
+	    fi
+	done
+    fi
 }
 
 get_version_regexp() {
@@ -70,7 +70,7 @@ get_version_string() {
     assert [ $# -eq 1 ]
 
     if [ -n "$1" -a -x "$1" ]; then
-	"$1" --version || true
+	"$1" --version 2>&1
     fi
 }
 
