@@ -59,11 +59,11 @@ get_library_files() {
     assert [ -n "$1" ]
     find "$1" \
 	 -maxdepth 1 \
-	 -name '*.*' \
-	 ! -name .editorconfig \
-	 ! -name .gitattributes \
-	 ! -name .gitignore \
-	 ! -name '*~' \
+	 '(' \
+	 -name '*.ini' -o \
+	 -name '*.sh' -o \
+	 -name '*.txt' \
+	 ')' \
 	 -type f \
 	 -print0
 }
@@ -78,7 +78,9 @@ get_script_files() {
 	 ! -name get-python-interpreter \
 	 ! -name run-python \
 	 ! -name "$script" \
-	 ! -name '*.*' \
+	 ! -name '*.ini' \
+	 ! -name '*.sh' \
+	 ! -name '*.txt' \
 	 ! -name '*~' \
 	 -type f \
 	 -print0
