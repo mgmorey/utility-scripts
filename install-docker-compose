@@ -137,12 +137,6 @@ get_hardware() {
 }
 
 get_installed_filenames() {
-    if [ -x /bin/realpath ]; then
-	realpath="/bin/realpath -q"
-    else
-	realpath=get_realpath
-    fi
-
     filenames=$(/usr/bin/which -a $FILENAME | quote_lines)
     eval $realpath $filenames | remove_duplicate_lines
 }
@@ -285,6 +279,12 @@ install_compose() {
 install_docker_compose() {
     hardware=$(get_hardware)
     platform=$(get_platform)
+
+    if [ -x /bin/realpath ]; then
+	realpath="/bin/realpath -q"
+    else
+	realpath=get_realpath
+    fi
 
     if [ -z "$prefix" ]; then
 	prefix=$(get_prefix)
