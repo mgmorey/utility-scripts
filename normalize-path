@@ -31,10 +31,36 @@ join_dirnames() {
 }
 
 normalize_path() {
+    error=false
+    quiet=false
+
+    while getopts qh opt; do
+	case $opt in
+	    (q)
+		quiet=true
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ "$quiet" = true ]; then
+	options=-q
+    else
+	options=
+    fi
+
     if [ -x "${script_prefix}get-realpath" ]; then
-	realpath="${script_prefix}get-realpath -q"
+	realpath="${script_prefix}get-realpath${options:+ $options}"
     elif [ -x /bin/realpath ]; then
-	realpath="/bin/realpath -q"
+	realpath="/bin/realpath${options:+ $options}"
     else
 	realpath=get_realpath
     fi
@@ -57,6 +83,24 @@ remove_duplicate_lines() {
 
 split_path() {
     awk -v RS=: '{print}' | sed '/^$/d'
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script [-q] [PATH-VARIABLE]
+
+Normalize directories in colon-delimited path variable.
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
 }
 
 script=$(basename "$0")
