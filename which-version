@@ -164,6 +164,8 @@ usage_error() {
 which_version() {
     if [ -x "${script_prefix}get-realpath" ]; then
 	realpath="${script_prefix}get-realpath"
+    elif [ -x /bin/realpath ]; then
+	realpath=/bin/realpath
     else
 	realpath=get_realpath
     fi
