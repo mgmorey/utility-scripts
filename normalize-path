@@ -31,7 +31,9 @@ join_dirnames() {
 }
 
 normalize_path() {
-    if [ -x /bin/realpath ]; then
+    if [ -x "${script_prefix}get-realpath" ]; then
+	realpath="${script_prefix}get-realpath -q"
+    elif [ -x /bin/realpath ]; then
 	realpath="/bin/realpath -q"
     else
 	realpath=get_realpath
