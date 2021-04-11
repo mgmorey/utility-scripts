@@ -98,11 +98,15 @@ get_version_string() {
 
 parse_arguments() {
     checksum=false
+    separator=$(printf '\t\n')
 
-    while getopts ch opt; do
+    while getopts ct:h opt; do
 	case $opt in
 	    (c)
 		checksum=true
+		;;
+	    (t)
+		separator="$OPTARG"
 		;;
 	    (h)
 		usage
@@ -145,9 +149,9 @@ remove_duplicate_lines() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-c] COMMAND
+Usage: $script [-c] [-t separator] COMMAND
 
-Print command path and version.
+Print command paths and versions.
 EOF
 }
 
@@ -177,11 +181,10 @@ which_version() {
     get_filenames "$command" | while read filename; do
 	if version=$(get_version "$command" "$filename" "$option"); then
 	    if [ "$checksum" = true ]; then
-		md5sum=$(get_md5sum "$filename")
-		printf '%s:%s:%s\n' "$md5sum" "$version" "$filename"
-	    else
-		printf '%s:%s\n' "$version" "$filename"
+		printf '%s%s' "$(get_md5sum "$filename")" "$separator"
 	    fi
+
+	    printf '%s%s%s\n' "$version" "$separator" "$filename"
 	else
 	    printf '%s: %s: No version available\n' "$script" "$filename" >&2
 	fi
