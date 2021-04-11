@@ -19,6 +19,7 @@ nm	--version
 objdump	--version
 pip	--version
 pipenv	--version
+pyenv	--version
 python	--version
 python2	--version
 python3	--version
