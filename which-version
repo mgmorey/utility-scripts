@@ -163,7 +163,7 @@ usage_error() {
 
 which_version() {
     if [ -x /bin/realpath ]; then
-	realpath="/bin/realpath -q"
+	realpath=/bin/realpath
     else
 	realpath=get_realpath
     fi
