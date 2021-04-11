@@ -20,6 +20,7 @@ get_realpath() {
     if [ -x /bin/realpath ]; then
 	exec /bin/realpath "$@"
     else
+	error=false
 	quiet=false
 
 	while getopts qh opt; do
@@ -45,11 +46,21 @@ get_realpath() {
 
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
-		printf '%s\n' "$file"
+		if [ -d $(dirname "$file") -o "$quiet" = true ]; then
+		    printf '%s\n' "$file"
+		else
+		    printf '%s: %s: No such file or directory\n' \
+			   "$script" "$file" >&2
+		    error=true
+		fi
 	    else
 		printf '%s\n' "$PWD/${file#./}"
 	    fi
 	done
+    fi
+
+    if [ "$error" = true ]; then
+	return 1
     fi
 }
 
