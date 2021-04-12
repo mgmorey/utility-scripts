@@ -56,7 +56,6 @@ get_version() {
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     assert [ -n "$3" ]
-
     "$1" "$2" 2>&1 | sed -n 's/'"$3"'/\1/p'
 }
 
@@ -113,10 +112,6 @@ parse_arguments() {
 
 quote_lines() {
     sed 's/^\(.*\)$/"\1"/'
-}
-
-quote_metachars() {
-    sed 's/\([\\\$]\)/\\\1/g'
 }
 
 remove_duplicate_lines() {
