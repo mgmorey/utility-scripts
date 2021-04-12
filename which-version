@@ -88,16 +88,18 @@ get_version_option() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     "$script_prefix$script.awk" \
+	column=2 \
 	command=$(basename "$1") \
-	"$script_prefix$script-option.txt"
+	"$script_prefix$script.txt"
 }
 
 get_version_regexp() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     "$script_prefix$script.awk" \
+	column=3 \
 	command=$(basename "$1") \
-	"$script_prefix$script-regexp.txt"
+	"$script_prefix$script.txt"
 }
 
 parse_arguments() {
