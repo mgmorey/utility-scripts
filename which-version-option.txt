@@ -11,6 +11,8 @@ g++	--version
 gcc	--version
 gdb	--version
 git	--version
+gmake	--version
+gsed	--version
 ld	--version
 make	--version
 md5sum	--version
