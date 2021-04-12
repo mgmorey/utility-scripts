@@ -68,8 +68,10 @@ join_dirnames() {
 
 normalize_path() {
     configure_platform
-    dirnames=$(printf '%s\n' "$path" | split_path | quote_lines)
-    eval $realpath $dirnames | remove_duplicate_lines | join_dirnames
+    printf '%s\n' "$path" | split_path | \
+	quote_lines | xargs $realpath | \
+	remove_duplicate_lines | \
+	join_dirnames
 }
 
 parse_arguments() {
