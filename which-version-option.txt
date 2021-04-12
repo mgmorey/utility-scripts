@@ -8,6 +8,7 @@ docker-compose	--version
 emacs	--version
 expr	--version
 g++	--version
+gawk	--version
 gcc	--version
 gdb	--version
 git	--version
