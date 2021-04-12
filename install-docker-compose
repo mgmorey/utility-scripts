@@ -137,8 +137,9 @@ get_hardware() {
 }
 
 get_installed_filenames() {
-    filenames=$(/usr/bin/which -a $FILENAME | quote_lines)
-    eval $realpath $filenames | remove_duplicate_lines
+    /usr/bin/which -a $FILENAME | \
+	quote_lines | xargs $realpath | \
+	remove_duplicate_lines
 }
 
 get_installation_status() (
