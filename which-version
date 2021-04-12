@@ -41,20 +41,13 @@ configure_platform() {
 }
 
 get_filenames() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-
-    if [ "$resolve" = true ]; then
-	eval $realpath $($which "$1" | quote_lines)
-    else
-	$which "$1"
-    fi | remove_duplicate_lines
+    assert [ $# -ge 1 ]
+    $which "$@" | resolve_filenames | remove_duplicate_lines
 }
 
 get_md5sum() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    md5sum "$1" | awk '{print $1}'
+    assert [ $# -ge 1 ]
+    md5sum "$@" | awk '{print $1}'
 }
 
 get_realpath() (
@@ -167,15 +160,19 @@ parse_arguments() {
     commands="$@"
 }
 
-quote_lines() {
-    sed 's/^\(.*\)$/"\1"/'
-}
-
 remove_duplicate_lines() {
     if [ "$ID" = windows ]; then
 	awk '!_[tolower($0)]++'
     else
 	awk '!_[$0]++'
+    fi
+}
+
+resolve_filenames() {
+    if [ "$resolve" = true ]; then
+	xargs $realpath
+    else
+	cat
     fi
 }
 
