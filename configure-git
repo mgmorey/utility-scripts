@@ -31,10 +31,6 @@ abort_invalid_prefix() {
     usage_error '%s: invalid prefix -- %s\n' "$script" "$*"
 }
 
-abort_invalid_toolkit() {
-    usage_error '%s: invalid toolkit -- %s\n' "$script" "$*"
-}
-
 abort_not_supported() {
     abort '%s: %s: %s not supported\n' "$script" "$PRETTY_NAME" "$*"
 }
