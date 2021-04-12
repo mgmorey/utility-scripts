@@ -89,7 +89,7 @@ get_version_option() {
     assert [ -n "$1" ]
     "$script_prefix$script.awk" \
 	column=2 \
-	command=$(basename "$1") \
+	command=$(basename -- "$1") \
 	"$script_prefix$script.txt"
 }
 
@@ -98,7 +98,7 @@ get_version_regexp() {
     assert [ -n "$1" ]
     "$script_prefix$script.awk" \
 	column=3 \
-	command=$(basename "$1") \
+	command=$(basename -- "$1") \
 	"$script_prefix$script.txt"
 }
 
