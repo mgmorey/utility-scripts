@@ -56,18 +56,8 @@ get_version() {
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     assert [ -n "$3" ]
-    command="$1"
-    filename="$2"
-    option="$3"
 
-    if string=$(get_version_string "$filename" "$option"); then
-	get_version_regexp "$command" | quote_metachars | while read re; do
-	    if version=$(expr "$string" : "$re"); then
-		printf '%s\n' "$version"
-		break
-	    fi
-	done
-    fi
+    "$1" "$2" 2>&1 | sed -n 's/'"$3"'/\1/p'
 }
 
 get_version_option() {
@@ -84,16 +74,6 @@ get_version_regexp() {
     "$script_prefix$script.awk" \
 	command=$(basename "$1") \
 	"$script_prefix$script-regexp.txt"
-}
-
-get_version_string() {
-    assert [ $# -eq 2 ]
-    assert [ -n "$1" ]
-    assert [ -n "$2" ]
-
-    if [ -x "$1" ]; then
-	"$1" "$2" 2>&1
-    fi
 }
 
 parse_arguments() {
@@ -178,8 +158,12 @@ which_version() {
 	abort '%s: %s: Not supported\n' "$script" "$command"
     fi
 
+    if ! regexp=$(get_version_regexp "$command") || [ -z "$regexp" ]; then
+	abort '%s: %s: Not supported\n' "$script" "$command"
+    fi
+
     get_filenames "$command" | while read filename; do
-	if version=$(get_version "$command" "$filename" "$option"); then
+	if version=$(get_version "$filename" "$option" "$regexp"); then
 	    if [ "$checksum" = true ]; then
 		printf '%s%s' "$(get_md5sum "$filename")" "$separator"
 	    fi

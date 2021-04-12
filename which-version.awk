@@ -20,5 +20,6 @@ BEGIN {
     FS = "\t";
 }
 $1 == command {
-    print $2
+    print $2;
+    exit;
 }
