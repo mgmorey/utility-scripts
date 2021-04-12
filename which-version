@@ -121,7 +121,7 @@ parse_arguments() {
     shift $(($OPTIND - 1))
 
     if [ $# -lt 1 ]; then
-	usage_error '%s: Not enough arguments\n' "$0"
+	usage_error '%s: Not enough arguments\n' "$script"
     fi
 
     if [ $# -gt 1 ]; then
