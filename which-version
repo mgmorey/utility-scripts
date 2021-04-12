@@ -35,7 +35,7 @@ configure_platform() {
     fi
 
     case "$ID" in
-	(Darwin)
+	(macos)
 	    sed=gsed
 	    ;;
 	(*)
@@ -81,7 +81,7 @@ get_version() {
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     assert [ -n "$3" ]
-    "$1" "$2" 2>&1 | $sed -n 's/'"$3"'/\1/p'
+    "$1" "$2" 2>&1 | $sed -n "$3"
 }
 
 get_version_option() {
