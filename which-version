@@ -25,6 +25,31 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
+configure_platform() {
+    if [ -x "${script_prefix}get-realpath" ]; then
+	realpath="${script_prefix}get-realpath"
+    elif [ -x /bin/realpath ]; then
+	realpath=/bin/realpath
+    else
+	realpath=get_realpath
+    fi
+
+    case "$ID" in
+	(Darwin)
+	    sed=gsed
+	    ;;
+	(*)
+	    sed=sed
+	    ;;
+    esac
+
+    if ! /usr/bin/which $sed >/dev/null 2>&1; then
+	abort '%s: %s: Command not found\n' \
+	      "$script" \
+	      "$sed"
+    fi
+}
+
 get_filenames() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
@@ -56,7 +81,7 @@ get_version() {
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     assert [ -n "$3" ]
-    "$1" "$2" 2>&1 | sed -n 's/'"$3"'/\1/p'
+    "$1" "$2" 2>&1 | $sed -n 's/'"$3"'/\1/p'
 }
 
 get_version_option() {
@@ -141,13 +166,7 @@ usage_error() {
 }
 
 which_version() {
-    if [ -x "${script_prefix}get-realpath" ]; then
-	realpath="${script_prefix}get-realpath"
-    elif [ -x /bin/realpath ]; then
-	realpath=/bin/realpath
-    else
-	realpath=get_realpath
-    fi
+    configure_platform
 
     if ! option=$(get_version_option "$command") || [ -z "$option" ]; then
 	abort '%s: %s: Not supported\n' "$script" "$command"
