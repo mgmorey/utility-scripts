@@ -46,7 +46,7 @@ get_realpath() {
 
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
-		if [ -d $(dirname "$file") -o "$quiet" = true ]; then
+		if [ -d "$(dirname "$file")" -o "$quiet" = true ]; then
 		    printf '%s\n' "$file"
 		else
 		    printf '%s: %s: No such file or directory\n' \
