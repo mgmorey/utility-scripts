@@ -16,6 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+ALL=false
+RESOLVE=false
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -26,22 +29,9 @@ assert() {
 }
 
 configure_platform() {
-    if [ -x "${script_prefix}get-realpath" ]; then
-	realpath="${script_prefix}get-realpath"
-    elif [ -x /bin/realpath ]; then
-	realpath=/bin/realpath
-    else
-	realpath=get_realpath
-    fi
-
-    case "$ID" in
-	(macos)
-	    sed=gsed
-	    ;;
-	(*)
-	    sed=sed
-	    ;;
-    esac
+    realpath=$(get_realpath_command)
+    sed=$(get_sed_command)
+    which=$(get_which)
 
     if ! /usr/bin/which $sed >/dev/null 2>&1; then
 	abort '%s: %s: Command not found\n' \
@@ -53,11 +43,12 @@ configure_platform() {
 get_filenames() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    filenames=$(/usr/bin/which -a "$1" | quote_lines)
 
-    if [ -n "$filenames" ]; then
-	eval $realpath $filenames | remove_duplicate_lines
-    fi
+    if [ "$resolve" = true ]; then
+	eval $realpath $($which "$1" | quote_lines)
+    else
+	$which "$1"
+    fi | remove_duplicate_lines
 }
 
 get_md5sum() {
@@ -75,6 +66,27 @@ get_realpath() (
 	fi
     done
 )
+
+get_realpath_command() {
+    if [ -x "${script_prefix}get-realpath" ]; then
+	printf '%s\n' "${script_prefix}get-realpath"
+    elif [ -x /bin/realpath ]; then
+	printf '%s\n' /bin/realpath
+    else
+	printf '%s\n' get_realpath
+    fi
+}
+
+get_sed_command() {
+    case "$ID" in
+	(macos)
+	    printf '%s\n' gsed
+	    ;;
+	(*)
+	    printf '%s\n' sed
+	    ;;
+    esac
+}
 
 get_version() {
     assert [ $# -eq 3 ]
@@ -102,14 +114,36 @@ get_version_regexp() {
 	"$script_prefix$script.txt"
 }
 
+get_which() {
+    printf '%s\n' /usr/bin/which
+
+    if [ "$all" = true ]; then
+	printf '%s\n' -a
+    fi
+}
+
 parse_arguments() {
+    all=$ALL
     checksum=false
+    resolve=$RESOLVE
     separator=$(printf '\t\n')
 
-    while getopts ct:h opt; do
+    while getopts 1acnrt:h opt; do
 	case $opt in
+	    (1)
+		all=false
+		;;
+	    (a)
+		all=true
+		;;
 	    (c)
 		checksum=true
+		;;
+	    (n)
+		resolve=false
+		;;
+	    (r)
+		resolve=true
 		;;
 	    (t)
 		separator="$OPTARG"
@@ -147,7 +181,7 @@ remove_duplicate_lines() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-c] [-t separator] COMMAND
+Usage: $script [-1] [-a] [-c] [-n] [-r] [-t separator] COMMAND
 
 Print command paths and versions.
 EOF

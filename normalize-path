@@ -16,6 +16,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
+}
+
+configure_platform() {
+    realpath_command=$(get_realpath_command)
+    realpath_options=$(get_realpath_options "$realpath_command")
+    realpath="$realpath_command${realpath_options:+ $realpath_options}"
+}
+
 get_realpath() (
     for file; do
 	if expr "$file" : '/.*' >/dev/null; then
@@ -26,11 +41,38 @@ get_realpath() (
     done
 )
 
+get_realpath_command() {
+    if [ -x "${script_prefix}get-realpath" ]; then
+	printf '%s\n' "${script_prefix}get-realpath"
+    elif [ -x /bin/realpath ]; then
+	printf '%s\n' /bin/realpath
+    else
+	printf '%s\n' get_realpath
+    fi
+}
+
+get_realpath_options() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    if [ "$1" != get_realpath ]; then
+	if [ "$quiet" = true ]; then
+	    printf '%s\n' -q
+	fi
+    fi
+}
+
 join_dirnames() {
     awk -v ORS=: '{print}' | sed 's/:$/\n/'
 }
 
 normalize_path() {
+    configure_platform
+    dirnames=$(printf '%s\n' "$path" | split_path | quote_lines)
+    eval $realpath $dirnames | remove_duplicate_lines | join_dirnames
+}
+
+parse_arguments() {
     error=false
     quiet=false
 
@@ -57,16 +99,7 @@ normalize_path() {
 	options=
     fi
 
-    if [ -x "${script_prefix}get-realpath" ]; then
-	realpath="${script_prefix}get-realpath${options:+ $options}"
-    elif [ -x /bin/realpath ]; then
-	realpath="/bin/realpath${options:+ $options}"
-    else
-	realpath=get_realpath
-    fi
-
-    dirnames=$(printf '%s\n' "${1-$PATH}" | split_path | quote_lines)
-    eval $realpath $dirnames | remove_duplicate_lines | join_dirnames
+    path="${1-$PATH}"
 }
 
 quote_lines() {
@@ -117,4 +150,5 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 eval $("${script_prefix}get-os-release" -x)
-normalize_path "$@"
+parse_arguments "$@"
+normalize_path
