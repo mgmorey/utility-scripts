@@ -182,7 +182,7 @@ resolve_filenames() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-1] [-a] [-c] [-n] [-r] [-t separator] COMMAND
+Usage: $script [-1] [-a] [-c] [-n] [-r] [-t separator] COMMAND [COMMAND [...]]
 
 Print command paths and versions.
 EOF
