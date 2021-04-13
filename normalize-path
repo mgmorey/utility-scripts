@@ -42,10 +42,10 @@ get_realpath() (
 )
 
 get_realpath_command() {
-    if [ -x "${script_prefix}get-realpath" ]; then
-	printf '%s\n' "${script_prefix}get-realpath"
-    elif [ -x /bin/realpath ]; then
+    if [ -x /bin/realpath ]; then
 	printf '%s\n' /bin/realpath
+    elif [ -x "${script_prefix}get-realpath" ]; then
+	printf '%s\n' "${script_prefix}get-realpath"
     else
 	printf '%s\n' get_realpath
     fi
@@ -70,7 +70,7 @@ normalize_path() {
     configure_platform
     printf '%s\n' "$path" | split_path | \
 	quote_lines | xargs $realpath | \
-	remove_duplicate_lines | \
+	remove_duplicate_dirnames | \
 	join_dirnames
 }
 
@@ -105,10 +105,10 @@ parse_arguments() {
 }
 
 quote_lines() {
-    sed 's/^\(.*\)$/"\1"/'
+    awk -v quote="${1-'}" '{printf("%s%s%s\n", quote, $0, quote)}'
 }
 
-remove_duplicate_lines() {
+remove_duplicate_dirnames() {
     if [ "$ID" = windows ]; then
 	awk '!_[tolower($0)]++'
     else

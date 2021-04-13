@@ -1,6 +1,6 @@
-#!/usr/bin/sed -f
+#!/usr/bin/awk -f
 
-# quote-lines: filter to double-quote each line of input
+# quote-lines: filter to quote each line of input
 # Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,4 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-s/^\(.*\)$/"\1"/
+BEGIN {
+    if (quote == "")
+	quote = "'"
+}
+{
+    printf("%s%s%s\n", quote, $0, quote)
+}

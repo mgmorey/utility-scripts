@@ -42,7 +42,7 @@ configure_platform() {
 
 get_filenames() {
     assert [ $# -ge 1 ]
-    $which "$@" | resolve_filenames | remove_duplicate_lines
+    $which "$@" | resolve_filenames | remove_duplicate_filenames
 }
 
 get_md5sum() {
@@ -61,10 +61,10 @@ get_realpath() (
 )
 
 get_realpath_command() {
-    if [ -x "${script_prefix}get-realpath" ]; then
-	printf '%s\n' "${script_prefix}get-realpath"
-    elif [ -x /bin/realpath ]; then
+    if [ -x /bin/realpath ]; then
 	printf '%s\n' /bin/realpath
+    elif [ -x "${script_prefix}get-realpath" ]; then
+	printf '%s\n' "${script_prefix}get-realpath"
     else
 	printf '%s\n' get_realpath
     fi
@@ -161,10 +161,10 @@ parse_arguments() {
 }
 
 quote_lines() {
-    sed 's/^\(.*\)$/"\1"/'
+    awk -v quote="${1-'}" '{printf("%s%s%s\n", quote, $0, quote)}'
 }
 
-remove_duplicate_lines() {
+remove_duplicate_filenames() {
     if [ "$ID" = windows ]; then
 	awk '!_[tolower($0)]++'
     else
