@@ -42,10 +42,10 @@ get_realpath() (
 )
 
 get_realpath_command() {
-    if [ -x /bin/realpath ]; then
-	printf '%s\n' /bin/realpath
-    elif [ -x "${script_prefix}get-realpath" ]; then
+    if [ -x "${script_prefix}get-realpath" ]; then
 	printf '%s\n' "${script_prefix}get-realpath"
+    elif [ -x /bin/realpath ]; then
+	printf '%s\n' /bin/realpath
     else
 	printf '%s\n' get_realpath
     fi
