@@ -40,10 +40,6 @@ get_realpath() {
 
 	shift $(($OPTIND - 1))
 
-	if [ $# -lt 1 ]; then
-	    usage_error '%s: Not enough arguments\n' "$0"
-	fi
-
 	for file; do
 	    if expr "$file" : '/.*' >/dev/null; then
 		if [ -d "$(dirname "$file")" -o "$quiet" = true ]; then
