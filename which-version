@@ -166,7 +166,19 @@ quote_lines() {
 
 remove_duplicate_filenames() {
     if [ "$ID" = windows ]; then
-	awk '!_[tolower($0)]++'
+	function=tolower
+    else
+	function=
+    fi
+
+    remove_duplicate_lines $function
+}
+
+remove_duplicate_lines() {
+    assert [ $# -eq 0 -o $# -eq 1 ]
+
+    if [ $# -eq 1 ]; then
+	awk '!_['"$1"'($0)]++'
     else
 	awk '!_[$0]++'
     fi
@@ -219,7 +231,7 @@ which_version() {
 		printf '%s%s%s\n' "$version" "$separator" "$filename"
 	    fi
 	done
-    done
+    done | remove_duplicate_lines
 }
 
 script=$(basename "$0")
