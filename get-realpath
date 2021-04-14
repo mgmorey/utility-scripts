@@ -17,7 +17,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 get_realpath() {
-    if [ -x /bin/realpath ]; then
+    if [ $# -eq 0 ]; then
+	return 0
+    elif [ -x /bin/realpath ]; then
 	exec /bin/realpath "$@"
     else
 	error=false
