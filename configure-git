@@ -95,7 +95,7 @@ configure_git() {
     eval $command
 
     if [ "$build" = true ]; then
-	$make ${ncpu:+-j $ncpu }all doc
+	$make${ncpu:+ -j $ncpu} all doc
     fi
 }
 

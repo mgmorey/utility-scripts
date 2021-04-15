@@ -23,6 +23,7 @@ ENABLE_DEBUG=true
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
 PREFIX=/usr/local
+WITH_METALINK=false
 
 abort() {
     printf "$@" >&2
@@ -69,17 +70,6 @@ configure_compiler() {
 }
 
 configure_curl() {
-    basename=curl-$curl_version
-
-    archive_dir="$HOME/Downloads/cURL"
-    build_dir="$HOME/Documents/build/$basename"
-    src_dir="$HOME/Documents/src/cURL/$basename"
-
-    command=$(get_configure_command $src_dir)
-    filename=$basename.tar.gz
-
-    pathname=$archive_dir/$filename
-
     mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
     download_archive
     extract_files
@@ -93,11 +83,12 @@ configure_curl() {
 	exit 0
     fi
 
+    command=$(get_configure_command $src_dir)
     printf '%s\n' "$command"
     eval $command
 
     if [ "$build" = true ]; then
-	$make ${ncpu:+-j $ncpu }all doc
+	$make${ncpu:+ -j $ncpu}
     fi
 }
 
@@ -107,7 +98,9 @@ configure_platform() {
     enable_debug=$ENABLE_DEBUG
     force=false
     make=make
+    ncpu=$(lscpu | awk '$1 == "CPU(s):" {print $2}')
     prefix=$PREFIX
+    with_metalink=$WITH_METALINK
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -141,6 +134,16 @@ configure_platform() {
     if [ -n "${libgif-}" ] && [ ! -x $libgif ]; then
 	abort '%s: %s: No such shared object\n' "$script" "$libgif"
     fi
+
+
+    basename=curl-$curl_version
+
+    archive_dir="$HOME/Downloads/cURL"
+    build_dir="$HOME/Documents/build/$basename"
+    src_dir="$HOME/Documents/src/cURL/$basename"
+
+    filename=$basename.tar.gz
+    pathname=$archive_dir/$filename
 }
 
 configure_platform_bsd_netbsd() {
@@ -240,6 +243,12 @@ get_configure_options() {
 	options="${options:+$options }--disable-debug"
     fi
 
+    if [ "${with_metalink-}" = true ]; then
+	options="${options:+$options }--with-metalink"
+    elif [ "${with_metalink-}" = false ]; then
+	options="${options:+$options }--without-metalink"
+    fi
+
     if [ -n "${options:-}" ]; then
 	printf '%s\n' "$options"
     fi
@@ -317,7 +326,7 @@ install_dependencies() {
 }
 
 parse_arguments() {
-    while getopts fgnp:v:h opt; do
+    while getopts fgmnp:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -327,6 +336,9 @@ parse_arguments() {
 		;;
 	    (g)
 		enable_debug=true
+		;;
+	    (m)
+		with_metalink=true
 		;;
 	    (n)
 		build=false
@@ -367,7 +379,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-f] [-g] [-n] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-f] [-g] [-m] [-n] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }
@@ -469,7 +481,14 @@ parse_arguments "$@"
 
 if [ "$(id -u)" -eq 0 ]; then
     install_dependencies
-    run_unpriv "$0"
+    run_unpriv "$0" "$@"
+
+    if [ "$build" = true ]; then
+	cd "$build_dir"
+	$make${ncpu:+ -j $ncpu} install
+	find . -user root -type d | xargs chown-real-user
+	find . -user root -type f | xargs chown-real-user
+    fi
 else
     install_dependencies
     configure_curl
