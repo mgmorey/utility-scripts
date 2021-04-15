@@ -105,7 +105,7 @@ parse_arguments() {
 }
 
 quote_lines() {
-    awk -v quote="${1-\047}" '{printf("%s%s%s\n", quote, $0, quote)}'
+    awk -v quote="${1-\047}" '{print quote $0 quote}'
 }
 
 remove_duplicate_dirnames() {
