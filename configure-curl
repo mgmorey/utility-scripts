@@ -23,7 +23,7 @@ ENABLE_DEBUG=true
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
 PREFIX=/usr/local
-WITH_METALINK=false
+WITH_METALINK=
 
 abort() {
     printf "$@" >&2
@@ -326,7 +326,7 @@ install_dependencies() {
 }
 
 parse_arguments() {
-    while getopts fgmnp:v:h opt; do
+    while getopts fgmnop:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -342,6 +342,9 @@ parse_arguments() {
 		;;
 	    (n)
 		build=false
+		;;
+	    (o)
+		enable_debug=false
 		;;
 	    (p)
 		case $OPTARG in
@@ -379,7 +382,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-f] [-g] [-m] [-n] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-f] [-g] [-m] [-n] [-o] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }
