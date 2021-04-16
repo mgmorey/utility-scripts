@@ -321,8 +321,6 @@ install_curl() {
 	if [ "$ID" = windows -o "$(id -u)" -eq 0 ]; then
 	    cd "$build_dir"
 	    $make${make_options:+ $make_options}
-	    find . -user root -type d | xargs chown-real-user
-	    find . -user root -type f | xargs chown-real-user
 	fi
     fi
 }
