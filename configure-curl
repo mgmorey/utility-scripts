@@ -19,7 +19,7 @@
 CURL_VERSION=7.76.1
 
 BASE_URL=https://curl.se
-ENABLE_DEBUG=true
+ENABLE_DEBUG=
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
 PREFIX=/usr/local
@@ -88,7 +88,7 @@ configure_curl() {
     eval $command
 
     if [ "$build" = true ]; then
-	$make${ncpu:+ -j $ncpu}
+	$make${make_options:+ $make_options}
     fi
 }
 
@@ -97,8 +97,9 @@ configure_platform() {
     curl_version=$CURL_VERSION
     enable_debug=$ENABLE_DEBUG
     force=false
+    install=false
     make=make
-    ncpu=$(lscpu | awk '$1 == "CPU(s):" {print $2}')
+    make_options=$(get_make_options)
     prefix=$PREFIX
     with_metalink=$WITH_METALINK
 
@@ -284,6 +285,14 @@ get_linker_flags() {
     fi
 }
 
+get_make_options() {
+    ncpu=$((lscpu || true) | awk '$1 == "CPU(s):" {print $2}')
+
+    if [ -n "$ncpu" ]; then
+	printf '%s\n' -j "$ncpu"
+    fi
+}
+
 get_pkg_config_path() {
     for pkgdir in ${pkgdirs-}; do
 	pkg_config_path=${pkg_config_path+$pkg_config_path:}$pkgdir
@@ -307,18 +316,27 @@ include_prefix() {
     fi
 }
 
+install_curl() {
+    if [ "$install" = true ]; then
+	if [ "$ID" = windows -o "$(id -u)" -eq 0 ]; then
+	    cd "$build_dir"
+	    $make${make_options:+ $make_options}
+	    find . -user root -type d | xargs chown-real-user
+	    find . -user root -type f | xargs chown-real-user
+	fi
+    fi
+}
+
 install_dependencies() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (windows)
-		case "$kernel_name" in
-		    (CYGWIN_NT)
-			return 0
-			;;
-		esac
-		;;
-	esac
-    done
+    case "$ID" in
+	(windows)
+	    case "$kernel_name" in
+		(CYGWIN_NT)
+		    return 0
+		    ;;
+	    esac
+	    ;;
+    esac
 
     packages="$(get_dependencies | sort -u)"
     pattern="$(get-packages -s pattern development)"
@@ -326,7 +344,7 @@ install_dependencies() {
 }
 
 parse_arguments() {
-    while getopts fgmnop:v:h opt; do
+    while getopts fgimnop:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -336,6 +354,9 @@ parse_arguments() {
 		;;
 	    (g)
 		enable_debug=true
+		;;
+	    (i)
+		install=true
 		;;
 	    (m)
 		with_metalink=true
@@ -382,7 +403,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-f] [-g] [-m] [-n] [-o] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-f] [-g] [-i] [-m] [-n] [-o] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }
@@ -481,18 +502,12 @@ eval $(get-os-release -x)
 validate_platform
 configure_platform
 parse_arguments "$@"
+install_dependencies
 
 if [ "$(id -u)" -eq 0 ]; then
-    install_dependencies
     run_unpriv "$0" "$@"
-
-    if [ "$build" = true ]; then
-	cd "$build_dir"
-	$make${ncpu:+ -j $ncpu} install
-	find . -user root -type d | xargs chown-real-user
-	find . -user root -type f | xargs chown-real-user
-    fi
 else
-    install_dependencies
     configure_curl
 fi
+
+install_curl
