@@ -98,8 +98,8 @@ configure_paths() {
     basename=curl-$curl_version
     build_dir="$HOME/Documents/build/$basename"
     filename=$basename.tar.gz
+    pathname="$ARCHIVE_DIR/$filename"
     src_dir="$HOME/Documents/src/cURL/$basename"
-    pathname=$ARCHIVE_DIR/$filename
 }
 
 configure_platform() {
@@ -134,35 +134,29 @@ configure_platform() {
     if [ -n "${cc-}" ] && [ ! -x $cc ]; then
 	abort '%s: %s: No such compiler\n' "$script" "$cc"
     fi
-
-    if [ -n "${libgif-}" ] && [ ! -x $libgif ]; then
-	abort '%s: %s: No such shared object\n' "$script" "$libgif"
-    fi
 }
 
 configure_platform_bsd_netbsd() {
     make=gmake
     include_prefix /usr/pkg
     configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
-    libgif="$libdir/libgif.so"
 }
 
 configure_platform_linux_redhat_8() {
     include_prefix $LOCAL_PREFIX
     configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
-    libgif="$libdir/libgif.so"
 }
 
 configure_platform_unix_illumos() {
     include_prefix $LOCAL_PREFIX
     configure_compiler "/usr/bin/gcc -m64" "${incdirs-}" "${libdirs-}"
-    libgif="$libdir/libgif.so"
 }
 
 configure_platform_unix_solaris() {
     include_prefix $OPENCSW_PREFIX amd64
-    configure_compiler "/opt/developerstudio12.6/bin/cc -m64" "${incdirs-}" "${libdirs-}"
-    libgif="$libdir/libgif.so"
+    configure_compiler "/opt/developerstudio12.6/bin/cc -m64" \
+		       "${incdirs-}" \
+		       "${libdirs-}"
 }
 
 download_archive() {
@@ -314,7 +308,7 @@ include_prefix() {
 
 install_curl() {
     if [ "$make_install" = true ]; then
-	if [ "$ID" = windows -o "$(id -u)" -eq 0 ]; then
+	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
 	    cd "$build_dir"
 	    $make${make_options:+ $make_options} install
 	fi
