@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+GIT_VERSION=2.31.1
+
 BASE_URL=https://github.com/git/git/archive
 
 ARCHIVE_DIR="$HOME/Downloads/Git"
@@ -29,6 +31,10 @@ abort() {
 
 abort_invalid_prefix() {
     usage_error '%s: invalid prefix -- %s\n' "$script" "$*"
+}
+
+abort_invalid_version() {
+    usage_error '%s: invalid version -- %s\n' "$script" "$*"
 }
 
 abort_not_supported() {
@@ -66,6 +72,7 @@ configure_git() {
     mkdir -p "$(dirname "$src_dir")" "$ARCHIVE_DIR"
     download_archive
     extract_files
+
     cd "$src_dir"
 
     if [ "$force" = true ]; then
@@ -90,10 +97,10 @@ configure_git() {
 }
 
 configure_paths() {
-    basename=master
+    basename=git-$git_version
     filename=$basename.zip
-    pathname=$ARCHIVE_DIR/$filename
-    src_dir="$HOME/Documents/src/Git/git-master"
+    pathname="$ARCHIVE_DIR/$filename"
+    src_dir="$HOME/Documents/src/Git/$basename"
 }
 
 configure_platform() {
@@ -128,43 +135,38 @@ configure_platform() {
     if [ -n "${cc-}" ] && [ ! -x $cc ]; then
 	abort '%s: %s: No such compiler\n' "$script" "$cc"
     fi
-
-    if [ -n "${libgif-}" ] && [ ! -x $libgif ]; then
-	abort '%s: %s: No such shared object\n' "$script" "$libgif"
-    fi
 }
 
 configure_platform_bsd_netbsd() {
     make=gmake
     include_prefix /usr/pkg
     configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
-    libgif="$libdir/libgif.so"
 }
 
 configure_platform_linux_redhat_8() {
     include_prefix $LOCAL_PREFIX
     configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
-    libgif="$libdir/libgif.so"
 }
 
 configure_platform_unix_illumos() {
     include_prefix $LOCAL_PREFIX
     configure_compiler "/usr/bin/gcc -m64" "${incdirs-}" "${libdirs-}"
-    libgif="$libdir/libgif.so"
 }
 
 configure_platform_unix_solaris() {
     include_prefix $OPENCSW_PREFIX amd64
-    configure_compiler "/opt/developerstudio12.6/bin/cc -m64" "${incdirs-}" "${libdirs-}"
-    libgif="$libdir/libgif.so"
+    configure_compiler "/opt/developerstudio12.6/bin/cc -m64" \
+		       "${incdirs-}" \
+		       "${libdirs-}"
 }
 
 download_archive() {
-    url=$BASE_URL/$filename
+    url=$BASE_URL/refs/tags/v$git_version.zip
 
     if [ ! -r "$pathname" ]; then
 	cd "$ARCHIVE_DIR"
 	wget $url
+	/bin/mv -f v$git_version.zip $basename.zip
     fi
 
 }
@@ -310,9 +312,10 @@ install_dependencies() {
 
 install_git() {
     if [ "$make_install" = true ]; then
-	if [ "$ID" = windows -o "$(id -u)" -eq 0 ]; then
+	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
 	    cd "$src_dir"
-	    $make${make_options:+ $make_options} install install-doc install-html
+	    $make${make_options:+ $make_options} \
+		 install install-doc install-html
 
 	    if [ "$(id -u)" -eq 0 ]; then
 		find . -user root -type d | xargs chown-real-user
@@ -325,6 +328,7 @@ install_git() {
 parse_arguments() {
     build=true
     force=false
+    git_version=$GIT_VERSION
     make_install=false
     prefix=$LOCAL_PREFIX
 
@@ -355,6 +359,9 @@ parse_arguments() {
 			abort_invalid_prefix $OPTARG
 			;;
 		esac
+		;;
+	    (v)
+		git_version=$OPTARG
 		;;
 	    (h)
 		usage
@@ -431,6 +438,9 @@ validate_platform() {
 	    return
 	    ;;
 	(illumos)
+	    return
+	    ;;
+	(macos)
 	    return
 	    ;;
 	(netbsd)
