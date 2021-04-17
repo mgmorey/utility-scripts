@@ -186,6 +186,9 @@ extract_files() {
 	    (*.tar.xz)
 		xz -dc "$pathname" | tar -xvf -
 		;;
+	    (*.zip)
+		unzip "$pathname"
+		;;
 	esac
     fi
 }
@@ -344,7 +347,7 @@ parse_arguments() {
     prefix=$LOCAL_PREFIX
     with_metalink=${WITH_METALINK-}
 
-    while getopts fgimnop:tv:h opt; do
+    while getopts bfgimnop:tv:h opt; do
 	case $opt in
 	    (b)
 		build=true
