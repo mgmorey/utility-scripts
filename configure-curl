@@ -18,12 +18,10 @@
 
 CURL_VERSION=7.76.1
 
+ARCHIVE_DIR="$HOME/Downloads/cURL"
 BASE_URL=https://curl.se
-ENABLE_DEBUG=
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
-PREFIX=/usr/local
-WITH_METALINK=
 
 abort() {
     printf "$@" >&2
@@ -70,7 +68,7 @@ configure_compiler() {
 }
 
 configure_curl() {
-    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
+    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$ARCHIVE_DIR"
     download_archive
     extract_files
     cd "$build_dir"
@@ -89,19 +87,24 @@ configure_curl() {
 
     if [ "$build" = true ]; then
 	$make${make_options:+ $make_options}
+
+	if [ "$make_test" = true ]; then
+	    $make${make_options:+ $make_options} test
+	fi
     fi
 }
 
+configure_paths() {
+    basename=curl-$curl_version
+    build_dir="$HOME/Documents/build/$basename"
+    filename=$basename.tar.gz
+    src_dir="$HOME/Documents/src/cURL/$basename"
+    pathname=$ARCHIVE_DIR/$filename
+}
+
 configure_platform() {
-    build=true
-    curl_version=$CURL_VERSION
-    enable_debug=$ENABLE_DEBUG
-    force=false
-    install=false
     make=make
     make_options=$(get_make_options)
-    prefix=$PREFIX
-    with_metalink=$WITH_METALINK
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -135,16 +138,6 @@ configure_platform() {
     if [ -n "${libgif-}" ] && [ ! -x $libgif ]; then
 	abort '%s: %s: No such shared object\n' "$script" "$libgif"
     fi
-
-
-    basename=curl-$curl_version
-
-    archive_dir="$HOME/Downloads/cURL"
-    build_dir="$HOME/Documents/build/$basename"
-    src_dir="$HOME/Documents/src/cURL/$basename"
-
-    filename=$basename.tar.gz
-    pathname=$archive_dir/$filename
 }
 
 configure_platform_bsd_netbsd() {
@@ -176,7 +169,7 @@ download_archive() {
     url=$BASE_URL/download/$filename
 
     if [ ! -r "$pathname" ]; then
-	cd "$archive_dir"
+	cd "$ARCHIVE_DIR"
 	wget $url
     fi
 
@@ -317,10 +310,10 @@ include_prefix() {
 }
 
 install_curl() {
-    if [ "$install" = true ]; then
+    if [ "$make_install" = true ]; then
 	if [ "$ID" = windows -o "$(id -u)" -eq 0 ]; then
 	    cd "$build_dir"
-	    $make${make_options:+ $make_options}
+	    $make${make_options:+ $make_options} install
 	fi
     fi
 }
@@ -342,7 +335,16 @@ install_dependencies() {
 }
 
 parse_arguments() {
-    while getopts fgimnop:v:h opt; do
+    build=true
+    curl_version=$CURL_VERSION
+    enable_debug=${ENABLE_DEBUG-}
+    force=false
+    make_install=false
+    make_test=false
+    prefix=$LOCAL_PREFIX
+    with_metalink=${WITH_METALINK-}
+
+    while getopts fgimnop:tv:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -354,7 +356,7 @@ parse_arguments() {
 		enable_debug=true
 		;;
 	    (i)
-		install=true
+		make_install=true
 		;;
 	    (m)
 		with_metalink=true
@@ -379,6 +381,9 @@ parse_arguments() {
 			;;
 		esac
 		;;
+	    (t)
+		make_test=true
+		;;
 	    (v)
 		curl_version=$OPTARG
 		;;
@@ -401,7 +406,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-f] [-g] [-i] [-m] [-n] [-o] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-f] [-g] [-i] [-m] [-n] [-o] [-p PREFIX] [-t] [-v VERSION]
        $script -h
 EOF
 }
@@ -500,6 +505,7 @@ eval $(get-os-release -x)
 validate_platform
 configure_platform
 parse_arguments "$@"
+configure_paths
 install_dependencies
 
 if [ "$(id -u)" -eq 0 ]; then
