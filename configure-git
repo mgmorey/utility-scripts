@@ -18,9 +18,9 @@
 
 BASE_URL=https://github.com/git/git/archive
 
+ARCHIVE_DIR="$HOME/Downloads/Git"
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
-PREFIX=/usr/local
 
 abort() {
     printf "$@" >&2
@@ -37,16 +37,6 @@ abort_not_supported() {
 
 assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
-}
-
-chown_real_user() {
-    user_name=$(get_real_user)
-
-    if [ -n "$user_name" ]; then
-	user_id=$(get_user_id $user_name)
-	group_id=$(get_group_id $user_name)
-	chown "$user_id${group_id:+:$group_id}" "$@"
-    fi
 }
 
 clean_build() {
@@ -73,11 +63,7 @@ configure_compiler() {
 }
 
 configure_git() {
-    basename=master
-    command=$(get_configure_command $src_dir)
-    filename=$basename.zip
-    pathname=$archive_dir/$filename
-    mkdir -p "$(dirname "$src_dir")" "$archive_dir"
+    mkdir -p "$(dirname "$src_dir")" "$ARCHIVE_DIR"
     download_archive
     extract_files
     cd "$src_dir"
@@ -90,21 +76,29 @@ configure_git() {
 	exit 0
     fi
 
-    $make configure
+    if [ ! -r configure ]; then
+	$make configure
+    fi
+
+    command=$(get_configure_command $src_dir)
     printf '%s\n' "$command"
     eval $command
 
     if [ "$build" = true ]; then
-	$make${ncpu:+ -j $ncpu} all doc
+	$make${make_options:+ $make_options} all doc
     fi
 }
 
-configure_platform() {
-    archive_dir="$HOME/Downloads/Git"
-    make=make
-    ncpu=$(lscpu | awk '$1 == "CPU(s):" {print $2}')
-    prefix=$PREFIX
+configure_paths() {
+    basename=master
+    filename=$basename.zip
+    pathname=$ARCHIVE_DIR/$filename
     src_dir="$HOME/Documents/src/Git/git-master"
+}
+
+configure_platform() {
+    make=make
+    make_options=$(get_make_options)
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -169,17 +163,23 @@ download_archive() {
     url=$BASE_URL/$filename
 
     if [ ! -r "$pathname" ]; then
-	cd "$archive_dir"
+	cd "$ARCHIVE_DIR"
 	wget $url
     fi
 
 }
 
 extract_files() {
-    if [ ! -r "$src_dir/configure" ]; then
+    if [ ! -r "$src_dir/configure.ac" ]; then
 	cd "$(dirname "$src_dir")"
 
 	case "$pathname" in
+	    (*.tar.gz)
+		gzip -dc "$pathname" | tar -xvf -
+		;;
+	    (*.tar.xz)
+		xz -dc "$pathname" | tar -xvf -
+		;;
 	    (*.zip)
 		unzip "$pathname"
 		;;
@@ -263,6 +263,14 @@ get_linker_flags() {
     fi
 }
 
+get_make_options() {
+    ncpu=$((lscpu 2>/dev/null || true) | awk '$1 == "CPU(s):" {print $2}')
+
+    if [ -n "$ncpu" ]; then
+	printf '%s\n' -j "$ncpu"
+    fi
+}
+
 get_pkg_config_path() {
     for pkgdir in ${pkgdirs-}; do
 	pkg_config_path=${pkg_config_path+$pkg_config_path:}$pkgdir
@@ -300,18 +308,36 @@ install_dependencies() {
     install-packages ${pattern:+-p "$pattern" }$packages
 }
 
+install_git() {
+    if [ "$make_install" = true ]; then
+	if [ "$ID" = windows -o "$(id -u)" -eq 0 ]; then
+	    cd "$src_dir"
+	    $make${make_options:+ $make_options} install install-doc install-html
+
+	    if [ "$(id -u)" -eq 0 ]; then
+		find . -user root -type d | xargs chown-real-user
+		find . -user root -type f | xargs chown-real-user
+	    fi
+	fi
+    fi
+}
+
 parse_arguments() {
     build=true
     force=false
-    prefix=$PREFIX
+    make_install=false
+    prefix=$LOCAL_PREFIX
 
-    while getopts bfnp:h opt; do
+    while getopts bfinp:h opt; do
 	case $opt in
 	    (b)
 		build=true
 		;;
 	    (f)
 		force=true
+		;;
+	    (i)
+		make_install=true
 		;;
 	    (n)
 		build=false
@@ -349,7 +375,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-f] [-n] [-p PREFIX]
+Usage: $script [-b] [-f] [-i] [-n] [-p PREFIX]
        $script -h
 EOF
 }
@@ -442,18 +468,13 @@ eval $(get-os-release -x)
 validate_platform
 configure_platform
 parse_arguments "$@"
+configure_paths
+install_dependencies
 
 if [ "$(id -u)" -eq 0 ]; then
-    install_dependencies
-    run_unpriv "$0"
-    cd "$src_dir"
-
-    if [ "$build" = true ]; then
-	$make ${ncpu:+-j $ncpu }install install-doc install-html
-	find . -user root -type d | xargs chown-real-user
-	find . -user root -type f | xargs chown-real-user
-    fi
+    run_unpriv /bin/sh -c "$0 $*"
 else
-    install_dependencies
     configure_git
 fi
+
+install_git
