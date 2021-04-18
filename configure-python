@@ -1,4 +1,4 @@
-#!/bin/sh -eux
+#!/bin/sh -eu
 
 # configure-python: download and configure python
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
@@ -138,7 +138,7 @@ configure_python() {
     elif [ ! -r config.status ]; then
 	true
     else
-	exit 0
+	return 0
     fi
 
     command=$(get_configure_command $src_dir)
@@ -334,7 +334,7 @@ parse_arguments() {
     prefix=$LOCAL_PREFIX
     python_version=$PYTHON_VERSION
 
-    while getopts bdefp:tv:h opt; do
+    while getopts bdefip:tv:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -347,6 +347,9 @@ parse_arguments() {
 		;;
 	    (f)
 		force=true
+		;;
+	    (i)
+		make_install=true
 		;;
 	    (p)
 		case $OPTARG in
