@@ -78,7 +78,7 @@ configure_curl() {
     elif [ ! -r config.status ]; then
 	true
     else
-	exit 0
+	return 0
     fi
 
     command=$(get_configure_command $src_dir)
