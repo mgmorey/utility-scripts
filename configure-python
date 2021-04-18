@@ -16,12 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-BASE_URL=https://www.python.org/ftp
-PYTHON_VERSION=3.6.12
+PYTHON_VERSION=3.9.4
 
+ARCHIVE_DIR="$HOME/Downloads/Python"
+BASE_URL=https://www.python.org/ftp
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
-PREFIX=/usr/local
 
 abort() {
     printf "$@" >&2
@@ -67,11 +67,18 @@ configure_compiler() {
     pkg_config_path="$(get_pkg_config_path)"
 }
 
+configure_paths() {
+    # https://www.python.org/ftp/python/3.6.13/Python-3.6.13.tar.xz
+    basename=Python-$python_version
+    build_dir="$HOME/Documents/build/$basename"
+    filename=$basename.tar.xz
+    pathname="$ARCHIVE_DIR/$filename"
+    src_dir="$HOME/Documents/src/Python/$basename"
+}
+
 configure_platform() {
-    python_version=$PYTHON_VERSION
-    force=false
     make=make
-    prefix=$PREFIX
+    make_options=$(get_make_options)
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -121,18 +128,7 @@ configure_platform_unix_solaris() {
 }
 
 configure_python() {
-    basename=Python-$python_version
-
-    archive_dir="$HOME/Downloads/Python"
-    build_dir="$HOME/Documents/build/$basename"
-    src_dir="$HOME/Documents/src/Python/$basename"
-
-    command=$(get_configure_command $src_dir)
-    filename=$basename.tar.xz
-
-    pathname=$archive_dir/$filename
-
-    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
+    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$ARCHIVE_DIR"
     download_archive
     extract_files
     cd "$build_dir"
@@ -140,20 +136,29 @@ configure_python() {
     if [ "$force" = true ]; then
 	clean_build
     elif [ ! -r config.status ]; then
-	:
+	true
     else
 	exit 0
     fi
 
+    command=$(get_configure_command $src_dir)
     printf '%s\n' "$command"
     eval $command
+
+    if [ "$build" = true ]; then
+	$make${make_options:+ $make_options}
+
+	if [ "$make_test" = true ]; then
+	    $make${make_options:+ $make_options} test
+	fi
+    fi
 }
 
 download_archive() {
     url=$BASE_URL/python/$python_version/$filename
 
     if [ ! -r "$pathname" ]; then
-	cd "$archive_dir"
+	cd "$ARCHIVE_DIR"
 	wget $url
     fi
 
@@ -169,6 +174,9 @@ extract_files() {
 		;;
 	    (*.tar.xz)
 		xz -dc "$pathname" | tar -xvf -
+		;;
+	    (*.zip)
+		unzip "$pathname"
 		;;
 	esac
     fi
@@ -256,6 +264,14 @@ get_linker_flags() {
     fi
 }
 
+get_make_options() {
+    ncpu=$((lscpu 2>/dev/null || true) | awk '$1 == "CPU(s):" {print $2}')
+
+    if [ -n "$ncpu" ]; then
+	printf '%s\n' -j "$ncpu"
+    fi
+}
+
 get_pkg_config_path() {
     for pkgdir in ${pkgdirs-}; do
 	pkg_config_path=${pkg_config_path+$pkg_config_path:}$pkgdir
@@ -285,22 +301,44 @@ include_prefix() {
 }
 
 install_dependencies() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (windows)
-		return 0
-		;;
-	esac
-    done
+    case "$ID" in
+	(windows)
+	    case "$kernel_name" in
+		(CYGWIN_NT)
+		    return 0
+		    ;;
+	    esac
+	    ;;
+    esac
 
     packages="$(get_dependencies | sort -u)"
     pattern="$(get-packages -s pattern development)"
     install-packages ${pattern:+-p "$pattern" }$packages
 }
 
+install_python() {
+    if [ "$make_install" = true ]; then
+	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
+	    cd "$build_dir"
+	    $make${make_options:+ $make_options} install
+	fi
+    fi
+}
+
 parse_arguments() {
-    while getopts defp:v:h opt; do
+    build=true
+    force=false
+    make_install=false
+    make_test=false
+    optimize=false
+    prefix=$LOCAL_PREFIX
+    python_version=$PYTHON_VERSION
+
+    while getopts bdefp:tv:h opt; do
 	case $opt in
+	    (b)
+		build=true
+		;;
 	    (d)
 		optimize=false
 		;;
@@ -323,6 +361,9 @@ parse_arguments() {
 			abort_invalid_prefix $OPTARG
 			;;
 		esac
+		;;
+	    (t)
+		make_test=true
 		;;
 	    (v)
 		case $OPTARG in
@@ -362,7 +403,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-d|-e][-f] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-d|-e] [-f] [-p PREFIX] [-t] [-v VERSION]
        $script -h
 EOF
 }
@@ -429,11 +470,13 @@ eval $(get-os-release -x)
 validate_platform
 configure_platform
 parse_arguments "$@"
+configure_paths
+install_dependencies
 
 if [ "$(id -u)" -eq 0 ]; then
-    install_dependencies
-    run_unpriv "$0"
+    run_unpriv /bin/sh -c "$0 $*"
 else
-    install_dependencies
     configure_python
 fi
+
+install_python
