@@ -31,23 +31,11 @@ configure_platform() {
     realpath="$realpath_command${realpath_options:+ $realpath_options}"
 }
 
-get_realpath() (
-    for file; do
-	if expr "$file" : '/.*' >/dev/null; then
-	    printf '%s\n' "$file"
-	else
-	    printf '%s\n' "$PWD/${file#./}"
-	fi
-    done
-)
-
 get_realpath_command() {
     if [ -x "${script_prefix}get-realpath" ]; then
 	printf '%s\n' "${script_prefix}get-realpath"
     elif [ -x /bin/realpath ]; then
 	printf '%s\n' /bin/realpath
-    else
-	printf '%s\n' get_realpath
     fi
 }
 
@@ -55,10 +43,8 @@ get_realpath_options() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    if [ "$1" != get_realpath ]; then
-	if [ "$quiet" = true ]; then
-	    printf '%s\n' -q
-	fi
+    if [ "$quiet" = true ]; then
+	printf '%s\n' -q
     fi
 }
 

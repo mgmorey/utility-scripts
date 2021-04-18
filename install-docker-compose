@@ -213,15 +213,13 @@ get_prefix() {
     fi
 }
 
-get_realpath() (
-    for file; do
-	if expr "$file" : '/.*' >/dev/null; then
-	    printf '%s\n' "$file"
-	else
-	    printf '%s\n' "$PWD/${file#./}"
-	fi
-    done
-)
+get_realpath_command() {
+    if [ -x "${script_prefix}get-realpath" ]; then
+	printf '%s\n' "${script_prefix}get-realpath"
+    elif [ -x /bin/realpath ]; then
+	printf '%s\n' /bin/realpath
+    fi
+}
 
 get_target_mode() {
     assert [ $# -eq 1 ]
@@ -280,12 +278,7 @@ install_compose() {
 install_docker_compose() {
     hardware=$(get_hardware)
     platform=$(get_platform)
-
-    if [ -x /bin/realpath ]; then
-	realpath="/bin/realpath -q"
-    else
-	realpath=get_realpath
-    fi
+    realpath=$(get_realpath_command)
 
     if [ -z "$prefix" ]; then
 	prefix=$(get_prefix)
@@ -525,5 +518,17 @@ usage_error() {
 }
 
 script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
 parse_arguments "$@"
 install_docker_compose
