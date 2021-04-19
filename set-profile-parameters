@@ -90,6 +90,16 @@ include_binary_directories() {
     done
 }
 
+include_base_directories() {
+    case "$kernel_name" in
+	(Darwin)
+	    include_macos_directories
+	    ;;
+    esac
+
+    include_homebrew_keg_directories
+}
+
 include_common_directories() {
     # add common binary directories to PATH (if they exist)
     for dir in $COMMON_BINDIRS; do
@@ -206,16 +216,6 @@ include_pkgconf_directories() {
 		;;
 	esac
     fi
-}
-
-include_platform_directories() {
-    case "$kernel_name" in
-	(Darwin)
-	    include_macos_directories
-	    ;;
-    esac
-
-    include_homebrew_keg_directories
 }
 
 include_profile_directories() {
@@ -354,8 +354,8 @@ s|^'"$1"'$||
 
 set_profile_parameters() {
     configure_platform
+    include_base_directories
     include_common_directories
-    include_platform_directories
     include_profile_directories
     print_parameters $ALL_PARAMETERS
 }
