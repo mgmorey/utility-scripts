@@ -309,6 +309,7 @@ include_prefix() {
 install_curl() {
     if [ "$make_install" = true ]; then
 	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
+	    umask 0022
 	    cd "$build_dir"
 	    $make${make_options:+ $make_options} install
 	fi
