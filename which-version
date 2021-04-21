@@ -103,51 +103,6 @@ get_which() {
     fi
 }
 
-parse_arguments() {
-    all=$ALL
-    checksum=false
-    resolve=$RESOLVE
-    separator=$(printf '\t\n')
-
-    while getopts 1acnrt:h opt; do
-	case $opt in
-	    (1)
-		all=false
-		;;
-	    (a)
-		all=true
-		;;
-	    (c)
-		checksum=true
-		;;
-	    (n)
-		resolve=false
-		;;
-	    (r)
-		resolve=true
-		;;
-	    (t)
-		separator="$OPTARG"
-		;;
-	    (h)
-		usage
-		exit 0
-		;;
-	    (\?)
-		exit 2
-		;;
-	esac
-    done
-
-    shift $(($OPTIND - 1))
-
-    if [ $# -lt 1 ]; then
-	usage_error '%s: Not enough arguments\n' "$script"
-    fi
-
-    commands="$@"
-}
-
 quote_lines() {
     awk -v quote="${1-\047}" '{print quote $0 quote}'
 }
@@ -193,9 +148,50 @@ usage_error() {
 }
 
 which_version() {
+    all=$ALL
+    checksum=false
+    resolve=$RESOLVE
+    separator=$(printf '\t\n')
+
+    while getopts 1acnrt:h opt; do
+	case $opt in
+	    (1)
+		all=false
+		;;
+	    (a)
+		all=true
+		;;
+	    (c)
+		checksum=true
+		;;
+	    (n)
+		resolve=false
+		;;
+	    (r)
+		resolve=true
+		;;
+	    (t)
+		separator="$OPTARG"
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -lt 1 ]; then
+	usage_error '%s: Not enough arguments\n' "$script"
+    fi
+
     configure_platform
 
-    for command in $commands; do
+    for command; do
 	if ! option=$(get_version_option "$command") || [ -z "$option" ]; then
 	    abort '%s: %s: Not supported\n' "$script" "$command"
 	fi
@@ -230,5 +226,4 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 eval $("${script_prefix}get-os-release" -x)
-parse_arguments "$@"
-which_version
+which_version "$@"
