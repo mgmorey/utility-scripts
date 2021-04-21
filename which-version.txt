@@ -2,11 +2,11 @@ ar	--version	s/GNU ar .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 as	--version	s/GNU assembler .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 awk	--version	s/\(GNU Awk\|awk version\) \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\2/p
 bash	--version	s/GNU bash, version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
-curl	--version	s/curl \([0-9][0-9]*\(\.[0-9][0-9]*\)*\) .*/\1/p
+curl	--version	s/curl \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 curl-config	--version	s/libcurl \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 docker	--version	s/Docker version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 docker-compose	--version	s/docker-compose version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\), .*/\1/p
-emacs	--version	s/GNU Emacs \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
+emacs	--version	s/GNU Emacs \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 expr	--version	s/expr .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 g++	--version	s/.*g++.* .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 gawk	--version	s/GNU Awk \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
@@ -31,7 +31,7 @@ python3	--version	s/Python \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 ruby	--version	s/ruby \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 sbcl	--version	s/SBCL \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 sed	--version	s/.*sed .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
-sqlite3	--version	s/\([0-9][0-9]*\(\.[0-9][0-9]*\)*\) .*/\1/p
+sqlite3	--version	s/\([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 ssh	-V	s/OpenSSH[A-Z_a-z]*_\([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 uwsgi	--version	s/\([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 which	--version	s/GNU which v\([0-9][0-9]*\(\.[0-9][0-9]*\)*\), .*/\1/p
