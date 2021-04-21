@@ -15,6 +15,7 @@ gdb	--version	s/GNU gdb .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 git	--version	s/git version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 gmake	--version	s/GNU Make \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 gsed	--version	s/.*sed .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
+java	-version	s/openjdk version "\([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*"/\1/p
 ld	--version	s/GNU ld .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 ldd	--version	s/ldd .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 make	--version	s/GNU Make \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
