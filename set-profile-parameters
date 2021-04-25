@@ -153,13 +153,13 @@ include_homebrew_keg_directories() {
     fi
 
     for pkg in $("${script_prefix}brew-list-keg-only" 2>/dev/null || true); do
-	if [ -d $prefix/$pkg/include ]; then
-	    CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
-	fi
+	# if [ -d $prefix/$pkg/include ]; then
+	#     CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
+	# fi
 
-	if [ -d $prefix/$pkg/lib ]; then
-	    LDFLAGS="-L$prefix/$pkg/lib -R$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
-	fi
+	# if [ -d $prefix/$pkg/lib ]; then
+	#     LDFLAGS="-L$prefix/$pkg/lib -R$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
+	# fi
 
 	if is_to_be_included $prefix/$pkg/lib/$pkg/man "${MANPATH-}"; then
 	    MANPATH="$prefix/$pkg/lib/$pkg/man${MANPATH:+:$MANPATH}"
