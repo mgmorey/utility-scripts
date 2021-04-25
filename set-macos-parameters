@@ -1,0 +1,284 @@
+#!/bin/sh -eu
+
+# set-macos-parameters: print shell commands to set macOS parameters
+# Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+ALL_PARAMETERS="CPPFLAGS LDFLAGS PKG_CONFIG_PATH"
+
+LINUXBREW_DIRS="$(ls -d /home/linuxbrew/.linuxbrew 2>/dev/null || true)"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
+}
+
+get_homebrew_binary() (
+    for dir in $HOME/.linuxbrew $LINUXBREW_DIRS /usr/local; do
+	if [ -x $dir/bin/brew ]; then
+	    printf '%s\n' "$dir/bin/brew"
+	fi
+    done
+)
+
+get_homebrew_prefix() (
+    brew=$(get_homebrew_binary)
+
+    if [ -z "$brew" ]; then
+	return
+    fi
+
+    dir="$(cd "$(dirname "$brew")/../opt" && pwd)"
+
+    if [ -d "$dir" ]; then
+	printf '%s\n' "$dir"
+	break
+    fi
+)
+
+include_base_directories() {
+    case "$kernel_name" in
+	(Darwin)
+	    include_macos_directories
+	    ;;
+    esac
+
+    include_homebrew_keg_directories
+}
+
+include_homebrew_keg_directories() {
+    prefix=$(get_homebrew_prefix)
+
+    if [ -z "${prefix-}" ]; then
+	return
+    fi
+
+    for pkg in $("${script_prefix}brew-list-keg-only" 2>/dev/null || true); do
+	if [ -d $prefix/$pkg/include ]; then
+	    CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
+	fi
+
+	if [ -d $prefix/$pkg/lib ]; then
+	    LDFLAGS="-L$prefix/$pkg/lib -R$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
+	fi
+
+	if is_to_be_included $prefix/$pkg/lib/$pkg/man "${MANPATH-}"; then
+	    MANPATH="$prefix/$pkg/lib/$pkg/man${MANPATH:+:$MANPATH}"
+	fi
+
+	if is_to_be_included $prefix/$pkg/share/man "${MANPATH-}"; then
+	    MANPATH="$prefix/$pkg/share/man${MANPATH:+:$MANPATH}"
+	fi
+
+	if is_to_be_included $prefix/$pkg/bin "${PATH-}"; then
+	    PATH="$prefix/$pkg/bin${PATH:+:$PATH}"
+	fi
+
+	for pkgdir in $prefix/$pkg/lib/pkgconfig /usr/share/pkgconfig; do
+	    if is_to_be_included $pkgdir "${PKG_CONFIG_PATH-}"; then
+		PKG_CONFIG_PATH="$pkgdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+	    fi
+	done
+    done
+
+}
+
+include_macos_directories() {
+    if [ -x /usr/bin/xcrun ]; then
+	dir=$(/usr/bin/xcrun --show-sdk-path)
+	CPPFLAGS="-I$dir/usr/include"
+	LDFLAGS="-L$dir/usr/lib -R$dir/usr/lib"
+    fi
+
+    MANPATH=${MANPATH:-$(manpath)}
+
+    # set PATH so it includes user's private Python 3 bin if it exists
+    for version in 3.8 3.7 3.6; do
+	if [ -d "$HOME/Library/Python/$version/bin" ] ; then
+	    PATH="$HOME/Library/Python/$version/bin${PATH:+:$PATH}"
+	    break
+	fi
+    done
+}
+
+include_pkgconf_directories() {
+    pkgdir=$1/lib/pkgconfig
+
+    if is_to_be_included $pkgdir "${PKG_CONFIG_PATH-}"; then
+	case "$1" in
+	    (/opt/csw)
+		true
+		;;
+	    (/opt/local)
+		PKG_CONFIG_PATH="${PKG_CONFIG_PATH:+$PKG_CONFIG_PATH:}$pkgdir"
+		;;
+	    (*)
+		PKG_CONFIG_PATH="$pkgdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+		;;
+	esac
+    fi
+}
+
+is_included() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    printf '%s\n' "$2" | grep -Eq '(^|:)'"$1"'(:|$)'
+}
+
+is_to_be_included() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    test -d "$1" && ! is_included "$1" "$2"
+}
+
+parse_arguments() {
+    no_export=false
+    shell=$SHELL
+
+    while getopts ns:h opt; do
+	case $opt in
+	    (n)
+		no_export=true
+		;;
+	    (s)
+		parse_shell "$OPTARG"
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error '%s: Too many arguments\n' "$script"
+    fi
+}
+
+parse_shell() {
+    case $(basename "${1%.exe}") in
+	(*bash|ksh*|zsh)
+	    shell=${1%.exe}
+	    ;;
+	(csh|tcsh)
+	    shell=${1%.exe}
+	    ;;
+	(fish)
+	    shell=${1%.exe}
+	    ;;
+	(sh)
+	    shell=${1%.exe}
+	    ;;
+	(*)
+	    usage_error '%s: %s: Unsupported shell\n' "$script" "$1"
+	    ;;
+    esac
+}
+
+print_parameter() {
+    assert [ $# -gt 0 ]
+    assert [ -n "$1" ]
+
+    if [ -z "${2-}" ]; then
+	continue
+    elif [ "$no_export" = true ]; then
+	printf '%s=%s\n' "$1" "$2"
+    else
+	case "$(basename ${shell%.exe})" in
+	    (*bash|ksh*|zsh)
+		printf 'export %s="%s"\n' "$1" "$2"
+		;;
+	    (csh|tcsh)
+		printf 'setenv %s "%s";\n' "$1" "$2"
+		;;
+	    (fish)
+		printf 'set -x %s "%s";\n' "$1" "$2"
+		;;
+	    (*)
+		printf '%s="%s"\n' "$1" "$2"
+		printf 'export %s\n' "$1"
+		;;
+	esac
+    fi
+}
+
+print_parameters() {
+    assert [ $# -gt 0 ]
+
+    for var; do
+	eval value=\${$var-}
+	print_parameter "$var" "$value"
+    done
+}
+
+remove_directory() {
+    assert [ $# -eq 2 ]
+    printf '%s\n' "$2" | sed -e '
+s|:'"$1"':|:|g
+s|^'"$1"':||
+s|:'"$1"'$||
+s|^'"$1"'$||
+'
+}
+
+set_macos_parameters() {
+    include_base_directories
+    print_parameters $ALL_PARAMETERS
+}
+
+usage() {
+    cat <<-EOF >&2
+Usage: $script: [-s SHELL]
+       $script: -n
+       $script: -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+eval $("${script_prefix}get-os-release" -x)
+
+parse_arguments "$@"
+set_macos_parameters
