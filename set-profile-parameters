@@ -183,11 +183,11 @@ include_homebrew_keg_directories() {
 }
 
 include_macos_directories() {
-    if [ -x /usr/bin/xcrun ]; then
-	dir=$(/usr/bin/xcrun --show-sdk-path)
-	CPPFLAGS="-I$dir/usr/include"
-	LDFLAGS="-L$dir/usr/lib -R$dir/usr/lib"
-    fi
+    # if [ -x /usr/bin/xcrun ]; then
+    # 	dir=$(/usr/bin/xcrun --show-sdk-path)
+    # 	CPPFLAGS="-I$dir/usr/include"
+    # 	LDFLAGS="-L$dir/usr/lib -R$dir/usr/lib"
+    # fi
 
     MANPATH=${MANPATH:-$(manpath)}
 
