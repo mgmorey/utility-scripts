@@ -64,7 +64,7 @@ get_configuration_basename() {
 		basename=$ID-${VERSION_ID%-p*}
 		;;
 	    (macos)
-		basename=$ID-${VERSION_ID%.0}
+		basename=$ID-$(printf '%s\n' $VERSION_ID | cut -d. -f 1,2)
 		;;
 	    (netbsd)
 		basename=$ID-$VERSION_ID
