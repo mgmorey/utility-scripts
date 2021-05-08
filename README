@@ -35,7 +35,7 @@ This project has been tested on the following platforms:
 +-----------+---------------+-------------------------------+
 | Unix      | FreeBSD       | 13.0 (amd64)                  |
 +-----------+---------------+-------------------------------+
-| Unix      | NetBSD        | 9.0 (amd64)                   |
+| Unix      | NetBSD        | 9.1 (amd64)                   |
 +-----------+---------------+-------------------------------+
 
 The various OS ports have been tested on the following processors:
