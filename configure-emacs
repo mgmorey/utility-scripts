@@ -234,21 +234,23 @@ get_configure_command() {
 
 get_configure_options() {
     if [ "${with_cairo-}" = true ]; then
-	options="${options:+$options }--with-cairo${cairo:+=$cairo}"
+	options="${options:+$options }--with-cairo"
     elif [ "${with_cairo-}" = false ]; then
-	options="${options:+$options }--without-cairo${cairo:+=$cairo}"
+	options="${options:+$options }--without-cairo"
     fi
 
     if [ "${with_gif-}" = true ]; then
-	options="${options:+$options }--with-gif${gif:+=$gif}"
+	options="${options:+$options }--with-gif"
     elif [ "${with_gif-}" = false ]; then
-	options="${options:+$options }--without-gif${gif:+=$gif}"
+	options="${options:+$options }--without-gif"
+    else
+	options="${options:+$options }--with-gif=ifavailable"
     fi
 
     if [ "${with_gnutls-}" = true ]; then
-	options="${options:+$options }--with-gnutls${gnutls:+=$gnutls}"
+	options="${options:+$options }--with-gnutls"
     elif [ "${with_gnutls-}" = false ]; then
-	options="${options:+$options }--without-gnutls${gnutls:+=$gnutls}"
+	options="${options:+$options }--without-gnutls"
     fi
 
     if [ "${with_toolkit-}" = true ]; then
@@ -258,9 +260,9 @@ get_configure_options() {
     fi
 
     if [ "${with_widgets-}" = true ]; then
-	options="${options:+$options }--with-xwidgets${widgets:+=$widgets}"
+	options="${options:+$options }--with-xwidgets"
     elif [ "${with_widgets-}" = false ]; then
-	options="${options:+$options }--without-xwidgets${widgets:+=$widgets}"
+	options="${options:+$options }--without-xwidgets"
     fi
 
     if [ -n "${options:-}" ]; then
@@ -410,7 +412,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-f] [-p PREFIX] [-t TOOLKIT] [-v VERSION] [-w]
+Usage: $script [-c] [-f] [-g] [-n] [-p PREFIX] [-t TOOLKIT] [-v VERSION] [-w]
        $script -h
 EOF
 }

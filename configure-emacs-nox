@@ -105,11 +105,8 @@ configure_platform() {
     force=false
     make=make
     prefix=$PREFIX
-    with_cairo=false
-    with_gif=false
     with_gnutls=
     with_toolkit=false
-    with_widgets=false
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -139,10 +136,6 @@ configure_platform() {
     if [ -n "${cc-}" ] && [ ! -x $cc ]; then
 	abort '%s: %s: No such compiler\n' "$script" "$cc"
     fi
-
-    if [ -n "${libgif-}" ] && [ ! -x $libgif ]; then
-	abort '%s: %s: No such shared object\n' "$script" "$libgif"
-    fi
 }
 
 configure_platform_bsd_netbsd() {
@@ -150,25 +143,21 @@ configure_platform_bsd_netbsd() {
     with_gnutls=false
     include_prefix /usr/pkg
     configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
-    libgif="$libdir/libgif.so"
 }
 
 configure_platform_linux_redhat_8() {
     include_prefix $LOCAL_PREFIX
     configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
-    libgif="$libdir/libgif.so"
 }
 
 configure_platform_unix_illumos() {
     include_prefix $LOCAL_PREFIX
     configure_compiler "/usr/bin/gcc -m64" "${incdirs-}" "${libdirs-}"
-    libgif="$libdir/libgif.so"
 }
 
 configure_platform_unix_solaris() {
     include_prefix $OPENCSW_PREFIX amd64
     configure_compiler "/opt/developerstudio12.6/bin/cc -m64" "${incdirs-}" "${libdirs-}"
-    libgif="$libdir/libgif.so"
 }
 
 download_archive() {
@@ -237,34 +226,16 @@ get_configure_command() {
 }
 
 get_configure_options() {
-    if [ "${with_cairo-}" = true ]; then
-	options="${options:+$options }--with-cairo${cairo:+=$cairo}"
-    elif [ "${with_cairo-}" = false ]; then
-	options="${options:+$options }--without-cairo${cairo:+=$cairo}"
-    fi
-
-    if [ "${with_gif-}" = true ]; then
-	options="${options:+$options }--with-gif${gif:+=$gif}"
-    elif [ "${with_gif-}" = false ]; then
-	options="${options:+$options }--without-gif${gif:+=$gif}"
-    fi
-
     if [ "${with_gnutls-}" = true ]; then
-	options="${options:+$options }--with-gnutls${gnutls:+=$gnutls}"
+	options="${options:+$options }--with-gnutls"
     elif [ "${with_gnutls-}" = false ]; then
-	options="${options:+$options }--without-gnutls${gnutls:+=$gnutls}"
+	options="${options:+$options }--without-gnutls"
     fi
 
     if [ "${with_toolkit-}" = true ]; then
 	options="${options:+$options }--with-x-toolkit${toolkit:+=$toolkit}"
     elif [ "${with_toolkit-}" = false ]; then
 	options="${options:+$options }--with-x-toolkit=no"
-    fi
-
-    if [ "${with_widgets-}" = true ]; then
-	options="${options:+$options }--with-xwidgets${widgets:+=$widgets}"
-    elif [ "${with_widgets-}" = false ]; then
-	options="${options:+$options }--without-xwidgets${widgets:+=$widgets}"
     fi
 
     if [ -n "${options:-}" ]; then
@@ -388,7 +359,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-f] [-p PREFIX] [-t TOOLKIT] [-v VERSION] [-w]
+Usage: $script [-f] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }
