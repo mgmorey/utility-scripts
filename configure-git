@@ -266,7 +266,7 @@ get_linker_flags() {
 }
 
 get_make_options() {
-    ncpu=$((lscpu 2>/dev/null || true) | awk '$1 == "CPU(s):" {print $2}')
+    ncpu=$(lscpu 2>/dev/null | awk '$1 == "CPU(s):" {print $2}' || true)
 
     if [ -n "$ncpu" ]; then
 	printf '%s\n' -j "$ncpu"

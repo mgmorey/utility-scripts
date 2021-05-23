@@ -18,10 +18,10 @@
 
 EMACS_VERSION=27.2
 
+ARCHIVE_DIR="$HOME/Downloads/GNU"
 BASE_URL=https://mirrors.ocf.berkeley.edu/gnu
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
-PREFIX=/usr/local
 
 abort() {
     printf "$@" >&2
@@ -72,18 +72,7 @@ configure_compiler() {
 }
 
 configure_emacs() {
-    basename=emacs-$emacs_version
-
-    archive_dir="$HOME/Downloads/GNU"
-    build_dir="$HOME/Documents/build/$basename"
-    src_dir="$HOME/Documents/src/GNU/$basename"
-
-    command=$(get_configure_command $src_dir)
-    filename=$basename.tar.gz
-
-    pathname=$archive_dir/$filename
-
-    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
+    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$ARCHIVE_DIR"
     download_archive
     extract_files
     cd "$build_dir"
@@ -96,17 +85,30 @@ configure_emacs() {
 	exit 0
     fi
 
+    command=$(get_configure_command $src_dir)
     printf '%s\n' "$command"
     eval $command
+
+    if [ "$build" = true ]; then
+	$make${make_options:+ $make_options}
+
+	if [ "$make_test" = true ]; then
+	    $make${make_options:+ $make_options} test
+	fi
+    fi
+}
+
+configure_paths() {
+    basename=emacs-$emacs_version
+    build_dir="$HOME/Documents/build/$basename"
+    filename=$basename.tar.gz
+    pathname="$ARCHIVE_DIR/$filename"
+    src_dir="$HOME/Documents/src/GNU/$basename"
 }
 
 configure_platform() {
-    emacs_version=$EMACS_VERSION
-    force=false
     make=make
-    prefix=$PREFIX
-    with_gnutls=
-    with_toolkit=false
+    make_options=$(get_make_options)
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -164,7 +166,7 @@ download_archive() {
     url=$BASE_URL/emacs/$filename
 
     if [ ! -r "$pathname" ]; then
-	cd "$archive_dir"
+	cd "$ARCHIVE_DIR"
 	wget $url
     fi
 
@@ -180,6 +182,9 @@ extract_files() {
 		;;
 	    (*.tar.xz)
 		xz -dc "$pathname" | tar -xvf -
+		;;
+	    (*.zip)
+		unzip "$pathname"
 		;;
 	esac
     fi
@@ -273,6 +278,14 @@ get_linker_flags() {
     fi
 }
 
+get_make_options() {
+    ncpu=$(lscpu 2>/dev/null | awk '$1 == "CPU(s):" {print $2}' || true)
+
+    if [ -n "$ncpu" ]; then
+	printf '%s\n' -j "$ncpu"
+    fi
+}
+
 get_pkg_config_path() {
     for pkgdir in ${pkgdirs-}; do
 	pkg_config_path=${pkg_config_path+$pkg_config_path:}$pkgdir
@@ -310,11 +323,39 @@ install_dependencies() {
     install-packages ${pattern:+-p "$pattern" }$packages
 }
 
+install_emacs() {
+    if [ "$make_install" = true ]; then
+	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
+	    umask 0022
+	    cd "$build_dir"
+	    $make${make_options:+ $make_options} install
+	fi
+    fi
+}
+
 parse_arguments() {
-    while getopts fp:v:h opt; do
+    build=true
+    emacs_version=$EMACS_VERSION
+    force=false
+    make_install=false
+    make_test=false
+    prefix=$LOCAL_PREFIX
+    with_gnutls=
+    with_toolkit=false
+
+    while getopts bfinp:v:wh opt; do
 	case $opt in
+	    (b)
+		build=true
+		;;
 	    (f)
 		force=true
+		;;
+	    (i)
+		make_install=true
+		;;
+	    (n)
+		build=false
 		;;
 	    (p)
 		case $OPTARG in
@@ -359,7 +400,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-f] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-f] [-i] [-n] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }
@@ -458,11 +499,13 @@ eval $(get-os-release -x)
 validate_platform
 configure_platform
 parse_arguments "$@"
+configure_paths
+install_dependencies
 
 if [ "$(id -u)" -eq 0 ]; then
-    install_dependencies
-    run_unpriv "$0"
+    run_unpriv /bin/sh -c "$0 $*"
 else
-    install_dependencies
     configure_emacs
 fi
+
+install_emacs
