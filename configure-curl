@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CURL_VERSION=7.76.1
+CURL_VERSION=7.77.0
 
 ARCHIVE_DIR="$HOME/Downloads/cURL"
 BASE_URL=https://curl.se
@@ -30,6 +30,10 @@ abort() {
 
 abort_invalid_prefix() {
     usage_error '%s: invalid prefix -- %s\n' "$script" "$*"
+}
+
+abort_invalid_tls_backend() {
+    usage_error '%s: invalid TLS backend -- %s\n' "$script" "$*"
 }
 
 abort_invalid_version() {
@@ -240,6 +244,8 @@ get_configure_options() {
 	options="${options:+$options }--without-metalink"
     fi
 
+    options="${options:+$options }--with-$tls_backend"
+
     if [ -n "${options:-}" ]; then
 	printf '%s\n' "$options"
     fi
@@ -340,9 +346,10 @@ parse_arguments() {
     make_install=false
     make_test=false
     prefix=$LOCAL_PREFIX
+    tls_backend=openssl
     with_metalink=${WITH_METALINK-}
 
-    while getopts bfgimnop:tv:h opt; do
+    while getopts bfgimnop:s:tv:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -379,6 +386,20 @@ parse_arguments() {
 			;;
 		esac
 		;;
+	    (s)
+		case $OPTARG in
+		    (gnutls|openssl)
+			if [ -d $OPTARG ]; then
+			    tls_backend=$OPTARG
+			else
+			    abort_invalid_tls_backend $OPTARG
+			fi
+			;;
+		    (*)
+			abort_invalid_tls_backend $OPTARG
+			;;
+		esac
+		;;
 	    (t)
 		make_test=true
 		;;
@@ -404,7 +425,8 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-f] [-g] [-i] [-m] [-n] [-o] [-p PREFIX] [-t] [-v VERSION]
+Usage: $script [-b] [-f] [-g] [-i] [-m] [-n] [-o] [-p PREFIX] [-s TLS-BACKEND] \
+[-t] [-v VERSION]
        $script -h
 EOF
 }
