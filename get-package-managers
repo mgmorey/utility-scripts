@@ -80,7 +80,14 @@ get_package_managers() {
 		managers="/usr/bin/pkg /opt/local/bin/pkgin"
 		;;
 	    (macos)
-		managers="/usr/local/bin/brew"
+		case "$(uname -m)" in
+		    (arm64)
+			managers="/opt/homebrew/bin/brew"
+			;;
+		    (*)
+			managers="/usr/local/bin/brew"
+			;;
+		esac
 		;;
 	    (netbsd)
 		managers="/usr/pkg/bin/pkgin"
