@@ -18,7 +18,7 @@
 
 ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
 
-LINUXBREW_DIRS="$(ls -d /home/linuxbrew/.linuxbrew 2>/dev/null || true)"
+HOMEBREW_DIRS="/home/linuxbrew/.linuxbrew /opt/homebrew /usr/local"
 PKGSRC_DIRS="$(ls -d /usr/pkg /opt/pkg /opt/local 2>/dev/null || true)"
 SOLARIS_DIRS="$(ls -d /opt/csw /opt/*studio* 2>/dev/null || true)"
 SYSTEM_DIRS="/usr /usr/gnu"
@@ -53,12 +53,16 @@ configure_platform() {
 }
 
 get_homebrew_binary() (
-    for dir in $HOME/.linuxbrew $LINUXBREW_DIRS /usr/local; do
+    for dir in $HOME/.linuxbrew $(get_homebrew_dirs); do
 	if [ -x $dir/bin/brew ]; then
 	    printf '%s\n' "$dir/bin/brew"
 	fi
     done
 )
+
+get_homebrew_dirs() {
+    ls -d $HOMEBREW_DIRS 2>/dev/null || true
+}
 
 get_homebrew_prefix() (
     brew=$(get_homebrew_binary)
@@ -74,6 +78,14 @@ get_homebrew_prefix() (
 	break
     fi
 )
+
+get_pkgsrc_dirs() {
+    ls -d $PKGSRC_DIRS 2>/dev/null || true
+}
+
+get_solaris_dirs() {
+    ls -d $SOLARIS_DIRS 2>/dev/null || true
+}
 
 include_binary_directories() {
     for bindir; do
@@ -110,7 +122,8 @@ include_common_directories() {
 
     # add common prefix directories to paths (if they exist)
 
-    dirs="$SYSTEM_DIRS $SOLARIS_DIRS $PKGSRC_DIRS $LINUXBREW_DIRS /usr/local"
+    dirs="$SYSTEM_DIRS $(get_solaris_dirs)"
+    dirs="$dirs $(get_pkgsrc_dirs) $(get_homebrew_dirs)"
 
     for dir in $dirs; do
 	case "$dir" in
@@ -192,7 +205,7 @@ include_macos_directories() {
     MANPATH=${MANPATH:-$(manpath)}
 
     # set PATH so it includes user's private Python 3 bin if it exists
-    for version in 3.8 3.7 3.6; do
+    for version in 3.9 3.8 3.7 3.6; do
 	if [ -d "$HOME/Library/Python/$version/bin" ] ; then
 	    PATH="$HOME/Library/Python/$version/bin${PATH:+:$PATH}"
 	    break

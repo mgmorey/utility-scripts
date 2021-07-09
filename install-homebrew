@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 BASE_URL=https://raw.githubusercontent.com
-HOMEBREW_URL=$BASE_URL/Homebrew/install/master/install
+HOMEBREW_URL=$BASE_URL/Homebrew/install/HEAD/install.sh
 LINUXBREW_URL=$BASE_URL/Homebrew/install/master/install.sh
 
 abort() {
@@ -37,8 +37,6 @@ configure_platform() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (macos)
-		PKG_DIR=/Library/Developer/CommandLineTools/Packages/
-		PKG_NAME=macOS_SDK_headers_for_macOS_10.14.pkg
 		break
 		;;
 	esac
@@ -140,7 +138,7 @@ install_homebrew() {
 		esac
 		;;
 	    (macos)
-		run_unpriv /usr/bin/ruby -e "$(curl -fsSL $HOMEBREW_URL)"
+		/bin/bash -c "$(curl -fsSL $HOMEBREW_URL)"
 		break
 		;;
 	esac
@@ -159,7 +157,8 @@ preinstall_homebrew() {
 	    install-packages ${pattern:+-p "$pattern" }$packages
 	    ;;
 	(Darwin)
-	    installer -allowUntrusted -pkg $PKG_DIR/$PKG_NAME -target /
+
+	    true
 	    ;;
     esac
 }
