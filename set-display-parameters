@@ -115,7 +115,7 @@ print_parameters() {
     assert [ $# -gt 0 ]
 
     for var; do
-	eval value=\${$var-}
+	eval $(printf 'value="${%s-}"\n' "$var")
 	print_parameter "$var" "$value"
     done
 }
