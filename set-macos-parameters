@@ -16,9 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-ALL_PARAMETERS="CPPFLAGS LDFLAGS PKG_CONFIG_PATH"
+ALL_PARAMETERS="CPPFLAGS LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
 
-LINUXBREW_DIRS="$(ls -d /home/linuxbrew/.linuxbrew 2>/dev/null || true)"
+HOMEBREW_DIRS="/home/linuxbrew/.linuxbrew /opt/homebrew /usr/local"
 
 abort() {
     printf "$@" >&2
@@ -30,12 +30,16 @@ assert() {
 }
 
 get_homebrew_binary() (
-    for dir in $HOME/.linuxbrew $LINUXBREW_DIRS /usr/local; do
+    for dir in $HOME/.linuxbrew $(get_homebrew_dirs); do
 	if [ -x $dir/bin/brew ]; then
 	    printf '%s\n' "$dir/bin/brew"
 	fi
     done
 )
+
+get_homebrew_dirs() {
+    ls -d $HOMEBREW_DIRS 2>/dev/null || true
+}
 
 get_homebrew_prefix() (
     brew=$(get_homebrew_binary)
@@ -75,7 +79,7 @@ include_homebrew_keg_directories() {
 	fi
 
 	if [ -d $prefix/$pkg/lib ]; then
-	    LDFLAGS="-L$prefix/$pkg/lib -R$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
+	    LDFLAGS="-L$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
 	fi
 
 	if is_to_be_included $prefix/$pkg/lib/$pkg/man "${MANPATH-}"; then
@@ -103,7 +107,7 @@ include_macos_directories() {
     if [ -x /usr/bin/xcrun ]; then
 	dir=$(/usr/bin/xcrun --show-sdk-path)
 	CPPFLAGS="-I$dir/usr/include"
-	LDFLAGS="-L$dir/usr/lib -R$dir/usr/lib"
+	LDFLAGS="-L$dir/usr/lib"
     fi
 
     MANPATH=${MANPATH:-$(manpath)}
