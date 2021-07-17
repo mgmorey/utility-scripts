@@ -166,13 +166,13 @@ include_homebrew_keg_directories() {
     fi
 
     for pkg in $("${script_prefix}brew-list-keg-only" 2>/dev/null || true); do
-	# if [ -d $prefix/$pkg/include ]; then
-	#     CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
-	# fi
+	if [ -d $prefix/$pkg/include ]; then
+	    CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
+	fi
 
-	# if [ -d $prefix/$pkg/lib ]; then
-	#     LDFLAGS="-L$prefix/$pkg/lib -R$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
-	# fi
+	if [ -d $prefix/$pkg/lib ]; then
+	    LDFLAGS="-L$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
+	fi
 
 	if is_to_be_included $prefix/$pkg/lib/$pkg/man "${MANPATH-}"; then
 	    MANPATH="$prefix/$pkg/lib/$pkg/man${MANPATH:+:$MANPATH}"
@@ -196,21 +196,8 @@ include_homebrew_keg_directories() {
 }
 
 include_macos_directories() {
-    # if [ -x /usr/bin/xcrun ]; then
-    # 	dir=$(/usr/bin/xcrun --show-sdk-path)
-    # 	CPPFLAGS="-I$dir/usr/include"
-    # 	LDFLAGS="-L$dir/usr/lib -R$dir/usr/lib"
-    # fi
-
+    # include_xcode_directories
     MANPATH=${MANPATH:-$(manpath)}
-
-    # set PATH so it includes user's private Python 3 bin if it exists
-    for version in 3.9 3.8 3.7 3.6; do
-	if [ -d "$HOME/Library/Python/$version/bin" ] ; then
-	    PATH="$HOME/Library/Python/$version/bin${PATH:+:$PATH}"
-	    break
-	fi
-    done
 }
 
 include_pkgconf_directories() {
@@ -256,6 +243,14 @@ include_profile_directories() {
 	    PATH="$HOME/$dir${PATH:+:$PATH}"
 	fi
     done
+}
+
+include_xcode_directories() {
+    if [ -x /usr/bin/xcrun ]; then
+	dir=$(/usr/bin/xcrun --show-sdk-path)
+	CPPFLAGS="-I$dir/usr/include"
+	LDFLAGS="-L$dir/usr/lib"
+    fi
 }
 
 is_included() {
