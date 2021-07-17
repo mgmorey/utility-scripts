@@ -111,14 +111,6 @@ include_macos_directories() {
     fi
 
     MANPATH=${MANPATH:-$(manpath)}
-
-    # set PATH so it includes user's private Python 3 bin if it exists
-    for version in 3.8 3.7 3.6; do
-	if [ -d "$HOME/Library/Python/$version/bin" ] ; then
-	    PATH="$HOME/Library/Python/$version/bin${PATH:+:$PATH}"
-	    break
-	fi
-    done
 }
 
 include_pkgconf_directories() {
