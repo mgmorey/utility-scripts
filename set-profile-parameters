@@ -37,6 +37,7 @@ assert() {
 
 configure_platform() {
     bindirs=
+    brew=$(get_homebrew_binary)
 
     for id in $ID $ID_LIKE; do
 	case $id in
@@ -64,9 +65,12 @@ get_homebrew_dirs() {
     ls -d $HOMEBREW_DIRS 2>/dev/null || true
 }
 
-get_homebrew_prefix() (
-    brew=$(get_homebrew_binary)
+get_homebrew_keg_only() (
+    export PATH="$PATH:$(dirname $brew)"
+    "${script_prefix}brew-list-keg-only"
+)
 
+get_homebrew_prefix() (
     if [ -z "$brew" ]; then
 	return
     fi
@@ -159,13 +163,17 @@ include_common_directories() {
 }
 
 include_homebrew_keg_directories() {
+    if [ -z "${brew-}" ]; then
+	return
+    fi
+
     prefix=$(get_homebrew_prefix)
 
     if [ -z "${prefix-}" ]; then
 	return
     fi
 
-    for pkg in $("${script_prefix}brew-list-keg-only" 2>/dev/null || true); do
+    for pkg in $(get_homebrew_keg_only 2>/dev/null || true); do
 	if [ -d $prefix/$pkg/include ]; then
 	    CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
 	fi
@@ -192,7 +200,6 @@ include_homebrew_keg_directories() {
 	    fi
 	done
     done
-
 }
 
 include_macos_directories() {
@@ -345,7 +352,7 @@ print_parameters() {
     assert [ $# -gt 0 ]
 
     for var; do
-	eval value=\${$var-}
+	eval $(printf 'value="${%s-}"\n' "$var")
 	print_parameter "$var" "$value"
     done
 }
