@@ -18,13 +18,14 @@
 
 ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
 
-HOMEBREW_DIRS="/home/linuxbrew/.linuxbrew /opt/homebrew /usr/local"
-PKGSRC_DIRS="$(ls -d /usr/pkg /opt/pkg /opt/local 2>/dev/null || true)"
-SOLARIS_DIRS="$(ls -d /opt/csw /opt/*studio* 2>/dev/null || true)"
-SYSTEM_DIRS="/usr /usr/gnu"
-
 COMMON_BINDIRS="/usr/lib/cups/bin"
 PROFILE_BINDIRS="bin .cargo/bin .linuxbrew/bin .local/bin .pyenv/bin"
+
+HOMEBREW_DIRS="/home/linuxbrew/.linuxbrew /opt/homebrew /usr/local"
+SYSTEM_DIRS="/usr /usr/gnu"
+
+PKGSRC_DIRS="/usr/pkg /opt/pkg /opt/local"
+SOLARIS_DIRS="/opt/csw /opt/*studio*"
 
 abort() {
     printf "$@" >&2
@@ -83,9 +84,31 @@ get_homebrew_prefix() (
     fi
 )
 
+get_macos_python_bindir() (
+    case "$ID" in
+	 (macos)
+	     for version in 3.7 3.8 3.9; do
+		 if [ -d "$HOME/Library/Python/$version/bin" ]; then
+		     printf '%s\n' "Library/Python/$version/bin"
+		 fi
+	     done
+	     ;;
+    esac
+)
+
 get_pkgsrc_dirs() {
     ls -d $PKGSRC_DIRS 2>/dev/null || true
 }
+
+get_profile_bindirs() (
+    macos_python_bindir="$(get_macos_python_bindir)"
+
+    if [ -n "$macos_python_bindir" ]; then
+	printf '%s\n' "$macos_python_bindir"
+    fi
+
+    printf '%s\n' $PROFILE_BINDIRS
+)
 
 get_solaris_dirs() {
     ls -d $SOLARIS_DIRS 2>/dev/null || true
@@ -107,8 +130,8 @@ include_binary_directories() {
 }
 
 include_base_directories() {
-    case "$kernel_name" in
-	(Darwin)
+    case "$ID" in
+	(macos)
 	    include_macos_directories
 	    ;;
     esac
@@ -229,8 +252,9 @@ include_profile_directories() {
     INFOPATH="$(remove_directory "$HOME/info" "${INFOPATH-}")"
     MANPATH="$(remove_directory "$HOME/man" "${MANPATH-}")"
     PATH="$(remove_directory "$HOME/bin" "${PATH-}")"
+    profile_bindirs="$(get_profile_bindirs)"
 
-    for dir in $PROFILE_BINDIRS; do
+    for dir in $profile_bindirs; do
 	PATH="$(remove_directory "$HOME/$dir" "${PATH-}")"
     done
 
@@ -245,7 +269,7 @@ include_profile_directories() {
     fi
 
     # add user binary directories to PATH (if they exist)
-    for dir in $PROFILE_BINDIRS; do
+    for dir in $profile_bindirs; do
 	if ! is_included "$HOME/$dir" "${PATH-}"; then
 	    PATH="$HOME/$dir${PATH:+:$PATH}"
 	fi
