@@ -25,4 +25,4 @@ Library/Python/* \
 .local/bin/pip* \
 .local/bin/virtualenv* \
 .local/lib/python* \
-.local/virtualenvs/*
+.local/share/virtualenvs/*
