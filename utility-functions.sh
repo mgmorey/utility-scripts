@@ -350,7 +350,7 @@ get_command_helper() (
     assert [ $# -ge 2 ]
 
     case "$2" in
-	(pipenv)
+	(pipenv|virtualenv)
 	    scripts="${1:+$1/}$2"
 	    ;;
 	(*)
