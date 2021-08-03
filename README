@@ -17,7 +17,7 @@ This project has been tested on the following platforms:
 +-----------+---------------+-------------------------------+
 | GNU/Linux | openSUSE      | Leap 15.3 (x86_64)            |
 +-----------+---------------+-------------------------------+
-| GNU/Linux | openSUSE      | Tumbleweed 20210704 (x86_64)  |
+| GNU/Linux | openSUSE      | Tumbleweed 20210731 (x86_64)  |
 +-----------+---------------+-------------------------------+
 | GNU/Linux | Raspbian      | 10 (armhf)                    |
 +-----------+---------------+-------------------------------+
