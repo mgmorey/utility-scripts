@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CURL_VERSION=7.77.0
+CURL_VERSION=7.78.0
 
 ARCHIVE_DIR="$HOME/Downloads/cURL"
 BASE_URL=https://curl.se
