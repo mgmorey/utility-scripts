@@ -502,6 +502,16 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
+	(rocky)
+	    case "$VERSION_ID" in
+		(8.4)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
 	(ubuntu)
 	    return
 	    ;;
