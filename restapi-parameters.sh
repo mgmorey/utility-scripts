@@ -73,6 +73,9 @@ configure_baseline() {
 			(10)
 			    configure_linux_debian_10
 			    ;;
+			(11)
+			    configure_linux_debian_11
+			    ;;
 			(*)
 			    abort_not_supported Release
 			    ;;
@@ -448,6 +451,14 @@ configure_linux_debian_10() {
     # Set system Python interpreter
     SYSTEM_PYTHON=/usr/bin/python3.7
     SYSTEM_PYTHON_VERSION=3.7.3
+}
+
+configure_linux_debian_11() {
+    configure_linux_debian
+
+    # Set system Python interpreter
+    SYSTEM_PYTHON=/usr/bin/python3.9
+    SYSTEM_PYTHON_VERSION=3.9.2
 }
 
 configure_linux_fedora() {

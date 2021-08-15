@@ -45,6 +45,9 @@ configure_platform() {
 		    (10)
 			package=$DEBIAN_PKG
 			;;
+		    (11)
+			package=$DEBIAN_PKG
+			;;
 		    (*)
 			break
 			;;
@@ -130,6 +133,9 @@ validate_platform() {
 	    (debian)
 		case "$VERSION_ID" in
 		    (10)
+			return
+			;;
+		    (11)
 			return
 			;;
 		    (*)
