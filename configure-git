@@ -434,6 +434,16 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
+	(rocky)
+	    case "$VERSION_ID" in
+		(8.*)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
 	(freebsd)
 	    return
 	    ;;
