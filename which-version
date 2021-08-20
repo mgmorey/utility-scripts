@@ -29,6 +29,7 @@ assert() {
 }
 
 configure_platform() {
+    md5sum=$(get_md5sum_command)
     realpath=$(get_realpath_command)
     sed=$(get_sed_command)
     which=$(get_which)
@@ -47,7 +48,18 @@ get_filenames() {
 
 get_md5sum() {
     assert [ $# -ge 1 ]
-    md5sum "$@" | awk '{print $1}'
+    $md5sum "$@" | awk '{print $1}'
+}
+
+get_md5sum_command() {
+    case "$ID" in
+	(freebsd)
+	    printf '%s\n' gmd5sum
+	    ;;
+	(*)
+	    printf '%s\n' md5sum
+	    ;;
+    esac
 }
 
 get_realpath_command() {
