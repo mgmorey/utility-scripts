@@ -18,12 +18,13 @@
 
 cd
 /bin/rm -rf \
-Library/Python/* \
-.cache/pip \
-.cache/pipenv \
-.local/bin/easy_install* \
-.local/bin/pip* \
-.local/bin/virtualenv* \
-.local/lib/python* \
-.local/share/virtualenv \
-.local/share/virtualenvs/*
+	Library/Python/* \
+	.cache/pip \
+	.cache/pipenv \
+	.local/bin/easy_install* \
+	.local/bin/pip* \
+	.local/bin/virtualenv* \
+	.local/lib/python* \
+	.local/share/virtualenv \
+	.local/share/virtualenvs/* \
+	.virtualenvs
