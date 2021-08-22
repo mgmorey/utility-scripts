@@ -40,10 +40,10 @@ chown_real_user() {
 configure_platform() {
     case "${uname_kernel=$(uname -s)}" in
 	(CYGWIN_NT-*)
-	    pypi_utilities=pip
+	    pypi_utilities=pipenv
 	    ;;
 	(MINGW64_NT-*)
-	    pypi_utilities=pip
+	    pypi_utilities=pipenv
 	    ;;
 	(*)
 	    pypi_utilities=
