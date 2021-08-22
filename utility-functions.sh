@@ -20,8 +20,8 @@ PIP_RE='pip \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)'
 PIPENV_RE='pipenv, version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)'
 PYTHON_RE='Python \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)'
 
-PKGSRC_PREFIXES=$(ls -d /opt/local /opt/pkg /usr/pkg 2>/dev/null || true)
-SYSTEM_PREFIXES="$HOME/.local /usr/local $PKGSRC_PREFIXES /usr"
+PKGSRC_PREFIXES="/opt/local /opt/pkg /usr/pkg"
+SYSTEM_PREFIXES="%s/.local /usr/local %s /usr"
 
 activate_virtualenv() {
     assert [ $# -eq 1 ]
@@ -167,16 +167,11 @@ find_system_python() (
 )
 
 find_system_pythons() (
-    for suffix in $PYTHON_VERSIONS; do
-	for system_prefix in $SYSTEM_PREFIXES; do
-	    if [ -x $system_prefix/bin/python$suffix ]; then
-		python=$system_prefix/bin/python$suffix
-		version=$(get_python_version $python 2>/dev/null || true)
+    system_prefixes="$(get_system_prefixes)"
 
-		if [ -n "$version" ]; then
-		    printf '%s %s %s\n' "$python" "$suffix" "$version"
-		fi
-	    fi
+    for suffix in $PYTHON_VERSIONS; do
+	for prefix in $system_prefixes ''; do
+	    print_python_suffix_version "$prefix" $suffix
 	done
     done
 )
@@ -348,17 +343,22 @@ get_command() (
 
 get_command_helper() (
     assert [ $# -ge 2 ]
+    prefix="$1"
+
+    if [ "$prefix" = . ]; then
+	prefix=
+    fi
 
     case "$2" in
 	(pipenv|virtualenv)
-	    scripts="${1:+$1/}$2"
+	    scripts="${prefix:+$prefix/}$2"
 	    ;;
 	(*)
 	    scripts=
 	    ;;
     esac
 
-    for command in $scripts "${1:+$1/}python${3-} -m $module"; do
+    for command in $scripts "${prefix:+$prefix/}python${3-} -m $module"; do
 	if $command $option >/dev/null 2>&1; then
 	    printf '%s\n' "$command"
 	    return 0
@@ -395,6 +395,10 @@ get_pip_requirements() {
     printf -- '--requirement %s\n' ${pip_install_files:-$PIP_INSTALL_MAIN}
 }
 
+get_pkgsrc_prefixes() {
+    ls -d $PKGSRC_PREFIXES 2>/dev/null
+}
+
 get_python_version() {
     get_command_version "$1" "$PYTHON_RE"
 }
@@ -406,6 +410,17 @@ get_sort_command() {
 	    ;;
 	(*)
 	    printf '%s\n' "sort -Vr"
+	    ;;
+    esac
+}
+
+get_system_prefixes() {
+    case "${uname_kernel=$(uname -s)}" in
+	(MINGW64_NT-*)
+	    true
+	    ;;
+	(*)
+	    printf "$SYSTEM_PREFIXES\n" "$HOME" $(get_pkgsrc_prefixes || true)
 	    ;;
     esac
 }
@@ -528,6 +543,18 @@ install_via_pip() (
     $pip install $options "$@" >&2
 )
 
+print_python_suffix_version() (
+    assert [ $# -eq 2 ]
+    assert [ -n "$2" ]
+
+    python="${1:+$1/bin/}python$2"
+    version=$(get_python_version "$python" 2>/dev/null || true)
+
+    if [ -n "$version" ]; then
+	printf '%s %s %s\n' "$python" "$suffix" "$version"
+    fi
+)
+
 refresh_via_pip() {
     assert [ $# -ge 1 ]
     assert [ -n "$1" ]
@@ -603,6 +630,12 @@ set_flags() {
 }
 
 upgrade_via_pip() (
+    case "${uname_kernel=$(uname -s)}" in
+	(MINGW64_NT-*)
+	    return 0
+	    ;;
+    esac
+
     if [ "$(id -u)" -eq 0 ]; then
 	return
     fi
