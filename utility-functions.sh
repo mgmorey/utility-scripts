@@ -27,14 +27,22 @@ WINDOWS_PREFIXES="%s/AppData/Local/Programs/Python/Python%s"
 activate_virtualenv() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    assert [ -d $1/bin -a -r $1/bin/activate ]
+
+    if [ -d "$1/Scripts" -a -r "$1/Scripts/activate" ]; then
+	activate="$1/Scripts/activate"
+    elif [ -d "$1/bin" -a -r "$1/bin/activate" ]; then
+	activate="$1/bin/activate"
+    else
+	return 1
+    fi
+
     shell_state=$(set +o)
 
     if [ "${VENV_VERBOSE-false}" = true ]; then
 	printf '%s\n' "Activating virtual environment" >&2
     fi
 
-    . "$1/bin/activate"
+    . "$activate"
     eval "$shell_state"
 }
 
@@ -508,7 +516,15 @@ install_python_version() (
 )
 
 install_requirements_via_pip() (
-    pip=$(get_pip_command ${1-${VENV_DIRECTORY-venv}}/bin/python)
+    if [ -d "${1-${VENV_DIRECTORY-venv}}/Scripts" ]; then
+	dirname="${1-${VENV_DIRECTORY-venv}}/Scripts"
+    elif [ -d "${1-${VENV_DIRECTORY-venv}}/bin" ]; then
+	dirname="${1-${VENV_DIRECTORY-venv}}/bin"
+    else
+	dirname=
+    fi
+
+    pip=$(get_pip_command "${dirname:+$dirname/}python")
 
     if [ -z "$pip" ]; then
 	abort '%s: No pip command found in PATH\n' "$0"
@@ -601,8 +617,7 @@ refresh_via_pip() {
 	create_virtualenv "$@"
     fi
 
-    if [ -r $1/bin/activate ]; then
-	activate_virtualenv $1
+    if activate_virtualenv $1; then
 	assert [ -n "${VIRTUAL_ENV-}" ]
 
 	if [ "${venv_force_sync:-$sync}" = true ]; then
