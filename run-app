@@ -38,7 +38,7 @@ configure_platform() {
 	    pypi_utilities=pip
 	    ;;
 	(MINGW64_NT-*)
-	    pypi_utilities=pipenv
+	    pypi_utilities=pip
 	    ;;
 	(*)
 	    pypi_utilities=
