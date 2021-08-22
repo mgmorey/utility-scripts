@@ -20,8 +20,9 @@ PIP_RE='pip \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)'
 PIPENV_RE='pipenv, version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)'
 PYTHON_RE='Python \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)'
 
-PKGSRC_PREFIXES="/opt/local /opt/pkg /usr/pkg"
-SYSTEM_PREFIXES="%s/.local /usr/local %s /usr"
+PKGSRC_PREFIXES="/opt/local/bin /opt/pkg/bin /usr/pkg/bin"
+SYSTEM_PREFIXES="%s/.local/bin /usr/local/bin %s /usr/bin"
+WINDOWS_PREFIXES="%s/AppData/Local/Programs/Python/Python%s"
 
 activate_virtualenv() {
     assert [ $# -eq 1 ]
@@ -167,13 +168,27 @@ find_system_python() (
 )
 
 find_system_pythons() (
-    system_prefixes="$(get_system_prefixes)"
+    case "${uname_kernel=$(uname -s)}" in
+	(MINGW64_NT-*)
+	    for suffix in $PYTHON_VERSIONS; do
+		prefixes="$(get_windows_prefixes $suffix)"
 
-    for suffix in $PYTHON_VERSIONS; do
-	for prefix in $system_prefixes ''; do
-	    print_python_suffix_version "$prefix" $suffix
-	done
-    done
+		for prefix in $prefixes; do
+		    print_python_suffix_version "$prefix" .exe
+		done
+	    done
+	    ;;
+	(*)
+	    prefixes="$(get_posix_prefixes)"
+
+	    for suffix in $PYTHON_VERSIONS; do
+		for prefix in $prefixes; do
+		    print_python_suffix_version "$prefix" $suffix
+		done
+	    done
+	    ;;
+    esac
+
 )
 
 find_user_python() (
@@ -399,6 +414,10 @@ get_pkgsrc_prefixes() {
     ls -d $PKGSRC_PREFIXES 2>/dev/null
 }
 
+get_posix_prefixes() {
+    printf "$SYSTEM_PREFIXES\n" "$HOME" $(get_pkgsrc_prefixes || true)
+}
+
 get_python_version() {
     get_command_version "$1" "$PYTHON_RE"
 }
@@ -410,17 +429,6 @@ get_sort_command() {
 	    ;;
 	(*)
 	    printf '%s\n' "sort -Vr"
-	    ;;
-    esac
-}
-
-get_system_prefixes() {
-    case "${uname_kernel=$(uname -s)}" in
-	(MINGW64_NT-*)
-	    true
-	    ;;
-	(*)
-	    printf "$SYSTEM_PREFIXES\n" "$HOME" $(get_pkgsrc_prefixes || true)
 	    ;;
     esac
 }
@@ -441,6 +449,12 @@ get_versions_passed() (
 
     return 1
 )
+
+get_windows_prefixes() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf "$WINDOWS_PREFIXES\n" "$HOME" "$(printf '%s\n' $1 | tr -d .)"
+}
 
 grep_path() {
     printf '%s\n' "$1" | awk 'BEGIN {RS=":"} {print $0}' | grep -q "$2"
@@ -545,9 +559,13 @@ install_via_pip() (
 
 print_python_suffix_version() (
     assert [ $# -eq 2 ]
-    assert [ -n "$2" ]
+    prefix="$1"
 
-    python="${1:+$1/bin/}python$2"
+    if [ "$prefix" = . ]; then
+	prefix=
+    fi
+
+    python="${prefix:+$prefix/}python$2"
     version=$(get_python_version "$python" 2>/dev/null || true)
 
     if [ -n "$version" ]; then
