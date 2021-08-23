@@ -42,6 +42,12 @@ activate_virtualenv() {
 	printf '%s\n' "Activating virtual environment" >&2
     fi
 
+    case "${uname_kernel=$(uname -s)}" in
+	(CYGWIN_NT-*|MINGW64_NT-*)
+	    dos2unix "$activate"
+	    ;;
+    esac
+
     . "$activate"
     eval "$shell_state"
 }
@@ -52,7 +58,17 @@ check_python() {
     assert [ -n "$2" ]
     printf 'Python %s interpreter found: %s\n' "$2" "$1" >&2
 
-    if ! "$1" "$(/usr/bin/which test-python-version)" $2 >&2; then
+    case "${uname_kernel=$(uname -s)}" in
+	(CYGWIN_NT-*)
+	    home=$(get_windows_home C:)
+	    test_python_version="$home/bin/test-python-version"
+	    ;;
+	(*)
+	    test_python_version=$(/usr/bin/which test-python-version)
+	    ;;
+    esac
+
+    if ! "$1" $test_python_version $2 >&2; then
 	return 1
     fi
 
@@ -177,7 +193,7 @@ find_system_python() (
 
 find_system_pythons() (
     case "${uname_kernel=$(uname -s)}" in
-	(MINGW64_NT-*)
+	(CYGWIN_NT-*|MINGW64_NT-*)
 	    for suffix in $PYTHON_VERSIONS; do
 		prefixes="$(get_windows_prefixes $suffix)"
 
@@ -203,7 +219,7 @@ find_user_python() (
     assert [ $# -eq 1 ]
 
     case "${uname_kernel=$(uname -s)}" in
-	(MINGW64_NT-*)
+	(CYGWIN_NT-*|MINGW64_NT-*)
 	    printf '%s\n' "$1"
 	    return 0
 	    ;;
@@ -458,11 +474,24 @@ get_versions_passed() (
     return 1
 )
 
-get_windows_prefixes() {
+get_windows_home() (
+    case "${uname_kernel=$(uname -s)}" in
+	(CYGWIN_NT-*)
+	    printf '%s/Users/%s' "${1-/c}" "$USERNAME"
+	    ;;
+	(*)
+	    printf '%s' $HOME
+	    ;;
+    esac
+)
+
+get_windows_prefixes() (
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    printf "$WINDOWS_PREFIXES\n" "$HOME" "$(printf '%s\n' $1 | tr -d .)"
-}
+    home=$(get_windows_home)
+    suffix=$(printf '%s\n' $1 | tr -d .)
+    printf "$WINDOWS_PREFIXES\n" "$home" "$suffix"
+)
 
 grep_path() {
     printf '%s\n' "$1" | awk 'BEGIN {RS=":"} {print $0}' | grep -q "$2"
@@ -663,12 +692,6 @@ set_flags() {
 }
 
 upgrade_via_pip() (
-    case "${uname_kernel=$(uname -s)}" in
-	(MINGW64_NT-*)
-	    return 0
-	    ;;
-    esac
-
     if [ "$(id -u)" -eq 0 ]; then
 	return
     fi
