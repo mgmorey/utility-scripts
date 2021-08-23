@@ -27,28 +27,18 @@ WINDOWS_PREFIXES="%s/AppData/Local/Programs/Python/Python%s"
 activate_virtualenv() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
+    activation_script=$(get_venv_script "$1")
 
-    if [ -d "$1/Scripts" -a -r "$1/Scripts/activate" ]; then
-	activate="$1/Scripts/activate"
-    elif [ -d "$1/bin" -a -r "$1/bin/activate" ]; then
-	activate="$1/bin/activate"
-    else
-	return 1
+    if [ -z "$activation_script" ]; then
+	abort '%s: No activation script found\n' "$0"
+    fi
+
+    if [ "${VENV_VERBOSE-false}" = true ]; then
+	printf 'Activating virtual environment %s\n' "$1" >&2
     fi
 
     shell_state=$(set +o)
-
-    if [ "${VENV_VERBOSE-false}" = true ]; then
-	printf '%s\n' "Activating virtual environment" >&2
-    fi
-
-    case "${uname_kernel=$(uname -s)}" in
-	(CYGWIN_NT-*|MINGW64_NT-*)
-	    dos2unix "$activate"
-	    ;;
-    esac
-
-    . "$activate"
+    . "$activation_script"
     eval "$shell_state"
 }
 
@@ -146,6 +136,18 @@ create_virtualenv() (
 	fi
 
 	if eval $command $options; then
+	    activation_script=$(get_venv_script "$1")
+
+	    if [ -z "$activation_script" ]; then
+		abort '%s: No activation script found\n' "$0"
+	    fi
+
+	    case "${uname_kernel=$(uname -s)}" in
+		(CYGWIN_NT-*|MINGW64_NT-*)
+		    dos2unix "$activation_script"
+		    ;;
+	    esac
+
 	    return 0
 	fi
     done
@@ -457,6 +459,31 @@ get_sort_command() {
     esac
 }
 
+get_venv_script() (
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    script_dir=$(get_venv_script_dir "$1")
+
+    if [ -d "$script_dir" -a -r "$script_dir/activate" ]; then
+	printf '%s/activate' "$script_dir"
+    else
+	return 1
+    fi
+)
+
+get_venv_script_dir() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    if [ -d "$1/bin" ]; then
+	printf '%s/bin' "$1"
+    elif [ -d "$1/Scripts" ]; then
+	printf '%s/Scripts' "$1"
+    else
+	return 1
+    fi
+}
+
 get_versions_all() {
     pyenv install --list | awk 'NR > 1 {print $1}' | grep_version ${1-}
 }
@@ -545,14 +572,13 @@ install_python_version() (
 )
 
 install_requirements_via_pip() (
-    if [ -d "${1-${VENV_DIRECTORY-venv}}/Scripts" ]; then
-	dirname="${1-${VENV_DIRECTORY-venv}}/Scripts"
-    elif [ -d "${1-${VENV_DIRECTORY-venv}}/bin" ]; then
-	dirname="${1-${VENV_DIRECTORY-venv}}/bin"
-    else
-	dirname=
+    activation_script=$(get_venv_script "$1")
+
+    if [ -z "$activation_script" ]; then
+	abort '%s: No activation script found\n' "$0"
     fi
 
+    dirname=$(dirname "$activation_script")
     pip=$(get_pip_command "${dirname:+$dirname/}python")
 
     if [ -z "$pip" ]; then
