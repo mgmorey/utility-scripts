@@ -34,7 +34,7 @@ activate_virtualenv() {
     fi
 
     if [ "${VENV_VERBOSE-false}" = true ]; then
-	printf 'Activating virtual environment %s\n' "$1" >&2
+	printf 'Activating virtual environment in %s\n' "$1" >&2
     fi
 
     shell_state=$(set +o)
