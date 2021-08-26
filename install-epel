@@ -35,11 +35,14 @@ configure_platform() {
     case "$kernel_name" in
 	(Linux)
 	    case "$ID" in
+		(centos)
+		    version=$VERSION_ID
+		    ;;
 		(ol|rhel)
 		    version=${VERSION_ID%.*}
 		    ;;
-		(centos)
-		    version=$VERSION_ID
+		(rocky)
+		    version=${VERSION_ID%.*}
 		    ;;
 		esac
 	    ;;
@@ -89,6 +92,16 @@ validate_platform() {
 			(7.*)
 			    :
 			    ;;
+			(8.*)
+			    :
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(rocky)
+		    case "$VERSION_ID" in
 			(8.*)
 			    :
 			    ;;
