@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 KEYS="all ftp http https no"
-NO_PROXY="localhost,127.0.0.0/8"
+NO_PROXY="localhost,127.0.0.1"
 
 get_proxy_parameters() {
     for key in $KEYS; do
@@ -86,14 +86,6 @@ is_valid_local_host() {
     fi >/dev/null
 }
 
-is_valid_local_net() {
-    if expr "${1-}" : '127.0.0.0/8$'; then
-	true
-    else
-	false
-    fi >/dev/null
-}
-
 is_valid_middle() {
     if expr "${1-}" : '//' >/dev/null; then
 	is_valid_fqdn $(printf '%s\n' "$1" | sed 's/\/\///')
@@ -107,8 +99,6 @@ is_valid_no_proxy() (
 	if is_valid_fqdn_pattern "$word"; then
 	    continue
 	elif is_valid_local_host "$word"; then
-	    continue
-	elif is_valid_local_net "$word"; then
 	    continue
 	else
 	    return 1
