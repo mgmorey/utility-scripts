@@ -75,6 +75,9 @@ get_configuration_basename() {
 	    (windows)
 		basename=${kernel_name%_*}-$ID-${VERSION_ID%.0}
 		;;
+            (*)
+		basename=$ID-$VERSION_ID
+		;;
 	esac
 
 	if [ -n "${basename-}" ]; then
