@@ -54,9 +54,6 @@ get_configuration_basename() {
 	    (rhel|fedora)
 		basename=$ID-$VERSION_ID
 		;;
-	    (ubuntu)
-		basename=$ID-$VERSION_ID
-		;;
 	    (freebsd)
 		basename=$ID-${VERSION_ID%-p*}
 		;;
