@@ -32,19 +32,6 @@ assert() {
 get_configuration_basename() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (centos)
-		case "$VERSION_ID" in
-		    (7)
-			basename=$ID-$VERSION_ID
-			;;
-		    (8)
-			basename=$ID-$VERSION_ID
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
 	    (opensuse-tumbleweed)
 		basename=$ID
 		;;
