@@ -45,9 +45,6 @@ get_configuration_basename() {
 			;;
 		esac
 		;;
-	    (opensuse-leap)
-		basename=$ID-$VERSION_ID
-		;;
 	    (opensuse-tumbleweed)
 		basename=$ID
 		;;
