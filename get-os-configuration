@@ -35,7 +35,7 @@ get_configuration_basename() {
 	    (opensuse-tumbleweed)
 		basename=$ID
 		;;
-	    (rhel|fedora)
+	    (rhel)
 		basename=$ID-$VERSION_ID
 		;;
 	    (freebsd)
