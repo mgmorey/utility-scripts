@@ -16,9 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-GIT_VERSION=2.33.0
+GIT_VERSION=2.33.1
 
-BASE_URL=https://github.com/git/git/archive
+ARCHIVE_PREFIX=git-
+ARCHIVE_SUFFIX=.tar.gz
+BASE_URL=https://www.kernel.org/pub/software/scm/git
 
 ARCHIVE_DIR="$HOME/Downloads/Git"
 LOCAL_PREFIX=/usr/local
@@ -97,8 +99,8 @@ configure_git() {
 }
 
 configure_paths() {
-    basename=git-$git_version
-    filename=$basename.zip
+    basename=$ARCHIVE_PREFIX$git_version
+    filename=$basename$ARCHIVE_SUFFIX
     pathname="$ARCHIVE_DIR/$filename"
     src_dir="$HOME/Documents/src/Git/$basename"
 }
@@ -161,14 +163,10 @@ configure_platform_unix_solaris() {
 }
 
 download_archive() {
-    url=$BASE_URL/refs/tags/v$git_version.zip
-
     if [ ! -r "$pathname" ]; then
 	cd "$ARCHIVE_DIR"
-	wget $url
-	/bin/mv -f v$git_version.zip $basename.zip
+	wget $BASE_URL/$filename
     fi
-
 }
 
 extract_files() {
