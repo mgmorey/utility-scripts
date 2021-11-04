@@ -504,7 +504,7 @@ validate_platform() {
 	    ;;
 	(rocky)
 	    case "$VERSION_ID" in
-		(8.4)
+		(8.*)
 		    return
 		    ;;
 		(*)
