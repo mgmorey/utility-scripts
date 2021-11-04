@@ -377,6 +377,16 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
+	(rocky)
+	    case "$VERSION_ID" in
+		(8.*)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
 	(ubuntu)
 	    if [ "${VERSION_ID%.*}" -le 18 ]; then
 		abort_not_supported Release
