@@ -73,15 +73,16 @@ get_script_files() {
     assert [ -n "$1" ]
     find "$1" \
 	 -maxdepth 1 \
-	 ! -name LICENSE \
-	 ! -name README \
-	 ! -name get-python-interpreter \
-	 ! -name run-python \
 	 ! -name "$script" \
 	 ! -name '*.ini' \
 	 ! -name '*.sh' \
 	 ! -name '*.txt' \
 	 ! -name '*~' \
+	 ! -name .editorconfig \
+	 ! -name LICENSE \
+	 ! -name README \
+	 ! -name get-python-interpreter \
+	 ! -name run-python \
 	 -type f \
 	 -print0
 }
