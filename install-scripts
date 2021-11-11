@@ -78,7 +78,7 @@ get_script_files() {
 	 ! -name '*.sh' \
 	 ! -name '*.txt' \
 	 ! -name '*~' \
-	 ! -name .editorconfig \
+	 ! -name '.*' \
 	 ! -name LICENSE \
 	 ! -name README \
 	 ! -name get-python-interpreter \
