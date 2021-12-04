@@ -42,23 +42,23 @@ add_gpg_key() {
     done
 }
 
-add_repositories() {
+add_repository() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    repo="$(get_docker_repo $1)"
+    url="$(get_docker_repository_url $1)"
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
 	    (debian)
-		add-apt-repository "$repo"
+		add-apt-repository "$url"
 		break
 		;;
 	    (rhel|ol|centos|fedora)
-		repo_id=docker-ce-stable/$(uname -m)
-		data=$($manager repolist | get_repository_data $repo_id)
+		repo=docker-ce-stable/$(uname -m)
+		list=$($package_manager repolist | get_repository_data $repo)
 
-		if [ -z "$data" ]; then
-		    yum-config-manager --add-repo "$repo" >/dev/null
+		if [ -z "$list" ]; then
+		    yum-config-manager --add-repo "$url" >/dev/null
 		fi
 
 		break
@@ -87,7 +87,7 @@ configure_daemon_group() {
 }
 
 configure_platform() {
-    manager=$(get_package_manager_basename)
+    package_manager=$(get_package_manager_basename)
 }
 
 enable_additional_repositories() {
@@ -157,31 +157,40 @@ get_docker_origin() {
     done
 }
 
-get_docker_repo() {
+get_docker_repository_url() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
     arch=$(get_architecture)
-    repo=
+    url=
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
-	    (debian)
-		repo="deb [arch=$arch] $1 $(get_codename) stable"
+	    (debian|ubuntu)
+		url="deb [arch=$arch] $1 $(get_codename) stable"
 		;;
-	    (rhel|centos|fedora)
-		repo="$(get_docker_url $id)/docker-ce.repo"
+	    (centos|fedora|ol|rhel)
+		url="$(get_docker_linux_url $id)/docker-ce.repo"
 		;;
 	esac
 
-	if [ -n "${repo-}" ]; then
-	    printf '%s\n' "$repo"
+	if [ -n "${url-}" ]; then
+	    printf '%s\n' "$url"
 	    break
 	fi
     done
 }
 
-get_docker_url() {
-    printf '%s\n' "$DOCKER_BASE_URL/linux/$1"
+get_docker_linux_url() {
+    case "$1" in
+	(rhel|ol)
+	    distro=centos
+	    ;;
+	(*)
+	    distro=$1
+	    ;;
+    esac
+
+    printf '%s\n' "$DOCKER_BASE_URL/linux/$distro"
 }
 
 get_package_manager_basename() {
@@ -193,7 +202,7 @@ get_package_manager_basename() {
 get_repository_data() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    awk -v repo_id=$1 'NR > 1 && $1 == repo_id {print $0}'
+    awk -v repo=$1 'NR > 1 && $1 == repo {print $0}'
 }
 
 install_dependencies() {
@@ -304,10 +313,10 @@ postinstall_platform() {
 }
 
 preinstall_docker() {
-    docker_url=$(get_docker_url $ID)
+    docker_url=$(get_docker_linux_url $ID)
     install_dependencies
     add_gpg_key "$docker_url"
-    add_repositories "$docker_url"
+    add_repository "$docker_url"
     enable_additional_repositories
 }
 
