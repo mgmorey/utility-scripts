@@ -121,6 +121,19 @@ validate_platform() {
 	(fedora)
 	    true
 	    ;;
+	(ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    true
+		    ;;
+		(8.*)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
 	(opensuse-leap)
 	    case "$VERSION_ID" in
 		(15.[12])
@@ -147,7 +160,20 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
-	(rhel|ol)
+	(rhel)
+	    case "$VERSION_ID" in
+		(7.*)
+		    true
+		    ;;
+		(8.*)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(rocky)
 	    case "$VERSION_ID" in
 		(7.*)
 		    true
