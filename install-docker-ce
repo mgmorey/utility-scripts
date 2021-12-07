@@ -17,6 +17,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 DOCKER_BASE_URL=https://download.docker.com
+DOCKER_REPO=docker-ce-stable
+
 ORACLE_LINUX_REPOS="ol7_addons ol7_optional_latest"
 
 abort() {
@@ -54,17 +56,20 @@ add_repository() {
 		break
 		;;
 	    (rhel|ol|centos|fedora)
-		repo=docker-ce-stable/$(uname -m)
-		list=$($package_manager repolist | get_repository_data $repo)
-
-		if [ -z "$list" ]; then
-		    yum-config-manager --add-repo "$url" >/dev/null
-		fi
-
+		add_rpm_repository "$url"
 		break
 		;;
 	esac
     done
+}
+
+add_rpm_repository() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    if [ "$(get_repository_data $DOCKER_REPO)" != $DOCKER_REPO ]; then
+	yum-config-manager --add-repo "$1" >/dev/null
+    fi
 }
 
 assert() {
@@ -202,7 +207,7 @@ get_package_manager_basename() {
 get_repository_data() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    awk -v repo=$1 'NR > 1 && $1 == repo {print $0}'
+    $package_manager repolist | awk -v name=$1 'NR > 1 && $1 == name {print $1}'
 }
 
 install_dependencies() {
