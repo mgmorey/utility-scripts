@@ -170,7 +170,7 @@ download_archive() {
 }
 
 extract_files() {
-    if [ ! -r "$src_dir/configure" ]; then
+    if [ ! -r "$src_dir/configure.ac" ]; then
 	cd "$(dirname "$src_dir")"
 
 	case "$pathname" in
