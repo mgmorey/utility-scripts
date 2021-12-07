@@ -170,7 +170,10 @@ extract_files() {
 	cd "$(dirname "$src_dir")"
 
 	case "$pathname" in
-	    (*.tar.gz|*.tgz)
+	    (*.tar.bz2)
+		bzip2 -dc "$pathname" | tar -xvf -
+		;;
+	    (*.tar.gz)
 		gzip -dc "$pathname" | tar -xvf -
 		;;
 	    (*.tar.xz)

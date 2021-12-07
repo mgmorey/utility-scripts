@@ -181,6 +181,9 @@ extract_files() {
 	cd "$(dirname "$src_dir")"
 
 	case "$pathname" in
+	    (*.tar.bz2)
+		bzip2 -dc "$pathname" | tar -xvf -
+		;;
 	    (*.tar.gz)
 		gzip -dc "$pathname" | tar -xvf -
 		;;

@@ -170,10 +170,13 @@ download_archive() {
 }
 
 extract_files() {
-    if [ ! -r "$src_dir/configure.ac" ]; then
+    if [ ! -r "$src_dir/configure" ]; then
 	cd "$(dirname "$src_dir")"
 
 	case "$pathname" in
+	    (*.tar.bz2)
+		bzip2 -dc "$pathname" | tar -xvf -
+		;;
 	    (*.tar.gz)
 		gzip -dc "$pathname" | tar -xvf -
 		;;
