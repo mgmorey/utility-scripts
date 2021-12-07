@@ -1,0 +1,512 @@
+#!/bin/sh -eu
+
+# configure-make: download and configure GNU Make
+# Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+GNU_MIRROR_BASE_URL=http://mirror.team-cymru.com/gnu
+
+GNU_PROJECT_NAME=make
+GNU_PROJECT_VERSION=4.3
+
+GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
+GNU_ARCHIVE_SUFFIX=.tar.gz
+
+LOCAL_PREFIX=/usr/local
+OPENCSW_PREFIX=/opt/csw
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_invalid_prefix() {
+    usage_error '%s: invalid prefix -- %s\n' "$script" "$*"
+}
+
+abort_invalid_version() {
+    usage_error '%s: invalid version -- %s\n' "$script" "$*"
+}
+
+abort_not_supported() {
+    abort '%s: %s: %s not supported\n' "$script" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
+}
+
+clean_build() {
+    if [ -r Makefile ]; then
+	$make distclean
+    fi
+}
+
+configure_compiler() {
+    if [ -n "${1-}" ]; then
+	cc="$(get_compiler $1)"
+	cflags="$(get_compiler_flags $1)"
+    fi
+
+    if [ -n "${2-}" ]; then
+	cppflags="$(get_include_flags "$2")"
+    fi
+
+    if [ -n "${3-}" ]; then
+	ldflags="$(get_linker_flags "$3")"
+    fi
+
+    pkg_config_path="$(get_pkg_config_path)"
+}
+
+configure_make() {
+    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$GNU_ARCHIVE_DIR"
+    download_archive
+    extract_files
+    cd "$build_dir"
+
+    if [ "$force" = true ]; then
+	clean_build
+    elif [ ! -r config.status ]; then
+	true
+    else
+	exit 0
+    fi
+
+    command=$(get_configure_command $src_dir)
+    printf '%s\n' "$command"
+    eval $command
+
+    if [ "$build" = true ]; then
+	$make${make_options:+ $make_options}
+
+	if [ "$make_test" = true ]; then
+	    $make${make_options:+ $make_options} test
+	fi
+    fi
+}
+
+configure_paths() {
+    basename=$GNU_PROJECT_NAME-$gnu_project_version
+    build_dir="$HOME/Documents/build/$basename"
+    filename=$basename$GNU_ARCHIVE_SUFFIX
+    pathname="$GNU_ARCHIVE_DIR/$filename"
+    src_dir="$HOME/Documents/src/GNU/$basename"
+}
+
+configure_platform() {
+    make=make
+    make_options=$(get_make_options)
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		   (8.*)
+			configure_platform_linux_redhat_8
+			break
+			;;
+		esac
+		;;
+	    (illumos)
+		configure_platform_unix_illumos
+		break
+		;;
+	    (netbsd)
+		configure_platform_bsd_netbsd
+		break
+		;;
+	    (solaris)
+		configure_platform_unix_solaris
+		break
+		;;
+	esac
+    done
+
+    if [ -n "${cc-}" ] && [ ! -x $cc ]; then
+	abort '%s: %s: No such compiler\n' "$script" "$cc"
+    fi
+}
+
+configure_platform_bsd_netbsd() {
+    make=gmake
+    with_gnutls=false
+    include_prefix /usr/pkg
+    configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
+    libgif="$libdir/libgif.so"
+}
+
+configure_platform_linux_redhat_8() {
+    include_prefix $LOCAL_PREFIX
+    configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
+    libgif="$libdir/libgif.so"
+}
+
+configure_platform_unix_illumos() {
+    include_prefix $LOCAL_PREFIX
+    configure_compiler "/usr/bin/gcc -m64" "${incdirs-}" "${libdirs-}"
+    libgif="$libdir/libgif.so"
+}
+
+configure_platform_unix_solaris() {
+    include_prefix $OPENCSW_PREFIX amd64
+    configure_compiler "/opt/developerstudio12.6/bin/cc -m64" "${incdirs-}" "${libdirs-}"
+    libgif="$libdir/libgif.so"
+}
+
+download_archive() {
+    url=$GNU_MIRROR_BASE_URL/$GNU_PROJECT_NAME/$filename
+
+    if [ ! -r "$pathname" ]; then
+	cd "$GNU_ARCHIVE_DIR"
+	wget $url
+    fi
+
+}
+
+extract_files() {
+    if [ ! -r "$src_dir/configure" ]; then
+	cd "$(dirname "$src_dir")"
+
+	case "$pathname" in
+	    (*.tar.bz2)
+		bzip2 -dc "$pathname" | tar -xvf -
+		;;
+	    (*.tar.gz)
+		gzip -dc "$pathname" | tar -xvf -
+		;;
+	    (*.tar.xz)
+		xz -dc "$pathname" | tar -xvf -
+		;;
+	    (*.zip)
+		unzip "$pathname"
+		;;
+	esac
+    fi
+}
+
+get_compiler() {
+    printf '%s\n' "$1"
+}
+
+get_compiler_flags() {
+    shift
+    printf '%s\n' "$*"
+}
+
+get_configure_command() {
+    options=$(get_configure_options)
+    printf '%s' "$1/configure"
+
+    if [ -n "${options-}" ]; then
+	printf ' %s' "$options"
+    fi
+
+    if [ -n "${cc-}" ]; then
+	printf ' CC=\"%s\"' "${cc-}"
+    fi
+
+    if [ -n "${cflags-}" ]; then
+	printf ' CFLAGS=\"%s\"' "${cflags-}"
+    fi
+
+    if [ -n "${cppflags-}" ]; then
+	printf ' CPPFLAGS=\"%s\"' "${cppflags-}"
+    fi
+
+    if [ -n "${ldflags-}" ]; then
+	printf ' LDFLAGS=\"%s\"' "${ldflags-}"
+    fi
+
+    if [ -n "${pkg_config_path-}" ]; then
+	printf ' PKG_CONFIG_PATH=\"%s\"' "${pkg_config_path-}"
+    fi
+
+    printf '\n'
+}
+
+get_configure_options() {
+    if [ -n "${options:-}" ]; then
+	printf '%s\n' "$options"
+    fi
+}
+
+get_include_flags() {
+    assert [ $# -ge 1 ]
+    printf -- "-I%s\n" "$@"
+}
+
+get_linker_flags() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    ldflags=
+
+    for libdir; do
+	case "$os_family" in
+	    (gnu-*)
+		ldflags="-Wl,--rpath=$libdir"
+		;;
+	    (unix)
+		ldflags="-L$libdir -R$libdir"
+		;;
+	esac
+    done
+
+    if [ "${ldflags-}" ]; then
+	printf '%s\n' "$ldflags"
+    fi
+}
+
+get_make_options() {
+    ncpu=$(lscpu 2>/dev/null | awk '$1 == "CPU(s):" {print $2}' || true)
+
+    if [ -n "$ncpu" ]; then
+	printf '%s\n' -j "$ncpu"
+    fi
+}
+
+get_pkg_config_path() {
+    for pkgdir in ${pkgdirs-}; do
+	pkg_config_path=${pkg_config_path+$pkg_config_path:}$pkgdir
+    done
+
+    if [ "${pkg_config_path-}" ]; then
+	printf '%s\n' "$pkg_config_path"
+    fi
+}
+
+include_prefix() {
+    assert [ $# -ge 1 -a $# -le 2 ]
+    assert [ -n "$1" ]
+    incdir="$1/include"
+    libdir="$1/lib${2+/$2}"
+    incdirs="${incdirs+$incdirs }$incdir"
+    libdirs="${libdirs+$libdirs }$libdir"
+
+    if [ -d "$libdir/pkgconfig" ]; then
+	pkgdirs="${pkgdirs+$pkgdirs }$libdir/pkgconfig"
+    fi
+}
+
+install_make() {
+    if [ "$make_install" = true ]; then
+	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
+	    umask 0022
+	    cd "$build_dir"
+	    install_targets=
+	    $make${make_options:+ $make_options} install $install_targets
+	fi
+    fi
+}
+
+parse_arguments() {
+    build=true
+    gnu_project_version=$GNU_PROJECT_VERSION
+    force=false
+    make_install=false
+    make_test=false
+    prefix=$LOCAL_PREFIX
+
+    while getopts bfinp:v:h opt; do
+	case $opt in
+	    (b)
+		build=true
+		;;
+	    (f)
+		force=true
+		;;
+	    (i)
+		make_install=true
+		;;
+	    (n)
+		build=false
+		;;
+	    (p)
+		case $OPTARG in
+		    ($HOME|/opt/*|/usr|/usr/local)
+			if [ -d $OPTARG ]; then
+			    prefix=$OPTARG
+			else
+			    abort_invalid_prefix $OPTARG
+			fi
+			;;
+		    (*)
+			abort_invalid_prefix $OPTARG
+			;;
+		esac
+		;;
+	    (v)
+		case $OPTARG in
+		    (2[6789].[0-9]|2[6789].[1-9][0-9])
+			gnu_project_version=$OPTARG
+			;;
+		    (*)
+			abort_invalid_version $OPTARG
+			;;
+		esac
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error '%s: Too many arguments\n' "$script"
+    fi
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script [-b] [-c] [-f] [-g] [-i] [-n] [-p PREFIX] [-t TOOLKIT] [-v VERSION] [-w]
+       $script -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+validate_platform() {
+    case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    return
+		    ;;
+		(8)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    return
+	    ;;
+	(fedora)
+	    return
+	    ;;
+	(opensuse-*)
+	    return
+	    ;;
+	(ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    return
+		    ;;
+		(8.*)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(rhel)
+	    case "$VERSION_ID" in
+		(7.*)
+		    return
+		    ;;
+		(8.*)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(rocky)
+	    case "$VERSION_ID" in
+		(7.*)
+		    return
+		    ;;
+		(8.*)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    return
+	    ;;
+	(freebsd)
+	    return
+	    ;;
+	(illumos)
+	    return
+	    ;;
+	(macos)
+	    return
+	    ;;
+	(netbsd)
+	    return
+	    ;;
+	(solaris)
+	    return
+	    ;;
+	(windows)
+	    return
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
+
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+validate_platform
+configure_platform
+parse_arguments "$@"
+configure_paths
+
+if [ "$(id -u)" -eq 0 ]; then
+    run_unpriv /bin/sh -c "$0 $*"
+else
+    configure_make
+fi
+
+install_make
