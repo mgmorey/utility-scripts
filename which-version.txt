@@ -1,8 +1,8 @@
 ar	--version	s/GNU ar .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
-as	--version	s/GNU assembler .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
+as	--version	s/\(Apple clang version\|GNU assembler .*\) \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\2/p
 awk	--version	s/\(GNU Awk\|awk version\) \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\2/p
 bash	--version	s/GNU bash, version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
-clang	--version	s/Apple clang version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
+clang	--version	s/\(Apple clang version\|Homebrew clang version\) \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\2/p
 cppcheck	--version	s/Cppcheck \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 curl	--version	s/curl \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 curl-config	--version	s/libcurl \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
@@ -23,11 +23,11 @@ gsed	--version	s/.*sed .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 java	-version	s/\(java\|openjdk\) version "\([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*"/\2/p
 ld	--version	s/GNU ld .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 ldd	--version	s/ldd .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
-lldb	--version	s/lldb-\([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
+lldb	--version	s/\(lldb version \|lldb-\)\([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\2/p
 make	--version	s/GNU Make \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 md5sum	--version	s/md5sum .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 nasm	--version	s/NASM version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
-nm	--version	s/GNU nm .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
+nm	--version	s/\(Apple LLVM version\|GNU nm .*\) \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\2/p
 objdump	--version	s/GNU objdump .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 pip	--version	s/pip \([0-9][0-9]*\(\.[0-9][0-9]*\)*\) from .*/\1/p
 pipenv	--version	s/pipenv, version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
