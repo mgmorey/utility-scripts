@@ -16,9 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-ALL_PARAMETERS="CPPFLAGS LDFLAGS MANPATH PATH PKG_CONFIG_PATH SDKROOT"
-
-HOMEBREW_DIRS="/home/linuxbrew/.linuxbrew /opt/homebrew /usr/local"
+ALL_PARAMETERS="MANPATH SDKROOT"
 
 abort() {
     printf "$@" >&2
@@ -29,116 +27,12 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
-get_homebrew_binary() (
-    for dir in $HOME/.linuxbrew $(get_homebrew_dirs); do
-	if [ -x $dir/bin/brew ]; then
-	    printf '%s\n' "$dir/bin/brew"
-	fi
-    done
-)
+include_macos_parameters() {
+    MANPATH=${MANPATH:-$(manpath)}
 
-get_homebrew_dirs() {
-    ls -d $HOMEBREW_DIRS 2>/dev/null || true
-}
-
-get_homebrew_prefix() (
-    brew=$(get_homebrew_binary)
-
-    if [ -z "$brew" ]; then
-	return
-    fi
-
-    dir="$(cd "$(dirname "$brew")/../opt" && pwd)"
-
-    if [ -d "$dir" ]; then
-	printf '%s\n' "$dir"
-	break
-    fi
-)
-
-include_base_directories() {
-    case "$kernel_name" in
-	(Darwin)
-	    include_macos_directories
-	    ;;
-    esac
-
-    include_homebrew_keg_directories
-}
-
-include_homebrew_keg_directories() {
-    prefix=$(get_homebrew_prefix)
-
-    if [ -z "${prefix-}" ]; then
-	return
-    fi
-
-    for pkg in $("${script_prefix}brew-list-keg-only" 2>/dev/null || true); do
-	if [ -d $prefix/$pkg/include ]; then
-	    CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
-	fi
-
-	if [ -d $prefix/$pkg/lib ]; then
-	    LDFLAGS="-L$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
-	fi
-
-	if is_to_be_included $prefix/$pkg/lib/$pkg/man "${MANPATH-}"; then
-	    MANPATH="$prefix/$pkg/lib/$pkg/man${MANPATH:+:$MANPATH}"
-	fi
-
-	if is_to_be_included $prefix/$pkg/share/man "${MANPATH-}"; then
-	    MANPATH="$prefix/$pkg/share/man${MANPATH:+:$MANPATH}"
-	fi
-
-	if is_to_be_included $prefix/$pkg/bin "${PATH-}"; then
-	    PATH="$prefix/$pkg/bin${PATH:+:$PATH}"
-	fi
-
-	for pkgdir in $prefix/$pkg/lib/pkgconfig /usr/share/pkgconfig; do
-	    if is_to_be_included $pkgdir "${PKG_CONFIG_PATH-}"; then
-		PKG_CONFIG_PATH="$pkgdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-	    fi
-	done
-    done
-
-}
-
-include_macos_directories() {
     if [ -x /usr/bin/xcrun ]; then
 	SDKROOT=$(/usr/bin/xcrun --show-sdk-path)
     fi
-
-    MANPATH=${MANPATH:-$(manpath)}
-}
-
-include_pkgconf_directories() {
-    pkgdir=$1/lib/pkgconfig
-
-    if is_to_be_included $pkgdir "${PKG_CONFIG_PATH-}"; then
-	case "$1" in
-	    (/opt/csw)
-		true
-		;;
-	    (/opt/local)
-		PKG_CONFIG_PATH="${PKG_CONFIG_PATH:+$PKG_CONFIG_PATH:}$pkgdir"
-		;;
-	    (*)
-		PKG_CONFIG_PATH="$pkgdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-		;;
-	esac
-    fi
-}
-
-is_included() {
-    assert [ $# -eq 2 ]
-    assert [ -n "$1" ]
-    printf '%s\n' "$2" | grep -Eq '(^|:)'"$1"'(:|$)'
-}
-
-is_to_be_included() {
-    assert [ $# -eq 2 ]
-    assert [ -n "$1" ]
-    test -d "$1" && ! is_included "$1" "$2"
 }
 
 parse_arguments() {
@@ -237,7 +131,12 @@ s|^'"$1"'$||
 }
 
 set_macos_parameters() {
-    include_base_directories
+    case "$kernel_name" in
+	(Darwin)
+	    include_macos_parameters
+	    ;;
+    esac
+
     print_parameters $ALL_PARAMETERS
 }
 

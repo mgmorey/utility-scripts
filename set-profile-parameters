@@ -130,12 +130,6 @@ include_binary_directories() {
 }
 
 include_base_directories() {
-    case "$ID" in
-	(macos)
-	    include_macos_directories
-	    ;;
-    esac
-
     include_homebrew_keg_directories
 }
 
@@ -223,11 +217,6 @@ include_homebrew_keg_directories() {
 	    fi
 	done
     done
-}
-
-include_macos_directories() {
-    # include_xcode_directories
-    MANPATH=${MANPATH:-$(manpath)}
 }
 
 include_pkgconf_directories() {
