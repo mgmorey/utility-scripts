@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-ALL_PARAMETERS="CPPFLAGS LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
+ALL_PARAMETERS="CPPFLAGS LDFLAGS MANPATH PATH PKG_CONFIG_PATH SDKROOT"
 
 HOMEBREW_DIRS="/home/linuxbrew/.linuxbrew /opt/homebrew /usr/local"
 
@@ -105,9 +105,7 @@ include_homebrew_keg_directories() {
 
 include_macos_directories() {
     if [ -x /usr/bin/xcrun ]; then
-	dir=$(/usr/bin/xcrun --show-sdk-path)
-	CPPFLAGS="-I$dir/usr/include"
-	LDFLAGS="-L$dir/usr/lib"
+	SDKROOT=$(/usr/bin/xcrun --show-sdk-path)
     fi
 
     MANPATH=${MANPATH:-$(manpath)}
