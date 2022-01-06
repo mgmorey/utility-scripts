@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 get_compiler_version() {
-    ("$1" -dumpfullversion || "$1" -dumpversion) 2>/dev/null | cut -d'-' -f 1
+    ("$1" -dumpfullversion || "$1" -dumpversion) 2>/dev/null
 }
 
 get_compiler_version "${1-gcc}"
