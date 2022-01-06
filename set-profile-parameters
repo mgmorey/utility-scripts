@@ -190,12 +190,12 @@ include_homebrew_keg_directories() {
 	return
     fi
 
-    for pkg in $(get_homebrew_keg_only 2>/dev/null || true); do
-	if [ -d $prefix/$pkg/include ]; then
+    for pkg in $(get_homebrew_keg_only 2>/dev/null || true | sort -r); do
+	if ! is_included -I$prefix/$pkg/include "${CPPFLAGS-}"; then
 	    CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
 	fi
 
-	if [ -d $prefix/$pkg/lib ]; then
+	if ! is_included -L$prefix/$pkg/lib "${LDFLAGS-}"; then
 	    LDFLAGS="-L$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
 	fi
 
