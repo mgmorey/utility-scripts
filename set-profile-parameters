@@ -372,7 +372,7 @@ print_parameters() {
 
 remove_directory() {
     assert [ $# -eq 2 ]
-    printf '%s\n' "$2" | sed -e '
+    printf '%s\n' "$2" | sed '
 s|:'"$1"':|:|g
 s|^'"$1"':||
 s|:'"$1"'$||

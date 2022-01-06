@@ -42,7 +42,7 @@ grep_package() {
     assert [ -n "$1" ]
     assert [ -n "$2" ]
     assert [ -n "$3" ]
-    quoted_package=$(printf '%s\n' "$2" | sed -e 's/\+/\\\+/g')
+    quoted_package=$(printf '%s\n' "$2" | sed 's/\+/\\\+/g')
     "$1" -Eq '^'"$quoted_package"'([0-9]*|-[0-9\.]+)?(nb[0-9]+)?$' "$3"
 }
 

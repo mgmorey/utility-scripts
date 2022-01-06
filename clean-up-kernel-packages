@@ -82,7 +82,7 @@ get_kernel_packages() {
 get_current_kernel_package_release() {
     machine=$(uname -m)
     release=$(uname -r)
-    printf '%s\n' "${release%.$machine}" | sed -e 's/-default$//'
+    printf '%s\n' "${release%.$machine}" | sed 's/-default$//'
 }
 
 usage_error() {
