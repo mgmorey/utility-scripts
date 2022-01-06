@@ -15,13 +15,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+MAXDEPTH=1
+ROOTDIRS="$HOME/Documents/git $HOME/git"
+
+get_root_dir() (
+    for dir in $ROOTDIRS; do
+	if cd "$dir"; then
+	    printf '%s\n' "$dir"
+	    break
+	fi
+    done
+)
+
 git_pull_dir() (
     cd "$1"
     git pull origin $(awk '$1 == "ref:" {print $2}' .git/HEAD)
 )
 
 git_pull_recursive() {
-    dirs=$(find . -maxdepth 1 -type d)
+    rootdir=$(get_root_dir)
+    dirs=$(find $rootdir -maxdepth $MAXDEPTH -type d)
 
     for dir in $dirs; do
 	if [ -e "$dir/.git/HEAD" ]; then
