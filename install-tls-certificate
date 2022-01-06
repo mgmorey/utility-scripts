@@ -32,8 +32,6 @@ assert() {
 }
 
 install_tls_certificate() {
-    validate_platform
-
     if [ ! -e "$file" ]; then
 	abort '%s: %s: No such certificate file\n' "$script" "$file"
     fi
@@ -162,5 +160,6 @@ script_prefix=${script_dir:+$script_dir/}
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
+validate_platform
 parse_arguments "$@"
 install_tls_certificate
