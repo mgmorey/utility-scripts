@@ -1,0 +1,151 @@
+#!/bin/sh -eux
+
+CERTIFICATE_DIR=/etc/pki/ca-trust/source/anchors
+PACKAGE=ca-certificates
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_not_supported() {
+    abort '%s: %s: %s not supported\n' "$script" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
+}
+
+install_tls_certificate() {
+    validate_platform
+
+    if [ ! -e "$file" ]; then
+	abort '%s: %s: No such certificate file\n' "$script" "$file"
+    fi
+
+    if [ "$(file -b "$file")" != "PEM certificate" ]; then
+	abort '%s: %s: Not a certificate file\n' "$script" "$file"
+    fi
+
+    if ! rpm -q $PACKAGE >/dev/null 2>&1; then
+	manager=$(get-package-managers | awk 'NR == 1 {print $0}')
+	$manager install $PACKAGE
+    fi
+
+    update-ca-trust force-enable
+    /bin/cp -f "$file" $CERTIFICATE_DIR
+    update-ca-trust
+}
+
+parse_arguments() {
+    while getopts h opt; do
+	case $opt in
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		usage_error
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -lt 1 ]; then
+	usage_error '%s: Not enough arguments\n' "$script"
+    elif [ $# -gt 1 ]; then
+	usage_error '%s: Too many arguments\n' "$script"
+    fi
+
+    file=$1
+    shift
+}
+
+validate_platform() {
+    case "$kernel_name" in
+	(Linux)
+	    case "$ID" in
+		(centos)
+		    case "$VERSION_ID" in
+			(7)
+			    :
+			    ;;
+			(8)
+			    :
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(rhel|ol)
+		    case "$VERSION_ID" in
+			(7.*)
+			    :
+			    ;;
+			(8.*)
+			    :
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(rocky)
+		    case "$VERSION_ID" in
+			(8.*)
+			    :
+			    ;;
+			(*)
+			    abort_not_supported Release
+			    ;;
+		    esac
+		    ;;
+		(*)
+		    abort_not_supported Distro
+		    ;;
+		esac
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script FILE
+       $script -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+parse_arguments "$@"
+install_tls_certificate
