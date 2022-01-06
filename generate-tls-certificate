@@ -1,0 +1,3 @@
+#!/bin/sh -eux
+
+openssl req -x509 -newkey rsa:4096 -keyout "$HOME/key.pem" -out "$HOME/cert.pem" -sha256 -days 365
