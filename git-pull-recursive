@@ -1,0 +1,18 @@
+#!/bin/sh -eu
+
+git_pull_dir() (
+    cd "$1"
+    git pull origin $(awk '$1 == "ref:" {print $2}' .git/HEAD)
+)
+
+git_pull_recursive() {
+    dirs=$(find . -maxdepth 1 -type d)
+
+    for dir in $dirs; do
+	if [ -e "$dir/.git/HEAD" ]; then
+	    git_pull_dir "$dir"
+	fi
+    done
+}
+
+git_pull_recursive
