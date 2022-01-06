@@ -77,6 +77,23 @@ parse_arguments() {
     shift
 }
 
+usage() {
+    cat <<EOF >&2
+Usage: $script FILE
+       $script -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
 validate_platform() {
     case "$kernel_name" in
 	(Linux)
@@ -126,23 +143,6 @@ validate_platform() {
 	    abort_not_supported "Operating system"
 	    ;;
     esac
-}
-
-usage() {
-    cat <<EOF >&2
-Usage: $script FILE
-       $script -h
-EOF
-}
-
-usage_error() {
-    if [ $# -gt 0 ]; then
-	printf "$@" >&2
-    fi
-
-    printf '%s\n' '' >&2
-    usage
-    exit 2
 }
 
 script=$(basename "$0")
