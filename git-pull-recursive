@@ -20,7 +20,7 @@ ROOTDIRS="$HOME/Documents/git $HOME/git"
 
 get_root_dir() (
     for dir in $ROOTDIRS; do
-	if cd "$dir"; then
+	if cd "$dir" 2>/dev/null; then
 	    printf '%s\n' "$dir"
 	    break
 	fi
