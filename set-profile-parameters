@@ -54,6 +54,10 @@ configure_platform() {
     fi
 }
 
+get_directory() {
+    printf '%s\n' "$1" | sed 's/^-[IL]//'
+}
+
 get_homebrew_binary() (
     for dir in $HOME/.linuxbrew $(get_homebrew_dirs); do
 	if [ -x $dir/bin/brew ]; then
@@ -191,11 +195,11 @@ include_homebrew_keg_directories() {
     fi
 
     for pkg in $(get_homebrew_keg_only 2>/dev/null | sort -r || true); do
-	if ! is_included -I$prefix/$pkg/include "${CPPFLAGS-}"; then
+	if is_to_be_included -I$prefix/$pkg/include "${CPPFLAGS-}"; then
 	    CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
 	fi
 
-	if ! is_included -L$prefix/$pkg/lib "${LDFLAGS-}"; then
+	if is_to_be_included -L$prefix/$pkg/lib "${LDFLAGS-}"; then
 	    LDFLAGS="-L$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
 	fi
 
@@ -276,13 +280,13 @@ include_xcode_directories() {
 is_included() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
-    printf '%s\n' "$2" | grep -Eq '(^|:)'"$1"'(:|$)'
+    printf '%s\n' "$2" | grep -Eq '(^|[: ])'"$1"'([: ]|$)'
 }
 
 is_to_be_included() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
-    test -d "$1" && ! is_included "$1" "$2"
+    test -d "$(get_directory "$1")" && ! is_included "$1" "$2"
 }
 
 parse_arguments() {
