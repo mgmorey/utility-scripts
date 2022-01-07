@@ -33,18 +33,29 @@ assert() {
 
 install_tls_certificate() {
     if [ ! -e "$file" ]; then
-	abort '%s: %s: No such certificate file\n' "$script" "$file"
+	abort '%s: %s: No such file\n' "$script" "$file"
     fi
 
-    if [ "$(file -b "$file")" != "PEM certificate" ]; then
-	abort '%s: %s: Not a certificate file\n' "$script" "$file"
-    fi
+    filetype="$(file -b "$file")"
+
+    case "$filetype" in
+	('PEM certificate')
+	    true
+	    ;;
+	('PEM RSA private key')
+	    true
+	    ;;
+	(*)
+	    abort '%s: %s: Not a valid PEM file\n' "$script" "$file"
+	    ;;
+    esac
 
     if ! rpm -q $PACKAGE >/dev/null 2>&1; then
 	manager=$(get-package-managers | awk 'NR == 1 {print $0}')
 	$manager install $PACKAGE
     fi
 
+    umask 0022
     update-ca-trust force-enable
     /bin/cp -f "$file" $CERTIFICATE_DIR
     update-ca-trust
