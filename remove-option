@@ -15,22 +15,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-get_version() {
-    "$1" --version 2>/dev/null | head -n 1
+abort() {
+    printf "$@" >&2
+    exit 1
 }
 
-grep_version() {
-    grep -Eq '^((.+) )?clang version .*$'
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
-is_clang() {
-    get_version "$1" | grep_version
+remove_option() {
+    assert [ $# -eq 2 ]
+    printf '%s\n' "$2" | sed '
+s| '"$1"' | |g
+s|^'"$1"' ||
+s| '"$1"'$||
+s|^'"$1"'$||
+'
 }
 
-if is_clang "${1-clang}"; then
-    result=true
-else
-    result=false
+if [ $# -eq 2 ]; then
+    remove_option "$1" "$2"
 fi
-
-printf '%s\n' "$result"
