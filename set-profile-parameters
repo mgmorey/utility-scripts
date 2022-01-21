@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
+ALL_PARAMETERS="CPPFLAGS INFOPATH LDLIBS MANPATH PATH PKG_CONFIG_PATH"
 
 COMMON_BINDIRS="/usr/lib/cups/bin"
 PROFILE_BINDIRS="bin .cargo/bin .linuxbrew/bin .local/bin .pyenv/bin"
@@ -199,8 +199,8 @@ include_homebrew_keg_directories() {
 	    CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
 	fi
 
-	if is_to_be_included -L$prefix/$pkg/lib "${LDFLAGS-}"; then
-	    LDFLAGS="-L$prefix/$pkg/lib${LDFLAGS:+ $LDFLAGS}"
+	if is_to_be_included -L$prefix/$pkg/lib "${LDLIBS-}"; then
+	    LDLIBS="-L$prefix/$pkg/lib${LDLIBS:+ $LDLIBS}"
 	fi
 
 	if is_to_be_included $prefix/$pkg/lib/$pkg/man "${MANPATH-}"; then
@@ -273,7 +273,7 @@ include_xcode_directories() {
     if [ -x /usr/bin/xcrun ]; then
 	dir=$(/usr/bin/xcrun --show-sdk-path)
 	CPPFLAGS="-I$dir/usr/include"
-	LDFLAGS="-L$dir/usr/lib"
+	LDLIBS="-L$dir/usr/lib"
     fi
 }
 

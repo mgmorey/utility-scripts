@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-ALL_PARAMETERS="CPPFLAGS LDFLAGS MANPATH SDKROOT"
+ALL_PARAMETERS="CPPFLAGS LDLIBS MANPATH SDKROOT"
 
 abort() {
     printf "$@" >&2
@@ -33,7 +33,7 @@ include_macos_parameters() {
     if [ -x /usr/bin/xcrun ]; then
 	SDKROOT=$(/usr/bin/xcrun --show-sdk-path)
 	CPPFLAGS="${CPPFLAGS+$CPPFLAGS }-I$SDKROOT/usr/include"
-	LDFLAGS="${LDFLAGS+$LDFLAGS }-L$SDKROOT/usr/lib"
+	LDLIBS="${LDLIBS+$LDLIBS }-L$SDKROOT/usr/lib"
     fi
 }
 
