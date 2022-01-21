@@ -29,6 +29,7 @@ md5sum	--version	s/md5sum .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 nasm	--version	s/NASM version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 nm	--version	s/\(Apple LLVM version\|GNU nm .*\) \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\2/p
 objdump	--version	s/GNU objdump .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
+openssl	version	s/OpenSSL \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 pip	--version	s/pip \([0-9][0-9]*\(\.[0-9][0-9]*\)*\) from .*/\1/p
 pipenv	--version	s/pipenv, version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 pyenv	--version	s/pyenv \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
