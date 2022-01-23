@@ -204,7 +204,7 @@ which_version() {
     configure_platform
 
     for command; do
-	command=${command%-*}
+	command=$(printf '%s\n' $command | $sed 's/-[0-9][0-9]*$//')
 
 	if ! option=$(get_version_option $command) || [ -z "$option" ]; then
 	    abort '%s: %s: Not supported\n' "$script" $command
