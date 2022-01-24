@@ -30,6 +30,10 @@ get_root_dir() (
 git_pull_dir() (
     cd "$1"
     git pull origin $(awk '$1 == "ref:" {print $2}' .git/HEAD)
+
+    if [ -x install-scripts ]; then
+	./install-scripts
+    fi
 )
 
 git_pull_recursive() {
