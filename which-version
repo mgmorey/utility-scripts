@@ -204,15 +204,17 @@ which_version() {
     configure_platform
 
     for command; do
-	if ! option=$(get_version_option "$command") || [ -z "$option" ]; then
-	    abort '%s: %s: Not supported\n' "$script" "$command"
+	command=$(printf '%s\n' $command | $sed 's/-[0-9][0-9]*$//')
+
+	if ! option=$(get_version_option $command) || [ -z "$option" ]; then
+	    abort '%s: %s: Not supported\n' "$script" $command
 	fi
 
-	if ! regexp=$(get_version_regexp "$command") || [ -z "$regexp" ]; then
-	    abort '%s: %s: Not supported\n' "$script" "$command"
+	if ! regexp=$(get_version_regexp $command) || [ -z "$regexp" ]; then
+	    abort '%s: %s: Not supported\n' "$script" $command
 	fi
 
-	get_filenames "$command" | while read filename; do
+	get_filenames $command | while read filename; do
 	    if version=$(get_version "$filename" "$option" "$regexp"); then
 		if [ "$checksum" = true ]; then
 		    printf '%s%s' "$(get_md5sum "$filename")" "$separator"
