@@ -16,7 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 CA_CERTIFICATE_TARGET_DIR=/etc/pki/ca-trust/source/anchors
-RPM_PACKAGE=ca-certificates
 
 abort() {
     printf "$@" >&2
@@ -29,40 +28,6 @@ abort_not_supported() {
 
 assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
-}
-
-install_ca_certificate_file() {
-    update-ca-trust force-enable
-    install -m a=r "$file" $CA_CERTIFICATE_TARGET_DIR
-    update-ca-trust extract
-}
-
-install_ca_certificates_package() {
-    if ! rpm -q $RPM_PACKAGE >/dev/null 2>&1; then
-	manager=$(get-package-managers | awk 'NR == 1 {print $0}')
-	$manager install $RPM_PACKAGE
-    fi
-}
-
-install_tls_ca_certificate() {
-    if [ ! -e "$file" ]; then
-	abort '%s: %s: No such file\n' "$script" "$file"
-    fi
-
-    filetype="$(file -b "$file")"
-
-    case "$filetype" in
-	('PEM certificate')
-	    true
-	    ;;
-	(*)
-	    abort '%s: %s: Not a PEM certificate file\n' "$script" "$file"
-	    ;;
-    esac
-
-    umask 0022
-    install_ca_certificates_package
-    install_ca_certificate_file
 }
 
 parse_arguments() {
@@ -84,7 +49,32 @@ parse_arguments() {
 	usage_error '%s: Too many arguments\n' "$script"
     fi
 
-    file="${1-$CA_CERT_FILE}"
+    file="$CA_CERTIFICATE_TARGET_DIR/$(basename ${1-$CA_CERT_FILE})"
+}
+
+uninstall_ca_certificate_file() {
+    /bin/rm -f "$file"
+    update-ca-trust
+}
+
+uninstall_tls_ca_certificate() {
+    if [ ! -e "$file" ]; then
+	abort '%s: %s: No such file\n' "$script" "$file"
+    fi
+
+    filetype="$(file -b "$file")"
+
+    case "$filetype" in
+	('PEM certificate')
+	    true
+	    ;;
+	(*)
+	    abort '%s: %s: Not a PEM certificate file\n' "$script" "$file"
+	    ;;
+    esac
+
+    umask 0022
+    uninstall_ca_certificate_file
 }
 
 usage() {
@@ -174,4 +164,4 @@ set_user_profile "$script_dir"
 eval $(get-os-release -x)
 validate_platform
 parse_arguments "$@"
-install_tls_ca_certificate
+uninstall_tls_ca_certificate
