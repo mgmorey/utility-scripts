@@ -1,0 +1,174 @@
+#!/bin/sh -eu
+
+# set-bsd-parameters: print shell commands to set BSD parameters
+# Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+ALL_PARAMETERS="CPPFLAGS LDLIBS"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
+}
+
+include_bsd_parameters() {
+    CPPFLAGS="-I/usr/include"
+    LDLIBS="-L/usr/lib"
+}
+
+parse_arguments() {
+    no_export=false
+    shell=$SHELL
+
+    while getopts ns:h opt; do
+	case $opt in
+	    (n)
+		no_export=true
+		;;
+	    (s)
+		parse_shell "$OPTARG"
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error '%s: Too many arguments\n' "$script"
+    fi
+}
+
+parse_shell() {
+    case $(basename "${1%.exe}") in
+	(*bash|ksh*|zsh)
+	    shell=${1%.exe}
+	    ;;
+	(csh|tcsh)
+	    shell=${1%.exe}
+	    ;;
+	(fish)
+	    shell=${1%.exe}
+	    ;;
+	(sh)
+	    shell=${1%.exe}
+	    ;;
+	(*)
+	    usage_error '%s: %s: Unsupported shell\n' "$script" "$1"
+	    ;;
+    esac
+}
+
+print_parameter() {
+    assert [ $# -gt 0 ]
+    assert [ -n "$1" ]
+
+    if [ -z "${2-}" ]; then
+	continue
+    elif [ "$no_export" = true ]; then
+	printf '%s=%s\n' "$1" "$2"
+    else
+	case "$(basename ${shell%.exe})" in
+	    (*bash|ksh*|zsh)
+		printf 'export %s="%s"\n' "$1" "$2"
+		;;
+	    (csh|tcsh)
+		printf 'setenv %s "%s";\n' "$1" "$2"
+		;;
+	    (fish)
+		printf 'set -x %s "%s";\n' "$1" "$2"
+		;;
+	    (*)
+		printf '%s="%s"\n' "$1" "$2"
+		printf 'export %s\n' "$1"
+		;;
+	esac
+    fi
+}
+
+print_parameters() {
+    assert [ $# -gt 0 ]
+
+    for var; do
+	eval $(printf 'value="${%s-}"\n' "$var")
+	print_parameter "$var" "$value"
+    done
+}
+
+remove_directory() {
+    assert [ $# -eq 2 ]
+    printf '%s\n' "$2" | sed '
+s|:'"$1"':|:|g
+s|^'"$1"':||
+s|:'"$1"'$||
+s|^'"$1"'$||
+'
+}
+
+set_bsd_parameters() {
+    case "$kernel_name" in
+	(Darwin)
+	    include_bsd_parameters
+	    ;;
+    esac
+
+    print_parameters $ALL_PARAMETERS
+}
+
+usage() {
+    cat <<-EOF >&2
+Usage: $script: [-s SHELL]
+       $script: -n
+       $script: -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+eval $("${script_prefix}get-os-release" -x)
+
+parse_arguments "$@"
+set_bsd_parameters
