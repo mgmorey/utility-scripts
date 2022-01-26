@@ -269,14 +269,6 @@ include_profile_directories() {
     done
 }
 
-include_xcode_directories() {
-    if [ -x /usr/bin/xcrun ]; then
-	dir=$(/usr/bin/xcrun --show-sdk-path)
-	CPPFLAGS="-I$dir/usr/include"
-	LDLIBS="-L$dir/usr/lib"
-    fi
-}
-
 is_included() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
