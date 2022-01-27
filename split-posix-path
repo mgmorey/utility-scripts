@@ -1,7 +1,7 @@
 #!/bin/sh -eu
 
-# split-path: filter to split path into directory names
-# Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
+# split-posix-path: filter to split POSIX directory path
+# Copyright (C) 2022  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
