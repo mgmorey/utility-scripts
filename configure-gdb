@@ -19,7 +19,7 @@
 GNU_MIRROR_BASE_URL=http://mirror.team-cymru.com/gnu
 
 GNU_PROJECT_NAME=gdb
-GNU_PROJECT_VERSION=11.1
+GNU_PROJECT_VERSION=11.2
 
 GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 GNU_ARCHIVE_SUFFIX=.tar.xz
@@ -93,7 +93,7 @@ configure_gdb() {
 	$make${make_options:+ $make_options}
 
 	if [ "$make_test" = true ]; then
-	    $make${make_options:+ $make_options} test
+	    $make${make_options:+ $make_options} check
 	fi
     fi
 }
@@ -243,6 +243,10 @@ get_configure_options() {
     fi
 }
 
+get_dependencies() {
+    get-packages gdb-test
+}
+
 get_include_flags() {
     assert [ $# -ge 1 ]
     printf -- "-I%s\n" "$@"
@@ -300,6 +304,22 @@ include_prefix() {
     fi
 }
 
+install_dependencies() {
+    case "$ID" in
+	(windows)
+	    case "$kernel_name" in
+		(CYGWIN_NT)
+		    return 0
+		    ;;
+	    esac
+	    ;;
+    esac
+
+    packages="$(get_dependencies | sort -u)"
+    pattern="$(get-packages -s pattern development)"
+    install-packages ${pattern:+-p "$pattern" }$packages
+}
+
 install_gdb() {
     if [ "$make_install" = true ]; then
 	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
@@ -319,7 +339,7 @@ parse_arguments() {
     make_test=false
     prefix=$LOCAL_PREFIX
 
-    while getopts bfinp:v:h opt; do
+    while getopts bfinp:tv:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -346,6 +366,9 @@ parse_arguments() {
 			abort_invalid_prefix $OPTARG
 			;;
 		esac
+		;;
+	    (t)
+		make_test=true
 		;;
 	    (v)
 		case $OPTARG in
@@ -376,7 +399,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-g] [-i] [-n] [-p PREFIX] [-t TOOLKIT] [-v VERSION] [-w]
+Usage: $script [-b] [-f] [-i] [-n] [-p PREFIX] [-t] [-v VERSION]
        $script -h
 EOF
 }
@@ -502,6 +525,7 @@ validate_platform
 configure_platform
 parse_arguments "$@"
 configure_paths
+install_dependencies
 
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"
