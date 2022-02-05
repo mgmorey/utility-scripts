@@ -5,8 +5,6 @@ This project has been tested on the following platforms:
 +===========+=================+=============================+
 | OS Family | Distribution    | OS Version (OS Ports)       |
 +===========+=================+=============================+
-| GNU/Linux | CentOS          | 8 (x86_64)                  |
-+-----------+-----------------+-----------------------------+
 | GNU/Linux | Debian          | 10 (amd64, s390x)           |
 +-----------+-----------------+-----------------------------+
 | GNU/Linux | Debian          | 11 (amd64)                  |
