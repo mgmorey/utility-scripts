@@ -1,5 +1,6 @@
 #!/bin/sh -eu
 
+mkdir -p $HOME/git
 cd $HOME/git
 
 if [ ! -d ctags ]; then
@@ -17,5 +18,8 @@ if [ ! -e Makefile ]; then
 fi
 
 make
-make install # may require extra privileges depending on where to install
-find . -user root
+
+if [ ! -d /usr/local/bin -o -w /usr/local/bin ]; then
+    make install # may require extra privileges depending on where to install
+    find . -user root
+fi
