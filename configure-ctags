@@ -34,7 +34,7 @@ configure_ctags() {
 	./configure
     fi
 
-    make
+    $make
 }
 
 configure_paths() {
@@ -42,8 +42,18 @@ configure_paths() {
 }
 
 configure_platform() {
-    make=make
+    make=$(get_make_command)
     make_options=
+}
+
+get_make_command() {
+    case "$ID" in
+	(*bsd)
+	    printf '%s\n' gmake
+	    ;;
+	(*)
+	    printf '%s\n' make
+    esac
 }
 
 install_ctags() {
