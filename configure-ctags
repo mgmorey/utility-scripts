@@ -1,25 +1,88 @@
 #!/bin/sh -eu
 
-mkdir -p $HOME/git
-cd $HOME/git
+# configure-gdb: download and configure Ctags
+# Copyright (C) 2022  "Michael G. Morey" <mgmorey@gmail.com>
 
-if [ ! -d ctags ]; then
-    git clone https://github.com/universal-ctags/ctags.git
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+configure_ctags() {
+    mkdir -p "$(dirname "$src_dir")"
+    cd "$(dirname "$src_dir")"
+
+    if [ ! -d ctags ]; then
+	git clone https://github.com/universal-ctags/ctags.git
+    fi
+
+    cd $src_dir
+
+    if [ ! -e configure ]; then
+	./autogen.sh
+    fi
+
+    if [ ! -e Makefile ]; then
+	./configure
+    fi
+
+    make
+}
+
+configure_paths() {
+    src_dir="$HOME/Documents/src/ctags"
+}
+
+configure_platform() {
+    make=make
+    make_options=
+}
+
+install_ctags() {
+    if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
+	umask 0022
+	cd "$src_dir"
+	$make${make_options:+ $make_options} install
+
+	if [ "$(id -u)" -eq 0 ]; then
+	    find . -user root -type d | xargs chown-real-user
+	    find . -user root -type f | xargs chown-real-user
+	fi
+    fi
+}
+
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+configure_platform
+configure_paths
+
+if [ "$(id -u)" -eq 0 ]; then
+    run_unpriv /bin/sh -c "$0 $*"
+else
+    configure_ctags
 fi
 
-cd ctags
-
-if [ ! -e configure ]; then
-    ./autogen.sh
-fi
-
-if [ ! -e Makefile ]; then
-    ./configure
-fi
-
-make
-
-if [ ! -d /usr/local/bin -o -w /usr/local/bin ]; then
-    make install # may require extra privileges depending on where to install
-    find . -user root
-fi
+install_ctags
