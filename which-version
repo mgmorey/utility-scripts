@@ -41,8 +41,8 @@ configure_platform() {
     fi
 }
 
-get_root_command() {
-    basename -- "$1" | $sed 's/-[0-9][0-9]*$//'
+get_command_rootname() {
+    basename -- "$1" .exe | $sed 's/-[0-9][0-9]*$//'
 }
 
 get_filenames() {
@@ -98,7 +98,7 @@ get_version_option() {
     assert [ -n "$1" ]
     "$script_prefix$script.awk" \
 	column=2 \
-	command=$(get_root_command "$1") \
+	command=$(get_command_rootname "$1") \
 	"$script_prefix$script.txt"
 }
 
@@ -107,7 +107,7 @@ get_version_regexp() {
     assert [ -n "$1" ]
     "$script_prefix$script.awk" \
 	column=3 \
-	command=$(get_root_command "$1") \
+	command=$(get_command_rootname "$1") \
 	"$script_prefix$script.txt"
 }
 
