@@ -5,6 +5,7 @@ bash	--version	s/GNU bash, version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 clang	-dumpfullversion	s/\([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 clang++	-dumpfullversion	s/\([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 cppcheck	--version	s/Cppcheck \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
+ctags	--version	s/Universal Ctags \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 curl	--version	s/curl \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 curl-config	--version	s/libcurl \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 dmalloc	--version	s/Dmalloc utility version string is: \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
