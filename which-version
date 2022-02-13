@@ -41,6 +41,10 @@ configure_platform() {
     fi
 }
 
+get_root_command() {
+    basename -- "$1" | $sed 's/-[0-9][0-9]*$//'
+}
+
 get_filenames() {
     assert [ $# -ge 1 ]
     $which "$@" | resolve_filenames | remove_duplicate_filenames
@@ -94,7 +98,7 @@ get_version_option() {
     assert [ -n "$1" ]
     "$script_prefix$script.awk" \
 	column=2 \
-	command=$(basename -- "$1") \
+	command=$(get_root_command "$1") \
 	"$script_prefix$script.txt"
 }
 
@@ -103,7 +107,7 @@ get_version_regexp() {
     assert [ -n "$1" ]
     "$script_prefix$script.awk" \
 	column=3 \
-	command=$(basename -- "$1") \
+	command=$(get_root_command "$1") \
 	"$script_prefix$script.txt"
 }
 
@@ -204,8 +208,6 @@ which_version() {
     configure_platform
 
     for command; do
-	command=$(printf '%s\n' $command | $sed 's/-[0-9][0-9]*$//')
-
 	if ! option=$(get_version_option $command) || [ -z "$option" ]; then
 	    abort '%s: %s: Not supported\n' "$script" $command
 	fi
