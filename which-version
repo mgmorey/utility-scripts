@@ -17,6 +17,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ALL=false
+CHECKSUM=false
+DELIMITER=$(printf '\t\n')
 RESOLVE=false
 
 abort() {
@@ -32,7 +34,7 @@ configure_platform() {
     md5sum=$(get_md5sum_command)
     realpath=$(get_realpath_command)
     sed=$(get_sed_command)
-    which=$(get_which)
+    which=$(get_which_command)
 
     if ! /usr/bin/which $sed >/dev/null 2>&1; then
 	abort '%s: %s: Command not found\n' \
@@ -43,6 +45,14 @@ configure_platform() {
 
 get_command_rootname() {
     basename -- "$1" .exe | $sed 's/-[0-9][0-9]*$//'
+}
+
+get_command_version() {
+    assert [ $# -eq 3 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    assert [ -n "$3" ]
+    "$1" "$2" 2>&1 | $sed -n "$3"
 }
 
 get_filenames() {
@@ -85,14 +95,6 @@ get_sed_command() {
     esac
 }
 
-get_version() {
-    assert [ $# -eq 3 ]
-    assert [ -n "$1" ]
-    assert [ -n "$2" ]
-    assert [ -n "$3" ]
-    "$1" "$2" 2>&1 | $sed -n "$3"
-}
-
 get_version_options() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
@@ -111,7 +113,7 @@ get_version_regex() {
 	"$script_prefix$script.txt"
 }
 
-get_which() {
+get_which_command() {
     printf '%s\n' /usr/bin/which
 
     if [ "$all" = true ]; then
@@ -165,11 +167,11 @@ usage_error() {
 
 which_version() {
     all=$ALL
-    checksum=false
+    checksum=$CHECKSUM
+    delimiter=$DELIMITER
     resolve=$RESOLVE
-    delimiter=$(printf '\t\n')
 
-    while getopts 1acnrt:h opt; do
+    while getopts 1acd:nrh opt; do
 	case $opt in
 	    (1)
 		all=false
@@ -180,14 +182,14 @@ which_version() {
 	    (c)
 		checksum=true
 		;;
+	    (d)
+		delimiter="$OPTARG"
+		;;
 	    (n)
 		resolve=false
 		;;
 	    (r)
 		resolve=true
-		;;
-	    (t)
-		delimiter="$OPTARG"
 		;;
 	    (h)
 		usage
@@ -220,16 +222,16 @@ which_version() {
 
 	get_filenames $command | while read filename; do
 	    for option in $(printf '%s\n' "$options" | tr ',' ' '); do
-		if version=$(get_version "$filename" "$option" "$regex"); then
-		    if [ -n "$version" ]; then
-			if [ "$checksum" = true ]; then
-			    md5sum=$(get_md5sum "$filename")
-			    printf '%s%s' "$md5sum" "$delimiter"
-			fi
+		version=$(get_command_version "$filename" "$option" "$regex")
 
-			printf '%s%s%s\n' "$version" "$delimiter" "$filename"
-			break
+		if [ -n "$version" ]; then
+		    if [ "$checksum" = true ]; then
+			md5sum=$(get_md5sum "$filename")
+			printf '%s%s' "$md5sum" "$delimiter"
 		    fi
+
+		    printf '%s%s%s\n' "$version" "$delimiter" "$filename"
+		    break
 		fi
 	    done
 	done
