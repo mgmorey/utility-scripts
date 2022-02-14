@@ -184,8 +184,8 @@ which_command_version() (
 
 	    if [ -n "$version" ]; then
 		if [ "$checksum" = true ]; then
-		    md5sum=$(get_md5sum "$filename")
-		    printf '%s%s' "$md5sum" "$delimiter"
+		    sum=$(get_md5sum "$filename")
+		    printf '%s%s' "$sum" "$delimiter"
 		fi
 
 		printf '%s%s%s\n' "$version" "$delimiter" "$filename"
