@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 BASE_URL=https://projects.unbit.it/downloads
-UWSGI_VERSION=2.0.17.1
+UWSGI_VERSION=2.0.20
 
 abort() {
     printf "$@" >&2
