@@ -13,6 +13,7 @@ curl-config	--version	s/libcurl \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 dmalloc	--version	1s/Dmalloc utility version string is: \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 docker	--version	s/Docker version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 docker-compose	--version	s/docker-compose version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\), .*/\1/p
+dos2unix	--version	1s/dos2unix \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 emacs	--version	1s/GNU Emacs \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 expr	--version	s/expr .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 g++	-dumpfullversion,-dumpversion	s/\([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
