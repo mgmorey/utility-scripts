@@ -33,39 +33,15 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
-configure_platform() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (macos)
-		break
-		;;
-	esac
-    done
-}
-
 get_packages() {
     get-packages bootstrap
     get-packages -s dependencies homebrew
 }
 
 install_homebrew() {
-    validate_platform
-    configure_platform
-    brew=$(which brew 2>/dev/null || true)
-
-    if [ -n "$brew" ]; then
-	if [ "$kernel_name" = Linux -a "$brew" = /usr/bin/brew ]; then
-	    if [ -x $HOME/.linuxbrew ]; then
-		return 0
-	    elif [ -x /home/linuxbrew ]; then
-		return 0
-	    fi
-	else
-	    return 0
-	fi
+    if is_homebrew_installed; then
+	return 0
     fi
-
-    preinstall_homebrew
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -87,6 +63,10 @@ install_homebrew() {
 	    (debian)
 		case "$VERSION_ID" in
 		    (10)
+			install_linuxbrew
+			break
+			;;
+		    (11)
 			install_linuxbrew
 			break
 			;;
@@ -121,15 +101,15 @@ install_homebrew() {
 	    (ubuntu)
 		case "$VERSION_ID" in
 		    (18.04)
-			run_unpriv brew
+			brew
 			break
 			;;
 		    (20.04)
-			run_unpriv brew
+			brew
 			break
 			;;
 		    (20.10)
-			run_unpriv brew
+			brew
 			break
 			;;
 		    (*)
@@ -146,13 +126,37 @@ install_homebrew() {
 }
 
 install_linuxbrew() {
+    umask 0022
+    install_script="${TMPDIR-/tmp}/install-homebrew.sh"
+    curl -fsSL $LINUXBREW_URL >"$install_script"
+    chmod a+x "$install_script"
     cat <<EOF
 Please copy and paste the following command into a shell to install Homebrew:
-/bin/bash -c "$(curl -fsSL $LINUXBREW_URL)"
+/bin/bash -c "$install_script"
 EOF
 }
 
+is_homebrew_installed() {
+    brew=$(which brew 2>/dev/null || true)
+
+    if [ -n "$brew" ]; then
+	if [ "$kernel_name" = Linux -a "$brew" = /usr/bin/brew ]; then
+	    if [ -x $HOME/.linuxbrew ]; then
+		return 0
+	    elif [ -x /home/linuxbrew ]; then
+		return 0
+	    fi
+	else
+	    return 0
+	fi
+    fi
+
+    return 1
+}
+
 preinstall_homebrew() {
+    validate_platform
+
     case "$kernel_name" in
 	(Linux)
 	    packages=$(get_packages | sort -u)
@@ -187,6 +191,9 @@ validate_platform() {
 	    (debian)
 		case "$VERSION_ID" in
 		    (10)
+			return
+			;;
+		    (11)
 			return
 			;;
 		    (*)
@@ -256,4 +263,10 @@ script_prefix=${script_dir:+$script_dir/}
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
-install_homebrew
+preinstall_homebrew
+
+if [ "$(id -u)" -eq 0 ]; then
+    run_unpriv /bin/sh -c "$0 $*"
+else
+    install_homebrew
+fi
