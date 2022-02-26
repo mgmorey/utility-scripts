@@ -53,6 +53,15 @@ install_quicklisp() (
 
 install_sbcl() {
     validate_platform
+
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (windows)
+		return
+ 		;;
+	esac
+    done
+
     install-packages $(get_packages)
 }
 
@@ -137,6 +146,9 @@ validate_platform() {
 		;;
 	    (windows)
 		case "$kernel_name" in
+		    (CYGWIN_NT)
+			return
+			;;
 		    (MINGW64_NT)
 			return
 			;;
