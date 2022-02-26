@@ -117,7 +117,7 @@ uninstall_packages_using() (
 
     case "$manager" in
 	(brew|*/brew)
-	    run_unpriv /bin/sh -c "$manager $uninstall $options $*"
+	    run_unpriv /bin/sh -c "$manager $uninstall $*"
 	    ;;
 	(*)
 	    $manager $uninstall $options $*
