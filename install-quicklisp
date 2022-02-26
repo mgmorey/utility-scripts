@@ -1,6 +1,175 @@
-#!/bin/sh -eux
+#!/bin/sh -eu
 
-cd
-curl -O https://beta.quicklisp.org/quicklisp.lisp
-sbcl --load quicklisp.lisp --eval "(quicklisp-quickstart:install)" --quit
-sbcl --load ~/quicklisp/setup.lisp --eval "(ql:add-to-init-file)" --quit
+# install-sbcl: install SBCL
+# Copyright (C) 2022  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+CATEGORIES="sbcl"
+
+QL_BASE_URL=https://beta.quicklisp.org
+QL_PREFIX="$HOME/quicklisp"
+QL_SCRIPT="quicklisp.lisp"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_not_supported() {
+    abort '%s: %s: %s not supported\n' "$0" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+}
+
+get_packages() {
+    "${script_prefix}get-packages" $CATEGORIES
+}
+
+install_quicklisp() (
+    cd
+
+    if [ -d quicklisp ]; then
+	return 0
+    fi
+
+    curl -O $QL_BASE_URL/$QL_SCRIPT
+    sbcl --load "$QL_SCRIPT" --eval "(quicklisp-quickstart:install)" --quit
+    sbcl --load "$QL_PREFIX/setup.lisp" --eval "(ql:add-to-init-file)" --quit
+)
+
+install_sbcl() {
+    validate_platform
+    install-packages $(get_packages)
+}
+
+validate_platform() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (centos)
+		case "$VERSION_ID" in
+		    (7)
+			return
+			;;
+		    (8)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (debian)
+		case "$VERSION_ID" in
+		    (10)
+			return
+			;;
+		    (11)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (fedora)
+		return
+		;;
+	    (opensuse)
+		return
+		;;
+	    (rhel|ol)
+		case "$VERSION_ID" in
+		    (7|7.*)
+			return
+			;;
+		    (8|8.*)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (ubuntu)
+		case "$VERSION_ID" in
+		    (18.*)
+			return
+			;;
+		    (19.*)
+			return
+			;;
+		    (20.*)
+			return
+			;;
+		    (21.*)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	    (freebsd)
+		return
+		;;
+	    (macos)
+		return
+		;;
+	    (netbsd)
+		return
+		;;
+	    (solaris)
+		return
+		;;
+	    (windows)
+		case "$kernel_name" in
+		    (MINGW64_NT)
+			return
+			;;
+		    (*)
+			break
+			;;
+		esac
+		;;
+	esac
+    done
+
+    abort_not_supported "Operating system"
+}
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+install_sbcl
+
+if [ "$(id -u)" -eq 0 ]; then
+    run_unpriv /bin/sh -c "$0 $*"
+else
+    install_quicklisp
+fi
