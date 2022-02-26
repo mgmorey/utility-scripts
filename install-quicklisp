@@ -1,0 +1,6 @@
+#!/bin/sh -eux
+
+cd
+curl -O https://beta.quicklisp.org/quicklisp.lisp
+sbcl --load quicklisp.lisp --eval "(quicklisp-quickstart:install)" --quit
+sbcl --load ~/quicklisp/setup.lisp --eval "(ql:add-to-init-file)" --quit
