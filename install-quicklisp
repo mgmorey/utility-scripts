@@ -46,9 +46,14 @@ install_quicklisp() (
 	return 0
     fi
 
+    ql_install="install${http_proxy+ :proxy \"$http_proxy\"}"
     curl -O $QL_BASE_URL/$QL_SCRIPT
-    sbcl --load "$QL_SCRIPT" --eval "(quicklisp-quickstart:install)" --quit
-    sbcl --load "$QL_PREFIX/setup.lisp" --eval "(ql:add-to-init-file)" --quit
+    sbcl --load "$QL_SCRIPT" \
+	 --eval "(quicklisp-quickstart:$ql_install)" \
+	 --quit
+    sbcl --load "$QL_PREFIX/setup.lisp" \
+	 --eval "(ql:add-to-init-file)" \
+	 --quit
 )
 
 install_sbcl() {
