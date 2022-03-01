@@ -18,10 +18,10 @@
 
 ALL_PARAMETERS="CPPFLAGS INFOPATH LDLIBS MANPATH PATH PKG_CONFIG_PATH"
 
-COMMON_BINDIRS="/usr/lib/cups/bin"
-PROFILE_BINDIRS="bin .cargo/bin .linuxbrew/bin .local/bin .pyenv/bin"
+COMMON_BINS="/usr/lib/cups/bin"
+PROFILE_BINS="bin .cargo/bin .linuxbrew/bin .local/bin .pyenv/bin"
 
-HOMEBREW_DIRS="/opt/homebrew /home/linuxbrew/.linuxbrew $HOME/.linuxbrew"
+HOMEBREW_DIRS="/opt/homebrew /home/linuxbrew/.linuxbrew"
 SYSTEM_DIRS="/usr /usr/gnu"
 
 PKGSRC_DIRS="/usr/pkg /opt/pkg /opt/local"
@@ -37,28 +37,25 @@ assert() {
 }
 
 configure_platform() {
-    bindirs=
-    brew=$(get_homebrew_binary)
+    realpath=$(get_realpath_command)
+    brew=$(get_brew_command)
+    bins=
 
     for id in $ID $ID_LIKE; do
 	case $id in
 	    (debian|opensuse|freebsd|windows)
-		bindirs="bin sbin"
+		bins="bin sbin"
 		break
 		;;
 	esac
     done
 
-    if [ -z "${bindirs-}" ]; then
-	bindirs="sbin bin"
+    if [ -z "${bins-}" ]; then
+	bins="sbin bin"
     fi
 }
 
-get_directory() {
-    printf '%s\n' "$1" | sed 's/^-[IL]//'
-}
-
-get_homebrew_binary() (
+get_brew_command() (
     for dir in $(get_homebrew_dirs); do
 	if [ -x $dir/bin/brew ]; then
 	    printf '%s\n' "$dir/bin/brew"
@@ -66,8 +63,12 @@ get_homebrew_binary() (
     done
 )
 
+get_directory() {
+    printf '%s\n' "$1" | sed 's/^-[IL]//'
+}
+
 get_homebrew_dirs() {
-    (ls -d $HOMEBREW_DIRS 2>/dev/null | xargs -r realpath) || true
+    (ls -d $HOMEBREW_DIRS $HOME/.linuxbrew 2>/dev/null || true) | xargs $realpath
 }
 
 get_homebrew_keg_only() (
@@ -98,15 +99,23 @@ get_prefix_dirs() {
 	   $(get_homebrew_dirs)
 }
 
-get_profile_bindirs() (
+get_profile_bins() (
     macos_python_bindir="$(get_macos_python_bindir)"
 
     if [ -n "$macos_python_bindir" ]; then
 	printf '%s\n' "$macos_python_bindir"
     fi
 
-    printf '%s\n' $PROFILE_BINDIRS
+    printf '%s\n' $PROFILE_BINS
 )
+
+get_realpath_command() {
+    if [ -x "${script_prefix}get-realpath" ]; then
+	printf '%s\n' "${script_prefix}get-realpath"
+    elif [ -x /bin/realpath ]; then
+	printf '%s\n' /bin/realpath
+    fi
+}
 
 get_solaris_dirs() {
     ls -d $SOLARIS_DIRS 2>/dev/null || true
@@ -129,7 +138,7 @@ include_binary_directories() {
 
 include_common_directories() {
     # add common binary directories to PATH (if they exist)
-    for dir in $COMMON_BINDIRS; do
+    for dir in $COMMON_BINS; do
 	if is_to_be_included "$dir" "$PATH"; then
 	    PATH="$dir${PATH:+:$PATH}"
 	fi
@@ -165,7 +174,7 @@ include_common_directories() {
 	    MANPATH="$dir/share/man${MANPATH:+:$MANPATH}"
 	fi
 
-	include_binary_directories $bindirs
+	include_binary_directories $bins
 	include_pkgconf_directories $dir
     done
 }
@@ -232,9 +241,9 @@ include_profile_directories() {
     INFOPATH="$(remove_directory "$HOME/info" "${INFOPATH-}")"
     MANPATH="$(remove_directory "$HOME/man" "${MANPATH-}")"
     PATH="$(remove_directory "$HOME/bin" "${PATH-}")"
-    profile_bindirs="$(get_profile_bindirs)"
+    profile_bins="$(get_profile_bins)"
 
-    for dir in $profile_bindirs; do
+    for dir in $profile_bins; do
 	PATH="$(remove_directory "$HOME/$dir" "${PATH-}")"
     done
 
@@ -249,7 +258,7 @@ include_profile_directories() {
     fi
 
     # add user binary directories to PATH (if they exist)
-    for dir in $profile_bindirs; do
+    for dir in $profile_bins; do
 	if ! is_included "$HOME/$dir" "${PATH-}"; then
 	    PATH="$HOME/$dir${PATH:+:$PATH}"
 	fi
