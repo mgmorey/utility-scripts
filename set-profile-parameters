@@ -21,7 +21,7 @@ ALL_PARAMETERS="CPPFLAGS INFOPATH LDLIBS MANPATH PATH PKG_CONFIG_PATH"
 COMMON_BINDIRS="/usr/lib/cups/bin"
 PROFILE_BINDIRS="bin .cargo/bin .linuxbrew/bin .local/bin .pyenv/bin"
 
-HOMEBREW_DIRS="/home/linuxbrew/.linuxbrew /opt/homebrew /usr/local"
+HOMEBREW_DIRS="/opt/homebrew /home/linuxbrew/.linuxbrew"
 SYSTEM_DIRS="/usr /usr/gnu"
 
 PKGSRC_DIRS="/usr/pkg /opt/pkg /opt/local"
@@ -59,7 +59,7 @@ get_directory() {
 }
 
 get_homebrew_binary() (
-    for dir in $HOME/.linuxbrew $(get_homebrew_dirs); do
+    for dir in $(get_homebrew_dirs); do
 	if [ -x $dir/bin/brew ]; then
 	    printf '%s\n' "$dir/bin/brew"
 	fi
@@ -67,25 +67,12 @@ get_homebrew_binary() (
 )
 
 get_homebrew_dirs() {
-    ls -d $HOMEBREW_DIRS 2>/dev/null || true
+    ls -d $HOMEBREW_DIRS $HOME/.linuxbrew 2>/dev/null || true
 }
 
 get_homebrew_keg_only() (
-    export PATH="$PATH:$(dirname $brew)"
+    export PATH="$PATH:$(dirname "$brew")"
     "${script_prefix}brew-list-keg-only"
-)
-
-get_homebrew_prefix() (
-    if [ -z "$brew" ]; then
-	return
-    fi
-
-    dir="$(cd "$(dirname "$brew")/../opt" && pwd)"
-
-    if [ -d "$dir" ]; then
-	printf '%s\n' "$dir"
-	break
-    fi
 )
 
 get_macos_python_bindir() (
@@ -102,6 +89,13 @@ get_macos_python_bindir() (
 
 get_pkgsrc_dirs() {
     ls -d $PKGSRC_DIRS 2>/dev/null || true
+}
+
+get_prefix_dirs() {
+    printf '%s\n' $SYSTEM_DIRS \
+	   $(get_solaris_dirs) \
+	   $(get_pkgsrc_dirs) \
+	   $(get_homebrew_dirs)
 }
 
 get_profile_bindirs() (
@@ -133,10 +127,6 @@ include_binary_directories() {
     done
 }
 
-include_base_directories() {
-    include_homebrew_keg_directories
-}
-
 include_common_directories() {
     # add common binary directories to PATH (if they exist)
     for dir in $COMMON_BINDIRS; do
@@ -147,10 +137,7 @@ include_common_directories() {
 
     # add common prefix directories to paths (if they exist)
 
-    dirs="$SYSTEM_DIRS $(get_solaris_dirs)"
-    dirs="$dirs $(get_pkgsrc_dirs) $(get_homebrew_dirs)"
-
-    for dir in $dirs; do
+    for dir in $(get_prefix_dirs); do
 	case "$dir" in
 	    (/opt/local|/opt/pkg|/usr/gnu|/usr/local|/usr/pkg)
 		INFOPATH="$(remove_directory "$dir/share/info" "${INFOPATH-}")"
@@ -183,39 +170,39 @@ include_common_directories() {
     done
 }
 
-include_homebrew_keg_directories() {
+include_brew_directories() {
     if [ -z "${brew-}" ]; then
 	return
     fi
 
-    prefix=$(get_homebrew_prefix)
+    prefix=$("$brew" --prefix)
 
     if [ -z "${prefix-}" ]; then
 	return
     fi
 
     for pkg in $(get_homebrew_keg_only 2>/dev/null | sort -r || true); do
-	if is_to_be_included -I$prefix/$pkg/include "${CPPFLAGS-}"; then
-	    CPPFLAGS="-I$prefix/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
+	if is_to_be_included -I$prefix/opt/$pkg/include "${CPPFLAGS-}"; then
+	    CPPFLAGS="-I$prefix/opt/$pkg/include${CPPFLAGS:+ $CPPFLAGS}"
 	fi
 
-	if is_to_be_included -L$prefix/$pkg/lib "${LDLIBS-}"; then
-	    LDLIBS="-L$prefix/$pkg/lib${LDLIBS:+ $LDLIBS}"
+	if is_to_be_included -L$prefix/opt/$pkg/lib "${LDLIBS-}"; then
+	    LDLIBS="-L$prefix/opt/$pkg/lib${LDLIBS:+ $LDLIBS}"
 	fi
 
-	if is_to_be_included $prefix/$pkg/lib/$pkg/man "${MANPATH-}"; then
-	    MANPATH="$prefix/$pkg/lib/$pkg/man${MANPATH:+:$MANPATH}"
+	if is_to_be_included $prefix/opt/$pkg/lib/$pkg/man "${MANPATH-}"; then
+	    MANPATH="$prefix/opt/$pkg/lib/$pkg/man${MANPATH:+:$MANPATH}"
 	fi
 
-	if is_to_be_included $prefix/$pkg/share/man "${MANPATH-}"; then
-	    MANPATH="$prefix/$pkg/share/man${MANPATH:+:$MANPATH}"
+	if is_to_be_included $prefix/opt/$pkg/share/man "${MANPATH-}"; then
+	    MANPATH="$prefix/opt/$pkg/share/man${MANPATH:+:$MANPATH}"
 	fi
 
-	if is_to_be_included $prefix/$pkg/bin "${PATH-}"; then
-	    PATH="$prefix/$pkg/bin${PATH:+:$PATH}"
+	if is_to_be_included $prefix/opt/$pkg/bin "${PATH-}"; then
+	    PATH="$prefix/opt/$pkg/bin${PATH:+:$PATH}"
 	fi
 
-	for pkgdir in $prefix/$pkg/lib/pkgconfig /usr/share/pkgconfig; do
+	for pkgdir in $prefix/opt/$pkg/lib/pkgconfig /usr/share/pkgconfig; do
 	    if is_to_be_included $pkgdir "${PKG_CONFIG_PATH-}"; then
 		PKG_CONFIG_PATH="$pkgdir${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 	    fi
@@ -378,7 +365,7 @@ s|^'"$1"'$||
 
 set_profile_parameters() {
     configure_platform
-    include_base_directories
+    include_brew_directories
     include_common_directories
     include_profile_directories
     print_parameters $ALL_PARAMETERS
