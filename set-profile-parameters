@@ -67,7 +67,7 @@ get_homebrew_binary() (
 )
 
 get_homebrew_dirs() {
-    ls -d $HOMEBREW_DIRS $HOME/.linuxbrew 2>/dev/null || true
+    (ls -d $HOMEBREW_DIRS $HOME/.linuxbrew 2>/dev/null || true) | xargs realpath
 }
 
 get_homebrew_keg_only() (
