@@ -16,10 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CURL_VERSION=7.81.0
+CURL_ARCHIVE_DIR="$HOME/Downloads/cURL"
+CURL_ARCHIVE_SUFFIX=.tar.gz
 
-ARCHIVE_DIR="$HOME/Downloads/cURL"
-BASE_URL=https://curl.se
+CURL_MIRROR_BASE_URL=https://curl.se
+
+CURL_PROJECT_NAME=curl
+CURL_PROJECT_VERSION=7.81.0
+
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
 
@@ -72,7 +76,7 @@ configure_compiler() {
 }
 
 configure_curl() {
-    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$ARCHIVE_DIR"
+    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$CURL_ARCHIVE_DIR"
     download_archive
     extract_files
     cd "$build_dir"
@@ -92,17 +96,17 @@ configure_curl() {
     if [ "$build" = true ]; then
 	$make${make_options:+ $make_options}
 
-	if [ "$make_test" = true ]; then
-	    $make${make_options:+ $make_options} test
+	if [ "$check" = true ]; then
+	    $make${make_options:+ $make_options} check
 	fi
     fi
 }
 
 configure_paths() {
-    basename=curl-$curl_version
+    basename=$CURL_PROJECT_NAME-$version
     build_dir="$HOME/Documents/build/$basename"
-    filename=$basename.tar.gz
-    pathname="$ARCHIVE_DIR/$filename"
+    filename=$basename$CURL_ARCHIVE_SUFFIX
+    pathname="$CURL_ARCHIVE_DIR/$filename"
     src_dir="$HOME/Documents/src/cURL/$basename"
 }
 
@@ -164,10 +168,10 @@ configure_platform_unix_solaris() {
 }
 
 download_archive() {
-    url=$BASE_URL/download/$filename
+    url=$CURL_MIRROR_BASE_URL/download/$filename
 
     if [ ! -r "$pathname" ]; then
-	cd "$ARCHIVE_DIR"
+	cd "$CURL_ARCHIVE_DIR"
 	wget $url
     fi
 
@@ -212,33 +216,37 @@ get_configure_command() {
     fi
 
     if [ -n "${cc-}" ]; then
-	printf ' CC=\"%s\"' "${cc-}"
+	printf ' CC=\"%s\"' "$cc"
     fi
 
     if [ -n "${cflags-}" ]; then
-	printf ' CFLAGS=\"%s\"' "${cflags-}"
+	printf ' CFLAGS=\"%s\"' "$cflags"
     fi
 
     if [ -n "${cppflags-}" ]; then
-	printf ' CPPFLAGS=\"%s\"' "${cppflags-}"
+	printf ' CPPFLAGS=\"%s\"' "$cppflags"
     fi
 
     if [ -n "${ldflags-}" ]; then
-	printf ' LDFLAGS=\"%s\"' "${ldflags-}"
+	printf ' LDFLAGS=\"%s\"' "$ldflags"
     fi
 
     if [ -n "${pkg_config_path-}" ]; then
-	printf ' PKG_CONFIG_PATH=\"%s\"' "${pkg_config_path-}"
+	printf ' PKG_CONFIG_PATH=\"%s\"' "$pkg_config_path"
     fi
 
     printf '\n'
 }
 
 get_configure_options() {
-    if [ "${enable_debug-}" = true ]; then
+    if [ "${debug-}" = true ]; then
 	options="${options:+$options }--enable-debug"
-    elif [ "${enable_debug-}" = false ]; then
+    elif [ "${debug-}" = false ]; then
 	options="${options:+$options }--disable-debug"
+    fi
+
+    if [ -n "${prefix-}" ]; then
+        options="${options:+$options }--prefix=$prefix"
     fi
 
     if [ "${with_metalink-}" = true ]; then
@@ -316,12 +324,11 @@ include_prefix() {
 }
 
 install_curl() {
-    if [ "$make_install" = true ]; then
+    if [ "$install" = true ]; then
 	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
 	    umask 0022
 	    cd "$build_dir"
-	    install_targets=
-	    $make${make_options:+ $make_options} install $install_targets
+	    $make${make_options:+ $make_options} prefix=$prefix install
 	fi
     fi
 }
@@ -344,28 +351,31 @@ install_dependencies() {
 
 parse_arguments() {
     build=true
-    curl_version=$CURL_VERSION
-    enable_debug=${ENABLE_DEBUG-}
+    check=false
+    debug=false
     force=false
-    make_install=false
-    make_test=false
+    install=false
     prefix=$LOCAL_PREFIX
     tls_backend=openssl
+    version=$CURL_PROJECT_VERSION
     with_metalink=${WITH_METALINK-}
 
-    while getopts bfgimnop:s:tv:h opt; do
+    while getopts bcfgimnop:t:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
+		;;
+	    (c)
+		check=true
 		;;
 	    (f)
 		force=true
 		;;
 	    (g)
-		enable_debug=true
+		debug=true
 		;;
 	    (i)
-		make_install=true
+		install=true
 		;;
 	    (m)
 		with_metalink=true
@@ -374,23 +384,19 @@ parse_arguments() {
 		build=false
 		;;
 	    (o)
-		enable_debug=false
+		debug=false
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/*|/usr|/usr/local)
-			if [ -d $OPTARG ]; then
-			    prefix=$OPTARG
-			else
-			    abort_invalid_prefix $OPTARG
-			fi
+		    ($HOME|/opt/%s|/usr|/usr/local)
+			prefix=$(printf "$OPTARG" "$CURL_PROJECT_NAME-$version")
 			;;
 		    (*)
 			abort_invalid_prefix $OPTARG
 			;;
 		esac
 		;;
-	    (s)
+	    (t)
 		case $OPTARG in
 		    (gnutls|openssl)
 			tls_backend=$OPTARG
@@ -400,11 +406,15 @@ parse_arguments() {
 			;;
 		esac
 		;;
-	    (t)
-		make_test=true
-		;;
 	    (v)
-		curl_version=$OPTARG
+		case $OPTARG in
+		    (7.[1-9][0-9]|7.[1-9][0-9].[1-9])
+			version=$OPTARG
+			;;
+		    (*)
+			abort_invalid_version $OPTARG
+			;;
+		esac
 		;;
 	    (h)
 		usage
@@ -425,8 +435,8 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-f] [-g] [-i] [-m] [-n] [-o] [-p PREFIX] [-s TLS-BACKEND] \
-[-t] [-v VERSION]
+Usage: $script [-b] [-c] [-f] [-g] [-i] [-m] [-n] [-o] [-p PREFIX] [-t TLS-BACKEND] \
+[-v VERSION]
        $script -h
 EOF
 }
