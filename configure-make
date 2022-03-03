@@ -92,14 +92,14 @@ configure_make() {
     if [ "$build" = true ]; then
 	$make${make_options:+ $make_options}
 
-	if [ "$make_test" = true ]; then
-	    $make${make_options:+ $make_options} test
+	if [ "$check" = true ]; then
+	    $make${make_options:+ $make_options} check
 	fi
     fi
 }
 
 configure_paths() {
-    basename=$GNU_PROJECT_NAME-$gnu_project_version
+    basename=$GNU_PROJECT_NAME-$version
     build_dir="$HOME/Documents/build/$basename"
     filename=$basename$GNU_ARCHIVE_SUFFIX
     pathname="$GNU_ARCHIVE_DIR/$filename"
@@ -238,9 +238,13 @@ get_configure_command() {
 }
 
 get_configure_options() {
-    if [ -n "${options:-}" ]; then
-	printf '%s\n' "$options"
+    if [ -n "${prefix-}" ]; then
+        printf '%s\n' --prefix="$prefix"
     fi
+}
+
+get_dependencies() {
+    get-packages bootstrap make-build make-test
 }
 
 get_include_flags() {
@@ -300,8 +304,22 @@ include_prefix() {
     fi
 }
 
+install_dependencies() {
+    for id in $ID $ID_LIKE; do
+	case "$id" in
+	    (windows)
+		return 0
+		;;
+	esac
+    done
+
+    packages="$(get_dependencies | sort -u)"
+    pattern="$(get-packages -s pattern development)"
+    install-packages ${pattern:+-p "$pattern" }$packages
+}
+
 install_make() {
-    if [ "$make_install" = true ]; then
+    if [ "$install" = true ]; then
 	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
 	    umask 0022
 	    cd "$build_dir"
@@ -313,34 +331,33 @@ install_make() {
 
 parse_arguments() {
     build=true
-    gnu_project_version=$GNU_PROJECT_VERSION
+    check=false
     force=false
-    make_install=false
-    make_test=false
+    install=false
     prefix=$LOCAL_PREFIX
+    version=$GNU_PROJECT_VERSION
 
-    while getopts bfinp:v:h opt; do
+    while getopts bcfinp:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
+		;;
+	    (c)
+		check=true
 		;;
 	    (f)
 		force=true
 		;;
 	    (i)
-		make_install=true
+		install=true
 		;;
 	    (n)
 		build=false
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/*|/usr|/usr/local)
-			if [ -d $OPTARG ]; then
-			    prefix=$OPTARG
-			else
-			    abort_invalid_prefix $OPTARG
-			fi
+		    ($HOME|/opt/%s|/opt/gnu/%s|/usr|/usr/local)
+			prefix=$(printf "$OPTARG" "$GNU_PROJECT_NAME-$version")
 			;;
 		    (*)
 			abort_invalid_prefix $OPTARG
@@ -349,8 +366,8 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    (2[6789].[0-9]|2[6789].[1-9][0-9])
-			gnu_project_version=$OPTARG
+		    (4.[1-9]|4.[1-9][0-9])
+			version=$OPTARG
 			;;
 		    (*)
 			abort_invalid_version $OPTARG
@@ -376,7 +393,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-g] [-i] [-n] [-p PREFIX] [-t TOOLKIT] [-v VERSION] [-w]
+Usage: $script [-b] [-c] [-f] [-g] [-i] [-n] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }
@@ -502,6 +519,7 @@ validate_platform
 configure_platform
 parse_arguments "$@"
 configure_paths
+install_dependencies
 
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"
