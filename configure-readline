@@ -323,8 +323,7 @@ install_readline() {
 	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
 	    umask 0022
 	    cd "$build_dir"
-	    install_targets=
-	    $make${make_options:+ $make_options} install $install_targets
+	    $make${make_options:+ $make_options} prefix=$prefix install
 	fi
     fi
 }
