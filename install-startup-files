@@ -101,21 +101,25 @@ install_startup_files() (
 	fi
     done
 
-    if [ ! -d .emacs.d ]; then
-	printf "Creating %s\n" .emacs.d
-	mkdir .emacs.d
+    if [ ! -d .config/emacs ]; then
+	printf "Creating %s\n" .config/emacs
+	mkdir -p .config/emacs
     fi
 
-    if [ -d .emacs.d ]; then
-	cd .emacs.d
+    if [ -d .config/emacs ]; then
+	cd .config/emacs
 
 	if [ ! -e init.el ]; then
-	    printf 'Installing %s\n' .emacs.d/init.el
-	    $gnu_install -bm 644 $git_dir/.emacs.d/init.el init.el
+	    printf 'Installing %s\n' .config/emacs/init.el
+	    $gnu_install -bm 644 $git_dir/.config/emacs/init.el init.el
 	fi
     fi
 
     cd
+
+    if [ ! -e .emacs.d ]; then
+	ln -s .config/emacs .emacs.d
+    fi
 
     for file in $LEGACY_FILES; do
 	if [ -e $file ]; then
