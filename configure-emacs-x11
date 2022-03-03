@@ -234,6 +234,10 @@ get_configure_command() {
 	printf ' PKG_CONFIG_PATH=\"%s\"' "${pkg_config_path-}"
     fi
 
+    if [ -n "${prefix-}" ]; then
+	printf ' PREFIX=\"%s\"' "${prefix-}"
+    fi
+
     printf '\n'
 }
 
