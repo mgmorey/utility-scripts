@@ -235,7 +235,7 @@ get_configure_command() {
     printf '\n'
 }
 
-get_configure_options() {
+get_configure_options() (
     if [ -n "${prefix-}" ]; then
 	options="${options:+$options }--prefix=$prefix"
     fi
@@ -275,7 +275,7 @@ get_configure_options() {
     if [ -n "${options:-}" ]; then
 	printf '%s\n' "$options"
     fi
-}
+)
 
 get_dependencies() {
     get-packages bootstrap emacs-build emacs-x11-build
