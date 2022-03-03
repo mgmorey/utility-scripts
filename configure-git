@@ -213,23 +213,23 @@ get_configure_command() {
     fi
 
     if [ -n "${cc-}" ]; then
-	printf ' CC=\"%s\"' "${cc-}"
+	printf ' CC=\"%s\"' "$cc"
     fi
 
     if [ -n "${cflags-}" ]; then
-	printf ' CFLAGS=\"%s\"' "${cflags-}"
+	printf ' CFLAGS=\"%s\"' "$cflags"
     fi
 
     if [ -n "${cppflags-}" ]; then
-	printf ' CPPFLAGS=\"%s\"' "${cppflags-}"
+	printf ' CPPFLAGS=\"%s\"' "$cppflags"
     fi
 
     if [ -n "${ldflags-}" ]; then
-	printf ' LDFLAGS=\"%s\"' "${ldflags-}"
+	printf ' LDFLAGS=\"%s\"' "$ldflags"
     fi
 
     if [ -n "${pkg_config_path-}" ]; then
-	printf ' PKG_CONFIG_PATH=\"%s\"' "${pkg_config_path-}"
+	printf ' PKG_CONFIG_PATH=\"%s\"' "$pkg_config_path"
     fi
 
     printf '\n'
