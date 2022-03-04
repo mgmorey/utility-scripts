@@ -142,7 +142,6 @@ configure_platform() {
 
 configure_platform_bsd_netbsd() {
     make=gmake
-    with_gnutls=false
     include_prefix /usr/pkg
     configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
     libgif="$libdir/libgif.so"

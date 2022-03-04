@@ -16,13 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
+GNU_ARCHIVE_SUFFIX=.tar.gz
+
 GNU_MIRROR_BASE_URL=http://mirror.team-cymru.com/gnu
 
 GNU_PROJECT_NAME=make
 GNU_PROJECT_VERSION=4.3
-
-GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
-GNU_ARCHIVE_SUFFIX=.tar.gz
 
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
@@ -142,7 +142,6 @@ configure_platform() {
 
 configure_platform_bsd_netbsd() {
     make=gmake
-    with_gnutls=false
     include_prefix /usr/pkg
     configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
     libgif="$libdir/libgif.so"
