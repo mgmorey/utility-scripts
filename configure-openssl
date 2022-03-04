@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# configure-curl: download and configure cURL
+# configure-openssl: download and configure OpenSSL
 # Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,10 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-SSL_VERSION=1.1.1m
+SSL_ARCHIVE_DIR="$HOME/Downloads/OpenSSL"
+SSL_ARCHIVE_SUFFIX=.tar.gz
 
-ARCHIVE_DIR="$HOME/Downloads/OpenSSL"
-BASE_URL=https://www.openssl.org
+SSL_MIRROR_BASE_URL=https://www.openssl.org
+
+SSL_PROJECT_NAME=openssl
+SSL_PROJECT_VERSION=1.1.1m
+
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
 
@@ -67,8 +71,8 @@ configure_compiler() {
     pkg_config_path="$(get_pkg_config_path)"
 }
 
-configure_curl() {
-    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$ARCHIVE_DIR"
+configure_openssl() {
+    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$SSL_ARCHIVE_DIR"
     download_archive
     extract_files
     cd "$build_dir"
@@ -88,17 +92,17 @@ configure_curl() {
     if [ "$build" = true ]; then
 	$make${make_options:+ $make_options}
 
-	if [ "$make_test" = true ]; then
-	    $make${make_options:+ $make_options} test
+	if [ "$check" = true ]; then
+	    $make${make_options:+ $make_options} "test"
 	fi
     fi
 }
 
 configure_paths() {
-    basename=openssl-$ssl_version
+    basename=$SSL_PROJECT_NAME-$version
     build_dir="$HOME/Documents/build/$basename"
-    filename=$basename.tar.gz
-    pathname="$ARCHIVE_DIR/$filename"
+    filename=$basename$SSL_ARCHIVE_SUFFIX
+    pathname="$SSL_ARCHIVE_DIR/$filename"
     src_dir="$HOME/Documents/src/OpenSSL/$basename"
 }
 
@@ -160,10 +164,10 @@ configure_platform_unix_solaris() {
 }
 
 download_archive() {
-    url=$BASE_URL/source/$filename
+    url=$SSL_MIRROR_BASE_URL/source/$filename
 
     if [ ! -r "$pathname" ]; then
-	cd "$ARCHIVE_DIR"
+	cd "$SSL_ARCHIVE_DIR"
 	wget $url
     fi
 
@@ -230,13 +234,15 @@ get_configure_command() {
     printf '\n'
 }
 
-get_configure_options() {
-    options=
+get_configure_options() (
+    if [ -n "${prefix-}" ]; then
+	options="${options:+$options }--prefix=$prefix"
+    fi
 
     if [ -n "${options:-}" ]; then
 	printf '%s\n' "$options"
     fi
-}
+)
 
 get_dependencies() {
     get-packages openssl-test
@@ -299,17 +305,6 @@ include_prefix() {
     fi
 }
 
-install_curl() {
-    if [ "$make_install" = true ]; then
-	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
-	    umask 0022
-	    cd "$build_dir"
-	    install_targets=
-	    $make${make_options:+ $make_options} install $install_targets
-	fi
-    fi
-}
-
 install_dependencies() {
     case "$ID" in
 	(windows)
@@ -326,54 +321,67 @@ install_dependencies() {
     install-packages ${pattern:+-p "$pattern" }$packages
 }
 
+install_openssl() {
+    if [ "$install" = true ]; then
+	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
+	    umask 0022
+	    cd "$build_dir"
+	    $make${make_options:+ $make_options} prefix=$prefix install
+	fi
+    fi
+}
+
 parse_arguments() {
     build=true
-    ssl_version=$SSL_VERSION
-    enable_debug=${ENABLE_DEBUG-}
+    check=false
+    debug=false
     force=false
-    make_install=false
-    make_test=false
+    install=false
     prefix=$LOCAL_PREFIX
+    version=$SSL_PROJECT_VERSION
 
-    while getopts bfginop:tv:h opt; do
+    while getopts bcfginop:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
+		;;
+	    (c)
+		check=true
 		;;
 	    (f)
 		force=true
 		;;
 	    (g)
-		enable_debug=true
+		debug=true
 		;;
 	    (i)
-		make_install=true
+		install=true
 		;;
 	    (n)
 		build=false
 		;;
 	    (o)
-		enable_debug=false
+		debug=false
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/*|/usr|/usr/local)
-			if [ -d $OPTARG ]; then
-			    prefix=$OPTARG
-			else
-			    abort_invalid_prefix $OPTARG
-			fi
+		    ($HOME|/opt/%s|/usr|/usr/local)
+			prefix=$(printf "$OPTARG" "$SSL_PROJECT_NAME-$version")
 			;;
 		    (*)
 			abort_invalid_prefix $OPTARG
 			;;
 		esac
 		;;
-	    (t)
-		make_test=true
-		;;
 	    (v)
-		ssl_version=$OPTARG
+		case $OPTARG in
+		    ([13].[0-9][0-9].[0-9]|[13].[1-9][0-9].[0-9][a-z])
+			version=$OPTARG
+			;;
+		    (*)
+			abort_invalid_version $OPTARG
+			;;
+		esac
 		;;
 	    (h)
 		usage
@@ -394,8 +402,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-f] [-g] [-i] [-m] [-n] [-o] [-p PREFIX] [-s TLS-BACKEND] \
-[-t] [-v VERSION]
+Usage: $script [-b] [-c] [-f] [-g] [-i] [-n] [-o] [-p PREFIX] [-t] [-v VERSION]
        $script -h
 EOF
 }
@@ -500,7 +507,7 @@ install_dependencies
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"
 else
-    configure_curl
+    configure_openssl
 fi
 
-install_curl
+install_openssl
