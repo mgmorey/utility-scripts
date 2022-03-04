@@ -90,11 +90,7 @@ configure_nasm() {
     eval $command
 
     if [ "$build" = true ]; then
-	$make${make_options:+ $make_options} everything
-
-	if [ "$check" = true ]; then
-	    $make${make_options:+ $make_options} "test"
-	fi
+	$make${make_options:+ $make_options} all rdf
     fi
 }
 
@@ -322,7 +318,7 @@ install_nasm() {
 	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
 	    umask 0022
 	    cd "$build_dir"
-	    $make${make_options:+ $make_options} prefix=$prefix install_everything
+	    $make${make_options:+ $make_options} prefix=$prefix install install_rdf
 	fi
     fi
 }
