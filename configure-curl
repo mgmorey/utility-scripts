@@ -238,7 +238,7 @@ get_configure_command() {
     printf '\n'
 }
 
-get_configure_options() {
+get_configure_options() (
     if [ "${debug-}" = true ]; then
 	options="${options:+$options }--enable-debug"
     elif [ "${debug-}" = false ]; then
@@ -260,7 +260,7 @@ get_configure_options() {
     if [ -n "${options:-}" ]; then
 	printf '%s\n' "$options"
     fi
-}
+)
 
 get_dependencies() {
     get-packages bootstrap curl-build curl-test
