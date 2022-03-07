@@ -56,9 +56,10 @@ configure_paths() {
 configure_sbcl() {
     mkdir -p "$(dirname "$src_dir")" "$SBCL_ARCHIVE_DIR"
     extract_files
-    cd "$src_dir"
 
     if [ "$build" = true ]; then
+	umask 0022
+	cd "$src_dir"
 	sh make.sh --prefix=$prefix
     fi
 }
