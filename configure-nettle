@@ -223,12 +223,12 @@ get_configure_command() {
 	printf ' CFLAGS=\"%s\"' "$cflags"
     fi
 
-    if [ -n "${cppflags-}" ]; then
-	printf ' CPPFLAGS=\"%s\"' "$cppflags"
+    if [ -n "${cppflags-$CPPFLAGS}" ]; then
+	printf ' CPPFLAGS=\"%s\"' "${cppflags-$CPPFLAGS}"
     fi
 
-    if [ -n "${ldflags-}" ]; then
-	printf ' LDFLAGS=\"%s\"' "$ldflags"
+    if [ -n "${ldflags-$LDFLAGS}" ]; then
+	printf ' LDFLAGS=\"%s\"' "${ldflags-$LDFLAGS}"
     fi
 
     if [ -n "${pkg_config_path-}" ]; then
@@ -378,7 +378,7 @@ parse_arguments() {
 	    (p)
 		case $OPTARG in
 		    ($HOME|/opt/%s|/opt/gnu/%s|/usr|/usr/local)
-			prefix=$(printf "$OPTARG" "$GNU_PROJECT_NAME-$version")
+			prefix=$OPTARG
 			;;
 		    (*)
 			abort_invalid_prefix $OPTARG

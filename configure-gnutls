@@ -384,7 +384,7 @@ parse_arguments() {
 	    (p)
 		case $OPTARG in
 		    ($HOME|/opt/%s|/opt/gnu/%s|/usr|/usr/local)
-			prefix=$(printf "$OPTARG" "$GNU_PROJECT_NAME-$version")
+			prefix=$OPTARG
 			;;
 		    (*)
 			abort_invalid_prefix $OPTARG
