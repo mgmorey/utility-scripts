@@ -240,7 +240,7 @@ get_configure_command() {
 
 get_configure_options() (
     if [ -n "${prefix-}" ]; then
-        options="${options:+$options }--prefix=$prefix"
+        options="${options:+$options }--prefix=$(get_prefix)"
     fi
 
     if [ -n "${options:-}" ]; then
@@ -296,6 +296,10 @@ get_pkg_config_path() {
     fi
 }
 
+get_prefix() {
+    printf "$prefix" "$GNU_PROJECT_NAME-$version"
+}
+
 include_prefix() {
     assert [ $# -ge 1 -a $# -le 2 ]
     assert [ -n "$1" ]
@@ -326,13 +330,15 @@ install_dependencies() {
 }
 
 install_nettle() {
-    if [ "$install" = true ]; then
-	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
-	    umask 0022
-	    cd "$build_dir"
-	    $make${make_options:+ $make_options} prefix=$prefix install
-	fi
+    if [ "$install" != true ]; then
+	return 0
+    elif [ "$ID" != macos -a "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+	return 0
     fi
+
+    umask 0022
+    cd "$build_dir"
+    $make${make_options:+ $make_options} prefix="$(get_prefix)" install
 }
 
 parse_arguments() {
