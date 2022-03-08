@@ -238,7 +238,7 @@ get_configure_command() {
 
 get_configure_options() (
     if [ -n "${prefix-}" ]; then
-        options="${options:+$options }--prefix=$prefix"
+        options="${options:+$options }--prefix=$(get_prefix)"
     fi
 
     options="${options:+$options }--with-included-libtasn1"
@@ -299,7 +299,8 @@ get_pkg_config_path() {
 }
 
 get_url() {
-    printf "%s/%s/%s/%s\n" "$GNU_MIRROR_BASE_URL" \
+    printf "%s/%s/%s/%s\n" \
+	   "$GNU_MIRROR_BASE_URL" \
 	   "$GNU_PROJECT_NAME" \
 	   "v$(printf '%s\n' $version | cut -d. -f1,2)" \
 	   "$filename"
@@ -335,13 +336,15 @@ install_dependencies() {
 }
 
 install_gnutls() {
-    if [ "$install" = true ]; then
-	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
-	    umask 0022
-	    cd "$build_dir"
-	    $make${make_options:+ $make_options} prefix=$prefix install
-	fi
+    if [ "$install" != true ]; then
+	return 0
+    elif [ "$ID" != macos -a "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+	return 0
     fi
+
+    umask 0022
+    cd "$build_dir"
+    $make${make_options:+ $make_options} prefix="$(get_prefix)" install
 }
 
 parse_arguments() {
