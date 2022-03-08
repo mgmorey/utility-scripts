@@ -19,7 +19,7 @@
 GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 GNU_ARCHIVE_SUFFIX=.tar.xz
 
-GNU_MIRROR_BASE_URL=http://mirror.team-cymru.com/gnu
+GNU_MIRROR_BASE_URL=https://ftp.gnu.org/gnu
 
 GNU_PROJECT_NAME=gmp
 GNU_PROJECT_VERSION=6.2.1

@@ -19,7 +19,7 @@
 GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 GNU_ARCHIVE_SUFFIX=.tar.gz
 
-GNU_MIRROR_BASE_URL=https://ftp.gnu.org/gnu/nettle
+GNU_MIRROR_BASE_URL=https://ftp.gnu.org/gnu
 
 GNU_PROJECT_NAME=nettle
 GNU_PROJECT_VERSION=3.7
@@ -168,7 +168,7 @@ configure_platform_unix_solaris() {
 }
 
 download_archive() {
-    url=$GNU_MIRROR_BASE_URL/$filename
+    url=$GNU_MIRROR_BASE_URL/$GNU_PROJECT_NAME/$filename
 
     if [ ! -r "$pathname" ]; then
 	cd "$GNU_ARCHIVE_DIR"
