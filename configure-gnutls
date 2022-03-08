@@ -241,7 +241,9 @@ get_configure_options() (
         options="${options:+$options }--prefix=$prefix"
     fi
 
+    options="${options:+$options }--with-included-libtasn1"
     options="${options:+$options }--with-included-unistring"
+    options="${options:+$options }--without-p11-kit"
 
     if [ -n "${options:-}" ]; then
 	printf '%s\n' "$options"
@@ -299,7 +301,7 @@ get_pkg_config_path() {
 get_url() {
     printf "%s/%s/%s/%s\n" "$GNU_MIRROR_BASE_URL" \
 	   "$GNU_PROJECT_NAME" \
-	   "v${GNU_PROJECT_VERSION%.0}" \
+	   "v$(printf '%s\n' $version | cut -d. -f1,2)" \
 	   "$filename"
 }
 
@@ -388,7 +390,7 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    (7.[1-9][0-9]|7.[1-9][0-9].[1-9])
+		    (3.[0-9].[0-9]|3.[1-9][0-9].[0-9])
 			version=$OPTARG
 			;;
 		    (*)
