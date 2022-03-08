@@ -298,6 +298,10 @@ get_pkg_config_path() {
     fi
 }
 
+get_prefix() {
+    printf "$prefix" "$GNU_PROJECT_NAME-$version"
+}
+
 get_url() {
     printf "%s/%s/%s/%s\n" \
 	   "$GNU_MIRROR_BASE_URL" \
@@ -383,7 +387,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/%s|/opt/gnu/%s|/usr|/usr/local)
+		    ($HOME|/opt/%s|/opt/gnu/%s|/usr/local)
 			prefix=$OPTARG
 			;;
 		    (*)
@@ -513,6 +517,7 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
+. "${script_prefix}config-functions.sh"
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)

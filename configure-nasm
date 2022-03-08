@@ -234,7 +234,7 @@ get_configure_command() {
 
 get_configure_options() {
     if [ -n "${prefix-}" ]; then
-        printf '%s\n' --prefix="$prefix"
+        printf '%s\n' --prefix="$(get_prefix)"
     fi
 }
 
@@ -286,6 +286,10 @@ get_pkg_config_path() {
     fi
 }
 
+get_prefix() {
+    printf "$prefix" "$NASM_PROJECT_NAME-$version"
+}
+
 include_prefix() {
     assert [ $# -ge 1 -a $# -le 2 ]
     assert [ -n "$1" ]
@@ -314,13 +318,16 @@ install_dependencies() {
 }
 
 install_nasm() {
-    if [ "$install" = true ]; then
-	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
-	    umask 0022
-	    cd "$build_dir"
-	    $make${make_options:+ $make_options} prefix=$prefix install install_rdf
-	fi
+    if [ "$install" != true ]; then
+	return 0
+    elif [ "$ID" != macos -a "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+	return 0
     fi
+
+    umask 0022
+    cd "$build_dir"
+    targets="install install_rdf"
+    $make${make_options:+ $make_options} prefix=$(get_prefix) $targets
 }
 
 parse_arguments() {
@@ -350,8 +357,8 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/%s|/usr|/usr/local)
-			prefix=$(printf "$OPTARG" "$NASM_PROJECT_NAME-$version")
+		    ($HOME|/opt/%s|/usr/local)
+			prefix=$OPTARG
 			;;
 		    (*)
 			abort_invalid_prefix $OPTARG
@@ -506,6 +513,7 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
+. "${script_prefix}config-functions.sh"
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)

@@ -60,7 +60,7 @@ configure_sbcl() {
     if [ "$build" = true ]; then
 	umask 0022
 	cd "$src_dir"
-	sh make.sh --prefix=$prefix
+	sh make.sh --prefix=$(get_prefix)
     fi
 }
 
@@ -89,6 +89,10 @@ get_dependencies() {
     get-packages bootstrap sbcl-build
 }
 
+get_prefix() {
+    printf "$prefix" "$SBCL_PROJECT_NAME-$version"
+}
+
 install_dependencies() {
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -104,13 +108,15 @@ install_dependencies() {
 }
 
 install_sbcl() {
-    if [ "$install" = true ]; then
-	if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
-	    umask 0022
-	    cd "$src_dir"
-	    sh install.sh
-	fi
+    if [ "$install" != true ]; then
+	return 0
+    elif [ "$ID" != macos -a "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+	return 0
     fi
+
+    umask 0022
+    cd "$src_dir"
+    sh install.sh
 }
 
 parse_arguments() {
@@ -136,8 +142,8 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/%s|/usr|/usr/local)
-			prefix=$(printf "$OPTARG" "$SBCL_PROJECT_NAME-$version")
+		    ($HOME|/opt/%s|/usr/local)
+			prefix=$OPTARG
 			;;
 		    (*)
 			abort_invalid_prefix $OPTARG
@@ -292,6 +298,7 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
+. "${script_prefix}config-functions.sh"
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)

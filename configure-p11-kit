@@ -381,8 +381,8 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/%s|/usr|/usr/local)
-			prefix=$(printf "$OPTARG" "$P11_PROJECT_NAME-$version")
+		    ($HOME|/opt/%s|/usr/local)
+			prefix=$OPTARG
 			;;
 		    (*)
 			abort_invalid_prefix $OPTARG
@@ -511,6 +511,7 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
+. "${script_prefix}config-functions.sh"
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
