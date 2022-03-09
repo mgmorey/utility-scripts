@@ -24,9 +24,6 @@ GNU_MIRROR_BASE_URL=https://ftp.gnu.org/gnu
 GNU_PROJECT_NAME=nettle
 GNU_PROJECT_VERSION=3.7
 
-LOCAL_PREFIX=/usr/local
-OPENCSW_PREFIX=/opt/csw
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -34,10 +31,6 @@ abort() {
 
 abort_invalid_prefix() {
     usage_error '%s: invalid prefix -- %s\n' "$script" "$*"
-}
-
-abort_invalid_tls_backend() {
-    usage_error '%s: invalid TLS backend -- %s\n' "$script" "$*"
 }
 
 abort_invalid_version() {
@@ -137,9 +130,7 @@ parse_arguments() {
     force=false
     install=false
     prefix=$LOCAL_PREFIX
-    tls_backend=openssl
     version=$GNU_PROJECT_VERSION
-    with_metalink=${WITH_METALINK-}
 
     while getopts bcfginop:v:h opt; do
 	case $opt in

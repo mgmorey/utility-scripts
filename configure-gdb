@@ -24,9 +24,6 @@ GNU_MIRROR_BASE_URL=http://mirror.team-cymru.com/gnu
 GNU_PROJECT_NAME=gdb
 GNU_PROJECT_VERSION=11.2
 
-LOCAL_PREFIX=/usr/local
-OPENCSW_PREFIX=/opt/csw
-
 abort() {
     printf "$@" >&2
     exit 1

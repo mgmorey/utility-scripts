@@ -22,9 +22,6 @@ SBCL_ARCHIVE_SUFFIX=.tar.bz2
 SBCL_PROJECT_NAME=sbcl
 SBCL_PROJECT_VERSION=2.2.2
 
-LOCAL_PREFIX=/usr/local
-OPENCSW_PREFIX=/opt/csw
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -91,20 +88,6 @@ get_dependencies() {
 
 get_prefix() {
     printf "$prefix" "$SBCL_PROJECT_NAME-$version"
-}
-
-install_dependencies() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (windows)
-		return 0
-		;;
-	esac
-    done
-
-    packages="$(get_dependencies | sort -u)"
-    pattern="$(get-packages -s pattern development)"
-    install-packages ${pattern:+-p "$pattern" }$packages
 }
 
 install_sbcl() {

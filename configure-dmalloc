@@ -24,12 +24,6 @@ DMALLOC_MIRROR_BASE_URL=https://dmalloc.com
 DMALLOC_PROJECT_NAME=dmalloc
 DMALLOC_PROJECT_VERSION=5.6.5
 
-LOCAL_PREFIX=/usr/local
-OPENCSW_PREFIX=/opt/csw
-
-CFLAGS="${CFLAGS+$CFLAGS }-fPIC"
-CXXFLAGS="${CXXFLAGS+$CXXFLAGS }-fPIC"
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -65,6 +59,8 @@ configure_dmalloc() {
 	return 0
     fi
 
+    export CFLAGS="${CFLAGS+$CFLAGS }-fPIC"
+    export CXXFLAGS="${CXXFLAGS+$CXXFLAGS }-fPIC"
     command=$(get_configure_command $src_dir)
     printf '%s\n' "$command"
     eval $command
