@@ -160,16 +160,6 @@ get_configure_command() {
     printf '\n'
 }
 
-get_configure_options() (
-    if [ -n "${prefix-}" ]; then
-        options="${options:+$options }--prefix=$(get_prefix)"
-    fi
-
-    if [ -n "${options:-}" ]; then
-	printf '%s\n' "$options"
-    fi
-)
-
 get_include_flags() {
     assert [ $# -ge 1 ]
     printf -- "-I%s\n" "$@"

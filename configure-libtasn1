@@ -67,6 +67,16 @@ download_archive() {
 
 }
 
+get_configure_options() (
+    if [ -n "${prefix-}" ]; then
+        options="${options:+$options }--prefix=$(get_prefix)"
+    fi
+
+    if [ -n "${options:-}" ]; then
+	printf '%s\n' "$options"
+    fi
+)
+
 get_dependencies() {
     get-packages bootstrap libtasn1-build libtasn1-test
 }

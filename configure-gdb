@@ -233,11 +233,15 @@ get_configure_command() {
     printf '\n'
 }
 
-get_configure_options() {
+get_configure_options() (
     if [ -n "${prefix-}" ]; then
-        printf '%s\n' --prefix="$(get_prefix)"
+        options="${options:+$options }--prefix=$(get_prefix)"
     fi
-}
+
+    if [ -n "${options:-}" ]; then
+	printf '%s\n' "$options"
+    fi
+)
 
 get_dependencies() {
     get-packages gdb-build gdb-test
