@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# https://www.nlnetlabs.nl/downloads/unbound/unbound-1.15.0.tar.gz
-
 UNBOUND_ARCHIVE_DIR="$HOME/Downloads/Unbound"
 UNBOUND_ARCHIVE_SUFFIX=.tar.gz
 
@@ -66,7 +64,7 @@ configure_unbound() {
     eval $command
 
     if [ "$build" = true ]; then
-	$make${make_options:+ $make_options}
+	$make${make_options:+ $make_options} all doc
     fi
 
     if [ "$check" = true ]; then
@@ -103,7 +101,7 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages unbound-build unbound-test
+    get-packages $UNBOUND_PROJECT_NAME-build $UNBOUND_PROJECT_NAME-test
 }
 
 get_prefix() {
@@ -132,7 +130,7 @@ install_unbound() {
 
     umask 0022
     cd "$build_dir"
-    $make${make_options:+ $make_options} prefix="$(get_prefix)" install
+    $make${make_options:+ $make_options} prefix="$(get_prefix)" install-all
 }
 
 parse_arguments() {
