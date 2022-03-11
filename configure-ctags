@@ -38,7 +38,7 @@ configure_ctags() {
 }
 
 configure_paths() {
-    src_dir="$HOME/Documents/src/ctags"
+    src_dir="$HOME/Documents/src/Ctags"
 }
 
 configure_platform() {
