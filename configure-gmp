@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# configure-gmp: download and configure GMP
+# configure-gmp: download and configure GNU GMP
 # Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -64,11 +64,12 @@ configure_gmp() {
     eval $command
 
     if [ "$build" = true ]; then
-	$make${make_options:+ $make_options}
+	targets="all info"
+	$make${make_options:+ $make_options} $targets
+    fi
 
-	if [ "$check" = true ]; then
-	    $make${make_options:+ $make_options} check
-	fi
+    if [ "$check" = true ]; then
+	$make${make_options:+ $make_options} check
     fi
 }
 
@@ -100,6 +101,10 @@ get_configure_options() (
     fi
 )
 
+get_dependencies() {
+    get-packages $GNU_PROJECT_NAME-build $GNU_PROJECT_NAME-test
+}
+
 get_prefix() {
     printf "$prefix" "$GNU_PROJECT_NAME-$version"
 }
@@ -113,16 +118,17 @@ install_gmp() {
 
     umask 0022
     cd "$build_dir"
-    $make${make_options:+ $make_options} prefix="$(get_prefix)" install
+    targets="install install-info"
+    $make${make_options:+ $make_options} prefix="$(get_prefix)" $targets
 }
 
 parse_arguments() {
     build=true
     check=false
-    version=$GNU_PROJECT_VERSION
     force=false
     install=false
     prefix=$LOCAL_PREFIX
+    version=$GNU_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do
 	case $opt in
@@ -143,7 +149,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/%s|/opt/gnu/%s|/usr/local)
+		    ($HOME/.local|/opt/%s|/opt/gnu/%s|/usr/local)
 			prefix=$OPTARG
 			;;
 		    (*)
@@ -153,7 +159,7 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    (6.[1-9]|6.[1-9][0-9]|6.[1-9][0-9].[1-9])
+		    (6.[1-9][0-9]|6.[1-9][0-9].[1-9])
 			version=$OPTARG
 			;;
 		    (*)
@@ -307,6 +313,7 @@ validate_platform
 configure_platform
 parse_arguments "$@"
 configure_paths
+install_dependencies
 
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"
