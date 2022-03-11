@@ -16,13 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-SSL_ARCHIVE_DIR="$HOME/Downloads/OpenSSL"
-SSL_ARCHIVE_SUFFIX=.tar.gz
+OPENSSL_ARCHIVE_DIR="$HOME/Downloads/OpenSSL"
+OPENSSL_ARCHIVE_SUFFIX=.tar.gz
 
-SSL_MIRROR_BASE_URL=https://www.openssl.org
+OPENSSL_MIRROR_BASE_URL=https://www.openssl.org
 
-SSL_PROJECT_NAME=openssl
-SSL_PROJECT_VERSION=1.1.1m
+OPENSSL_PROJECT_NAME=openssl
+OPENSSL_PROJECT_VERSION=1.1.1m
 
 abort() {
     printf "$@" >&2
@@ -46,7 +46,7 @@ assert() {
 }
 
 configure_openssl() {
-    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$SSL_ARCHIVE_DIR"
+    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$OPENSSL_ARCHIVE_DIR"
     download_archive
     extract_files
     cd "$build_dir"
@@ -59,32 +59,32 @@ configure_openssl() {
 	return 0
     fi
 
-    command=$(get_configure_command $src_dir)
+    command=$(get_configure_command $src_dir config)
     printf '%s\n' "$command"
     eval $command
 
     if [ "$build" = true ]; then
 	$make${make_options:+ $make_options}
+    fi
 
-	if [ "$check" = true ]; then
-	    $make${make_options:+ $make_options} "test"
-	fi
+    if [ "$check" = true ]; then
+	$make${make_options:+ $make_options} "test"
     fi
 }
 
 configure_paths() {
-    basename=$SSL_PROJECT_NAME-$version
+    basename=$OPENSSL_PROJECT_NAME-$version
     build_dir="$HOME/Documents/build/$basename"
-    filename=$basename$SSL_ARCHIVE_SUFFIX
-    pathname="$SSL_ARCHIVE_DIR/$filename"
+    filename=$basename$OPENSSL_ARCHIVE_SUFFIX
+    pathname="$OPENSSL_ARCHIVE_DIR/$filename"
     src_dir="$HOME/Documents/src/OpenSSL/$basename"
 }
 
 download_archive() {
-    url=$SSL_MIRROR_BASE_URL/source/$filename
+    url=$OPENSSL_MIRROR_BASE_URL/source/$filename
 
     if [ ! -r "$pathname" ]; then
-	cd "$SSL_ARCHIVE_DIR"
+	cd "$OPENSSL_ARCHIVE_DIR"
 	wget $url
     fi
 
@@ -101,11 +101,11 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages openssl-test
+    get-packages $OPENSSL_PROJECT_NAME-build $OPENSSL_PROJECT_NAME-test
 }
 
 get_prefix() {
-    printf "$prefix" "$SSL_PROJECT_NAME-$version"
+    printf "$prefix" "$OPENSSL_PROJECT_NAME-$version"
 }
 
 install_openssl() {
@@ -123,13 +123,12 @@ install_openssl() {
 parse_arguments() {
     build=true
     check=false
-    debug=false
     force=false
     install=false
     prefix=$LOCAL_PREFIX
-    version=$SSL_PROJECT_VERSION
+    version=$OPENSSL_PROJECT_VERSION
 
-    while getopts bcfginop:v:h opt; do
+    while getopts bcfinp:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -140,21 +139,15 @@ parse_arguments() {
 	    (f)
 		force=true
 		;;
-	    (g)
-		debug=true
-		;;
 	    (i)
 		install=true
 		;;
 	    (n)
 		build=false
 		;;
-	    (o)
-		debug=false
-		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/%s|/usr/local)
+		    ($HOME/.local|/opt/%s|/usr/local)
 			prefix=$OPTARG
 			;;
 		    (*)
@@ -191,7 +184,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-g] [-i] [-n] [-o] [-p PREFIX] [-t] [-v VERSION]
+Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-t] [-v VERSION]
        $script -h
 EOF
 }

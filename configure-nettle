@@ -65,10 +65,10 @@ configure_nettle() {
 
     if [ "$build" = true ]; then
 	$make${make_options:+ $make_options}
+    fi
 
-	if [ "$check" = true ]; then
-	    $make${make_options:+ $make_options} check
-	fi
+    if [ "$check" = true ]; then
+	$make${make_options:+ $make_options} check
     fi
 }
 
@@ -101,24 +101,11 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages bootstrap nettle-build nettle-test
+    get-packages $GNU_PROJECT_NAME-build $GNU_PROJECT_NAME-test
 }
 
 get_prefix() {
     printf "$prefix" "$GNU_PROJECT_NAME-$version"
-}
-
-include_prefix() {
-    assert [ $# -ge 1 -a $# -le 2 ]
-    assert [ -n "$1" ]
-    incdir="$1/include"
-    libdir="$1/lib${2+/$2}"
-    incdirs="${incdirs+$incdirs }$incdir"
-    libdirs="${libdirs+$libdirs }$libdir"
-
-    if [ -d "$libdir/pkgconfig" ]; then
-	pkgdirs="${pkgdirs+$pkgdirs }$libdir/pkgconfig"
-    fi
 }
 
 install_nettle() {
@@ -136,13 +123,12 @@ install_nettle() {
 parse_arguments() {
     build=true
     check=false
-    debug=false
     force=false
     install=false
     prefix=$LOCAL_PREFIX
     version=$GNU_PROJECT_VERSION
 
-    while getopts bcfginop:v:h opt; do
+    while getopts bcfinp:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -153,21 +139,15 @@ parse_arguments() {
 	    (f)
 		force=true
 		;;
-	    (g)
-		debug=true
-		;;
 	    (i)
 		install=true
 		;;
 	    (n)
 		build=false
 		;;
-	    (o)
-		debug=false
-		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/%s|/opt/gnu/%s|/usr/local)
+		    ($HOME/.local|/opt/%s|/opt/gnu/%s|/usr/local)
 			prefix=$OPTARG
 			;;
 		    (*)
@@ -204,7 +184,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-g] [-i] [-n] [-o] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }

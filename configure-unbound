@@ -108,19 +108,6 @@ get_prefix() {
     printf "$prefix" "$UNBOUND_PROJECT_NAME-$version"
 }
 
-include_prefix() {
-    assert [ $# -ge 1 -a $# -le 2 ]
-    assert [ -n "$1" ]
-    incdir="$1/include"
-    libdir="$1/lib${2+/$2}"
-    incdirs="${incdirs+$incdirs }$incdir"
-    libdirs="${libdirs+$libdirs }$libdir"
-
-    if [ -d "$libdir/pkgconfig" ]; then
-	pkgdirs="${pkgdirs+$pkgdirs }$libdir/pkgconfig"
-    fi
-}
-
 install_unbound() {
     if [ "$install" != true ]; then
 	return 0

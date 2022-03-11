@@ -130,24 +130,12 @@ get_compiler_flags() {
 }
 
 get_configure_command() {
+    cflags="${CFLAGS+$CFLAGS }${cflags-}"
+    cppflags="${CPPFLAGS+$CPPFLAGS }${cppflags-}"
+    cxxflags="${CXXFLAGS+$CXXFLAGS }${cxxflags-}"
+    ldflags="${LDFLAGS+$LDFLAGS }${ldflags-}"
     options=$(get_configure_options)
-    printf '%s' "$1/configure"
-
-    if [ -z "${cflags-}" ]; then
-	cflags="${CFLAGS-}"
-    fi
-
-    if [ -z "${cppflags-}" ]; then
-	cppflags="${CPPFLAGS-}"
-    fi
-
-    if [ -z "${cxxflags-}" ]; then
-	cxxflags="${CXXFLAGS-}"
-    fi
-
-    if [ -z "${ldflags-}" ]; then
-	ldflags="${LDFLAGS-}"
-    fi
+    printf '%s' "$1/${2-configure}"
 
     if [ -n "${options-}" ]; then
 	printf ' %s' "$options"
