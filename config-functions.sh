@@ -97,7 +97,7 @@ configure_platform_unix_solaris() {
 }
 
 extract_files() {
-    if [ ! -r "$src_dir/configure" ]; then
+    if [ ! -d "$src_dir" ]; then
 	cd "$(dirname "$src_dir")"
 
 	case "$pathname" in
@@ -133,6 +133,22 @@ get_configure_command() {
     options=$(get_configure_options)
     printf '%s' "$1/configure"
 
+    if [ -z "${cflags-}" ]; then
+	cflags="${CFLAGS-}"
+    fi
+
+    if [ -z "${cppflags-}" ]; then
+	cppflags="${CPPFLAGS-}"
+    fi
+
+    if [ -z "${cxxflags-}" ]; then
+	cxxflags="${CXXFLAGS-}"
+    fi
+
+    if [ -z "${ldflags-}" ]; then
+	ldflags="${LDFLAGS-}"
+    fi
+
     if [ -n "${options-}" ]; then
 	printf ' %s' "$options"
     fi
@@ -145,12 +161,20 @@ get_configure_command() {
 	printf ' CFLAGS=\"%s\"' "$cflags"
     fi
 
-    if [ -n "${cppflags-$CPPFLAGS}" ]; then
-	printf ' CPPFLAGS=\"%s\"' "${cppflags-$CPPFLAGS}"
+    if [ -n "${cppflags-}" ]; then
+	printf ' CPPFLAGS=\"%s\"' "$cppflags"
     fi
 
-    if [ -n "${ldflags-$LDFLAGS}" ]; then
-	printf ' LDFLAGS=\"%s\"' "${ldflags-$LDFLAGS}"
+    if [ -n "${cxx-}" ]; then
+	printf ' CXX=\"%s\"' "$cxx"
+    fi
+
+    if [ -n "${cxxflags-}" ]; then
+	printf ' CXXFLAGS=\"%s\"' "$cxxflags"
+    fi
+
+    if [ -n "${ldflags-}" ]; then
+	printf ' LDFLAGS=\"%s\"' "$ldflags"
     fi
 
     if [ -n "${pkg_config_path-}" ]; then
