@@ -51,49 +51,28 @@ configure_paths() {
 }
 
 configure_sbcl() {
-    mkdir -p "$(dirname "$src_dir")" "$SBCL_ARCHIVE_DIR"
+    if [ "$force" = true ]; then
+	/bin/rm -rf "$src_dir"
+    fi
+
+    mkdir -p "$(dirname "$src_dir")"
     extract_files
 
     if [ "$build" = true ]; then
 	umask 0022
 	cd "$src_dir"
-	sh make.sh --prefix=$(get_prefix)
+	build_prefix=$(get_prefix)
+	sh make.sh --prefix="$build_prefix"
+	# (cd ./doc/manual && make)
+    fi
+
+    if [ "$check" = true ]; then
+	(cd ./tests && sh run-tests.sh)
     fi
 }
-
-extract_files() {
-    if [ ! -r "$src_dir/make.sh" ]; then
-	cd "$(dirname "$src_dir")"
-
-	case "$pathname" in
-	    (*.tar.bz2)
-		bzip2 -dc "$pathname" | tar -xvf -
-		;;
-	    (*.tar.gz)
-		gzip -dc "$pathname" | tar -xvf -
-		;;
-	    (*.tar.xz)
-		xz -dc "$pathname" | tar -xvf -
-		;;
-	    (*.zip)
-		unzip "$pathname"
-		;;
-	esac
-    fi
-}
-
-get_configure_options() (
-    if [ -n "${prefix-}" ]; then
-        options="${options:+$options }--prefix=$(get_prefix)"
-    fi
-
-    if [ -n "${options:-}" ]; then
-	printf '%s\n' "$options"
-    fi
-)
 
 get_dependencies() {
-    get-packages bootstrap sbcl-build
+    get-packages $SBCL_PROJECT_NAME-build
 }
 
 get_prefix() {
@@ -109,20 +88,26 @@ install_sbcl() {
 
     umask 0022
     cd "$src_dir"
-    sh install.sh
+    install_prefix=$(get_prefix)
+    sh install.sh --prefix="$install_prefix"
+    install_project_link "$install_prefix"
 }
 
 parse_arguments() {
     build=true
+    check=false
     force=false
     install=false
     prefix=$LOCAL_PREFIX
     version=$SBCL_PROJECT_VERSION
 
-    while getopts bfinp:v:h opt; do
+    while getopts bcfinp:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
+		;;
+	    (c)
+		check=true
 		;;
 	    (f)
 		force=true
@@ -135,7 +120,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/%s|/usr/local)
+		    ($HOME/.local|/opt/%s|/usr/local)
 			prefix=$OPTARG
 			;;
 		    (*)
@@ -172,7 +157,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-f] [-i] [-n] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }
