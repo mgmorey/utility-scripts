@@ -16,13 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-P11_ARCHIVE_DIR="$HOME/Downloads/P11"
-P11_ARCHIVE_SUFFIX=.tar.xz
+P11_KIT_ARCHIVE_DIR="$HOME/Downloads/P11"
+P11_KIT_ARCHIVE_SUFFIX=.tar.xz
 
-P11_MIRROR_BASE_URL=https://github.com/p11-glue/p11-kit/releases/download
+P11_KIT_MIRROR_BASE_URL=https://github.com/p11-glue/p11-kit/releases/download
 
-P11_PROJECT_NAME=p11-kit
-P11_PROJECT_VERSION=0.24.1
+P11_KIT_PROJECT_NAME=p11-kit
+P11_KIT_PROJECT_VERSION=0.24.1
 
 abort() {
     printf "$@" >&2
@@ -31,10 +31,6 @@ abort() {
 
 abort_invalid_prefix() {
     usage_error '%s: invalid prefix -- %s\n' "$script" "$*"
-}
-
-abort_invalid_tls_backend() {
-    usage_error '%s: invalid TLS backend -- %s\n' "$script" "$*"
 }
 
 abort_invalid_version() {
@@ -50,7 +46,7 @@ assert() {
 }
 
 configure_p11_kit() {
-    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$P11_ARCHIVE_DIR"
+    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$P11_KIT_ARCHIVE_DIR"
     download_archive
     extract_files
     cd "$build_dir"
@@ -69,27 +65,28 @@ configure_p11_kit() {
 
     if [ "$build" = true ]; then
 	$make${make_options:+ $make_options}
+    fi
 
-	if [ "$check" = true ]; then
-	    $make${make_options:+ $make_options} check
-	fi
+    if [ "$check" = true ]; then
+	$make${make_options:+ $make_options} check
     fi
 }
 
 configure_paths() {
-    basename=$P11_PROJECT_NAME-$version
+    basename=$P11_KIT_PROJECT_NAME-$version
     build_dir="$HOME/Documents/build/$basename"
-    filename=$basename$P11_ARCHIVE_SUFFIX
-    pathname="$P11_ARCHIVE_DIR/$filename"
+    filename=$basename$P11_KIT_ARCHIVE_SUFFIX
+    pathname="$P11_KIT_ARCHIVE_DIR/$filename"
     src_dir="$HOME/Documents/src/P11/$basename"
 }
 
 download_archive() {
-    if [ ! -r "$pathname" ]; then
-	cd "$P11_ARCHIVE_DIR"
-	wget "$(get_url)"
-    fi
+    url="$P11_KIT_MIRROR_BASE_URL/$version/$filename"
 
+    if [ ! -r "$pathname" ]; then
+	cd "$P11_KIT_ARCHIVE_DIR"
+	wget $url
+    fi
 }
 
 get_configure_options() (
@@ -103,17 +100,11 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages bootstrap p11-kit-build p11-kit-test
+    get-packages $P11_KIT_PROJECT_NAME-build $P11_KIT_PROJECT_NAME-test
 }
 
 get_prefix() {
-    printf "$prefix" "$P11_PROJECT_NAME-$version"
-}
-
-get_url() {
-    printf "%s/%s/%s\n" "$P11_MIRROR_BASE_URL" \
-	   "$version" \
-	   "$filename"
+    printf "$prefix" "$P11_KIT_PROJECT_NAME-$version"
 }
 
 install_p11_kit() {
@@ -131,13 +122,10 @@ install_p11_kit() {
 parse_arguments() {
     build=true
     check=false
-    debug=false
     force=false
     install=false
     prefix=$LOCAL_PREFIX
-    tls_backend=openssl
-    version=$P11_PROJECT_VERSION
-    with_metalink=${WITH_METALINK-}
+    version=$P11_KIT_PROJECT_VERSION
 
     while getopts bcfginop:v:h opt; do
 	case $opt in
@@ -150,21 +138,15 @@ parse_arguments() {
 	    (f)
 		force=true
 		;;
-	    (g)
-		debug=true
-		;;
 	    (i)
 		install=true
 		;;
 	    (n)
 		build=false
 		;;
-	    (o)
-		debug=false
-		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/%s|/usr/local)
+		    ($HOME/.local|/opt/%s|/usr/local)
 			prefix=$OPTARG
 			;;
 		    (*)
@@ -201,7 +183,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-g] [-i] [-n] [-o] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }
