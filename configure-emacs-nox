@@ -49,23 +49,6 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
-configure_compiler() {
-    if [ -n "${1-}" ]; then
-	cc="$(get_compiler $1)"
-	cflags="$(get_compiler_flags $1)"
-    fi
-
-    if [ -n "${2-}" ]; then
-	cppflags="$(get_include_flags "$2")"
-    fi
-
-    if [ -n "${3-}" ]; then
-	ldflags="$(get_linker_flags "$3")"
-    fi
-
-    pkg_config_path="$(get_pkg_config_path)"
-}
-
 configure_emacs() {
     mkdir -p "$build_dir" "$(dirname "$src_dir")" "$GNU_ARCHIVE_DIR"
     download_archive
@@ -86,10 +69,10 @@ configure_emacs() {
 
     if [ "$build" = true ]; then
 	$make${make_options:+ $make_options}
+    fi
 
-	if [ "$check" = true ]; then
-	    $make${make_options:+ $make_options} check
-	fi
+    if [ "$check" = true ]; then
+	$make${make_options:+ $make_options} check
     fi
 }
 
@@ -101,62 +84,6 @@ configure_paths() {
     src_dir="$HOME/Documents/src/GNU/$basename"
 }
 
-configure_platform() {
-    make=make
-    make_options=$(get_make_options)
-
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (rhel|ol)
-		case "$VERSION_ID" in
-		   (8.*)
-			configure_platform_linux_redhat_8
-			break
-			;;
-		esac
-		;;
-	    (illumos)
-		configure_platform_unix_illumos
-		break
-		;;
-	    (netbsd)
-		configure_platform_bsd_netbsd
-		break
-		;;
-	    (solaris)
-		configure_platform_unix_solaris
-		break
-		;;
-	esac
-    done
-
-    if [ -n "${cc-}" ] && [ ! -x $cc ]; then
-	abort '%s: %s: No such compiler\n' "$script" "$cc"
-    fi
-}
-
-configure_platform_bsd_netbsd() {
-    make=gmake
-    with_gnutls=false
-    include_prefix /usr/pkg
-    configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
-}
-
-configure_platform_linux_redhat_8() {
-    include_prefix $LOCAL_PREFIX
-    configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
-}
-
-configure_platform_unix_illumos() {
-    include_prefix $LOCAL_PREFIX
-    configure_compiler "/usr/bin/gcc -m64" "${incdirs-}" "${libdirs-}"
-}
-
-configure_platform_unix_solaris() {
-    include_prefix $OPENCSW_PREFIX amd64
-    configure_compiler "/opt/developerstudio12.6/bin/cc -m64" "${incdirs-}" "${libdirs-}"
-}
-
 download_archive() {
     url=$GNU_MIRROR_BASE_URL/$GNU_PROJECT_NAME/$filename
 
@@ -165,67 +92,6 @@ download_archive() {
 	wget $url
     fi
 
-}
-
-extract_files() {
-    if [ ! -r "$src_dir/configure" ]; then
-	cd "$(dirname "$src_dir")"
-
-	case "$pathname" in
-	    (*.tar.bz2)
-		bzip2 -dc "$pathname" | tar -xvf -
-		;;
-	    (*.tar.gz)
-		gzip -dc "$pathname" | tar -xvf -
-		;;
-	    (*.tar.xz)
-		xz -dc "$pathname" | tar -xvf -
-		;;
-	    (*.zip)
-		unzip "$pathname"
-		;;
-	esac
-    fi
-}
-
-get_compiler() {
-    printf '%s\n' "$1"
-}
-
-get_compiler_flags() {
-    shift
-    printf '%s\n' "$*"
-}
-
-get_configure_command() {
-    options=$(get_configure_options)
-    printf '%s' "$1/configure"
-
-    if [ -n "${options-}" ]; then
-	printf ' %s' "$options"
-    fi
-
-    if [ -n "${cc-}" ]; then
-	printf ' CC=\"%s\"' "$cc"
-    fi
-
-    if [ -n "${cflags-}" ]; then
-	printf ' CFLAGS=\"%s\"' "$cflags"
-    fi
-
-    if [ -n "${cppflags-}" ]; then
-	printf ' CPPFLAGS=\"%s\"' "$cppflags"
-    fi
-
-    if [ -n "${ldflags-}" ]; then
-	printf ' LDFLAGS=\"%s\"' "$ldflags"
-    fi
-
-    if [ -n "${pkg_config_path-}" ]; then
-	printf ' PKG_CONFIG_PATH=\"%s\"' "$pkg_config_path"
-    fi
-
-    printf '\n'
 }
 
 get_configure_options() (
@@ -239,11 +105,7 @@ get_configure_options() (
 	options="${options:+$options }--without-gnutls"
     fi
 
-    if [ "${with_toolkit-}" = true ]; then
-	options="${options:+$options }--with-x-toolkit${toolkit:+=$toolkit}"
-    elif [ "${with_toolkit-}" = false ]; then
-	options="${options:+$options }--with-x-toolkit=no"
-    fi
+    options="${options:+$options }--with-x-toolkit=no"
 
     if [ -n "${options:-}" ]; then
 	printf '%s\n' "$options"
@@ -251,82 +113,11 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages bootstrap emacs-nox-build
-}
-
-get_include_flags() {
-    assert [ $# -ge 1 ]
-    printf -- "-I%s\n" "$@"
-}
-
-get_linker_flags() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    ldflags=
-
-    for libdir; do
-	case "$os_family" in
-	    (gnu-*)
-		ldflags="-Wl,--rpath=$libdir"
-		;;
-	    (unix)
-		ldflags="-L$libdir -R$libdir"
-		;;
-	esac
-    done
-
-    if [ "${ldflags-}" ]; then
-	printf '%s\n' "$ldflags"
-    fi
-}
-
-get_make_options() {
-    ncpu=$(lscpu 2>/dev/null | awk '$1 == "CPU(s):" {print $2}' || true)
-
-    if [ -n "$ncpu" ]; then
-	printf '%s\n' -j "$ncpu"
-    fi
-}
-
-get_pkg_config_path() {
-    for pkgdir in ${pkgdirs-}; do
-	pkg_config_path=${pkg_config_path+$pkg_config_path:}$pkgdir
-    done
-
-    if [ "${pkg_config_path-}" ]; then
-	printf '%s\n' "$pkg_config_path"
-    fi
+    get-packages emacs-nox-build
 }
 
 get_prefix() {
     printf "$prefix" "$GNU_PROJECT_NAME-$version"
-}
-
-include_prefix() {
-    assert [ $# -ge 1 -a $# -le 2 ]
-    assert [ -n "$1" ]
-    incdir="$1/include"
-    libdir="$1/lib${2+/$2}"
-    incdirs="${incdirs+$incdirs }$incdir"
-    libdirs="${libdirs+$libdirs }$libdir"
-
-    if [ -d "$libdir/pkgconfig" ]; then
-	pkgdirs="${pkgdirs+$pkgdirs }$libdir/pkgconfig"
-    fi
-}
-
-install_dependencies() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (windows)
-		return 0
-		;;
-	esac
-    done
-
-    packages="$(get_dependencies | sort -u)"
-    pattern="$(get-packages -s pattern development)"
-    install-packages ${pattern:+-p "$pattern" }$packages
 }
 
 install_emacs() {
@@ -342,35 +133,42 @@ install_emacs() {
 }
 
 parse_arguments() {
-    build=true
+    build=false
     check=false
+    depends=true
     force=false
     install=false
     prefix=$LOCAL_PREFIX
     version=$GNU_PROJECT_VERSION
     with_gnutls=
-    with_toolkit=false
 
-    while getopts bcfinp:v:wh opt; do
+    while getopts bcfginp:v:wh opt; do
 	case $opt in
 	    (b)
 		build=true
 		;;
 	    (c)
+		build=true
 		check=true
 		;;
 	    (f)
 		force=true
 		;;
+	    (g)
+		with_gnutls=true
+		;;
 	    (i)
+		build=true
 		install=true
 		;;
 	    (n)
-		build=false
+		depends=false
 		;;
 	    (p)
+		build=true
+
 		case $OPTARG in
-		    ($HOME|/opt/%s|/opt/gnu/%s|/usr/local)
+		    ($HOME/.local|/opt/gnu/%s|/usr/local)
 			prefix=$OPTARG
 			;;
 		    (*)
@@ -407,7 +205,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-c] [-f] [-g] [-i] [-n] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }
@@ -451,6 +249,16 @@ validate_platform() {
 		(7.*)
 		    return
 		    ;;
+		(8.*)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(rocky)
+	    case "$VERSION_ID" in
 		(8.*)
 		    return
 		    ;;
