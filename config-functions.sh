@@ -130,10 +130,10 @@ get_compiler_flags() {
 }
 
 get_configure_command() {
-    cflags="${CFLAGS+$CFLAGS }${cflags-}"
-    cppflags="${CPPFLAGS+$CPPFLAGS }${cppflags-}"
-    cxxflags="${CXXFLAGS+$CXXFLAGS }${cxxflags-}"
-    ldflags="${LDFLAGS+$LDFLAGS }${ldflags-}"
+    cflags="${CFLAGS-}${cflags+ $cflags}"
+    cppflags="${CPPFLAGS-}${cppflags+ $cppflags}"
+    cxxflags="${CXXFLAGS-}${cxxflags+ $cxxflags}"
+    ldflags="${LDFLAGS-}${ldflags+ $ldflags}"
     options=$(get_configure_options)
     printf '%s' "$1/${2-configure}"
 
@@ -237,6 +237,11 @@ install_dependencies() {
 		    return 0
 		    ;;
 	    esac
+	    ;;
+	(*)
+	    if [ "$depends" = false ]; then
+		return 0
+	    fi
 	    ;;
     esac
 
