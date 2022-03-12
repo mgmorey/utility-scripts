@@ -22,7 +22,7 @@ OPENSSL_ARCHIVE_SUFFIX=.tar.gz
 OPENSSL_MIRROR_BASE_URL=https://www.openssl.org
 
 OPENSSL_PROJECT_NAME=openssl
-OPENSSL_PROJECT_VERSION=1.1.1m
+OPENSSL_PROJECT_VERSION=3.0.1
 
 abort() {
     printf "$@" >&2
