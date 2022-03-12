@@ -101,7 +101,7 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages bootstrap make-build make-test
+    get-packages bootstrap $GNU_PROJECT_NAME-build $GNU_PROJECT_NAME-test
 }
 
 get_prefix() {
