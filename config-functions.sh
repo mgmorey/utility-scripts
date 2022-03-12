@@ -239,7 +239,7 @@ install_dependencies() {
 	    esac
 	    ;;
 	(*)
-	    if [ "$depends" = false ]; then
+	    if [ "${depends-true}" = false ]; then
 		return 0
 	    fi
 	    ;;
@@ -249,3 +249,25 @@ install_dependencies() {
     pattern="$(get-packages -s pattern development)"
     install-packages ${pattern:+-p "$pattern" }$packages
 }
+
+install_project_link() (
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    prefix="$1"
+    link="${prefix%-*}"
+
+    if [ "$link" != "$prefix" ]; then
+	prefix_base=$(basename "$prefix")
+	prefix_dir=$(dirname "$prefix")
+	link_base=$(basename "$link")
+	link_dir=$(dirname "$link")
+	cd "$link_dir"
+	rm -f "$link_base"
+
+	if [ "$link_dir" = "$prefix_dir" ]; then
+	    ln -sf "$prefix_base" "$link_base"
+	else
+	    ln -sf "$prefix" "$link_base"
+	fi
+    fi
+)
