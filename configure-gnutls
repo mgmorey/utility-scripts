@@ -64,11 +64,11 @@ configure_gnutls() {
     eval $command
 
     if [ "$build" = true ]; then
-	$make${make_options:+ $make_options}
+	$make${make_options:+ $make_options} prefix="$(get_prefix)"
+    fi
 
-	if [ "$check" = true ]; then
-	    $make${make_options:+ $make_options} check
-	fi
+    if [ "$check" = true ]; then
+	$make${make_options:+ $make_options} prefix="$(get_prefix)" check
     fi
 }
 
@@ -95,7 +95,6 @@ get_configure_options() (
 
     options="${options:+$options }--with-included-libtasn1"
     options="${options:+$options }--with-included-unistring"
-    # options="${options:+$options }--without-p11-kit"
 
     if [ -n "${options:-}" ]; then
 	printf '%s\n' "$options"
@@ -103,7 +102,7 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages bootstrap gnutls-build gnutls-test
+    get-packages $GNU_PROJECT_NAME-build $GNU_PROJECT_NAME-test
 }
 
 get_prefix() {
@@ -133,7 +132,6 @@ install_gnutls() {
 parse_arguments() {
     build=true
     check=false
-    debug=false
     force=false
     install=false
     prefix=$LOCAL_PREFIX
@@ -150,17 +148,11 @@ parse_arguments() {
 	    (f)
 		force=true
 		;;
-	    (g)
-		debug=true
-		;;
 	    (i)
 		install=true
 		;;
 	    (n)
 		build=false
-		;;
-	    (o)
-		debug=false
 		;;
 	    (p)
 		case $OPTARG in
