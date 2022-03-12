@@ -91,6 +91,8 @@ download_archive() {
 }
 
 get_configure_options() (
+    options="--enable-mini-gmp"
+
     if [ -n "${prefix-}" ]; then
         options="${options:+$options }--prefix=$(get_prefix)"
     fi
