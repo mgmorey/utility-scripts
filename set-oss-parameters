@@ -67,36 +67,59 @@ parse_arguments() {
     dirs="$@"
 }
 
+set_oss_dir() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    case "$(basename "$1" "$bits")" in
+        (include)
+	    if is_to_be_included "-I$1" "${CPPFLAGS-}"; then
+		CPPFLAGS="-I$1${CPPFLAGS+ $CPPFLAGS}"
+	    fi
+	    ;;
+        (info)
+	    if is_to_be_included "$1" "${INFOPATH-}"; then
+		INFOPATH="$1${INFOPATH+:$INFOPATH}"
+	    fi
+	    ;;
+        (lib)
+	    if [ "$(get_count "$1/*.a" "$1/*.la")" -gt 0 ]; then
+		if is_to_be_included "-L$1" "${LDFLAGS-}"; then
+		    LDFLAGS="-L$1${LDFLAGS+ $LDFLAGS}"
+		fi
+	    fi
+	    if [ "$(get_count "$1/*.so" "$1/*.so.*")" -gt 0 ]; then
+		if is_to_be_included "$1" "${LD_LIBRARY_PATH-}"; then
+		    LD_LIBRARY_PATH="$1${LD_LIBRARY_PATH+:$LD_LIBRARY_PATH}"
+		fi
+		if is_to_be_included "$1" "${LD_RUN_PATH-}"; then
+		    LD_RUN_PATH="$1${LD_RUN_PATH+:$LD_RUN_PATH}"
+		fi
+	    fi
+	    ;;
+        (man)
+	    if is_to_be_included "$1" "${MANPATH-}"; then
+		MANPATH="$1${MANPATH+:$MANPATH}"
+	    fi
+	    ;;
+        (bin)
+	    if is_to_be_included "$1" "${PATH-}"; then
+		PATH="$1${PATH+:$PATH}"
+	    fi
+	    ;;
+        (pkgconfig)
+	    if is_to_be_included "$1" "${PKG_CONFIG_PATH-}"; then
+		PKG_CONFIG_PATH="$1${PKG_CONFIG_PATH+:$PKG_CONFIG_PATH}"
+	    fi
+	    ;;
+    esac
+}
+
 set_oss_parameters() {
     bits="$(uname -m | sed 's/x86_//')"
 
     for dir in $(get_dirs $dirs | sort -r); do
-	case "$(basename "$dir" "$bits")" in
-            (include)
-		CPPFLAGS="-I$dir${CPPFLAGS+ $CPPFLAGS}"
-		;;
-            (info)
-		INFOPATH="$dir${INFOPATH+:$INFOPATH}"
-		;;
-            (lib)
-		if [ "$(get_count "$dir/*.a" "$dir/*.la")" -gt 0 ]; then
-		    LDFLAGS="-L$dir${LDFLAGS+ $LDFLAGS}"
-		fi
-		if [ "$(get_count "$dir/*.so" "$dir/*.so.*")" -gt 0 ]; then
-		    LD_LIBRARY_PATH="$dir${LD_LIBRARY_PATH+:$LD_LIBRARY_PATH}"
-		    LD_RUN_PATH="$dir${LD_RUN_PATH+:$LD_RUN_PATH}"
-		fi
-		;;
-            (man)
-		MANPATH="$dir${MANPATH+:$MANPATH}"
-		;;
-            (bin)
-		PATH="$dir${PATH+:$PATH}"
-		;;
-            (pkgconfig)
-		PKG_CONFIG_PATH="$dir${PKG_CONFIG_PATH+:$PKG_CONFIG_PATH}"
-		;;
-	esac
+	set_oss_dir "$dir"
     done
 
     print_parameters $ALL_PARAMETERS
