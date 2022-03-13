@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-ALL_PARAMETERS="CPPFLAGS LDLIBS"
+ALL_PARAMETERS="CPPFLAGS LDFLAGS"
 
 abort() {
     printf "$@" >&2
@@ -29,7 +29,7 @@ assert() {
 
 include_bsd_parameters() {
     CPPFLAGS="-I/usr/include"
-    LDLIBS="-L/usr/lib"
+    LDFLAGS="-L/usr/lib"
 }
 
 parse_arguments() {
