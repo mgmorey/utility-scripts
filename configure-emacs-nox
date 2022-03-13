@@ -129,7 +129,9 @@ install_emacs() {
 
     umask 0022
     cd "$build_dir"
-    $make${make_options:+ $make_options} prefix="$(get_prefix)" install
+    install_prefix=$(get_prefix)
+    $make${make_options:+ $make_options} prefix="$install_prefix" install
+    install_project_link "$install_prefix"
 }
 
 parse_arguments() {
