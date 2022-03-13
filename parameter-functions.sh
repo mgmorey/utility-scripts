@@ -13,6 +13,10 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+get_directory() {
+    printf '%s\n' "$1" | sed 's/^-[IL]//'
+}
+
 is_included() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
