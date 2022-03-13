@@ -31,16 +31,12 @@ configure_platform() {
     xcrun=$(get_xcrun_command)
 }
 
-get_python_bindir() (
-    case "$ID" in
-	 (macos)
-	     for version in 3.7 3.8 3.9 3.10; do
-		 if [ -d "$HOME/Library/Python/$version/bin" ]; then
-		     printf '%s\n' "Library/Python/$version/bin"
-		 fi
-	     done
-	     ;;
-    esac
+get_python_bins() (
+    for version in 3.7 3.8 3.9 3.10; do
+	if [ -d "$HOME/Library/Python/$version/bin" ]; then
+	    printf '%s\n' "Library/Python/$version/bin"
+	fi
+    done
 )
 
 get_xcrun_command() (
@@ -60,8 +56,8 @@ include_sdk_parameters() {
 }
 
 include_python_directories() {
-    # add user binary directories to PATH (if they exist)
-    for bin in $(get_python_bindir); do
+    # add Python binary directories to PATH (if they exist)
+    for bin in $(get_python_bins); do
 	if ! is_included "$HOME/$bin" "${PATH-}"; then
 	    PATH="$HOME/$bin${PATH:+:$PATH}"
 	fi
@@ -98,8 +94,8 @@ parse_arguments() {
 }
 
 set_macos_parameters() {
-    case "$kernel_name" in
-	(Darwin)
+    case "$ID" in
+	 (macos)
 	    configure_platform
 	    include_sdk_parameters
 	    include_python_directories
