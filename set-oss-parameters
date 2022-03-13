@@ -1,0 +1,195 @@
+#!/bin/sh -eu
+
+# set-oss-parameters: print shell commands to set OSS parameters
+# Copyright (C) 2022  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS LD_LIBRARY_PATH LD_RUN_PATH \
+MANPATH PATH PKG_CONFIG_PATH"
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
+}
+
+get_dirs() {
+    find -L $(eval ls -d "$@" 2>/dev/null) -maxdepth 2 -type d
+}
+
+get_count() {
+    eval ls "$@" 2>/dev/null | wc -l
+}
+
+parse_arguments() {
+    no_export=false
+    shell=$SHELL
+
+    while getopts ns:h opt; do
+	case $opt in
+	    (n)
+		no_export=true
+		;;
+	    (s)
+		parse_shell "$OPTARG"
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -lt 1 ]; then
+	usage_error '%s: Not enough arguments\n' "$script"
+    fi
+
+    dirs="$@"
+}
+
+parse_shell() {
+    case $(basename "${1%.exe}") in
+	(*bash|ksh*|zsh)
+	    shell=${1%.exe}
+	    ;;
+	(csh|tcsh)
+	    shell=${1%.exe}
+	    ;;
+	(fish)
+	    shell=${1%.exe}
+	    ;;
+	(sh)
+	    shell=${1%.exe}
+	    ;;
+	(*)
+	    usage_error '%s: %s: Unsupported shell\n' "$script" "$1"
+	    ;;
+    esac
+}
+
+print_parameter() {
+    assert [ $# -gt 0 ]
+    assert [ -n "$1" ]
+
+    if [ -z "${2-}" ]; then
+	continue
+    elif [ "$no_export" = true ]; then
+	printf '%s=%s\n' "$1" "$2"
+    else
+	case "$(basename ${shell%.exe})" in
+	    (*bash|ksh*|zsh)
+		printf 'export %s="%s"\n' "$1" "$2"
+		;;
+	    (csh|tcsh)
+		printf 'setenv %s "%s";\n' "$1" "$2"
+		;;
+	    (fish)
+		printf 'set -x %s "%s";\n' "$1" "$2"
+		;;
+	    (*)
+		printf '%s="%s"\n' "$1" "$2"
+		printf 'export %s\n' "$1"
+		;;
+	esac
+    fi
+}
+
+print_parameters() {
+    assert [ $# -gt 0 ]
+
+    for var; do
+	eval $(printf 'value="${%s-}"\n' "$var")
+	print_parameter "$var" "$value"
+    done
+}
+
+set_oss_parameters() {
+    bits="$(uname -m | sed 's/x86_//')"
+
+    for dir in $(get_dirs $dirs | sort -r); do
+	case "$(basename "$dir" "$bits")" in
+            (include)
+		CPPFLAGS="-I$dir${CPPFLAGS+ $CPPFLAGS}"
+		;;
+            (info)
+		INFOPATH="$dir${INFOPATH+:$INFOPATH}"
+		;;
+            (lib)
+		if [ "$(get_count "$dir/*.a" "$dir/*.la")" -gt 0 ]; then
+		    LDFLAGS="-L$dir${LDFLAGS+ $LDFLAGS}"
+		fi
+		if [ "$(get_count "$dir/*.so" "$dir/*.so.*")" -gt 0 ]; then
+		    LD_LIBRARY_PATH="$dir${LD_LIBRARY_PATH+:$LD_LIBRARY_PATH}"
+		    LD_RUN_PATH="$dir${LD_RUN_PATH+:$LD_RUN_PATH}"
+		fi
+		;;
+            (man)
+		MANPATH="$dir${MANPATH+:$MANPATH}"
+		;;
+            (bin)
+		PATH="$dir${PATH+:$PATH}"
+		;;
+            (pkgconfig)
+		PKG_CONFIG_PATH="$dir${PKG_CONFIG_PATH+:$PKG_CONFIG_PATH}"
+		;;
+	esac
+    done
+
+    print_parameters $ALL_PARAMETERS
+}
+
+usage() {
+    cat <<-EOF >&2
+Usage: $script: [-s SHELL] [DIR [...]]
+       $script: -n
+       $script: -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+eval $("${script_prefix}get-os-release" -x)
+
+parse_arguments "$@"
+set_oss_parameters
