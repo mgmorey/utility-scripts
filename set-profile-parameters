@@ -16,7 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS MANPATH PATH PKG_CONFIG_PATH"
+ALL_PARAMETERS="CPPFLAGS INFOPATH LDFLAGS LD_LIBRARY_PATH LD_RUN_PATH \
+MANPATH PATH PKG_CONFIG_PATH"
 AWK_EXPR='{printf("%s/opt/%s\n", prefix, $0)}'
 
 COMMON_BINS="/usr/lib/cups/bin"
