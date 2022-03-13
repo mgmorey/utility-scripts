@@ -165,7 +165,7 @@ include_brew_directories() {
 	return 0
     fi
 
-    eval "$(set-oss-parameters $(get_keg_only_pathnames) /usr)"
+    eval "$(${script_prefix}set-oss-parameters $(get_keg_only_pathnames) /usr)"
 }
 
 include_pkgconf_directories() {
