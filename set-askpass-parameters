@@ -86,54 +86,7 @@ parse_command() {
     esac
 }
 
-parse_shell() {
-    case $(basename "${1%.exe}") in
-	(*bash|ksh*|zsh)
-	    shell=${1%.exe}
-	    ;;
-	(csh|tcsh)
-	    shell=${1%.exe}
-	    ;;
-	(fish)
-	    shell=${1%.exe}
-	    ;;
-	(sh)
-	    shell=${1%.exe}
-	    ;;
-	(*)
-	    usage_error '%s: %s: Unsupported shell\n' "$script" "$1"
-	    ;;
-    esac
-}
-
-print_parameter() {
-    assert [ $# -gt 0 ]
-    assert [ -n "$1" ]
-
-    if [ -z "${2-}" ]; then
-	continue
-    elif [ "$no_export" = true ]; then
-	printf '%s=%s\n' "$1" "$2"
-    else
-	case "$(basename ${shell%.exe})" in
-	    (*bash|ksh*|zsh)
-		printf 'export %s="%s"\n' "$1" "$2"
-		;;
-	    (csh|tcsh)
-		printf 'setenv %s "%s";\n' "$1" "$2"
-		;;
-	    (fish)
-		printf 'set -x %s "%s";\n' "$1" "$2"
-		;;
-	    (*)
-		printf '%s="%s"\n' "$1" "$2"
-		printf 'export %s\n' "$1"
-		;;
-	esac
-    fi
-}
-
-print_parameters() {
+print_askpass_parameters() {
     for var in $(get_all_parameters); do
 	print_parameter "$var" "$askpass_helper"
     done
@@ -148,7 +101,7 @@ set_askpass_parameters() {
 	exit 0
     fi
 
-    print_parameters $(get_all_parameters)
+    print_askpass_parameters $(get_all_parameters)
 }
 
 to_upper() {
@@ -163,16 +116,6 @@ Usage: $script: [-s SHELL] [COMMAND [...]]
 EOF
 }
 
-usage_error() {
-    if [ $# -gt 0 ]; then
-	printf "$@" >&2
-    fi
-
-    printf '%s\n' '' >&2
-    usage
-    exit 2
-}
-
 script=$(basename "$0")
 
 case "$0" in
@@ -185,6 +128,8 @@ case "$0" in
 esac
 
 script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}parameter-functions.sh"
 
 parse_arguments "$@"
 set_askpass_parameters

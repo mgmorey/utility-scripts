@@ -61,72 +61,6 @@ parse_arguments() {
     fi
 }
 
-parse_shell() {
-    case $(basename "${1%.exe}") in
-	(*bash|ksh*|zsh)
-	    shell=${1%.exe}
-	    ;;
-	(csh|tcsh)
-	    shell=${1%.exe}
-	    ;;
-	(fish)
-	    shell=${1%.exe}
-	    ;;
-	(sh)
-	    shell=${1%.exe}
-	    ;;
-	(*)
-	    usage_error '%s: %s: Unsupported shell\n' "$script" "$1"
-	    ;;
-    esac
-}
-
-print_parameter() {
-    assert [ $# -gt 0 ]
-    assert [ -n "$1" ]
-
-    if [ -z "${2-}" ]; then
-	continue
-    elif [ "$no_export" = true ]; then
-	printf '%s=%s\n' "$1" "$2"
-    else
-	case "$(basename ${shell%.exe})" in
-	    (*bash|ksh*|zsh)
-		printf 'export %s="%s"\n' "$1" "$2"
-		;;
-	    (csh|tcsh)
-		printf 'setenv %s "%s";\n' "$1" "$2"
-		;;
-	    (fish)
-		printf 'set -x %s "%s";\n' "$1" "$2"
-		;;
-	    (*)
-		printf '%s="%s"\n' "$1" "$2"
-		printf 'export %s\n' "$1"
-		;;
-	esac
-    fi
-}
-
-print_parameters() {
-    assert [ $# -gt 0 ]
-
-    for var; do
-	eval $(printf 'value="${%s-}"\n' "$var")
-	print_parameter "$var" "$value"
-    done
-}
-
-remove_directory() {
-    assert [ $# -eq 2 ]
-    printf '%s\n' "$2" | sed '
-s|:'"$1"':|:|g
-s|^'"$1"':||
-s|:'"$1"'$||
-s|^'"$1"'$||
-'
-}
-
 set_bsd_parameters() {
     case "$kernel_name" in
 	(Darwin)
@@ -145,16 +79,6 @@ Usage: $script: [-s SHELL]
 EOF
 }
 
-usage_error() {
-    if [ $# -gt 0 ]; then
-	printf "$@" >&2
-    fi
-
-    printf '%s\n' '' >&2
-    usage
-    exit 2
-}
-
 script=$(basename "$0")
 
 case "$0" in
@@ -168,7 +92,8 @@ esac
 
 script_prefix=${script_dir:+$script_dir/}
 
-eval $("${script_prefix}get-os-release" -x)
+. "${script_prefix}parameter-functions.sh"
 
+eval $("${script_prefix}get-os-release" -x)
 parse_arguments "$@"
 set_bsd_parameters

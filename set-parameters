@@ -50,26 +50,6 @@ parse_arguments() {
     fi
 }
 
-parse_shell() {
-    case $(basename "${1%.exe}") in
-	(*bash|ksh*|zsh)
-	    shell=${1%.exe}
-	    ;;
-	(csh|tcsh)
-	    shell=${1%.exe}
-	    ;;
-	(fish)
-	    shell=${1%.exe}
-	    ;;
-	(sh)
-	    shell=${1%.exe}
-	    ;;
-	(*)
-	    usage_error '%s: %s: Unsupported shell\n' "$script" "$1"
-	    ;;
-    esac
-}
-
 set_parameters() {
     "${script_prefix}set-profile-parameters" -s $shell || true
     "${script_prefix}set-askpass-parameters" -s $shell || true
@@ -81,16 +61,6 @@ usage() {
 Usage: $0: [-s SHELL]
        $0: -h
 EOF
-}
-
-usage_error() {
-    if [ $# -gt 0 ]; then
-	printf "$@" >&2
-    fi
-
-    printf '%s\n' '' >&2
-    usage
-    exit 2
 }
 
 script=$(basename "$0")
@@ -106,7 +76,8 @@ esac
 
 script_prefix=${script_dir:+$script_dir/}
 
-eval $("${script_prefix}get-os-release" -x)
+. "${script_prefix}parameter-functions.sh"
 
+eval $("${script_prefix}get-os-release" -x)
 parse_arguments "$@"
 set_parameters

@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-ALL_PARAMETERS="CPPFLAGS LDFLAGS MANPATH SDKROOT"
+ALL_PARAMETERS="CPPFLAGS LDFLAGS MANPATH PATH SDKROOT"
 
 abort() {
     printf "$@" >&2
@@ -27,14 +27,45 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
-include_macos_parameters() {
+configure_platform() {
+    xcrun=$(get_xcrun_command)
+}
+
+get_python_bindir() (
+    case "$ID" in
+	 (macos)
+	     for version in 3.7 3.8 3.9 3.10; do
+		 if [ -d "$HOME/Library/Python/$version/bin" ]; then
+		     printf '%s\n' "Library/Python/$version/bin"
+		 fi
+	     done
+	     ;;
+    esac
+)
+
+get_xcrun_command() (
+    if [ -x /usr/bin/xcrun ]; then
+	printf '%s\n' "/usr/bin/xcrun"
+    fi
+)
+
+include_sdk_parameters() {
     MANPATH=${MANPATH:-$(manpath)}
 
-    if [ -x /usr/bin/xcrun ]; then
-	SDKROOT=$(/usr/bin/xcrun --show-sdk-path)
+    if [ -n "${xcrun-}" ]; then
+	SDKROOT=$($xcrun --show-sdk-path)
 	CPPFLAGS="${CPPFLAGS+$CPPFLAGS }-I$SDKROOT/usr/include"
 	LDFLAGS="${LDFLAGS+$LDFLAGS }-L$SDKROOT/usr/lib"
     fi
+}
+
+include_python_directories() {
+    # add user binary directories to PATH (if they exist)
+    for bin in $(get_python_bindir); do
+	if ! is_included "$HOME/$bin" "${PATH-}"; then
+	    PATH="$HOME/$bin${PATH:+:$PATH}"
+	fi
+    done
 }
 
 parse_arguments() {
@@ -66,80 +97,15 @@ parse_arguments() {
     fi
 }
 
-parse_shell() {
-    case $(basename "${1%.exe}") in
-	(*bash|ksh*|zsh)
-	    shell=${1%.exe}
-	    ;;
-	(csh|tcsh)
-	    shell=${1%.exe}
-	    ;;
-	(fish)
-	    shell=${1%.exe}
-	    ;;
-	(sh)
-	    shell=${1%.exe}
-	    ;;
-	(*)
-	    usage_error '%s: %s: Unsupported shell\n' "$script" "$1"
-	    ;;
-    esac
-}
-
-print_parameter() {
-    assert [ $# -gt 0 ]
-    assert [ -n "$1" ]
-
-    if [ -z "${2-}" ]; then
-	continue
-    elif [ "$no_export" = true ]; then
-	printf '%s=%s\n' "$1" "$2"
-    else
-	case "$(basename ${shell%.exe})" in
-	    (*bash|ksh*|zsh)
-		printf 'export %s="%s"\n' "$1" "$2"
-		;;
-	    (csh|tcsh)
-		printf 'setenv %s "%s";\n' "$1" "$2"
-		;;
-	    (fish)
-		printf 'set -x %s "%s";\n' "$1" "$2"
-		;;
-	    (*)
-		printf '%s="%s"\n' "$1" "$2"
-		printf 'export %s\n' "$1"
-		;;
-	esac
-    fi
-}
-
-print_parameters() {
-    assert [ $# -gt 0 ]
-
-    for var; do
-	eval $(printf 'value="${%s-}"\n' "$var")
-	print_parameter "$var" "$value"
-    done
-}
-
-remove_directory() {
-    assert [ $# -eq 2 ]
-    printf '%s\n' "$2" | sed '
-s|:'"$1"':|:|g
-s|^'"$1"':||
-s|:'"$1"'$||
-s|^'"$1"'$||
-'
-}
-
 set_macos_parameters() {
     case "$kernel_name" in
 	(Darwin)
-	    include_macos_parameters
+	    configure_platform
+	    include_sdk_parameters
+	    include_python_directories
+	    print_parameters $ALL_PARAMETERS
 	    ;;
     esac
-
-    print_parameters $ALL_PARAMETERS
 }
 
 usage() {
@@ -148,16 +114,6 @@ Usage: $script: [-s SHELL]
        $script: -n
        $script: -h
 EOF
-}
-
-usage_error() {
-    if [ $# -gt 0 ]; then
-	printf "$@" >&2
-    fi
-
-    printf '%s\n' '' >&2
-    usage
-    exit 2
 }
 
 script=$(basename "$0")
@@ -173,7 +129,8 @@ esac
 
 script_prefix=${script_dir:+$script_dir/}
 
-eval $("${script_prefix}get-os-release" -x)
+. "${script_prefix}parameter-functions.sh"
 
+eval $("${script_prefix}get-os-release" -x)
 parse_arguments "$@"
 set_macos_parameters
