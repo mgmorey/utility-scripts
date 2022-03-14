@@ -64,7 +64,7 @@ configure_nasm() {
     eval $command
 
     if [ "$build" = true ]; then
-	$make${make_options:+ $make_options} all rdf
+	make_build all rdf
     fi
 }
 
@@ -122,7 +122,7 @@ install_nasm() {
     cd "$build_dir"
     install_prefix=$(get_prefix)
     targets="install install_rdf"
-    $make${make_options:+ $make_options} prefix="$install_prefix" $targets
+    make_install prefix="$install_prefix" $targets
     install_project_link "$install_prefix"
 }
 

@@ -70,11 +70,11 @@ configure_curl() {
     eval $command
 
     if [ "$build" = true ]; then
-	$make${make_options:+ $make_options}
+	make_build
     fi
 
     if [ "$check" = true ]; then
-	$make${make_options:+ $make_options} check
+	make_check "check"
     fi
 }
 
@@ -100,13 +100,7 @@ get_configure_options() (
         options="${options:+$options }--prefix=$(get_prefix)"
     fi
 
-    if [ "${tls_backend-}" = gnutls ]; then
-        options="${options:+$options }--with-gnutls"
-    fi
-
-    if [ "${with_metalink-}" = true ]; then
-        options="${options:+$options }--with-metalink"
-    fi
+    options="${options:+$options }--with-$tls_backend"
 
     if [ -n "${options:-}" ]; then
 	printf '%s\n' "$options"
@@ -144,9 +138,8 @@ parse_arguments() {
     prefix=$CURL_OPT_PREFIX
     tls_backend=$CURL_TLS_BACKEND
     version=$CURL_PROJECT_VERSION
-    with_metalink=${WITH_METALINK-}
 
-    while getopts bcfimnp:t:v:h opt; do
+    while getopts bcfinp:t:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -159,9 +152,6 @@ parse_arguments() {
 		;;
 	    (i)
 		install=true
-		;;
-	    (m)
-		with_metalink=true
 		;;
 	    (n)
 		build=false
@@ -215,7 +205,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-i] [-m] [-n] [-p PREFIX] [-t TLS-BACKEND] \
+Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-t TLS-BACKEND] \
 [-v VERSION]
        $script -h
 EOF

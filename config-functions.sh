@@ -43,7 +43,6 @@ configure_compiler() {
 
 configure_platform() {
     make=make
-    make_options=$(get_make_options)
 
     for id in $ID $ID_LIKE; do
 	case "$id" in
@@ -120,6 +119,10 @@ extract_files() {
 		;;
 	esac
     fi
+}
+
+get_cpu_count() {
+    lscpu 2>/dev/null | awk '$1 == "CPU(s):" {print $2}' || true
 }
 
 get_compiler() {
@@ -200,12 +203,20 @@ get_linker_flags() {
     fi
 }
 
-get_make_options() {
-    ncpu=$(lscpu 2>/dev/null | awk '$1 == "CPU(s):" {print $2}' || true)
+get_make_build_options() {
+    get_make_job_options "$(get_cpu_count)"
+}
 
-    if [ -n "$ncpu" ]; then
-	printf '%s\n' -j "$ncpu"
-    fi
+get_make_check_options() {
+    get_make_job_options
+}
+
+get_make_install_options() {
+    get_make_job_options
+}
+
+get_make_job_options() {
+    printf '%s\n' -j "${1:-1}"
 }
 
 get_pkg_config_path() {
@@ -273,3 +284,18 @@ install_project_link() (
 	fi
     fi
 )
+
+make_build() {
+    build_options=$(get_make_build_options)
+    ${make-make}${build_options:+ $build_options} "$@"
+}
+
+make_check() {
+    check_options=$(get_make_check_options)
+    ${make-make}${check_options:+ $check_options} "$@"
+}
+
+make_install() {
+    install_options=$(get_make_install_options)
+    ${make-make}${install_options:+ $install_options} "$@"
+}

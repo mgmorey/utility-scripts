@@ -43,6 +43,33 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
+configure_libtasn() {
+    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$LIBTASN_ARCHIVE_DIR"
+    download_archive
+    extract_files
+    cd "$build_dir"
+
+    if [ "$force" = true ]; then
+	clean_build
+    elif [ ! -r config.status ]; then
+	true
+    else
+	return 0
+    fi
+
+    command=$(get_configure_command $src_dir)
+    printf '%s\n' "$command"
+    eval $command
+
+    if [ "$build" = true ]; then
+	make_build
+    fi
+
+    if [ "$check" = true ]; then
+	make_check "check"
+    fi
+}
+
 configure_paths() {
     basename=$LIBTASN_PROJECT_NAME-$version
     build_dir="$HOME/Documents/build/$basename"
@@ -69,7 +96,7 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages bootstrap libtasn1-build libtasn1-test
+    get-packages $LIBTASN_PROJECT_NAME-build $LIBTASN_PROJECT_NAME-test
 }
 
 get_prefix() {
@@ -83,7 +110,7 @@ get_url() {
 	   "$filename"
 }
 
-install_libtasn1() {
+install_libtasn() {
     if [ "$install" != true ]; then
 	return 0
     elif [ "$ID" != macos -a "$ID" != windows -a "$(id -u)" -gt 0 ]; then
@@ -92,7 +119,9 @@ install_libtasn1() {
 
     umask 0022
     cd "$build_dir"
-    $make${make_options:+ $make_options} prefix="$(get_prefix)" install
+    install_prefix=$(get_prefix)
+    make_install options} prefix="$install_prefix" install
+    install_project_link "$install_prefix"
 }
 
 parse_arguments() {
@@ -272,7 +301,7 @@ install_dependencies
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"
 else
-    configure_libtasn1
+    configure_libtasn
 fi
 
-install_libtasn1
+install_libtasn

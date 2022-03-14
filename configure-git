@@ -69,11 +69,11 @@ configure_git() {
     eval $command
 
     if [ "$build" = true ]; then
-	$make${make_options:+ $make_options} all doc
+	make_build all doc
     fi
 
     if [ "$check" = true ]; then
-	$make${make_options:+ $make_options} test
+	make_check "test"
     fi
 }
 
@@ -120,12 +120,12 @@ install_git() {
     cd "$src_dir"
     install_prefix=$(get_prefix)
     targets="install install-doc install-html"
-    $make${make_options:+ $make_options} prefix="$install_prefix" $targets
+    make_install prefix="$install_prefix" $targets
     install_project_link "$install_prefix"
 
     if [ "$(id -u)" -eq 0 ]; then
-	find . -user root -type d | xargs chown-real-user
-	find . -user root -type f | xargs chown-real-user
+	find "$src_dir" -user root -type d | xargs chown-real-user
+	find "$src_dir" -user root -type f | xargs chown-real-user
     fi
 }
 

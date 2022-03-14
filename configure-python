@@ -73,11 +73,11 @@ configure_python() {
     eval $command
 
     if [ "$build" = true ]; then
-	$make${make_options:+ $make_options}
+	make_build
     fi
 
     if [ "$check" = true ]; then
-	$make${make_options:+ $make_options} "test"
+	make_check "test"
     fi
 }
 
@@ -118,8 +118,13 @@ install_python() {
     umask 0022
     cd "$build_dir"
     install_prefix=$(get_prefix)
-    $make${make_options:+ $make_options} prefix="$install_prefix" install
+    make_install prefix="$install_prefix" install
     install_project_link "$install_prefix"
+
+    if [ "$(id -u)" -eq 0 ]; then
+	find "$src_dir" -user root -type d | xargs chown-real-user
+	find "$src_dir" -user root -type f | xargs chown-real-user
+    fi
 }
 
 parse_arguments() {

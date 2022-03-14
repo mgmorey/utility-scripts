@@ -63,11 +63,11 @@ configure_gnutls() {
     eval $command
 
     if [ "$build" = true ]; then
-	$make${make_options:+ $make_options}
+	make_build
     fi
 
     if [ "$check" = true ]; then
-	$make${make_options:+ $make_options} check
+	make_check "check"
     fi
 }
 
@@ -125,7 +125,7 @@ install_gnutls() {
     umask 0022
     cd "$build_dir"
     install_prefix=$(get_prefix)
-    $make${make_options:+ $make_options} prefix="$install_prefix" install
+    make_install prefix="$install_prefix" install
     install_project_link "$install_prefix"
 }
 

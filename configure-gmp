@@ -63,11 +63,11 @@ configure_gmp() {
 
     if [ "$build" = true ]; then
 	targets="all info"
-	$make${make_options:+ $make_options} $targets
+	make_build $targets
     fi
 
     if [ "$check" = true ]; then
-	$make${make_options:+ $make_options} check
+	make_check "check"
     fi
 }
 
@@ -117,7 +117,7 @@ install_gmp() {
     cd "$build_dir"
     install_prefix=$(get_prefix)
     targets="install install-info"
-    $make${make_options:+ $make_options} prefix="$install_prefix" $targets
+    make_install prefix="$install_prefix" $targets
     install_project_link "$install_prefix"
 }
 

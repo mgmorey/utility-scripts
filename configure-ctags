@@ -16,6 +16,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+CTAGS_OPT_PREFIX=/opt/%s
+CTAGS_PROJECT_NAME=ctags
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_invalid_prefix() {
+    usage_error '%s: invalid prefix -- %s\n' "$script" "$*"
+}
+
+abort_not_supported() {
+    abort '%s: %s: %s not supported\n' "$script" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
+}
+
 configure_ctags() {
     mkdir -p "$(dirname "$src_dir")"
     cd "$(dirname "$src_dir")"
@@ -24,26 +44,24 @@ configure_ctags() {
 	git clone https://github.com/universal-ctags/ctags.git
     fi
 
-    cd $src_dir
+    cd "$src_dir"
+    ./autogen.sh
+    command=$(get_configure_command $src_dir)
+    printf '%s\n' "$command"
+    eval $command
 
-    if [ ! -e configure ]; then
-	./autogen.sh
+    if [ "$build" = true ]; then
+	make_build
     fi
 
-    if [ ! -e Makefile ]; then
-	./configure
+    if [ "$check" = true ]; then
+	make_check "check"
     fi
-
-    $make
 }
 
 configure_paths() {
-    src_dir="$HOME/Documents/src/Ctags"
-}
-
-configure_platform() {
-    make=$(get_make_command)
-    make_options=
+    basename=$CTAGS_PROJECT_NAME
+    src_dir="$HOME/Documents/src/Ctags/$basename"
 }
 
 get_configure_options() (
@@ -56,27 +74,189 @@ get_configure_options() (
     fi
 )
 
-get_make_command() {
-    case "$ID" in
-	(*bsd)
-	    printf '%s\n' gmake
-	    ;;
-	(*)
-	    printf '%s\n' make
-    esac
+get_dependencies() {
+    get-packages bootstrap ctags-build
+}
+
+get_prefix() {
+    printf "$prefix" "$CTAGS_PROJECT_NAME"
 }
 
 install_ctags() {
-    if [ "$ID" = macos -o "$ID" = windows -o "$(id -u)" -eq 0 ]; then
-	umask 0022
-	cd "$src_dir"
-	$make${make_options:+ $make_options} install
-
-	if [ "$(id -u)" -eq 0 ]; then
-	    find . -user root -type d | xargs chown-real-user
-	    find . -user root -type f | xargs chown-real-user
-	fi
+    if [ "$install" != true ]; then
+	return 0
+    elif [ "$ID" != macos -a "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+	return 0
     fi
+
+    umask 0022
+    cd "$src_dir"
+    install_prefix=$(get_prefix)
+    make_install prefix="$install_prefix" install
+    install_project_link "$install_prefix"
+
+    if [ "$(id -u)" -eq 0 ]; then
+	find "$src_dir" -user root -type d | xargs chown-real-user
+	find "$src_dir" -user root -type f | xargs chown-real-user
+    fi
+}
+
+parse_arguments() {
+    build=true
+    check=false
+    force=false
+    install=false
+    prefix=$CTAGS_OPT_PREFIX
+
+    while getopts bcfinp:h opt; do
+	case $opt in
+	    (b)
+		build=true
+		;;
+	    (c)
+		check=true
+		;;
+	    (f)
+		force=true
+		;;
+	    (i)
+		install=true
+		;;
+	    (n)
+		build=false
+		;;
+	    (p)
+		case $OPTARG in
+		    ($HOME/.local|$LOCAL_PREFIX|$CTAGS_OPT_PREFIX)
+			prefix=$OPTARG
+			;;
+		    (*)
+			abort_invalid_prefix $OPTARG
+			;;
+		esac
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error '%s: Too many arguments\n' "$script"
+    fi
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX]
+       $script -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+validate_platform() {
+    case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    return
+		    ;;
+		(8)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    return
+	    ;;
+	(fedora)
+	    return
+	    ;;
+	(opensuse-*)
+	    return
+	    ;;
+	(ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    return
+		    ;;
+		(8.*)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(rhel)
+	    case "$VERSION_ID" in
+		(7.*)
+		    return
+		    ;;
+		(8.*)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(rocky)
+	    case "$VERSION_ID" in
+		(7.*)
+		    return
+		    ;;
+		(8.*)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    return
+	    ;;
+	(freebsd)
+	    return
+	    ;;
+	(illumos)
+	    return
+	    ;;
+	(macos)
+	    return
+	    ;;
+	(netbsd)
+	    return
+	    ;;
+	(solaris)
+	    return
+	    ;;
+	(windows)
+	    return
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
 }
 
 script=$(basename "$0")
@@ -93,11 +273,15 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
+. "${script_prefix}config-functions.sh"
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
+validate_platform
 configure_platform
+parse_arguments "$@"
 configure_paths
+install_dependencies
 
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"

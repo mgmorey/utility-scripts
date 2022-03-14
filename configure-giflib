@@ -50,11 +50,11 @@ configure_giflib() {
     cd "$src_dir"
 
     if [ "$build" = true ]; then
-	$make${make_options:+ $make_options} PREFIX="$(get_prefix)"
+	make_build PREFIX="$(get_prefix)"
     fi
 
     if [ "$check" = true ]; then
-	$make${make_options:+ $make_options} PREFIX="$(get_prefix)" check
+	make_check PREFIX="$(get_prefix)" check
     fi
 }
 
@@ -93,7 +93,7 @@ install_giflib() {
     umask 0022
     cd "$src_dir"
     install_prefix=$(get_prefix)
-    $make${make_options:+ $make_options} PREFIX="$install_prefix" install
+    make_install PREFIX="$install_prefix" install
     install_project_link "$install_prefix"
 }
 
