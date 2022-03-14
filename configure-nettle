@@ -85,7 +85,6 @@ download_archive() {
 	cd "$GNU_ARCHIVE_DIR"
 	wget $url
     fi
-
 }
 
 get_configure_options() (

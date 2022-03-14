@@ -55,7 +55,6 @@ download_archive() {
 	cd "$archive_dir"
 	wget $url
     fi
-
 }
 
 extract_files() {

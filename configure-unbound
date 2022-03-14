@@ -88,7 +88,6 @@ download_archive() {
 	cd "$UNBOUND_ARCHIVE_DIR"
 	wget $url
     fi
-
 }
 
 get_configure_options() (

@@ -83,7 +83,6 @@ download_archive() {
 	cd "$NASM_ARCHIVE_DIR"
 	wget $url
     fi
-
 }
 
 get_configure_options() (

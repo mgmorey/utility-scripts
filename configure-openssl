@@ -88,7 +88,6 @@ download_archive() {
 	cd "$OPENSSL_ARCHIVE_DIR"
 	wget $url
     fi
-
 }
 
 get_configure_options() (

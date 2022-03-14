@@ -93,7 +93,6 @@ download_archive() {
 	cd "$CURL_ARCHIVE_DIR"
 	wget $url
     fi
-
 }
 
 get_configure_options() (

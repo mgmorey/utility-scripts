@@ -90,7 +90,6 @@ download_archive() {
 	cd "$GNU_ARCHIVE_DIR"
 	wget $url
     fi
-
 }
 
 get_configure_options() (
@@ -103,7 +102,7 @@ get_configure_options() (
     else
         options="${options:+$options }--without-cairo"
     fi
-    
+
     if [ "${with_xtoolkit-}" = true ]; then
         options="${options:+$options }--with-gif=ifavailable"
     else

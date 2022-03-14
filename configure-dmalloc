@@ -91,7 +91,6 @@ download_archive() {
 	cd "$DMALLOC_ARCHIVE_DIR"
 	wget $url
     fi
-
 }
 
 get_configure_options() (
