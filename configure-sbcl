@@ -19,6 +19,7 @@
 SBCL_ARCHIVE_DIR="$HOME/Downloads/SBCL"
 SBCL_ARCHIVE_SUFFIX=.tar.bz2
 
+SBCL_OPT_PREFIX=/opt/%s
 SBCL_PROJECT_NAME=sbcl
 SBCL_PROJECT_VERSION=2.2.2
 
@@ -63,7 +64,10 @@ configure_sbcl() {
 	cd "$src_dir"
 	build_prefix=$(get_prefix)
 	sh make.sh --prefix="$build_prefix"
-	# (cd ./doc/manual && make)
+
+        if [ "$docs" = true ]; then
+	    (cd ./doc/manual && make)
+        fi
     fi
 
     if [ "$check" = true ]; then
@@ -96,18 +100,22 @@ install_sbcl() {
 parse_arguments() {
     build=true
     check=false
+    docs=false
     force=false
     install=false
-    prefix=$LOCAL_PREFIX
+    prefix=$SBCL_OPT_PREFIX
     version=$SBCL_PROJECT_VERSION
 
-    while getopts bcfinp:v:h opt; do
+    while getopts bcdfinp:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
 		;;
 	    (c)
 		check=true
+		;;
+	    (d)
+		docs=true
 		;;
 	    (f)
 		force=true
@@ -120,7 +128,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME/.local|/opt/%s|/usr/local)
+		    ($HOME/.local|$LOCAL_PREFIX|$SBCL_OPT_PREFIX)
 			prefix=$OPTARG
 			;;
 		    (*)
@@ -157,7 +165,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-c] [-d] [-f] [-i] [-n] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }

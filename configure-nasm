@@ -121,8 +121,10 @@ install_nasm() {
 
     umask 0022
     cd "$build_dir"
+    install_prefix=$(get_prefix)
     targets="install install_rdf"
-    $make${make_options:+ $make_options} prefix=$(get_prefix) $targets
+    $make${make_options:+ $make_options} prefix="$install_prefix" $targets
+    install_project_link "$install_prefix"
 }
 
 parse_arguments() {

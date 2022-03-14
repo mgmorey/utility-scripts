@@ -21,6 +21,7 @@ UNBOUND_ARCHIVE_SUFFIX=.tar.gz
 
 UNBOUND_MIRROR_BASE_URL=https://www.nlnetlabs.nl/downloads/unbound
 
+UNBOUND_OPT_PREFIX=/opt/%s
 UNBOUND_PROJECT_NAME=unbound
 UNBOUND_PROJECT_VERSION=1.15.0
 
@@ -117,7 +118,9 @@ install_unbound() {
 
     umask 0022
     cd "$build_dir"
-    $make${make_options:+ $make_options} prefix="$(get_prefix)" install-all
+    install_prefix=$(get_prefix)
+    $make${make_options:+ $make_options} prefix="$install_prefix" install-all
+    install_project_link "$install_prefix"
 }
 
 parse_arguments() {
@@ -125,7 +128,7 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$LOCAL_PREFIX
+    prefix=$UNBOUND_OPT_PREFIX
     version=$UNBOUND_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do
@@ -147,7 +150,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME/.local|/opt/%s|/usr/local)
+		    ($HOME/.local|$LOCAL_PREFIX|$UNBOUND_OPT_PREFIX)
 			prefix=$OPTARG
 			;;
 		    (*)

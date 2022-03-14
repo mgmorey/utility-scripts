@@ -17,12 +17,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
-GNU_ARCHIVE_SUFFIX=.tar.xz
 
-GNU_MIRROR_BASE_URL=https://ftp.gnu.org/gnu
-
-GNU_PROJECT_NAME=gmp
-GNU_PROJECT_VERSION=6.2.1
+GDB_ARCHIVE_SUFFIX=.tar.xz
+GDB_PROJECT_NAME=gmp
+GDB_PROJECT_VERSION=6.2.1
 
 abort() {
     printf "$@" >&2
@@ -74,15 +72,15 @@ configure_gmp() {
 }
 
 configure_paths() {
-    basename=$GNU_PROJECT_NAME-$version
+    basename=$GDB_PROJECT_NAME-$version
     build_dir="$HOME/Documents/build/$basename"
-    filename=$basename$GNU_ARCHIVE_SUFFIX
+    filename=$basename$GDB_ARCHIVE_SUFFIX
     pathname="$GNU_ARCHIVE_DIR/$filename"
     src_dir="$HOME/Documents/src/GNU/$basename"
 }
 
 download_archive() {
-    url=$GNU_MIRROR_BASE_URL/$GNU_PROJECT_NAME/$filename
+    url=$GNU_MIRROR_BASE_URL/$GDB_PROJECT_NAME/$filename
 
     if [ ! -r "$pathname" ]; then
 	cd "$GNU_ARCHIVE_DIR"
@@ -102,11 +100,11 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages $GNU_PROJECT_NAME-build $GNU_PROJECT_NAME-test
+    get-packages $GDB_PROJECT_NAME-build $GDB_PROJECT_NAME-test
 }
 
 get_prefix() {
-    printf "$prefix" "$GNU_PROJECT_NAME-$version"
+    printf "$prefix" "$GDB_PROJECT_NAME-$version"
 }
 
 install_gmp() {
@@ -118,8 +116,10 @@ install_gmp() {
 
     umask 0022
     cd "$build_dir"
+    install_prefix=$(get_prefix)
     targets="install install-info"
-    $make${make_options:+ $make_options} prefix="$(get_prefix)" $targets
+    $make${make_options:+ $make_options} prefix="$install_prefix" $targets
+    install_project_link "$install_prefix"
 }
 
 parse_arguments() {
@@ -127,8 +127,8 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$LOCAL_PREFIX
-    version=$GNU_PROJECT_VERSION
+    prefix=$GNU_OPT_PREFIX
+    version=$GDB_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do
 	case $opt in
@@ -149,7 +149,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME/.local|/opt/%s|/opt/gnu/%s|/usr/local)
+		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX)
 			prefix=$OPTARG
 			;;
 		    (*)

@@ -19,6 +19,7 @@
 GIFLIB_ARCHIVE_DIR="$HOME/Downloads/GIFLIB"
 GIFLIB_ARCHIVE_SUFFIX=.tar.gz
 
+GIFLIB_OPT_PREFIX=/opt/%s
 GIFLIB_PROJECT_NAME=giflib
 GIFLIB_PROJECT_VERSION=5.2.1
 
@@ -91,7 +92,9 @@ install_giflib() {
 
     umask 0022
     cd "$src_dir"
-    $make${make_options:+ $make_options} PREFIX="$(get_prefix)" install
+    install_prefix=$(get_prefix)
+    $make${make_options:+ $make_options} PREFIX="$install_prefix" install
+    install_project_link "$install_prefix"
 }
 
 parse_arguments() {
@@ -99,7 +102,7 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$LOCAL_PREFIX
+    prefix=$GIFLIB_OPT_PREFIX
     version=$GIFLIB_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do
@@ -121,7 +124,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME/.local|/opt/%s|/usr/local)
+		    ($HOME/.local|$LOCAL_PREFIX|$GIFLIB_OPT_PREFIX)
 			prefix=$OPTARG
 			;;
 		    (*)
@@ -177,6 +180,9 @@ validate_platform() {
     case "$ID" in
 	(centos)
 	    case "$VERSION_ID" in
+		(7)
+		    return
+		    ;;
 		(8)
 		    return
 		    ;;

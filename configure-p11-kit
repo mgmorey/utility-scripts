@@ -21,6 +21,7 @@ P11_KIT_ARCHIVE_SUFFIX=.tar.xz
 
 P11_KIT_MIRROR_BASE_URL=https://github.com/p11-glue/p11-kit/releases/download
 
+P11_KIT_OPT_PREFIX=/opt/%s
 P11_KIT_PROJECT_NAME=p11-kit
 P11_KIT_PROJECT_VERSION=0.24.1
 
@@ -116,7 +117,9 @@ install_p11_kit() {
 
     umask 0022
     cd "$build_dir"
-    $make${make_options:+ $make_options} prefix="$(get_prefix)" install
+    install_prefix=$(get_prefix)
+    $make${make_options:+ $make_options} prefix="$install_prefix" install
+    install_project_link "$install_prefix"
 }
 
 parse_arguments() {
@@ -124,7 +127,7 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$LOCAL_PREFIX
+    prefix=$P11_KIT_OPT_PREFIX
     version=$P11_KIT_PROJECT_VERSION
 
     while getopts bcfginop:v:h opt; do
@@ -146,7 +149,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME/.local|/opt/%s|/usr/local)
+		    ($HOME/.local|$LOCAL_PREFIX|$P11_KIT_OPT_PREFIX)
 			prefix=$OPTARG
 			;;
 		    (*)

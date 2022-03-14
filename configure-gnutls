@@ -17,12 +17,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
-GNU_ARCHIVE_SUFFIX=.tar.xz
 
-GNU_MIRROR_BASE_URL=https://www.gnupg.org/ftp/gcrypt
-
-GNU_PROJECT_NAME=gnutls
-GNU_PROJECT_VERSION=3.7.3
+GNUTLS_ARCHIVE_SUFFIX=.tar.xz
+GNUTLS_MIRROR_BASE_URL=https://www.gnupg.org/ftp/gcrypt
+GNUTLS_PROJECT_NAME=gnutls
+GNUTLS_PROJECT_VERSION=3.7.3
 
 abort() {
     printf "$@" >&2
@@ -64,18 +63,18 @@ configure_gnutls() {
     eval $command
 
     if [ "$build" = true ]; then
-	$make${make_options:+ $make_options} prefix="$(get_prefix)"
+	$make${make_options:+ $make_options}
     fi
 
     if [ "$check" = true ]; then
-	$make${make_options:+ $make_options} prefix="$(get_prefix)" check
+	$make${make_options:+ $make_options} check
     fi
 }
 
 configure_paths() {
-    basename=$GNU_PROJECT_NAME-$version
+    basename=$GNUTLS_PROJECT_NAME-$version
     build_dir="$HOME/Documents/build/$basename"
-    filename=$basename$GNU_ARCHIVE_SUFFIX
+    filename=$basename$GNUTLS_ARCHIVE_SUFFIX
     pathname="$GNU_ARCHIVE_DIR/$filename"
     src_dir="$HOME/Documents/src/GNU/$basename"
 }
@@ -102,17 +101,17 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages $GNU_PROJECT_NAME-build $GNU_PROJECT_NAME-test
+    get-packages $GNUTLS_PROJECT_NAME-build $GNUTLS_PROJECT_NAME-test
 }
 
 get_prefix() {
-    printf "$prefix" "$GNU_PROJECT_NAME-$version"
+    printf "$prefix" "$GNUTLS_PROJECT_NAME-$version"
 }
 
 get_url() {
     printf "%s/%s/%s/%s\n" \
 	   "$GNU_MIRROR_BASE_URL" \
-	   "$GNU_PROJECT_NAME" \
+	   "$GNUTLS_PROJECT_NAME" \
 	   "v$(printf '%s\n' $version | cut -d. -f1,2)" \
 	   "$filename"
 }
@@ -126,7 +125,9 @@ install_gnutls() {
 
     umask 0022
     cd "$build_dir"
-    $make${make_options:+ $make_options} prefix="$(get_prefix)" install
+    install_prefix=$(get_prefix)
+    $make${make_options:+ $make_options} prefix="$install_prefix" install
+    install_project_link "$install_prefix"
 }
 
 parse_arguments() {
@@ -134,8 +135,8 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$LOCAL_PREFIX
-    version=$GNU_PROJECT_VERSION
+    prefix=$GNU_OPT_PREFIX
+    version=$GNUTLS_PROJECT_VERSION
 
     while getopts bcfginop:v:h opt; do
 	case $opt in
@@ -156,7 +157,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/%s|/opt/gnu/%s|/usr/local)
+		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX)
 			prefix=$OPTARG
 			;;
 		    (*)

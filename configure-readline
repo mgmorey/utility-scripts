@@ -17,12 +17,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
-GNU_ARCHIVE_SUFFIX=.tar.gz
 
-GNU_MIRROR_BASE_URL=http://mirror.team-cymru.com/gnu
-
-GNU_PROJECT_NAME=readline
-GNU_PROJECT_VERSION=8.1
+READLINE_ARCHIVE_SUFFIX=.tar.gz
+READLINE_PROJECT_NAME=readline
+READLINE_PROJECT_VERSION=8.1
 
 abort() {
     printf "$@" >&2
@@ -46,9 +44,9 @@ assert() {
 }
 
 configure_paths() {
-    basename=$GNU_PROJECT_NAME-$version
+    basename=$READLINE_PROJECT_NAME-$version
     build_dir="$HOME/Documents/build/$basename"
-    filename=$basename$GNU_ARCHIVE_SUFFIX
+    filename=$basename$READLINE_ARCHIVE_SUFFIX
     pathname="$GNU_ARCHIVE_DIR/$filename"
     src_dir="$HOME/Documents/src/GNU/$basename"
 }
@@ -81,7 +79,7 @@ configure_readline() {
 }
 
 download_archive() {
-    url=$GNU_MIRROR_BASE_URL/$GNU_PROJECT_NAME/$filename
+    url=$GNU_MIRROR_BASE_URL/$READLINE_PROJECT_NAME/$filename
 
     if [ ! -r "$pathname" ]; then
 	cd "$GNU_ARCHIVE_DIR"
@@ -105,7 +103,7 @@ get_dependencies() {
 }
 
 get_prefix() {
-    printf "$prefix" "$GNU_PROJECT_NAME-$version"
+    printf "$prefix" "$READLINE_PROJECT_NAME-$version"
 }
 
 install_readline() {
@@ -117,7 +115,9 @@ install_readline() {
 
     umask 0022
     cd "$build_dir"
-    $make${make_options:+ $make_options} prefix="$(get_prefix)" install
+    install_prefix=$(get_prefix)
+    $make${make_options:+ $make_options} prefix="$install_prefix" install
+    install_project_link "$install_prefix"
 }
 
 parse_arguments() {
@@ -125,8 +125,8 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$LOCAL_PREFIX
-    version=$GNU_PROJECT_VERSION
+    prefix=$GNU_OPT_PREFIX
+    version=$READLINE_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do
 	case $opt in
@@ -147,7 +147,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/%s|/opt/gnu/%s|/usr/local)
+		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX)
 			prefix=$OPTARG
 			;;
 		    (*)
@@ -157,7 +157,7 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    (8.[1-9]|8.[1-9][0-9])
+		    (8.[0-9]|8.[1-9][0-9])
 			version=$OPTARG
 			;;
 		    (*)

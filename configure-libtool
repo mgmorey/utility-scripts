@@ -17,12 +17,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
-GNU_ARCHIVE_SUFFIX=.tar.xz
+LIBTOOL_ARCHIVE_SUFFIX=.tar.xz
 
-GNU_MIRROR_BASE_URL=http://mirror.team-cymru.com/gnu
-
-GNU_PROJECT_NAME=libtool
-GNU_PROJECT_VERSION=2.4.6
+LIBTOOL_PROJECT_NAME=libtool
+LIBTOOL_PROJECT_VERSION=2.4.6
 
 abort() {
     printf "$@" >&2
@@ -73,15 +71,15 @@ configure_libtool() {
 }
 
 configure_paths() {
-    basename=$GNU_PROJECT_NAME-$version
+    basename=$LIBTOOL_PROJECT_NAME-$version
     build_dir="$HOME/Documents/build/$basename"
-    filename=$basename$GNU_ARCHIVE_SUFFIX
+    filename=$basename$LIBTOOL_ARCHIVE_SUFFIX
     pathname="$GNU_ARCHIVE_DIR/$filename"
     src_dir="$HOME/Documents/src/GNU/$basename"
 }
 
 download_archive() {
-    url=$GNU_MIRROR_BASE_URL/$GNU_PROJECT_NAME/$filename
+    url=$GNU_MIRROR_BASE_URL/$LIBTOOL_PROJECT_NAME/$filename
 
     if [ ! -r "$pathname" ]; then
 	cd "$GNU_ARCHIVE_DIR"
@@ -90,8 +88,18 @@ download_archive() {
 
 }
 
+get_configure_options() (
+    if [ -n "${prefix-}" ]; then
+        options="${options:+$options }--prefix=$(get_prefix)"
+    fi
+
+    if [ -n "${options:-}" ]; then
+	printf '%s\n' "$options"
+    fi
+)
+
 get_prefix() {
-    printf "$prefix" "$GNU_PROJECT_NAME-$version"
+    printf "$prefix" "$LIBTOOL_PROJECT_NAME-$version"
 }
 
 install_libtool() {
@@ -103,16 +111,18 @@ install_libtool() {
 
     umask 0022
     cd "$build_dir"
-    $make${make_options:+ $make_options} prefix="$(get_prefix)" install
+    install_prefix=$(get_prefix)
+    $make${make_options:+ $make_options} prefix="$install_prefix" install
+    install_project_link "$install_prefix"
 }
 
 parse_arguments() {
     build=true
     check=false
-    version=$GNU_PROJECT_VERSION
+    version=$LIBTOOL_PROJECT_VERSION
     force=false
     install=false
-    prefix=$LOCAL_PREFIX
+    prefix=$GNU_OPT_PREFIX
 
     while getopts bcfinp:v:h opt; do
 	case $opt in
@@ -133,7 +143,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/%s|/opt/gnu/%s|/usr/local)
+		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX)
 			prefix=$OPTARG
 			;;
 		    (*)

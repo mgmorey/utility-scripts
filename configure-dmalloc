@@ -21,6 +21,7 @@ DMALLOC_ARCHIVE_SUFFIX=.tgz
 
 DMALLOC_MIRROR_BASE_URL=https://dmalloc.com
 
+DMALLOC_OPT_PREFIX=/opt/%s
 DMALLOC_PROJECT_NAME=dmalloc
 DMALLOC_PROJECT_VERSION=5.6.5
 
@@ -120,9 +121,11 @@ install_dmalloc() {
 
     umask 0022
     cd "$build_dir"
+    install_prefix=$(get_prefix)
     targets="install installcxx installcxxsl installdocs installsl \
 installth installthcxx installthcxxsl installthsl"
-    $make${make_options:+ $make_options} prefix=$(get_prefix) $targets
+    $make${make_options:+ $make_options} prefix="$install_prefix" $targets
+    install_project_link "$install_prefix"
 }
 
 parse_arguments() {
@@ -130,7 +133,7 @@ parse_arguments() {
     check=true
     force=false
     install=false
-    prefix=$LOCAL_PREFIX
+    prefix=$DMALLOC_OPT_PREFIX
     version=$DMALLOC_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do
@@ -152,7 +155,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/%s|/usr/local)
+		    ($HOME/.local|$LOCAL_PREFIX|$DMALLOC_OPT_PREFIX)
 			prefix=$OPTARG
 			;;
 		    (*)

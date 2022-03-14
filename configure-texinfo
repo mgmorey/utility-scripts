@@ -17,12 +17,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
-GNU_ARCHIVE_SUFFIX=.tar.xz
 
-GNU_MIRROR_BASE_URL=https://ftp.gnu.org/gnu
-
-GNU_PROJECT_NAME=texinfo
-GNU_PROJECT_VERSION=6.8
+TEXTINFO_ARCHIVE_SUFFIX=.tar.xz
+TEXTINFO_PROJECT_NAME=texinfo
+TEXTINFO_PROJECT_VERSION=6.8
 
 abort() {
     printf "$@" >&2
@@ -73,15 +71,15 @@ configure_texinfo() {
 }
 
 configure_paths() {
-    basename=$GNU_PROJECT_NAME-$version
+    basename=$TEXTINFO_PROJECT_NAME-$version
     build_dir="$HOME/Documents/build/$basename"
-    filename=$basename$GNU_ARCHIVE_SUFFIX
+    filename=$basename$TEXTINFO_ARCHIVE_SUFFIX
     pathname="$GNU_ARCHIVE_DIR/$filename"
     src_dir="$HOME/Documents/src/GNU/$basename"
 }
 
 download_archive() {
-    url=$GNU_MIRROR_BASE_URL/$GNU_PROJECT_NAME/$filename
+    url=$GNU_MIRROR_BASE_URL/$TEXTINFO_PROJECT_NAME/$filename
 
     if [ ! -r "$pathname" ]; then
 	cd "$GNU_ARCHIVE_DIR"
@@ -101,11 +99,11 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages bootstrap $GNU_PROJECT_NAME-build $GNU_PROJECT_NAME-test
+    get-packages $TEXTINFO_PROJECT_NAME-build $TEXTINFO_PROJECT_NAME-test
 }
 
 get_prefix() {
-    printf "$prefix" "$GNU_PROJECT_NAME-$version"
+    printf "$prefix" "$TEXTINFO_PROJECT_NAME-$version"
 }
 
 install_texinfo() {
@@ -127,8 +125,8 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$LOCAL_PREFIX
-    version=$GNU_PROJECT_VERSION
+    prefix=$GNU_OPT_PREFIX
+    version=$TEXTINFO_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do
 	case $opt in
@@ -149,7 +147,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/%s|/opt/gnu/%s|/usr/local)
+		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX)
 			prefix=$OPTARG
 			;;
 		    (*)

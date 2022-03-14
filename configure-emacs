@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# configure-emacs-x11: download and configure GNU Emacs
+# configure-emacs: download and configure GNU Emacs
 # Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -17,12 +17,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
-GNU_ARCHIVE_SUFFIX=.tar.gz
 
-GNU_MIRROR_BASE_URL=https://mirrors.ocf.berkeley.edu/gnu
-
-GNU_PROJECT_NAME=emacs
-GNU_PROJECT_VERSION=27.2
+EMACS_ARCHIVE_SUFFIX=.tar.gz
+EMACS_PROJECT_NAME=emacs
+EMACS_PROJECT_VERSION=27.2
+EMACS_TLS_BACKEND=openssl
 
 abort() {
     printf "$@" >&2
@@ -79,13 +78,13 @@ configure_emacs() {
 configure_paths() {
     basename=emacs-$version
     build_dir="$HOME/Documents/build/$basename"
-    filename=$basename$GNU_ARCHIVE_SUFFIX
+    filename=$basename$EMACS_ARCHIVE_SUFFIX
     pathname="$GNU_ARCHIVE_DIR/$filename"
     src_dir="$HOME/Documents/src/GNU/$basename"
 }
 
 download_archive() {
-    url=$GNU_MIRROR_BASE_URL/$GNU_PROJECT_NAME/$filename
+    url=$GNU_MIRROR_BASE_URL/$EMACS_PROJECT_NAME/$filename
 
     if [ ! -r "$pathname" ]; then
 	cd "$GNU_ARCHIVE_DIR"
@@ -99,29 +98,33 @@ get_configure_options() (
 	options="${options:+$options }--prefix=$(get_prefix)"
     fi
 
-    if [ "${with_cairo-}" = true ]; then
-	options="${options:+$options }--with-cairo"
-    elif [ "${with_cairo-}" = false ]; then
-	options="${options:+$options }--without-cairo"
+    if [ "${with_xtoolkit-}" = true ]; then
+        options="${options:+$options }--with-cairo"
+    else
+        options="${options:+$options }--without-cairo"
+    fi
+    
+    if [ "${with_xtoolkit-}" = true ]; then
+        options="${options:+$options }--with-gif=ifavailable"
+    else
+        options="${options:+$options }--without-gif"
     fi
 
-    options="${options:+$options }--with-gif=ifavailable"
-
-    if [ "${with_gnutls-}" = true ]; then
+    if [ "${tls_backend-}" = gnutls ]; then
 	options="${options:+$options }--with-gnutls"
-    elif [ "${with_gnutls-}" = false ]; then
+    elif [ "${tls_backend-}" = openssl ]; then
 	options="${options:+$options }--without-gnutls"
     fi
 
-    if [ "${with_toolkit-}" = true ]; then
-	options="${options:+$options }--with-x-toolkit${toolkit:+=$toolkit}"
-    elif [ "${with_toolkit-}" = false ]; then
+    if [ "${with_xtoolkit-}" = true ]; then
+	options="${options:+$options }--with-x-toolkit${xtoolkit:+=$xtoolkit}"
+    elif [ "${with_xtoolkit-}" = false ]; then
 	options="${options:+$options }--with-x-toolkit=no"
     fi
 
-    if [ "${with_widgets-}" = true ]; then
+    if [ "${with_xwidgets-}" = true ]; then
 	options="${options:+$options }--with-xwidgets"
-    elif [ "${with_widgets-}" = false ]; then
+    elif [ "${with_xwidgets-}" = false ]; then
 	options="${options:+$options }--without-xwidgets"
     fi
 
@@ -131,11 +134,17 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages emacs-x11-build
+    if [ "${with_xtoolkit-}" = true ]; then
+	package=emacs-x11-build
+    else
+	package=emacs-nox-build
+    fi
+
+    get-packages $package
 }
 
 get_prefix() {
-    printf "$prefix" "$GNU_PROJECT_NAME-$version"
+    printf "$prefix" "$EMACS_PROJECT_NAME-$version"
 }
 
 install_emacs() {
@@ -158,14 +167,13 @@ parse_arguments() {
     depends=true
     force=false
     install=false
-    prefix=$LOCAL_PREFIX
-    version=$GNU_PROJECT_VERSION
-    with_cairo=true
-    with_gnutls=false
-    with_toolkit=true
-    with_widgets=false
+    prefix=$GNU_OPT_PREFIX
+    tls_backend=$EMACS_TLS_BACKEND
+    version=$EMACS_PROJECT_VERSION
+    with_xtoolkit=false
+    with_xwidgets=false
 
-    while getopts bcfginp:v:wx:h opt; do
+    while getopts bcfginp:t:v:wx:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -176,9 +184,6 @@ parse_arguments() {
 		;;
 	    (f)
 		force=true
-		;;
-	    (g)
-		with_gnutls=true
 		;;
 	    (i)
 		build=true
@@ -191,11 +196,25 @@ parse_arguments() {
 		build=true
 
 		case $OPTARG in
-		    ($HOME/.local|/opt/gnu/%s|/usr/local)
+		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX)
 			prefix=$OPTARG
 			;;
 		    (*)
 			abort_invalid_prefix $OPTARG
+			;;
+		esac
+		;;
+	    (t)
+		case $OPTARG in
+		    (gnutls)
+			tls_backend=$OPTARG
+			;;
+		    (openssl)
+			tls_backend=$OPTARG
+		        with_xwidgets=false
+			;;
+		    (*)
+			abort_invalid_tls_backend $OPTARG
 			;;
 		esac
 		;;
@@ -210,13 +229,25 @@ parse_arguments() {
 		esac
 		;;
 	    (w)
-		with_widgets=true
+		tls_backend=gnutls
+		with_xtoolkit=true
+		with_xwidgets=true
+		xtoolkit=gtk3
 		;;
 	    (x)
 		case $OPTARG in
-		    (athena|gtk|gtk2|gtk3|lucid|no)
-			toolkit=$OPTARG
-			with_toolkit=true
+		    (athena|gtk|gtk2|lucid)
+			with_xtoolkit=true
+		        with_xwidgets=false
+			xtoolkit=$OPTARG
+			;;
+		    (gtk3)
+			with_xtoolkit=true
+			xtoolkit=$OPTARG
+			;;
+		    (no)
+			with_xtoolkit=false
+		        with_xwidgets=false
 			;;
 		    (*)
 			abort_invalid_toolkit $OPTARG
@@ -241,8 +272,8 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-g] [-i] [-n] [-p PREFIX] [-v VERSION] [-w] \
-[-x TOOLKIT]
+Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-t TLS-BACKEND] \
+[-v VERSION] [-w] [-x X-TOOLKIT]
        $script -h
 EOF
 }

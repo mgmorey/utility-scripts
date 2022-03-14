@@ -21,6 +21,7 @@ GIT_ARCHIVE_SUFFIX=.tar.gz
 
 GIT_MIRROR_BASE_URL=https://www.kernel.org/pub/software/scm/git
 
+GIT_OPT_PREFIX=/opt/%s
 GIT_PROJECT_NAME=git
 GIT_PROJECT_VERSION=2.35.1
 
@@ -49,7 +50,6 @@ configure_git() {
     mkdir -p "$(dirname "$src_dir")" "$GIT_ARCHIVE_DIR"
     download_archive
     extract_files
-
     cd "$src_dir"
 
     if [ "$force" = true ]; then
@@ -70,10 +70,10 @@ configure_git() {
 
     if [ "$build" = true ]; then
 	$make${make_options:+ $make_options} all doc
+    fi
 
-	if [ "$check" = true ]; then
-	    $make${make_options:+ $make_options} test
-	fi
+    if [ "$check" = true ]; then
+	$make${make_options:+ $make_options} test
     fi
 }
 
@@ -118,8 +118,10 @@ install_git() {
 
     umask 0022
     cd "$src_dir"
+    install_prefix=$(get_prefix)
     targets="install install-doc install-html"
-    $make${make_options:+ $make_options} prefix=$(get_prefix) $targets
+    $make${make_options:+ $make_options} prefix="$install_prefix" $targets
+    install_project_link "$install_prefix"
 
     if [ "$(id -u)" -eq 0 ]; then
 	find . -user root -type d | xargs chown-real-user
@@ -132,7 +134,7 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$LOCAL_PREFIX
+    prefix=$GIT_OPT_PREFIX
     version=$GIT_PROJECT_VERSION
 
     while getopts bcfinp:h opt; do
@@ -154,7 +156,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/%s|/usr/local)
+		    ($HOME/.local|$LOCAL_PREFIX|$GIT_OPT_PREFIX)
 			prefix=$OPTARG
 			;;
 		    (*)

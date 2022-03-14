@@ -21,8 +21,10 @@ CURL_ARCHIVE_SUFFIX=.tar.gz
 
 CURL_MIRROR_BASE_URL=https://curl.se
 
+CURL_OPT_PREFIX=/opt/%s
 CURL_PROJECT_NAME=curl
 CURL_PROJECT_VERSION=7.82.0
+CURL_TLS_BACKEND=openssl
 
 abort() {
     printf "$@" >&2
@@ -69,10 +71,10 @@ configure_curl() {
 
     if [ "$build" = true ]; then
 	$make${make_options:+ $make_options}
+    fi
 
-	if [ "$check" = true ]; then
-	    $make${make_options:+ $make_options} check
-	fi
+    if [ "$check" = true ]; then
+	$make${make_options:+ $make_options} check
     fi
 }
 
@@ -99,6 +101,14 @@ get_configure_options() (
         options="${options:+$options }--prefix=$(get_prefix)"
     fi
 
+    if [ "${tls_backend-}" = gnutls ]; then
+        options="${options:+$options }--with-gnutls"
+    fi
+
+    if [ "${with_metalink-}" = true ]; then
+        options="${options:+$options }--with-metalink"
+    fi
+
     if [ -n "${options:-}" ]; then
 	printf '%s\n' "$options"
     fi
@@ -121,7 +131,9 @@ install_curl() {
 
     umask 0022
     cd "$build_dir"
-    $make${make_options:+ $make_options} prefix="$(get_prefix)" install
+    install_prefix=$(get_prefix)
+    $make${make_options:+ $make_options} prefix="$install_prefix" install
+    install_project_link "$install_prefix"
 }
 
 parse_arguments() {
@@ -130,12 +142,12 @@ parse_arguments() {
     debug=false
     force=false
     install=false
-    prefix=$LOCAL_PREFIX
-    tls_backend=openssl
+    prefix=$CURL_OPT_PREFIX
+    tls_backend=$CURL_TLS_BACKEND
     version=$CURL_PROJECT_VERSION
     with_metalink=${WITH_METALINK-}
 
-    while getopts bcfgimnop:t:v:h opt; do
+    while getopts bcfimnp:t:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -146,9 +158,6 @@ parse_arguments() {
 	    (f)
 		force=true
 		;;
-	    (g)
-		debug=true
-		;;
 	    (i)
 		install=true
 		;;
@@ -158,12 +167,9 @@ parse_arguments() {
 	    (n)
 		build=false
 		;;
-	    (o)
-		debug=false
-		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME|/opt/%s|/usr/local)
+		    ($HOME/.local|$LOCAL_PREFIX|$CURL_OPT_PREFIX)
 			prefix=$OPTARG
 			;;
 		    (*)
@@ -210,7 +216,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-g] [-i] [-m] [-n] [-o] [-p PREFIX] [-t TLS-BACKEND] \
+Usage: $script [-b] [-c] [-f] [-i] [-m] [-n] [-p PREFIX] [-t TLS-BACKEND] \
 [-v VERSION]
        $script -h
 EOF

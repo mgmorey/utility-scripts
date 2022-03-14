@@ -13,6 +13,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+GNU_MIRROR_BASE_URL=https://ftp.gnu.org/gnu
+GNU_OPT_PREFIX=/opt/gnu/%s
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
 

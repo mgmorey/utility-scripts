@@ -16,15 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.18.0.tar.gz
-
 GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
-GNU_ARCHIVE_SUFFIX=.tar.gz
 
-GNU_MIRROR_BASE_URL=https://ftp.gnu.org/gnu
-
-GNU_PROJECT_NAME=libtasn1
-GNU_PROJECT_VERSION=4.18.0
+LIBTASN_ARCHIVE_SUFFIX=.tar.gz
+LIBTASN_PROJECT_NAME=libtasn1
+LIBTASN_PROJECT_VERSION=4.18.0
 
 abort() {
     printf "$@" >&2
@@ -33,10 +29,6 @@ abort() {
 
 abort_invalid_prefix() {
     usage_error '%s: invalid prefix -- %s\n' "$script" "$*"
-}
-
-abort_invalid_tls_backend() {
-    usage_error '%s: invalid TLS backend -- %s\n' "$script" "$*"
 }
 
 abort_invalid_version() {
@@ -52,9 +44,9 @@ assert() {
 }
 
 configure_paths() {
-    basename=$GNU_PROJECT_NAME-$version
+    basename=$LIBTASN_PROJECT_NAME-$version
     build_dir="$HOME/Documents/build/$basename"
-    filename=$basename$GNU_ARCHIVE_SUFFIX
+    filename=$basename$LIBTASN_ARCHIVE_SUFFIX
     pathname="$GNU_ARCHIVE_DIR/$filename"
     src_dir="$HOME/Documents/src/GNU/$basename"
 }
@@ -82,13 +74,13 @@ get_dependencies() {
 }
 
 get_prefix() {
-    printf "$prefix" "$GNU_PROJECT_NAME-$version"
+    printf "$prefix" "$LIBTASN_PROJECT_NAME-$version"
 }
 
 get_url() {
     printf "%s/%s/%s\n" \
 	   "$GNU_MIRROR_BASE_URL" \
-	   "$GNU_PROJECT_NAME" \
+	   "$LIBTASN_PROJECT_NAME" \
 	   "$filename"
 }
 
@@ -111,9 +103,7 @@ parse_arguments() {
     force=false
     install=false
     prefix=$LOCAL_PREFIX
-    tls_backend=openssl
-    version=$GNU_PROJECT_VERSION
-    with_metalink=${WITH_METALINK-}
+    version=$LIBTASN_PROJECT_VERSION
 
     while getopts bcfginop:v:h opt; do
 	case $opt in
