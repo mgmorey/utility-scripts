@@ -37,6 +37,7 @@ assert() {
 }
 
 configure_ctags() {
+    umask 0022
     mkdir -p "$(dirname "$src_dir")"
     cd "$(dirname "$src_dir")"
 
@@ -45,6 +46,7 @@ configure_ctags() {
     fi
 
     cd "$src_dir"
+
     ./autogen.sh
     command=$(get_configure_command $src_dir)
     printf '%s\n' "$command"

@@ -34,6 +34,8 @@ assert() {
 
 configure_qemu() {
     validate_platform
+    umask 0022
+
     basename=qemu-$QEMU_VERSION
 
     archive_dir="$HOME/Downloads/QEMU"

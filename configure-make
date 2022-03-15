@@ -44,6 +44,8 @@ assert() {
 }
 
 configure_make() {
+    umask 0022
+
     if [ "$force" = true ]; then
 	rm -rf "$build_dirname" "$src_dirname" "$archive_pathname"
     fi

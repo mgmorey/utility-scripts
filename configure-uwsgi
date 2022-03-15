@@ -34,6 +34,8 @@ assert() {
 
 configure_uwsgi() {
     validate_platform
+    umask 0022
+
     basename=uwsgi-$UWSGI_VERSION
 
     archive_dir="$HOME/Downloads/uWSGI"

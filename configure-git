@@ -47,24 +47,26 @@ assert() {
 }
 
 configure_git() {
-    mkdir -p "$(dirname "$src_dir")" "$GIT_ARCHIVE_DIR"
-    download_archive
-    extract_files
-    cd "$src_dir"
+    umask 0022
 
     if [ "$force" = true ]; then
-	clean_build
-    elif [ ! -r config.status ]; then
-	true
-    else
-	return 0
+	rm -rf "$src_dirname" "$archive_pathname"
     fi
+
+    mkdir -p "$src_dirname" "$archive_dirname"
+    download_archive "$archive_pathname" "$archive_url"
+    extract_archive "$archive_pathname" "$src_dirname"
+    cd "$src_dirname"
+
+    command=$(get_configure_command .)
+    printf '%s\n' "$command"
+    eval $command
 
     if [ ! -r configure ]; then
 	$make configure
     fi
 
-    command=$(get_configure_command $src_dir)
+    command=$(get_configure_command $src_dirname)
     printf '%s\n' "$command"
     eval $command
 
@@ -78,16 +80,22 @@ configure_git() {
 }
 
 configure_paths() {
-    basename=$GIT_PROJECT_NAME-$version
-    filename=$basename$GIT_ARCHIVE_SUFFIX
-    pathname="$GIT_ARCHIVE_DIR/$filename"
-    src_dir="$HOME/Documents/src/Git/$basename"
+    archive_dirname="$GIT_ARCHIVE_DIR"
+    archive_basename=$GIT_PROJECT_NAME-$version
+    src_dirname="$HOME/Documents/src/Git/$archive_basename"
+    archive_filename=$archive_basename$GIT_ARCHIVE_SUFFIX
+    archive_pathname="$GIT_ARCHIVE_DIR/$archive_filename"
+    archive_url=$GIT_MIRROR_BASE_URL/$archive_filename
 }
 
 download_archive() {
-    if [ ! -r "$pathname" ]; then
-	cd "$GIT_ARCHIVE_DIR"
-	wget $GIT_MIRROR_BASE_URL/$filename
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+
+    if [ ! -r "$1" ]; then
+	cd "$(dirname "$1")"
+	wget $2
     fi
 }
 
@@ -102,7 +110,7 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages bootstrap git-build
+    get-packages $GIT_PROJECT_NAME-build $GIT_PROJECT_NAME-test
 }
 
 get_prefix() {
@@ -117,15 +125,14 @@ install_git() {
     fi
 
     umask 0022
-    cd "$src_dir"
+    cd "$src_dirname"
     install_prefix=$(get_prefix)
-    targets="install install-doc install-html"
-    make_install prefix="$install_prefix" $targets
+    make_install prefix="$install_prefix" install install-doc install-html
     install_project_link "$install_prefix"
 
     if [ "$(id -u)" -eq 0 ]; then
-	find "$src_dir" -user root -type d | xargs chown-real-user
-	find "$src_dir" -user root -type f | xargs chown-real-user
+	find "$src_dirname" -user root -type d | xargs chown-real-user
+	find "$src_dirname" -user root -type f | xargs chown-real-user
     fi
 }
 
@@ -134,10 +141,11 @@ parse_arguments() {
     check=false
     force=false
     install=false
+    keep=false
     prefix=$GIT_OPT_PREFIX
     version=$GIT_PROJECT_VERSION
 
-    while getopts bcfinp:h opt; do
+    while getopts bcfiknp:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -146,13 +154,18 @@ parse_arguments() {
 		check=true
 		;;
 	    (f)
+		build=true
 		force=true
 		;;
 	    (i)
 		install=true
 		;;
+	    (k)
+		keep=true
+		;;
 	    (n)
 		build=false
+		force=false
 		;;
 	    (p)
 		case $OPTARG in
@@ -166,7 +179,7 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    (2.[1-9]|2.[1-9][0-9]|2.[1-9][0-9].[1-9])
+		    (2.[0-9]|2.[1-9][0-9]|2.[1-9][0-9].[0-9])
 			version=$OPTARG
 			;;
 		    (*)
@@ -193,7 +206,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-f] [-i] [-n] [-p PREFIX]
+Usage: $script [-b] [-c] [-f] [-i] [-k] [-n] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }
@@ -304,7 +317,10 @@ validate_platform
 configure_platform
 parse_arguments "$@"
 configure_paths
-install_dependencies
+
+if [ "$keep" != true ]; then
+    install_dependencies
+fi
 
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"

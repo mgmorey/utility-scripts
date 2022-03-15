@@ -53,6 +53,8 @@ configure_paths() {
 }
 
 configure_sbcl() {
+    umask 0022
+
     if [ "$force" = true ]; then
 	/bin/rm -rf "$src_dirname"
     fi
@@ -60,7 +62,6 @@ configure_sbcl() {
     mkdir -p "$(dirname "$src_dirname")"
     extract_archive "$archive_pathname" "$src_dirname"
     cd "$src_dirname"
-    umask 0022
 
     if [ "$build" = true ]; then
 	build_prefix=$(get_prefix)

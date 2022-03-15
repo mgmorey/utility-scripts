@@ -52,6 +52,7 @@ assert() {
 }
 
 configure_curl() {
+    umask 0022
     mkdir -p "$build_dir" "$(dirname "$src_dir")" "$CURL_ARCHIVE_DIR"
     download_archive
     extract_files

@@ -45,6 +45,7 @@ assert() {
 }
 
 configure_giflib() {
+    umask 0022
     mkdir -p "$(dirname "$src_dir")"
     extract_files
     cd "$src_dir"
