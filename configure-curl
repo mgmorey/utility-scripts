@@ -59,9 +59,7 @@ configure_curl() {
 
     if [ "$force" = true ]; then
 	clean_build
-    elif [ ! -r config.status ]; then
-	true
-    else
+    elif [ -r config.status ]; then
 	return 0
     fi
 

@@ -45,20 +45,16 @@ assert() {
 }
 
 configure_gnutls() {
-    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$GNU_ARCHIVE_DIR"
-    download_archive
-    extract_files
-    cd "$build_dir"
-
     if [ "$force" = true ]; then
-	clean_build
-    elif [ ! -r config.status ]; then
-	true
-    else
-	return 0
+	rm -rf "$build_dirname" "$src_dirname" "$archive_pathname"
     fi
 
-    command=$(get_configure_command $src_dir)
+    mkdir -p "$build_dirname" "$src_dirname" "$archive_dirname"
+    download_archive "$archive_pathname" "$archive_url"
+    extract_archive "$archive_pathname" "$src_dirname"
+    cd "$build_dirname"
+
+    command=$(get_configure_command "$src_dirname")
     printf '%s\n' "$command"
     eval $command
 
@@ -72,17 +68,23 @@ configure_gnutls() {
 }
 
 configure_paths() {
-    basename=$GNUTLS_PROJECT_NAME-$version
-    build_dir="$HOME/Documents/build/$basename"
-    filename=$basename$GNUTLS_ARCHIVE_SUFFIX
-    pathname="$GNU_ARCHIVE_DIR/$filename"
-    src_dir="$HOME/Documents/src/GNU/$basename"
+    archive_dirname="$GNU_ARCHIVE_DIR"
+    archive_basename=$GNUTLS_PROJECT_NAME-$version
+    build_dirname="$HOME/Documents/build/$archive_basename"
+    src_dirname="$HOME/Documents/src/GNU/$archive_basename"
+    archive_filename=$archive_basename$GNUTLS_ARCHIVE_SUFFIX
+    archive_pathname="$archive_dirname/$archive_filename"
+    archive_url="$(get_url)"
 }
 
 download_archive() {
-    if [ ! -r "$pathname" ]; then
-	cd "$GNU_ARCHIVE_DIR"
-	wget "$(get_url)"
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+
+    if [ ! -r "$1" ]; then
+	cd "$(dirname "$1")"
+	wget $2
     fi
 }
 
@@ -109,10 +111,10 @@ get_prefix() {
 
 get_url() {
     printf "%s/%s/%s/%s\n" \
-	   "$GNU_MIRROR_BASE_URL" \
+	   "$GNUTLS_MIRROR_BASE_URL" \
 	   "$GNUTLS_PROJECT_NAME" \
 	   "v$(printf '%s\n' $version | cut -d. -f1,2)" \
-	   "$filename"
+	   "$archive_filename"
 }
 
 install_gnutls() {
@@ -123,7 +125,7 @@ install_gnutls() {
     fi
 
     umask 0022
-    cd "$build_dir"
+    cd "$build_dirname"
     install_prefix=$(get_prefix)
     make_install prefix="$install_prefix" install
     install_project_link "$install_prefix"
@@ -146,6 +148,7 @@ parse_arguments() {
 		check=true
 		;;
 	    (f)
+		build=true
 		force=true
 		;;
 	    (i)
@@ -153,6 +156,7 @@ parse_arguments() {
 		;;
 	    (n)
 		build=false
+		force=false
 		;;
 	    (p)
 		case $OPTARG in

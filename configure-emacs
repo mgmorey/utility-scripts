@@ -49,20 +49,16 @@ assert() {
 }
 
 configure_emacs() {
-    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$GNU_ARCHIVE_DIR"
-    download_archive
-    extract_files
-    cd "$build_dir"
-
-    if [ "$force" = true -a -r Makefile ]; then
-	$make distclean
-    elif [ ! -r config.status ]; then
-	true
-    else
-	exit 0
+    if [ "$force" = true ]; then
+	rm -rf "$build_dirname" "$src_dirname" "$archive_pathname"
     fi
 
-    command=$(get_configure_command $src_dir)
+    mkdir -p "$build_dirname" "$src_dirname" "$archive_dirname"
+    download_archive "$archive_pathname" "$archive_url"
+    extract_archive "$archive_pathname" "$src_dirname"
+    cd "$build_dirname"
+
+    command=$(get_configure_command "$src_dirname")
     printf '%s\n' "$command"
     eval $command
 
@@ -76,19 +72,23 @@ configure_emacs() {
 }
 
 configure_paths() {
-    basename=emacs-$version
-    build_dir="$HOME/Documents/build/$basename"
-    filename=$basename$EMACS_ARCHIVE_SUFFIX
-    pathname="$GNU_ARCHIVE_DIR/$filename"
-    src_dir="$HOME/Documents/src/GNU/$basename"
+    archive_dirname="$GNU_ARCHIVE_DIR"
+    archive_basename=$EMACS_PROJECT_NAME-$version
+    build_dirname="$HOME/Documents/build/$archive_basename"
+    src_dirname="$HOME/Documents/src/GNU/$archive_basename"
+    archive_filename=$archive_basename$EMACS_ARCHIVE_SUFFIX
+    archive_pathname="$archive_dirname/$archive_filename"
+    archive_url=$GNU_MIRROR_BASE_URL/$EMACS_PROJECT_NAME/$archive_filename
 }
 
 download_archive() {
-    url=$GNU_MIRROR_BASE_URL/$EMACS_PROJECT_NAME/$filename
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
 
-    if [ ! -r "$pathname" ]; then
-	cd "$GNU_ARCHIVE_DIR"
-	wget $url
+    if [ ! -r "$1" ]; then
+	cd "$(dirname "$1")"
+	wget $2
     fi
 }
 
@@ -154,46 +154,47 @@ install_emacs() {
     fi
 
     umask 0022
-    cd "$build_dir"
+    cd "$build_dirname"
     install_prefix=$(get_prefix)
     make_install prefix="$install_prefix" install
     install_project_link "$install_prefix"
 }
 
 parse_arguments() {
-    build=false
+    build=true
     check=false
-    depends=true
     force=false
     install=false
+    keep=false
     prefix=$GNU_OPT_PREFIX
     tls_backend=$EMACS_TLS_BACKEND
     version=$EMACS_PROJECT_VERSION
     with_xtoolkit=false
     with_xwidgets=false
 
-    while getopts bcfginp:t:v:wx:h opt; do
+    while getopts bcfgiknp:t:v:wx:h opt; do
 	case $opt in
 	    (b)
 		build=true
 		;;
 	    (c)
-		build=true
 		check=true
 		;;
 	    (f)
+		build=true
 		force=true
 		;;
 	    (i)
-		build=true
 		install=true
 		;;
+	    (k)
+		keep=true
+		;;
 	    (n)
-		depends=false
+		build=false
+		force=false
 		;;
 	    (p)
-		build=true
-
 		case $OPTARG in
 		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX)
 			prefix=$OPTARG
@@ -271,7 +272,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-t TLS-BACKEND] \
+Usage: $script [-b] [-c] [-f] [-i] [-k] [-n] [-p PREFIX] [-t TLS-BACKEND] \
 [-v VERSION] [-w] [-x X-TOOLKIT]
        $script -h
 EOF
@@ -383,7 +384,10 @@ validate_platform
 configure_platform
 parse_arguments "$@"
 configure_paths
-install_dependencies
+
+if [ "$keep" != true ]; then
+    install_dependencies
+fi
 
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"

@@ -51,10 +51,8 @@ configure_binutils() {
 
     if [ "$force" = true ]; then
 	clean_build
-    elif [ ! -r config.status ]; then
-	true
-    else
-	exit 0
+    elif [ -r config.status ]; then
+	return 0
     fi
 
     command=$(get_configure_command $src_dir)

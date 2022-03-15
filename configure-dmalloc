@@ -54,9 +54,7 @@ configure_dmalloc() {
 
     if [ "$force" = true ]; then
 	clean_build
-    elif [ ! -r config.status ]; then
-	true
-    else
+    elif [ -r config.status ]; then
 	return 0
     fi
 
@@ -67,8 +65,7 @@ configure_dmalloc() {
     eval $command
 
     if [ "$build" = true ]; then
-	targets="all cxx cxxsl shlib threads threadscxx threadscxxsl utils"
-	make_build $targets
+	make_build all cxx cxxsl shlib threads threadscxx threadscxxsl utils
     fi
 
     if [ "$check" = true ]; then
