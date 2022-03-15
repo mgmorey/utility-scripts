@@ -18,6 +18,15 @@ GNU_OPT_PREFIX=/opt/gnu/%s
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
 
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
+}
+
 clean_build() {
     if [ -r Makefile ]; then
 	$make distclean
@@ -97,31 +106,33 @@ configure_platform_unix_solaris() {
 		       "${libdirs-}"
 }
 
-extract_files() {
-    if [ ! -d "$src_dir" ]; then
-	cd "$(dirname "$src_dir")"
+extract_archive() (
+    assert [ $# -ge 1 -a $# -le 2 ]
+    assert [ -n "$1" ]
+    assert [ -r $1 ]
+    archive="$1"
+    shift
 
-	case "$pathname" in
-	    (*.tar.bz2)
-		bzip2 -dc "$pathname" | tar -xvf -
-		;;
-	    (*.tar.gz)
-		gzip -dc "$pathname" | tar -xvf -
-		;;
-	    (*.tar.xz)
-		xz -dc "$pathname" | tar -xvf -
-		;;
-	    (*.tgz)
-		gzip -dc "$pathname" | tar -xvf -
-		;;
-	    (*.zip)
-		unzip "$pathname"
-		;;
-	esac
+    if [ $# -eq 1 ]; then
+	cd "$(dirname "$1")"
     fi
+
+    compress=$(get_compressor "$archive")
+
+    if [ "$compress" = zip ]; then
+	un$compress "$archive"
+    elif [ -n "$compress" ]; then
+	$compress -dc "$archive" | tar -xvf -
+    else
+	return 1
+    fi
+)
+
+extract_files() {
+    extract_archive "$pathname" "$src_dir"
 }
 
-get_cpu_count() {
+get_cpu_core_count() {
     lscpu 2>/dev/null | awk '$1 == "CPU(s):" {print $2}' || true
 }
 
@@ -132,6 +143,29 @@ get_compiler() {
 get_compiler_flags() {
     shift
     printf '%s\n' "$*"
+}
+
+get_compressor() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    assert [ -r $1 ]
+    archive="$1"
+    shift
+
+    case "$archive" in
+	(*.tar.bz2|*.tbz2)
+	    printf '%s\n' bzip2
+	    ;;
+	(*.tar.gz|*.tgz)
+	    printf '%s\n' gzip
+	    ;;
+	(*.tar.xz|*.txz)
+	    printf '%s\n' xz
+	    ;;
+	(*.zip)
+	    printf '%s\n' zip
+	    ;;
+    esac
 }
 
 get_configure_command() {
@@ -204,7 +238,7 @@ get_linker_flags() {
 }
 
 get_make_build_options() {
-    get_make_job_options "$(get_cpu_count)"
+    get_make_job_options "$(get_cpu_core_count)"
 }
 
 get_make_check_options() {
