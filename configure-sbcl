@@ -45,23 +45,24 @@ assert() {
 }
 
 configure_paths() {
-    basename=$SBCL_PROJECT_NAME-$version-source
-    filename=$basename$SBCL_ARCHIVE_SUFFIX
-    pathname="$SBCL_ARCHIVE_DIR/$filename"
-    src_dir="$HOME/Documents/src/SBCL/${basename%-source}"
+    archive_dirname="$SBCL_ARCHIVE_DIR"
+    archive_basename=$SBCL_PROJECT_NAME-$version-source
+    src_dirname="$HOME/Documents/src/SBCL/${archive_basename%-source}"
+    archive_filename=$archive_basename$SBCL_ARCHIVE_SUFFIX
+    archive_pathname="$archive_dirname/$archive_filename"
 }
 
 configure_sbcl() {
     if [ "$force" = true ]; then
-	/bin/rm -rf "$src_dir"
+	/bin/rm -rf "$src_dirname"
     fi
 
-    mkdir -p "$(dirname "$src_dir")"
-    extract_files
+    mkdir -p "$(dirname "$src_dirname")"
+    extract_archive "$archive_pathname" "$src_dirname"
+    cd "$src_dirname"
+    umask 0022
 
     if [ "$build" = true ]; then
-	umask 0022
-	cd "$src_dir"
 	build_prefix=$(get_prefix)
 	sh make.sh --prefix="$build_prefix"
 
@@ -91,7 +92,7 @@ install_sbcl() {
     fi
 
     umask 0022
-    cd "$src_dir"
+    cd "$src_dirname"
     install_prefix=$(get_prefix)
     sh install.sh --prefix="$install_prefix"
     install_project_link "$install_prefix"
@@ -118,6 +119,7 @@ parse_arguments() {
 		docs=true
 		;;
 	    (f)
+		build=true
 		force=true
 		;;
 	    (i)
@@ -125,6 +127,7 @@ parse_arguments() {
 		;;
 	    (n)
 		build=false
+		force=false
 		;;
 	    (p)
 		case $OPTARG in
