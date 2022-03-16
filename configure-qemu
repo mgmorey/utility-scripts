@@ -16,12 +16,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-BASE_URL=https://download.qemu.org
-QEMU_VERSION=3.0.0
+QEMU_ARCHIVE_DIR="$HOME/Downloads/QEMU"
+QEMU_ARCHIVE_SUFFIX=.tar.xz
+
+QEMU_MIRROR_BASE_URL=https://download.qemu.org
+
+QEMU_OPT_PREFIX=/opt/%s
+QEMU_PROJECT_NAME=qemu
+QEMU_PROJECT_VERSION=3.0.0
 
 abort() {
     printf "$@" >&2
     exit 1
+}
+
+abort_invalid_prefix() {
+    usage_error '%s: invalid prefix -- %s\n' "$script" "$*"
+}
+
+abort_invalid_version() {
+    usage_error '%s: invalid version -- %s\n' "$script" "$*"
 }
 
 abort_not_supported() {
@@ -32,77 +46,253 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
+configure_paths() {
+    archive_dirname="$HOME/Downloads/QEMU"
+    archive_basename=qemu-$QEMU_PROJECT_VERSION
+    build_dirname="$HOME/Documents/build/$archive_basename"
+    src_dirname="$HOME/Documents/src/QEMU/$archive_basename"
+    archive_filename=$archive_basename.tar.xz
+    archive_pathname=$archive_dirname/$archive_filename
+    archive_url=$QEMU_MIRROR_BASE_URL/$archive_filename
+}
+
 configure_qemu() {
-    validate_platform
     umask 0022
 
-    basename=qemu-$QEMU_VERSION
+    if [ "$force" = true ]; then
+	rm -rf "$build_dirname" "$src_dirname" "$archive_pathname"
+    fi
 
-    archive_dir="$HOME/Downloads/QEMU"
-    build_dir="$HOME/Documents/build/$basename"
-    src_dir="$HOME/Documents/src/QEMU/$basename"
+    mkdir -p "$build_dirname" "$src_dirname" "$archive_dirname"
+    download_archive "$archive_pathname" "$archive_url"
+    extract_archive "$archive_pathname" "$src_dirname"
+    cd "$build_dirname"
 
-    filename=$basename.tar.xz
+    command="\"$src_dirname/configure\" --prefix=\"$(get_prefix)\""
+    printf '%s\n' "$command"
+    eval $command
 
-    pathname=$archive_dir/$filename
-
-    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$archive_dir"
-    download_archive
-    extract_files
-
-    if [ ! -r "$build_dir/config.status" ]; then
-	cd "$build_dir"
-	"$src_dir/configure" "$@"
+    if [ "$build" = true ]; then
+	make_build
     fi
 }
 
 download_archive() {
-    url=$BASE_URL/$filename
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
 
-    if [ ! -r "$pathname" ]; then
-	cd "$archive_dir"
-	wget $url
+    if [ ! -r "$1" ]; then
+	cd "$(dirname "$1")"
+	wget $2
     fi
 }
 
-extract_files() {
-    if [ ! -r "$src_dir/configure" ]; then
-	cd "$(dirname "$src_dir")"
+get_configure_options() (
+    if [ -n "${prefix-}" ]; then
+        options="${options:+$options }--prefix=$(get_prefix)"
+    fi
 
-	case "$pathname" in
-	    (*.tar.bz2)
-		bzip2 -dc "$pathname" | tar -xvf -
+    if [ -n "${options:-}" ]; then
+	printf '%s\n' "$options"
+    fi
+)
+
+get_dependencies() {
+    get-packages $QEMU_PROJECT_NAME-build $QEMU_PROJECT_NAME-test
+}
+
+get_prefix() {
+    printf "$prefix" "$QEMU_PROJECT_NAME-$version"
+}
+
+install_qemu() {
+    if [ "$install" != true ]; then
+	return 0
+    elif [ "$ID" != macos -a "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+	return 0
+    fi
+
+    umask 0022
+    cd "$build_dirname"
+    install_prefix=$(get_prefix)
+    make_install prefix="$install_prefix" install
+    install_project_link "$install_prefix"
+}
+
+parse_arguments() {
+    build=true
+    check=false
+    force=false
+    install=false
+    prefix=$QEMU_OPT_PREFIX
+    version=$QEMU_PROJECT_VERSION
+
+    while getopts bcfinp:v:h opt; do
+	case $opt in
+	    (b)
+		build=true
 		;;
-	    (*.tar.gz)
-		gzip -dc "$pathname" | tar -xvf -
+	    (c)
+		check=true
 		;;
-	    (*.tar.xz)
-		xz -dc "$pathname" | tar -xvf -
+	    (f)
+		build=true
+		force=true
 		;;
-	    (*.zip)
-		unzip "$pathname"
+	    (i)
+		install=true
+		;;
+	    (n)
+		build=false
+		force=false
+		;;
+	    (p)
+		case $OPTARG in
+		    ($HOME/.local|$LOCAL_PREFIX|$QEMU_OPT_PREFIX)
+			prefix=$OPTARG
+			;;
+		    (*)
+			abort_invalid_prefix $OPTARG
+			;;
+		esac
+		;;
+	    (v)
+		case $OPTARG in
+		    (3.[0-9].[0-9]|3.[1-9][0-9].[0-9])
+			version=$OPTARG
+			;;
+		    (*)
+			abort_invalid_version $OPTARG
+			;;
+		esac
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
 		;;
 	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error '%s: Too many arguments\n' "$script"
     fi
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-t] [-v VERSION]
+       $script -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
 }
 
 validate_platform() {
     case "$ID" in
-	(debian|raspbian|ubuntu)
-	    true
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    return
+		    ;;
+		(8)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
 	    ;;
-	(opensuse-*|rhel|ol|centos|fedora)
-	    true
+	(debian|raspbian)
+	    return
 	    ;;
-	(freebsd|macos|windows)
-	    true
-    	    ;;
+	(fedora)
+	    return
+	    ;;
+	(opensuse-*)
+	    return
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    return
+		    ;;
+		(8.*)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    return
+	    ;;
+	(freebsd)
+	    return
+	    ;;
+	(illumos)
+	    return
+	    ;;
+	(macos)
+	    return
+	    ;;
+	(netbsd)
+	    return
+	    ;;
+	(solaris)
+	    return
+	    ;;
+	(windows)
+	    return
+	    ;;
 	(*)
 	    abort_not_supported "Operating system"
 	    ;;
     esac
 }
 
-eval $(get-os-release -x)
+script=$(basename "$0")
 
-configure_qemu
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+. "${script_prefix}config-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+validate_platform
+configure_platform
+parse_arguments "$@"
+configure_paths
+install_dependencies
+
+if [ "$(id -u)" -eq 0 ]; then
+    run_unpriv /bin/sh -c "$0 $*"
+else
+    configure_qemu
+fi
+
+install_qemu

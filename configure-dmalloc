@@ -48,20 +48,19 @@ assert() {
 
 configure_dmalloc() {
     umask 0022
-    mkdir -p "$build_dir" "$(dirname "$src_dir")" "$DMALLOC_ARCHIVE_DIR"
-    download_archive
-    extract_files
-    cd "$build_dir"
 
     if [ "$force" = true ]; then
-	clean_build
-    elif [ -r config.status ]; then
-	return 0
+	rm -rf "$src_dirname" "$archive_pathname"
     fi
+
+    mkdir -p "$src_dirname" "$archive_dirname"
+    download_archive "$archive_pathname" "$archive_url"
+    extract_archive "$archive_pathname" "$src_dirname"
+    cd "$src_dirname"
 
     CFLAGS="${CFLAGS+$CFLAGS }-fPIC"
     CXXFLAGS="${CXXFLAGS+$CXXFLAGS }-fPIC"
-    command=$(get_configure_command $src_dir)
+    command=$(get_configure_command "$src_dirname")
     printf '%s\n' "$command"
     eval $command
 
@@ -75,19 +74,23 @@ configure_dmalloc() {
 }
 
 configure_paths() {
-    basename=$DMALLOC_PROJECT_NAME-$version
-    build_dir="$HOME/Documents/build/$basename"
-    filename=$basename$DMALLOC_ARCHIVE_SUFFIX
-    pathname="$DMALLOC_ARCHIVE_DIR/$filename"
-    src_dir="$HOME/Documents/src/dmalloc/$basename"
+    archive_dirname="$DMALLOC_ARCHIVE_DIR"
+    archive_basename=$DMALLOC_PROJECT_NAME-$version
+    build_dir="$HOME/Documents/build/$archive_basename"
+    src_dirname="$HOME/Documents/src/dmalloc/$archive_basename"
+    archive_filename=$archive_basename$DMALLOC_ARCHIVE_SUFFIX
+    archive_pathname="$DMALLOC_ARCHIVE_DIR/$archive_filename"
+    archive_url=$DMALLOC_MIRROR_BASE_URL/releases/$archive_filename
 }
 
 download_archive() {
-    url=$DMALLOC_MIRROR_BASE_URL/releases/$filename
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
 
-    if [ ! -r "$pathname" ]; then
-	cd "$DMALLOC_ARCHIVE_DIR"
-	wget $url
+    if [ ! -r "$1" ]; then
+	cd "$(dirname "$1")"
+	wget $2
     fi
 }
 
@@ -102,7 +105,7 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages bootstrap dmalloc-install
+    get-packages $DMALLOC_PROJECT_NAME-build $DMALLOC_PROJECT_NAME-install
 }
 
 get_prefix() {
@@ -142,6 +145,7 @@ parse_arguments() {
 		check=true
 		;;
 	    (f)
+		build=true
 		force=true
 		;;
 	    (i)
@@ -149,6 +153,7 @@ parse_arguments() {
 		;;
 	    (n)
 		build=false
+		force=false
 		;;
 	    (p)
 		case $OPTARG in
@@ -162,7 +167,7 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    (5.[0-9].[0-9]|5.[1-9][0-9].[0-9])
+		    (5.[0-9].[0-9]|5.[1-9][0-9]|5.[1-9][0-9].[0-9])
 			version=$OPTARG
 			;;
 		    (*)
