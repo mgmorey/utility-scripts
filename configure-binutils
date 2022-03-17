@@ -78,17 +78,6 @@ configure_paths() {
     archive_url=$GNU_MIRROR_BASE_URL/$BINUTILS_PROJECT_NAME/$archive_filename
 }
 
-download_archive() {
-    assert [ $# -eq 2 ]
-    assert [ -n "$1" ]
-    assert [ -n "$2" ]
-
-    if [ ! -r "$1" ]; then
-	cd "$(dirname "$1")"
-	wget $2
-    fi
-}
-
 get_configure_options() (
     if [ -n "${prefix-}" ]; then
         options="${options:+$options }--prefix=$(get_prefix)"

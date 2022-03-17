@@ -106,6 +106,17 @@ configure_platform_unix_solaris() {
 		       "${libdirs-}"
 }
 
+download_archive() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+
+    if [ ! -r "$1" ]; then
+	cd "$(dirname "$1")"
+	wget $2
+    fi
+}
+
 extract_archive() (
     assert [ $# -ge 1 -a $# -le 2 ]
     assert [ -n "$1" ]
