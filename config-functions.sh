@@ -113,8 +113,25 @@ download_archive() {
 
     if [ ! -r "$1" ]; then
 	cd "$(dirname "$1")"
-	wget $2
+
+	if ! download_using_curl "$(basename "$1")" "$2"; then
+	    download_using_wget "$(basename "$1")" "$2"
+	fi
     fi
+}
+
+download_using_curl() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    curl "$2" ${CURL_OPTS+$CURL_OPTS }--output "$1"
+}
+
+download_using_wget() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+    wget "$2" ${WGET_OPTS+$WGET_OPTS }--output-document="$1"
 }
 
 extract_archive() (
