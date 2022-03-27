@@ -68,12 +68,16 @@ get_homebrew_dirs() {
     ls -d $HOMEBREW_DIRS $HOME/.linuxbrew 2>/dev/null || true
 }
 
+get_homebrew_prefix() {
+    "$brew" --prefix 2>/dev/null || true
+}
+
 get_keg_only_packages() {
     PATH="$PATH:$(dirname "$brew")" "${script_prefix}brew-list-keg-only"
 }
 
 get_keg_only_pathnames() {
-    get_keg_only_packages | awk -v prefix=$("$brew" --prefix) "$AWK_EXPR"
+    get_keg_only_packages | awk -v prefix=$(get_homebrew_prefix) "$AWK_EXPR"
 }
 
 get_pkgsrc_dirs() {
@@ -166,7 +170,11 @@ include_brew_directories() {
 	return 0
     fi
 
-    eval "$(${script_prefix}set-oss-parameters $(get_keg_only_pathnames))"
+    dirnames=$(get_keg_only_pathnames)
+
+    if [ -n "$dirnames" ]; then
+	eval "$(${script_prefix}set-oss-parameters $dirnames)"
+    fi
 }
 
 include_pkgconf_directories() {
