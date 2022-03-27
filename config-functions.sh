@@ -111,12 +111,14 @@ download_archive() {
     assert [ -n "$1" ]
     assert [ -n "$2" ]
 
-    if [ ! -r "$1" ]; then
-	cd "$(dirname "$1")"
+    if [ -r "$1" -a -s "$1" ]; then
+	return
+    fi
 
-	if ! download_using_curl "$(basename "$1")" "$2"; then
-	    download_using_wget "$(basename "$1")" "$2"
-	fi
+    cd "$(dirname "$1")"
+
+    if ! download_using_curl "$(basename "$1")" "$2"; then
+	download_using_wget "$(basename "$1")" "$2"
     fi
 }
 
