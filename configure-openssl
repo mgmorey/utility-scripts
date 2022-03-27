@@ -23,7 +23,7 @@ OPENSSL_MIRROR_BASE_URL=https://www.openssl.org/source
 
 OPENSSL_OPT_PREFIX=/opt/%s
 OPENSSL_PROJECT_NAME=openssl
-OPENSSL_PROJECT_VERSION=3.0.1
+OPENSSL_PROJECT_VERSION=3.0.2
 
 abort() {
     printf "$@" >&2
