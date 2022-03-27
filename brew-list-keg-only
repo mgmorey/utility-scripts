@@ -22,7 +22,9 @@ import os
 import subprocess
 import sys
 
-COMMAND = ['/bin/sh', '-c', 'brew info --installed --json']
+COMMAND = ['/bin/sh', '-c', 'brew info --installed --json 2>/dev/null']
 
 s = subprocess.run(COMMAND, stdout=subprocess.PIPE).stdout.decode('utf-8')
-print('\n'.join([p['name'] for p in json.loads(s) if p['keg_only']]))
+
+if s:
+    print('\n'.join([p['name'] for p in json.loads(s) if p['keg_only']]))
