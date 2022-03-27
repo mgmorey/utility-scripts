@@ -124,14 +124,14 @@ download_using_curl() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
     assert [ -n "$2" ]
-    curl "$2" ${CURL_OPTS+$CURL_OPTS }--output "$1"
+    curl ${CURL_OPTS+$CURL_OPTS }--output "$1" "$2"
 }
 
 download_using_wget() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
     assert [ -n "$2" ]
-    wget "$2" ${WGET_OPTS+$WGET_OPTS }--output-document="$1"
+    wget ${WGET_OPTS+$WGET_OPTS }--output-document="$1" "$2"
 }
 
 extract_archive() (
