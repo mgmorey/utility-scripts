@@ -28,9 +28,13 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
-get_dirs() {
-    find -L $(eval ls -d "$@" 2>/dev/null) -maxdepth 2 -type d
-}
+get_dirs() (
+    dirnames=$(eval ls -d "$@" 2>/dev/null)
+
+    if [ -n "$dirnames" ]; then
+	find -L $dirnames -maxdepth 2 -type d
+    fi
+)
 
 get_count() {
     eval ls "$@" 2>/dev/null | wc -l
