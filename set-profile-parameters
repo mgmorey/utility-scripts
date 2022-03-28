@@ -91,9 +91,9 @@ get_prefix_dirs() {
 	   $(get_homebrew_dirs)
 }
 
-get_profile_bins() (
+get_profile_bins() {
     printf '%s\n' $PROFILE_BINS
-)
+}
 
 get_realpath_command() {
     if [ -x "${script_prefix}get-realpath" ]; then
@@ -165,9 +165,9 @@ include_common_directories() {
     done
 }
 
-include_brew_directories() {
+include_brew_directories() (
     if [ -z "${brew-}" ]; then
-	return 0
+	return
     fi
 
     dirnames=$(get_keg_only_pathnames)
@@ -175,7 +175,7 @@ include_brew_directories() {
     if [ -n "$dirnames" ]; then
 	eval "$(${script_prefix}set-oss-parameters $dirnames)"
     fi
-}
+)
 
 include_pkgconf_directories() {
     pkgdir=$1/lib/pkgconfig
