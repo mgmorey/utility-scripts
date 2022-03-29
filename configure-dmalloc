@@ -76,7 +76,6 @@ configure_dmalloc() {
 configure_paths() {
     archive_dirname="$DMALLOC_ARCHIVE_DIR"
     archive_basename=$DMALLOC_PROJECT_NAME-$version
-    build_dir="$HOME/Documents/build/$archive_basename"
     src_dirname="$HOME/Documents/src/Dmalloc/$archive_basename"
     archive_filename=$archive_basename$DMALLOC_ARCHIVE_SUFFIX
     archive_pathname="$DMALLOC_ARCHIVE_DIR/$archive_filename"
@@ -109,7 +108,7 @@ install_dmalloc() {
     fi
 
     umask 0022
-    cd "$build_dir"
+    cd "$src_dirname"
     install_prefix=$(get_prefix)
     targets="install installcxx installcxxsl installdocs installsl \
 installth installthcxx installthcxxsl installthsl"
