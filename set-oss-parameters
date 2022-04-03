@@ -29,7 +29,7 @@ assert() {
 }
 
 get_dirs() (
-    dirnames=$(eval ls -d "$@" 2>/dev/null)
+    dirnames=$(ls -d "$@" 2>/dev/null || true)
 
     if [ -n "$dirnames" ]; then
 	find -L $dirnames -maxdepth 2 -type d
