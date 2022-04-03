@@ -77,44 +77,28 @@ set_oss_dir() {
 
     case "$(basename "$1" "$bits")" in
         (include)
-	    if is_to_be_included "-I$1" "${CPPFLAGS-}"; then
-		CPPFLAGS="-I$1${CPPFLAGS+ $CPPFLAGS}"
-	    fi
+	    CPPFLAGS="-I$1${CPPFLAGS+ $CPPFLAGS}"
 	    ;;
         (info)
-	    if is_to_be_included "$1" "${INFOPATH-}"; then
-		INFOPATH="$1${INFOPATH+:$INFOPATH}"
-	    fi
+	    INFOPATH="$1${INFOPATH+:$INFOPATH}"
 	    ;;
         (lib)
 	    if [ "$(get_count "$1/*.a" "$1/*.la")" -gt 0 ]; then
-		if is_to_be_included "-L$1" "${LDFLAGS-}"; then
-		    LDFLAGS="-L$1${LDFLAGS+ $LDFLAGS}"
-		fi
+		LDFLAGS="-L$1${LDFLAGS+ $LDFLAGS}"
 	    fi
 	    if [ "$(get_count "$1/*.so" "$1/*.so.*")" -gt 0 ]; then
-		if is_to_be_included "$1" "${LD_LIBRARY_PATH-}"; then
-		    LD_LIBRARY_PATH="$1${LD_LIBRARY_PATH+:$LD_LIBRARY_PATH}"
-		fi
-		if is_to_be_included "$1" "${LD_RUN_PATH-}"; then
-		    LD_RUN_PATH="$1${LD_RUN_PATH+:$LD_RUN_PATH}"
-		fi
+		LD_LIBRARY_PATH="$1${LD_LIBRARY_PATH+:$LD_LIBRARY_PATH}"
+		LD_RUN_PATH="$1${LD_RUN_PATH+:$LD_RUN_PATH}"
 	    fi
 	    ;;
         (man)
-	    if is_to_be_included "$1" "${MANPATH-}"; then
-		MANPATH="$1${MANPATH+:$MANPATH}"
-	    fi
+	    MANPATH="$1${MANPATH+:$MANPATH}"
 	    ;;
         (bin)
-	    if is_to_be_included "$1" "${PATH-}"; then
-		PATH="$1${PATH+:$PATH}"
-	    fi
+	    PATH="$1${PATH+:$PATH}"
 	    ;;
         (pkgconfig)
-	    if is_to_be_included "$1" "${PKG_CONFIG_PATH-}"; then
-		PKG_CONFIG_PATH="$1${PKG_CONFIG_PATH+:$PKG_CONFIG_PATH}"
-	    fi
+	    PKG_CONFIG_PATH="$1${PKG_CONFIG_PATH+:$PKG_CONFIG_PATH}"
 	    ;;
     esac
 }
