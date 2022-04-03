@@ -81,7 +81,7 @@ configure_paths() {
 
 get_configure_options() (
     if [ -n "${prefix-}" ]; then
-        options="${options:+$options }--prefix=$(get_prefix)"
+	options="${options:+$options }--prefix=$(get_prefix)"
     fi
 
     options="${options:+$options }--with-included-libtasn1"
@@ -103,7 +103,7 @@ get_gnutls_configure_command() {
     if [ -n "${options-}" ]; then
 	printf ' %s' "$options"
     fi
-    
+
     printf '\n'
 }
 

@@ -76,13 +76,13 @@ set_oss_dir() {
     assert [ -n "$1" ]
 
     case "$(basename "$1" "$bits")" in
-        (include)
+	(include)
 	    CPPFLAGS="-I$1${CPPFLAGS+ $CPPFLAGS}"
 	    ;;
-        (info)
+	(info)
 	    INFOPATH="$1${INFOPATH+:$INFOPATH}"
 	    ;;
-        (lib)
+	(lib)
 	    if [ "$(get_count "$1/*.a" "$1/*.la")" -gt 0 ]; then
 		LDFLAGS="-L$1${LDFLAGS+ $LDFLAGS}"
 	    fi
@@ -91,13 +91,13 @@ set_oss_dir() {
 		LD_RUN_PATH="$1${LD_RUN_PATH+:$LD_RUN_PATH}"
 	    fi
 	    ;;
-        (man)
+	(man)
 	    MANPATH="$1${MANPATH+:$MANPATH}"
 	    ;;
-        (bin)
+	(bin)
 	    PATH="$1${PATH+:$PATH}"
 	    ;;
-        (pkgconfig)
+	(pkgconfig)
 	    PKG_CONFIG_PATH="$1${PKG_CONFIG_PATH+:$PKG_CONFIG_PATH}"
 	    ;;
     esac

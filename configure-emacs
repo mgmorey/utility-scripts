@@ -89,15 +89,15 @@ get_configure_options() (
     fi
 
     if [ "${with_xtoolkit-}" = true ]; then
-        options="${options:+$options }--with-cairo"
+	options="${options:+$options }--with-cairo"
     else
-        options="${options:+$options }--without-cairo"
+	options="${options:+$options }--without-cairo"
     fi
 
     if [ "${with_xtoolkit-}" = true ]; then
-        options="${options:+$options }--with-gif=ifavailable"
+	options="${options:+$options }--with-gif=ifavailable"
     else
-        options="${options:+$options }--without-gif"
+	options="${options:+$options }--without-gif"
     fi
 
     if [ "${tls_backend-}" = gnutls ]; then
@@ -213,7 +213,7 @@ parse_arguments() {
 			;;
 		    (openssl)
 			tls_backend=$OPTARG
-		        with_xwidgets=false
+			with_xwidgets=false
 			;;
 		    (*)
 			abort_invalid_tls_backend $OPTARG
@@ -240,7 +240,7 @@ parse_arguments() {
 		case $OPTARG in
 		    (athena|gtk|gtk2|lucid)
 			with_xtoolkit=true
-		        with_xwidgets=false
+			with_xwidgets=false
 			xtoolkit=$OPTARG
 			;;
 		    (gtk3)
@@ -249,7 +249,7 @@ parse_arguments() {
 			;;
 		    (no)
 			with_xtoolkit=false
-		        with_xwidgets=false
+			with_xwidgets=false
 			;;
 		    (*)
 			abort_invalid_toolkit $OPTARG
