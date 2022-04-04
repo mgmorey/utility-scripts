@@ -58,8 +58,13 @@ configure_emacs() {
     mkdir -p "$build_dirname" "$src_dirname" "$archive_dirname"
     download_archive "$archive_pathname" "$archive_url"
     extract_archive "$archive_pathname" "$src_dirname"
-    cd "$build_dirname"
+    cd "$src_dirname"
 
+    if [ ! -r configure ]; then
+       make configure
+    fi
+
+    cd "$build_dirname"
     command=$(get_emacs_configure_command "$src_dirname")
     printf '%s\n' "$command"
     eval $command
