@@ -127,7 +127,7 @@ parse_arguments() {
     debug=false
     force=false
     install=false
-    prefix=$LOCAL_PREFIX
+    prefix=$GNU_OPT_PREFIX
     version=$LIBTASN_PROJECT_VERSION
 
     while getopts bcfginop:v:h opt; do
