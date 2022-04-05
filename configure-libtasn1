@@ -55,7 +55,7 @@ configure_libtasn() {
     extract_archive "$archive_pathname" "$src_dirname"
     cd "$build_dirname"
 
-    command=$(get_configure_command $src_dirname)
+    command=$(get_libtasn_configure_command $src_dirname)
     printf '%s\n' "$command"
     eval $command
 
@@ -90,6 +90,17 @@ get_configure_options() (
 
 get_dependencies() {
     get-packages $LIBTASN_PROJECT_NAME-build $LIBTASN_PROJECT_NAME-test
+}
+
+get_libtasn_configure_command() {
+    options=$(get_configure_options)
+    printf '%s' "$1/${2-configure}"
+
+    if [ -n "${options-}" ]; then
+	printf ' %s' "$options"
+    fi
+
+    printf '\n'
 }
 
 get_prefix() {
