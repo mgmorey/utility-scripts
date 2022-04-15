@@ -48,7 +48,7 @@ configure_ctags() {
     cd "$src_dir"
 
     ./autogen.sh
-    command=$(get_configure_command $src_dir)
+    command=$(get_ctags_configure_command $src_dir)
     printf '%s\n' "$command"
     eval $command
 
@@ -76,8 +76,19 @@ get_configure_options() (
     fi
 )
 
+get_ctags_configure_command() {
+    options=$(get_configure_options)
+    printf '%s' "$1/${2-configure}"
+
+    if [ -n "${options-}" ]; then
+	printf ' %s' "$options"
+    fi
+
+    printf '\n'
+}
+
 get_dependencies() {
-    get-packages bootstrap ctags-build
+    get-packages $CTAGS_PROJECT_NAME-build $CTAGS_PROJECT_NAME-test
 }
 
 get_prefix() {
