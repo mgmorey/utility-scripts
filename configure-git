@@ -141,7 +141,7 @@ parse_arguments() {
     prefix=$GIT_OPT_PREFIX
     version=$GIT_PROJECT_VERSION
 
-    while getopts bcfiknp:h opt; do
+    while getopts bcfiknp:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
