@@ -165,7 +165,7 @@ include_common_directories() {
     done
 }
 
-include_brew_directories() (
+include_brew_directories() {
     if [ -z "${brew-}" ]; then
 	return
     fi
@@ -175,7 +175,7 @@ include_brew_directories() (
     if [ -n "$dirnames" ]; then
 	eval "$(${script_prefix}set-oss-parameters $dirnames)"
     fi
-)
+}
 
 include_pkgconf_directories() {
     pkgdir=$1/lib/pkgconfig
