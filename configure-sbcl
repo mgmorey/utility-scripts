@@ -105,10 +105,11 @@ parse_arguments() {
     docs=false
     force=false
     install=false
+    keep=false
     prefix=$SBCL_OPT_PREFIX
     version=$SBCL_PROJECT_VERSION
 
-    while getopts bcdfinp:v:h opt; do
+    while getopts bcdfiknp:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -125,6 +126,9 @@ parse_arguments() {
 		;;
 	    (i)
 		install=true
+		;;
+	    (k)
+		keep=true
 		;;
 	    (n)
 		build=false
@@ -169,7 +173,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-d] [-f] [-i] [-n] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-c] [-d] [-f] [-i] [-k] [-n] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }
@@ -295,7 +299,10 @@ eval $(get-os-release -x)
 validate_platform
 parse_arguments "$@"
 configure_paths
-install_dependencies
+
+if [ "$keep" != true ]; then
+    install_dependencies
+fi
 
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"
