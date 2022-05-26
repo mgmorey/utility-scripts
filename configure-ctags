@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# configure-gdb: download and configure Ctags
+# configure-ctags: download and configure Universal Ctags
 # Copyright (C) 2022  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+CTAGS_ARCHIVE_DIR="$HOME/Downloads/Ctags"
+CTAGS_ARCHIVE_SUFFIX=.tar.gz
+
+CTAGS_MIRROR_BASE_URL=https://github.com/universal-ctags/ctags
+
 CTAGS_OPT_PREFIX=/opt/%s
 CTAGS_PROJECT_NAME=ctags
+CTAGS_PROJECT_VERSION=5.9.20220522.0
 
 abort() {
     printf "$@" >&2
@@ -38,17 +44,18 @@ assert() {
 
 configure_ctags() {
     umask 0022
-    mkdir -p "$(dirname "$src_dir")"
-    cd "$(dirname "$src_dir")"
 
-    if [ ! -d ctags ]; then
-	git clone https://github.com/universal-ctags/ctags.git
+    if [ "$force" = true ]; then
+	rm -rf "$src_dirname" "$archive_pathname"
     fi
 
-    cd "$src_dir"
+    mkdir -p "$src_dirname" "$archive_dirname"
+    download_archive "$archive_pathname" "$archive_url"
+    extract_archive "$archive_pathname" "$src_dirname"
+    cd "$src_dirname"
 
     ./autogen.sh
-    command=$(get_ctags_configure_command $src_dir)
+    command=$(get_ctags_configure_command "$src_dirname")
     printf '%s\n' "$command"
     eval $command
 
@@ -62,8 +69,12 @@ configure_ctags() {
 }
 
 configure_paths() {
-    basename=$CTAGS_PROJECT_NAME
-    src_dir="$HOME/Documents/src/Ctags/$basename"
+    archive_dirname="$CTAGS_ARCHIVE_DIR"
+    archive_basename=p$version
+    src_dirname="$HOME/Documents/src/Ctags/ctags-$archive_basename"
+    archive_filename=$archive_basename$CTAGS_ARCHIVE_SUFFIX
+    archive_pathname="$CTAGS_ARCHIVE_DIR/$archive_filename"
+    archive_url=$CTAGS_MIRROR_BASE_URL/archive/refs/tags/$archive_filename
 }
 
 get_configure_options() (
@@ -92,7 +103,7 @@ get_dependencies() {
 }
 
 get_prefix() {
-    printf "$prefix" "$CTAGS_PROJECT_NAME"
+    printf "$prefix" "$CTAGS_PROJECT_NAME-$version"
 }
 
 install_ctags() {
@@ -103,14 +114,14 @@ install_ctags() {
     fi
 
     umask 0022
-    cd "$src_dir"
+    cd "$src_dirname"
     install_prefix=$(get_prefix)
     make_install prefix="$install_prefix" install
     install_project_link "$install_prefix"
 
     if [ "$(id -u)" -eq 0 ]; then
-	find "$src_dir" -user root -type d | xargs chown-real-user
-	find "$src_dir" -user root -type f | xargs chown-real-user
+	find "$src_dirname" -user root -type d | xargs chown-real-user
+	find "$src_dirname" -user root -type f | xargs chown-real-user
     fi
 }
 
@@ -120,8 +131,9 @@ parse_arguments() {
     force=false
     install=false
     prefix=$CTAGS_OPT_PREFIX
+    version=$CTAGS_PROJECT_VERSION
 
-    while getopts bcfinp:h opt; do
+    while getopts bcfinp:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -145,6 +157,16 @@ parse_arguments() {
 			;;
 		    (*)
 			abort_invalid_prefix $OPTARG
+			;;
+		esac
+		;;
+	    (v)
+		case $OPTARG in
+		    (5.9.20[0-9][0-9][0-9][0-9][0-9][0-9].[0-9])
+			version=$OPTARG
+			;;
+		    (*)
+			abort_invalid_version $OPTARG
 			;;
 		esac
 		;;
