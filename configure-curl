@@ -301,6 +301,7 @@ configure_platform
 parse_arguments "$@"
 configure_paths
 install_dependencies
+pip install impacket
 
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"
