@@ -84,7 +84,10 @@ get_configure_options() (
 	options="${options:+$options }--prefix=$(get_prefix)"
     fi
 
-    options="${options:+$options }--with-included-libtasn1"
+    if ! which asn1Parser >/dev/null 2>&1; then
+	options="${options:+$options }--with-included-libtasn1"
+    fi
+
     options="${options:+$options }--with-included-unistring"
 
     if [ -n "${options:-}" ]; then
@@ -131,6 +134,11 @@ install_gnutls() {
     install_prefix=$(get_prefix)
     make_install prefix="$install_prefix" install
     install_project_link "$install_prefix"
+
+    if [ "$(id -u)" -eq 0 ]; then
+	find "$build_dirname" -user root -type d | xargs chown-real-user
+	find "$build_dirname" -user root -type f | xargs chown-real-user
+    fi
 }
 
 parse_arguments() {
