@@ -21,7 +21,7 @@ SBCL_ARCHIVE_SUFFIX=.tar.bz2
 
 SBCL_OPT_PREFIX=/opt/%s
 SBCL_PROJECT_NAME=sbcl
-SBCL_PROJECT_VERSION=2.2.4
+SBCL_PROJECT_VERSION=2.2.5
 
 abort() {
     printf "$@" >&2
@@ -88,7 +88,7 @@ get_prefix() {
 install_sbcl() {
     if [ "$install" != true ]; then
 	return 0
-    elif [ "$ID" != macos -a "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+    elif [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
 	return 0
     fi
 

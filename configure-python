@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# configure-python: download and configure python
+# configure-python: download and configure the Python interpreter
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ PYTHON_MIRROR_BASE_URL=https://www.python.org/ftp
 
 PYTHON_OPT_PREFIX=/opt/%s
 PYTHON_PROJECT_NAME=python
-PYTHON_PROJECT_VERSION=3.10.2
+PYTHON_PROJECT_VERSION=3.10.4
 
 abort() {
     printf "$@" >&2
@@ -102,7 +102,7 @@ get_prefix() {
 install_python() {
     if [ "$install" != true ]; then
 	return 0
-    elif [ "$ID" != macos -a "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+    elif [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
 	return 0
     fi
 

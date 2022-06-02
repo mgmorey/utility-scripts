@@ -57,27 +57,27 @@ configure_platform() {
 }
 
 get_brew_command() (
-    for dir in $(get_homebrew_dirs | xargs $realpath); do
+    for dir in $(get_brew_dirs | xargs $realpath); do
 	if [ -x $dir/bin/brew ]; then
 	    printf '%s\n' "$dir/bin/brew"
 	fi
     done
 )
 
-get_homebrew_dirs() {
+get_brew_dirs() {
     ls -d $HOMEBREW_DIRS $HOME/.linuxbrew 2>/dev/null || true
 }
 
-get_homebrew_prefix() {
+get_brew_prefix() {
     "$brew" --prefix 2>/dev/null || true
 }
 
-get_keg_only_packages() {
+get_brew_packages() {
     PATH="$PATH:$(dirname "$brew")" "${script_prefix}brew-list-keg-only"
 }
 
-get_keg_only_pathnames() {
-    get_keg_only_packages | awk -v prefix=$(get_homebrew_prefix) "$AWK_EXPR"
+get_brew_pathnames() {
+    get_brew_packages | awk -v prefix=$1 "$AWK_EXPR"
 }
 
 get_pkgsrc_dirs() {
@@ -88,7 +88,7 @@ get_prefix_dirs() {
     printf '%s\n' $SYSTEM_DIRS \
 	   $(get_solaris_dirs) \
 	   $(get_pkgsrc_dirs) \
-	   $(get_homebrew_dirs)
+	   $(get_brew_dirs)
 }
 
 get_profile_bins() {
@@ -170,7 +170,8 @@ include_brew_directories() {
 	return
     fi
 
-    dirnames=$(get_keg_only_pathnames)
+    brew_prefix=$(get_brew_prefix)
+    dirnames="$brew_prefix $(get_brew_pathnames $brew_prefix)"
 
     if [ -n "$dirnames" ]; then
 	eval "$(${script_prefix}set-oss-parameters $dirnames)"

@@ -1,7 +1,7 @@
 #!/bin/sh -eu
 
-# configure-openssl: download and configure OpenSSL
-# Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
+# configure-libidn2: download and configure the GNU IDN library
+# Copyright (C) 2022  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,14 +16,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-OPENSSL_ARCHIVE_DIR="$HOME/Downloads/OpenSSL"
-OPENSSL_ARCHIVE_SUFFIX=.tar.gz
+GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 
-OPENSSL_MIRROR_BASE_URL=https://www.openssl.org/source
-
-OPENSSL_OPT_PREFIX=/opt/%s
-OPENSSL_PROJECT_NAME=openssl
-OPENSSL_PROJECT_VERSION=3.0.3
+LIBIDN_ARCHIVE_SUFFIX=.tar.gz
+LIBIDN_PROJECT_NAME=libidn
+LIBIDN_PROJECT_VERSION=2.3.2
 
 abort() {
     printf "$@" >&2
@@ -46,7 +43,7 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
-configure_openssl() {
+configure_libidn() {
     umask 0022
 
     if [ "$force" = true ]; then
@@ -58,7 +55,7 @@ configure_openssl() {
     extract_archive "$archive_pathname" "$src_dirname"
     cd "$build_dirname"
 
-    command=$(get_configure_command "$src_dirname" config)
+    command=$(get_libidn_configure_command $src_dirname)
     printf '%s\n' "$command"
     eval $command
 
@@ -67,18 +64,23 @@ configure_openssl() {
     fi
 
     if [ "$check" = true ]; then
-	make_check "test"
+	make_check "check"
     fi
 }
 
 configure_paths() {
-    archive_dirname="$OPENSSL_ARCHIVE_DIR"
-    archive_basename=$OPENSSL_PROJECT_NAME-$version
+    archive_dirname="$GNU_ARCHIVE_DIR"
+    archive_basename=$(get_archive_basename)
     build_dirname="$HOME/Documents/build/$archive_basename"
-    src_dirname="$HOME/Documents/src/OpenSSL/$archive_basename"
-    archive_filename=$archive_basename$OPENSSL_ARCHIVE_SUFFIX
-    archive_pathname="$archive_dirname/$archive_filename"
-    archive_url=$OPENSSL_MIRROR_BASE_URL/$archive_filename
+    src_dirname="$HOME/Documents/src/GNU/$archive_basename"
+    archive_filename=$archive_basename$LIBIDN_ARCHIVE_SUFFIX
+    archive_pathname="$GNU_ARCHIVE_DIR/$archive_filename"
+    archive_url=$GNU_MIRROR_BASE_URL/$LIBIDN_PROJECT_NAME/$archive_filename
+}
+
+get_archive_basename() {
+    project_suffix=$(get_major_version "$version")
+    printf '%s%s-%s\n' "$LIBIDN_PROJECT_NAME" "$project_suffix" "$version"
 }
 
 get_configure_options() (
@@ -92,14 +94,29 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages $OPENSSL_PROJECT_NAME-build $OPENSSL_PROJECT_NAME-test
+    get-packages $LIBIDN_PROJECT_NAME-build $LIBIDN_PROJECT_NAME-test
+}
+
+get_libidn_configure_command() {
+    options=$(get_configure_options)
+    printf '%s' "$1/${2-configure}"
+
+    if [ -n "${options-}" ]; then
+	printf ' %s' "$options"
+    fi
+
+    printf '\n'
+}
+
+get_major_version() {
+    printf '%s\n' "$1" | cut -d. -f1
 }
 
 get_prefix() {
-    printf "$prefix" "$OPENSSL_PROJECT_NAME-$version"
+    printf "$prefix" "$LIBIDN_PROJECT_NAME-$version"
 }
 
-install_openssl() {
+install_libidn() {
     if [ "$install" != true ]; then
 	return 0
     elif [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
@@ -116,12 +133,13 @@ install_openssl() {
 parse_arguments() {
     build=true
     check=false
+    debug=false
     force=false
     install=false
-    prefix=$OPENSSL_OPT_PREFIX
-    version=$OPENSSL_PROJECT_VERSION
+    prefix=$GNU_OPT_PREFIX
+    version=$LIBIDN_PROJECT_VERSION
 
-    while getopts bcfinp:v:h opt; do
+    while getopts bcfginop:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -133,6 +151,9 @@ parse_arguments() {
 		build=true
 		force=true
 		;;
+	    (g)
+		debug=true
+		;;
 	    (i)
 		install=true
 		;;
@@ -140,9 +161,12 @@ parse_arguments() {
 		build=false
 		force=false
 		;;
+	    (o)
+		debug=false
+		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME/.local|$LOCAL_PREFIX|$OPENSSL_OPT_PREFIX)
+		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX)
 			prefix=$OPTARG
 			;;
 		    (*)
@@ -152,10 +176,7 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    (1.[0-9].[0-9][a-z]|1.[1-9][0-9].[0-9][a-z])
-			version=$OPTARG
-			;;
-		    (3.[0-9].[0-9]|3.[1-9][0-9].[0-9])
+		    (4.[1-9][0-9]|4.[1-9][0-9].[0-9])
 			version=$OPTARG
 			;;
 		    (*)
@@ -182,7 +203,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-t] [-v VERSION]
+Usage: $script [-b] [-c] [-f] [-g] [-i] [-n] [-o] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }
@@ -288,7 +309,7 @@ install_dependencies
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"
 else
-    configure_openssl
+    configure_libidn
 fi
 
-install_openssl
+install_libidn

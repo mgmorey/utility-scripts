@@ -79,7 +79,9 @@ configure_paths() {
 }
 
 get_configure_options() (
-    options="--enable-mini-gmp"
+    if [ "$minigmp" = true ]; then
+	options="${options:+$options }--enable-mini-gmp"
+    fi
 
     if [ -n "${prefix-}" ]; then
         options="${options:+$options }--prefix=$(get_prefix)"
@@ -112,7 +114,7 @@ get_prefix() {
 install_nettle() {
     if [ "$install" != true ]; then
 	return 0
-    elif [ "$ID" != macos -a "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+    elif [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
 	return 0
     fi
 
@@ -121,6 +123,11 @@ install_nettle() {
     install_prefix=$(get_prefix)
     make_install prefix="$install_prefix" install
     install_project_link "$install_prefix"
+
+    if [ "$(id -u)" -eq 0 ]; then
+	find "$build_dirname" -user root -type d | xargs chown-real-user
+	find "$build_dirname" -user root -type f | xargs chown-real-user
+    fi
 }
 
 parse_arguments() {
@@ -128,10 +135,11 @@ parse_arguments() {
     check=false
     force=false
     install=false
+    minigmp=false
     prefix=$GNU_OPT_PREFIX
     version=$NETTLE_PROJECT_VERSION
 
-    while getopts bcfinp:v:h opt; do
+    while getopts bcfimnp:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -145,6 +153,9 @@ parse_arguments() {
 		;;
 	    (i)
 		install=true
+		;;
+	    (m)
+		minigmp=true
 		;;
 	    (n)
 		build=false
@@ -189,7 +200,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-c] [-f] [-i] [-m] [-n] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }

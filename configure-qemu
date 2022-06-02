@@ -98,7 +98,7 @@ get_prefix() {
 install_qemu() {
     if [ "$install" != true ]; then
 	return 0
-    elif [ "$ID" != macos -a "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+    elif [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
 	return 0
     fi
 

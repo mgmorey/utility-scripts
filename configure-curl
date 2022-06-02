@@ -109,7 +109,7 @@ get_prefix() {
 install_curl() {
     if [ "$install" != true ]; then
 	return 0
-    elif [ "$ID" != macos -a "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+    elif [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
 	return 0
     fi
 
@@ -301,6 +301,7 @@ configure_platform
 parse_arguments "$@"
 configure_paths
 install_dependencies
+pip install impacket
 
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"

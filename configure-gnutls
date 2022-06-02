@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# configure-gnutls: download and configure GnuTLS
+# configure-gnutls: download and configure the GNU TLS library
 # Copyright (C) 2022  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 GNUTLS_ARCHIVE_SUFFIX=.tar.xz
 GNUTLS_MIRROR_BASE_URL=https://www.gnupg.org/ftp/gcrypt
 GNUTLS_PROJECT_NAME=gnutls
-GNUTLS_PROJECT_VERSION=3.6.16
+GNUTLS_PROJECT_VERSION=3.7.6
 
 abort() {
     printf "$@" >&2
@@ -84,7 +84,10 @@ get_configure_options() (
 	options="${options:+$options }--prefix=$(get_prefix)"
     fi
 
-    options="${options:+$options }--with-included-libtasn1"
+    if ! which asn1Parser >/dev/null 2>&1; then
+	options="${options:+$options }--with-included-libtasn1"
+    fi
+
     options="${options:+$options }--with-included-unistring"
 
     if [ -n "${options:-}" ]; then
@@ -122,7 +125,7 @@ get_url() {
 install_gnutls() {
     if [ "$install" != true ]; then
 	return 0
-    elif [ "$ID" != macos -a "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+    elif [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
 	return 0
     fi
 
@@ -131,6 +134,11 @@ install_gnutls() {
     install_prefix=$(get_prefix)
     make_install prefix="$install_prefix" install
     install_project_link "$install_prefix"
+
+    if [ "$(id -u)" -eq 0 ]; then
+	find "$build_dirname" -user root -type d | xargs chown-real-user
+	find "$build_dirname" -user root -type f | xargs chown-real-user
+    fi
 }
 
 parse_arguments() {
