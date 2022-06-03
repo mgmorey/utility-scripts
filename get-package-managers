@@ -68,6 +68,9 @@ get_package_managers() {
 		    (8.*)
 			managers="/usr/bin/dnf /home/linuxbrew/.linuxbrew/bin/brew"
 			;;
+		    (9.*)
+			managers="/usr/bin/dnf /home/linuxbrew/.linuxbrew/bin/brew"
+			;;
 		    (*)
 			break
 			;;
