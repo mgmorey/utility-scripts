@@ -35,6 +35,7 @@ nm	--version	1s/\(Apple LLVM version\|GNU nm .*\) \([0-9][0-9]*\(\.[0-9][0-9]*\)
 objdump	--version	1s/GNU objdump .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 openssl	version	s/OpenSSL \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 pip	--version	s/pip \([0-9][0-9]*\(\.[0-9][0-9]*\)*\) from .*/\1/p
+pip3	--version	s/pip \([0-9][0-9]*\(\.[0-9][0-9]*\)*\) from .*/\1/p
 pipenv	--version	s/pipenv, version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 pyenv	--version	s/pyenv \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 pytest	--version	s/pytest \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
