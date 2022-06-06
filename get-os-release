@@ -45,7 +45,7 @@ collect_data() {
     system_release=${system_data#* }
 
     case "$system_name" in
-	(CYGWIN_NT-*|MINGW64_NT-*)
+	(CYGWIN_NT-*|MINGW64_NT-*|MSYS_NT-*)
 	    collect_data_for_windows
 	    ;;
 	(GNU|Linux)
