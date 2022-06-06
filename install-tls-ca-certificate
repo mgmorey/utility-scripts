@@ -31,6 +31,56 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
+configure_platform() {
+    case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+                    install_ca_certificates_package
+		    ;;
+		(8)
+		    :
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(7.*)
+                    install_ca_certificates_package
+		    ;;
+		(8.*)
+                    install_ca_certificates_package
+		    ;;
+		(9.*)
+                    install_ca_certificates_package
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(rocky)
+	    case "$VERSION_ID" in
+		(8.*)
+                    install_ca_certificates_package
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(windows)
+            true
+	    ;;
+	(*)
+	    abort_not_supported Distro
+	    ;;
+    esac
+}
+
 install_ca_certificate_file() {
     update-ca-trust force-enable
     install -m a=r "$file" $CA_CERTIFICATE_TARGET_DIR
@@ -61,7 +111,7 @@ install_tls_ca_certificate() {
     esac
 
     umask 0022
-    install_ca_certificates_package
+    configure_platform
     install_ca_certificate_file
 }
 
@@ -105,52 +155,48 @@ usage_error() {
 }
 
 validate_platform() {
-    case "$kernel_name" in
-	(Linux)
-	    case "$ID" in
-		(centos)
-		    case "$VERSION_ID" in
-			(7)
-			    :
-			    ;;
-			(8)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
+    case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    true
 		    ;;
-		(rhel|ol)
-		    case "$VERSION_ID" in
-			(7.*)
-			    :
-			    ;;
-			(8.*)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
-		    ;;
-		(rocky)
-		    case "$VERSION_ID" in
-			(8.*)
-			    :
-			    ;;
-			(*)
-			    abort_not_supported Release
-			    ;;
-		    esac
+		(8)
+		    :
 		    ;;
 		(*)
-		    abort_not_supported Distro
+		    abort_not_supported Release
 		    ;;
-		esac
+	    esac
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    true
+		    ;;
+		(8.*)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(rocky)
+	    case "$VERSION_ID" in
+		(8.*)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(windows)
+            true
 	    ;;
 	(*)
-	    abort_not_supported "Operating system"
+	    abort_not_supported Distro
 	    ;;
     esac
 }
