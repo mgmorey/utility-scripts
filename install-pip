@@ -83,6 +83,9 @@ validate_platform() {
 		    (8|8.*)
 			return
 			;;
+		    (9|9.*)
+			return
+			;;
 		    (*)
 			break
 			;;

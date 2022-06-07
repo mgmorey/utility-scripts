@@ -48,6 +48,9 @@ configure_platform() {
 		    (8.*)
 			install-epel
 			;;
+		    (9.*)
+			install-epel
+			;;
 		    (*)
 			break
 			;;
@@ -113,6 +116,9 @@ validate_platform() {
 			return
 			;;
 		    (8.*)
+			return
+			;;
+		    (9.*)
 			return
 			;;
 		    (*)
