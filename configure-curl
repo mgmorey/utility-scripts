@@ -23,7 +23,7 @@ CURL_MIRROR_BASE_URL=https://curl.se
 
 CURL_OPT_PREFIX=/opt/%s
 CURL_PROJECT_NAME=curl
-CURL_PROJECT_VERSION=7.83.1
+CURL_PROJECT_VERSION=7.84.0
 CURL_TLS_BACKEND=openssl
 
 abort() {
@@ -301,7 +301,6 @@ configure_platform
 parse_arguments "$@"
 configure_paths
 install_dependencies
-pip install impacket
 
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"
