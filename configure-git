@@ -23,7 +23,7 @@ GIT_MIRROR_BASE_URL=https://www.kernel.org/pub/software/scm/git
 
 GIT_OPT_PREFIX=/opt/%s
 GIT_PROJECT_NAME=git
-GIT_PROJECT_VERSION=2.36.1
+GIT_PROJECT_VERSION=2.37.0
 
 abort() {
     printf "$@" >&2
