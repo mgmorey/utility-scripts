@@ -86,7 +86,7 @@ configure_paths() {
     archive_url=$CURL_MIRROR_BASE_URL/download/$archive_filename
 }
 
-get_configure_options() (
+get_curl_configure_options() (
     if [ -n "${prefix-}" ]; then
         options="${options:+$options }--prefix=$(get_prefix)"
     fi
@@ -99,11 +99,7 @@ get_configure_options() (
 )
 
 get_curl_configure_command() {
-    cflags="${CFLAGS-}${cflags+ $cflags}"
-    cppflags="${CPPFLAGS-}${cppflags+ $cppflags}"
-    cxxflags="${CXXFLAGS-}${cxxflags+ $cxxflags}"
-    ldflags="${LDFLAGS-}${ldflags+ $ldflags}"
-    options=$(get_configure_options)
+    options=$(get_curl_configure_options)
     printf '%s' "$1/${2-configure}"
 
     if [ -n "${options-}" ]; then
