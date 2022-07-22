@@ -39,7 +39,13 @@ assert() {
 
 configure_platform() {
     realpath=$(get_realpath_command)
-    brew=$(get_brew_command)
+
+    if [ "${USING_HOMEBREW-false}" = true ]; then
+	brew=$(get_brew_command)
+    else
+	brew=
+    fi
+
     bins=
 
     for id in $ID $ID_LIKE; do
