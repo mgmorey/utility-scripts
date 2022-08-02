@@ -1,0 +1,302 @@
+#!/bin/sh -eu
+
+# configure-libpsl: download and configure Public Suffix List library
+# Copyright (C) 2022  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+LIBPSL_ARCHIVE_DIR="$HOME/Downloads/PSL"
+LIBPSL_ARCHIVE_SUFFIX=.tar.gz
+
+LIBPSL_MIRROR_BASE_URL=https://github.com/rockdaboot/libpsl/releases/download
+
+LIBPSL_OPT_PREFIX=/opt/%s
+LIBPSL_PROJECT_NAME=libpsl
+LIBPSL_PROJECT_VERSION=0.21.0
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_invalid_prefix() {
+    usage_error '%s: invalid prefix -- %s\n' "$script" "$*"
+}
+
+abort_invalid_version() {
+    usage_error '%s: invalid version -- %s\n' "$script" "$*"
+}
+
+abort_not_supported() {
+    abort '%s: %s: %s not supported\n' "$script" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
+}
+
+configure_libpsl() {
+    umask 0022
+
+    if [ "$force" = true ]; then
+	rm -rf "$build_dirname" "$src_dirname" "$archive_pathname"
+    fi
+
+    mkdir -p "$build_dirname" "$src_dirname" "$archive_dirname"
+    download_archive "$archive_pathname" "$archive_url"
+    extract_archive "$archive_pathname" "$src_dirname"
+    cd "$build_dirname"
+
+    command=$(get_libpsl_configure_command $src_dirname)
+    printf '%s\n' "$command"
+    eval $command
+
+    if [ "$build" = true ]; then
+	make_build
+    fi
+
+    if [ "$check" = true ]; then
+	make_check "check"
+    fi
+}
+
+configure_paths() {
+    archive_dirname="$LIBPSL_ARCHIVE_DIR"
+    archive_basename=$LIBPSL_PROJECT_NAME-$version
+    build_dirname="$HOME/Documents/build/$archive_basename"
+    src_dirname="$HOME/Documents/src/PSL/$archive_basename"
+    archive_filename=$archive_basename$LIBPSL_ARCHIVE_SUFFIX
+    archive_pathname="$LIBPSL_ARCHIVE_DIR/$archive_filename"
+    archive_url="$LIBPSL_MIRROR_BASE_URL/$archive_basename/$archive_filename"
+}
+
+get_configure_options() (
+    if [ -n "${prefix-}" ]; then
+        options="${options:+$options }--prefix=$(get_prefix)"
+    fi
+
+    if [ -n "${options:-}" ]; then
+	printf '%s\n' "$options"
+    fi
+)
+
+get_dependencies() {
+    get-packages $LIBPSL_PROJECT_NAME-build $LIBPSL_PROJECT_NAME-test
+}
+
+get_libpsl_configure_command() {
+    options=$(get_configure_options)
+    printf '%s' "$1/${2-configure}"
+
+    if [ -n "${options-}" ]; then
+	printf ' %s' "$options"
+    fi
+
+    printf '\n'
+}
+
+get_prefix() {
+    printf "$prefix" "$LIBPSL_PROJECT_NAME-$version"
+}
+
+install_libpsl() {
+    if [ "$install" != true ]; then
+	return 0
+    elif [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+	return 0
+    fi
+
+    umask 0022
+    cd "$build_dirname"
+    install_prefix=$(get_prefix)
+    make_install prefix="$install_prefix" install
+    install_project_link "$install_prefix"
+}
+
+parse_arguments() {
+    build=true
+    check=false
+    force=false
+    install=false
+    prefix=$LIBPSL_OPT_PREFIX
+    version=$LIBPSL_PROJECT_VERSION
+
+    while getopts bcfginop:v:h opt; do
+	case $opt in
+	    (b)
+		build=true
+		;;
+	    (c)
+		check=true
+		;;
+	    (f)
+		build=true
+		force=true
+		;;
+	    (i)
+		install=true
+		;;
+	    (n)
+		build=false
+		force=false
+		;;
+	    (p)
+		case $OPTARG in
+		    ($HOME/.local|$LOCAL_PREFIX|$LIBPSL_OPT_PREFIX)
+			prefix=$OPTARG
+			;;
+		    (*)
+			abort_invalid_prefix $OPTARG
+			;;
+		esac
+		;;
+	    (v)
+		case $OPTARG in
+		    (0.[0-9]|0.[1-9][0-9]|0.[1-9][0-9].[0-9])
+			version=$OPTARG
+			;;
+		    (*)
+			abort_invalid_version $OPTARG
+			;;
+		esac
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error '%s: Too many arguments\n' "$script"
+    fi
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-v VERSION]
+       $script -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+validate_platform() {
+    case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    return
+		    ;;
+		(8)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    return
+	    ;;
+	(fedora)
+	    return
+	    ;;
+	(opensuse-*)
+	    return
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    return
+		    ;;
+		(8.*)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    return
+	    ;;
+	(freebsd)
+	    return
+	    ;;
+	(illumos)
+	    return
+	    ;;
+	(macos)
+	    return
+	    ;;
+	(netbsd)
+	    return
+	    ;;
+	(solaris)
+	    return
+	    ;;
+	(windows)
+	    return
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
+
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+. "${script_prefix}config-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+validate_platform
+configure_platform
+parse_arguments "$@"
+configure_paths
+install_dependencies
+
+if [ "$(id -u)" -eq 0 ]; then
+    run_unpriv /bin/sh -c "$0 $*"
+else
+    configure_libpsl
+fi
+
+install_libpsl
