@@ -20,7 +20,7 @@ GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 
 NETTLE_ARCHIVE_SUFFIX=.tar.gz
 NETTLE_PROJECT_NAME=nettle
-NETTLE_PROJECT_VERSION=3.8
+NETTLE_PROJECT_VERSION=3.8.1
 
 abort() {
     printf "$@" >&2
@@ -173,7 +173,7 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    (3.[0-9]|3.[1-9][0-9])
+		    (3.[0-9]|3.[1-9][0-9]|3.[1-9][0-9].[0-9])
 			version=$OPTARG
 			;;
 		    (*)
