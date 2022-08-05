@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# configure-gmp: download and configure the GNU GMP library
+# configure-gmp: download and configure the GNU MP Bignum library
 # Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

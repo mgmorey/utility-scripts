@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# configure-gdb: download and configure GDB
+# configure-gdb: download and configure the GNU Debugger
 # Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

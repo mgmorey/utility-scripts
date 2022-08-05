@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# configure-sbcl: download and configure SBCL
+# configure-sbcl: download and configure Steel Bank Common Lisp
 # Copyright (C) 2022  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# configure-libidn2: download and configure the GNU IDN library
+# configure-libidn2: download and configure the GNU IDN Library
 # Copyright (C) 2022  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
