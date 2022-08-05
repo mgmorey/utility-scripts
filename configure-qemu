@@ -23,7 +23,7 @@ QEMU_MIRROR_BASE_URL=https://download.qemu.org
 
 QEMU_OPT_PREFIX=/opt/%s
 QEMU_PROJECT_NAME=qemu
-QEMU_PROJECT_VERSION=3.0.0
+QEMU_PROJECT_VERSION=7.0.0
 
 abort() {
     printf "$@" >&2
