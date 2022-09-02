@@ -26,7 +26,7 @@ abort_python_missing() {
 }
 
 get_python_interpreter() {
-    get-python-interpreter -q $PYTHON_VERSIONS
+    ${script_prefix}get-python-interpreter -q $PYTHON_VERSIONS
 }
 
 run_python() {
@@ -39,4 +39,16 @@ run_python() {
     fi
 }
 
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
 run_python "$@"
