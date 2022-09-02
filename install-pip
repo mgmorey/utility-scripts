@@ -37,7 +37,8 @@ get_packages() {
 
 install_pip() {
     validate_platform
-    install-packages $(get_packages)
+    "${script_prefix}get-configuration"
+    "${script_prefix}install-packages" $(get_packages)
 }
 
 validate_platform() {
