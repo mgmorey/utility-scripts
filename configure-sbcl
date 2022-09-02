@@ -95,7 +95,7 @@ install_sbcl() {
     umask 0022
     cd "$src_dirname"
     install_prefix=$(get_prefix)
-    sh install.sh --prefix="$install_prefix"
+    INSTALL_ROOT="$install_prefix" sh install.sh
     install_project_link "$install_prefix"
 }
 
@@ -212,20 +212,7 @@ validate_platform() {
 	(opensuse-*)
 	    return
 	    ;;
-	(ol)
-	    case "$VERSION_ID" in
-		(7.*)
-		    return
-		    ;;
-		(8.*)
-		    return
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(rhel)
+	(rhel|ol|almalinux)
 	    case "$VERSION_ID" in
 		(7.*)
 		    return
