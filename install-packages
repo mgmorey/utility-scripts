@@ -182,7 +182,9 @@ install_packages_using() (
 
     case "$(basename $manager)" in
 	(brew)
-	    run_unpriv /bin/sh -c "$manager $install $*"
+            if [ -x "$manager" ]; then
+	        run_unpriv /bin/sh -c "$manager $install $*"
+            fi
 	    ;;
 	(*)
 	    $manager $install $options $*
