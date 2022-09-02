@@ -52,19 +52,18 @@ assert() {
 configure_paths() {
     archive_dirname="$SBCL_ARCHIVE_DIR"
     archive_basename=$(get_archive_basename)
-    tmp_dirname="/var/tmp/SBCL/$(get_archive_dirname)"
+    tmp_dirname=/var/tmp/${archive_basename%-binary}
     archive_filename=$archive_basename$SBCL_ARCHIVE_SUFFIX
     archive_pathname="$archive_dirname/$archive_filename"
 }
 
-configure_sbcl() {
+extract_sbcl() {
     umask 0022
 
     if [ "$force" = true ]; then
-	/bin/rm -rf "$src_dirname"
+	/bin/rm -rf "$tmp_dirname"
     fi
 
-    mkdir -p "$(dirname "$tmp_dirname")"
     extract_archive "$archive_pathname" "$tmp_dirname"
 }
 
@@ -78,16 +77,6 @@ get_archive_basename() (
 	   $os \
 	   binary
 )
-
-get_archive_dirname() {
-    arch=$(get_machine_architecture)
-    os=$(get_operating_system)
-    printf '%s-%s-%s-%s\n' \
-	   $SBCL_PROJECT_NAME \
-	   $version \
-	   $arch \
-	   $os
-}
 
 get_machine_architecture() (
     arch=$(uname -m)
@@ -288,7 +277,7 @@ configure_paths
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"
 else
-    configure_sbcl
+    extract_sbcl
 fi
 
 install_sbcl
