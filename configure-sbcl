@@ -21,7 +21,7 @@ SBCL_ARCHIVE_SUFFIX=.tar.bz2
 
 SBCL_OPT_PREFIX=/opt/%s
 SBCL_PROJECT_NAME=sbcl
-SBCL_PROJECT_VERSION=2.2.7
+SBCL_PROJECT_VERSION=2.2.8
 
 abort() {
     printf "$@" >&2
@@ -146,7 +146,7 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    (4.[1-9]|4.[1-9][0-9])
+		    (2.[1-9]|2.[1-9].[1-9]|2.[1-9].[1-9][0-9])
 			version=$OPTARG
 			;;
 		    (*)
