@@ -79,7 +79,7 @@ get_archive_basename() (
 )
 
 get_machine_architecture() (
-    arch=$(uname -m)
+    arch=$(uname -m | tr -- '_' '-')
 
     case "$arch" in
 	(aarch64)
