@@ -16,8 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+PREFIX=/usr/local
+
 get_configuration() {
-    for run_python in /usr/local/bin/run-python run-python; do
+    for run_python in run-python $PREFIX/bin/run-python; do
 	if which $run_python >/dev/null 2>&1; then
 	    $run_python "${script_prefix}$script.py" "$@"
 	    break
