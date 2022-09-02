@@ -16,11 +16,29 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CATEGORIES="sbcl"
+SBCL_ARCHIVE_DIR="$HOME/Downloads/SBCL"
+SBCL_ARCHIVE_SUFFIX=.tar.bz2
+
+SBCL_OPT_PREFIX=/opt/%s
+SBCL_PROJECT_NAME=sbcl
+SBCL_PROJECT_VERSION=2.2.8
 
 abort() {
     printf "$@" >&2
     exit 1
+}
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_invalid_prefix() {
+    usage_error '%s: invalid prefix -- %s\n' "$script" "$*"
+}
+
+abort_invalid_version() {
+    usage_error '%s: invalid version -- %s\n' "$script" "$*"
 }
 
 abort_not_supported() {
@@ -28,112 +46,224 @@ abort_not_supported() {
 }
 
 assert() {
-    "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
-get_packages() {
-    "${script_prefix}get-packages" $CATEGORIES
+configure_paths() {
+    archive_dirname="$SBCL_ARCHIVE_DIR"
+    archive_basename=$(get_archive_basename)
+    tmp_dirname="/var/tmp/SBCL/$(get_archive_dirname)"
+    archive_filename=$archive_basename$SBCL_ARCHIVE_SUFFIX
+    archive_pathname="$archive_dirname/$archive_filename"
+}
+
+configure_sbcl() {
+    umask 0022
+
+    if [ "$force" = true ]; then
+	/bin/rm -rf "$src_dirname"
+    fi
+
+    mkdir -p "$(dirname "$tmp_dirname")"
+    extract_archive "$archive_pathname" "$tmp_dirname"
+}
+
+get_archive_basename() (
+    arch=$(get_machine_architecture)
+    os=$(get_operating_system)
+    printf '%s-%s-%s-%s-%s\n' \
+	   $SBCL_PROJECT_NAME \
+	   $version \
+	   $arch \
+	   $os \
+	   binary
+)
+
+get_archive_dirname() {
+    arch=$(get_machine_architecture)
+    os=$(get_operating_system)
+    printf '%s-%s-%s-%s\n' \
+	   $SBCL_PROJECT_NAME \
+	   $version \
+	   $arch \
+	   $os
+}
+
+get_machine_architecture() (
+    arch=$(uname -m)
+
+    case "$arch" in
+	(aarch64)
+	    printf '%s\n' arm64
+	    ;;
+	(*)
+	    printf '%s\n' $arch
+	    ;;
+    esac
+)
+
+get_operating_system() {
+    uname -s | tr '[:upper:]' '[:lower:]'
+}
+
+get_prefix() {
+    printf "$prefix" "$SBCL_PROJECT_NAME-$version"
 }
 
 install_sbcl() {
-    validate_platform
-    install-packages $(get_packages)
+    if [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+	return 0
+    fi
+
+    umask 0022
+    cd "$tmp_dirname"
+    install_prefix=$(get_prefix)
+    INSTALL_ROOT="$install_prefix" sh install.sh
+    install_project_link "$install_prefix"
 }
 
-validate_platform() {
-    for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (centos)
-		case "$VERSION_ID" in
-		    (7)
-			return
-			;;
-		    (8)
-			return
+parse_arguments() {
+    force=false
+    prefix=$SBCL_OPT_PREFIX
+    version=$SBCL_PROJECT_VERSION
+
+    while getopts fp:v:h opt; do
+	case $opt in
+	    (f)
+		force=true
+		;;
+	    (p)
+		case $OPTARG in
+		    ($HOME/.local|$LOCAL_PREFIX|$SBCL_OPT_PREFIX)
+			prefix=$OPTARG
 			;;
 		    (*)
-			break
+			abort_invalid_prefix $OPTARG
 			;;
 		esac
 		;;
-	    (debian)
-		case "$VERSION_ID" in
-		    (10)
-			return
-			;;
-		    (11)
-			return
+	    (v)
+		case $OPTARG in
+		    ([12].[1-9]|[12].[1-9].[1-9]|[12].[1-9].[1-9][0-9])
+			version=$OPTARG
 			;;
 		    (*)
-			break
+			abort_invalid_version $OPTARG
 			;;
 		esac
 		;;
-	    (fedora)
-		return
+	    (h)
+		usage
+		exit 0
 		;;
-	    (opensuse)
-		return
-		;;
-	    (rhel|ol)
-		case "$VERSION_ID" in
-		    (7|7.*)
-			return
-			;;
-		    (8|8.*)
-			return
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (ubuntu)
-		case "$VERSION_ID" in
-		    (18.*)
-			return
-			;;
-		    (19.*)
-			return
-			;;
-		    (20.*)
-			return
-			;;
-		    (21.*)
-			return
-			;;
-		    (*)
-			break
-			;;
-		esac
-		;;
-	    (freebsd)
-		return
-		;;
-	    (macos)
-		return
-		;;
-	    (netbsd)
-		return
-		;;
-	    (solaris)
-		return
-		;;
-	    (windows)
-		case "$kernel_name" in
-		    (MINGW64_NT)
-			return
-			;;
-		    (*)
-			break
-			;;
-		esac
+	    (\?)
+		exit 2
 		;;
 	esac
     done
 
-    abort_not_supported "Operating system"
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error '%s: Too many arguments\n' "$script"
+    fi
 }
+
+usage() {
+    cat <<EOF >&2
+Usage: $script [-f] [-p PREFIX] [-v VERSION]
+       $script -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+validate_platform() {
+    case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    return
+		    ;;
+		(8)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    return
+	    ;;
+	(fedora)
+	    return
+	    ;;
+	(opensuse-*)
+	    return
+	    ;;
+	(rhel|ol|archlinux)
+	    case "$VERSION_ID" in
+		(7.*)
+		    return
+		    ;;
+		(8.*)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(rocky)
+	    case "$VERSION_ID" in
+		(7.*)
+		    return
+		    ;;
+		(8.*)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    return
+	    ;;
+	(freebsd)
+	    return
+	    ;;
+	(illumos)
+	    return
+	    ;;
+	(macos)
+	    return
+	    ;;
+	(netbsd)
+	    return
+	    ;;
+	(solaris)
+	    return
+	    ;;
+	(windows)
+	    return
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
+
+script=$(basename "$0")
 
 case "$0" in
     (*/*)
@@ -147,7 +277,18 @@ esac
 script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
+. "${script_prefix}config-functions.sh"
 
 set_user_profile "$script_dir"
 eval $(get-os-release -x)
+validate_platform
+parse_arguments "$@"
+configure_paths
+
+if [ "$(id -u)" -eq 0 ]; then
+    run_unpriv /bin/sh -c "$0 $*"
+else
+    configure_sbcl
+fi
+
 install_sbcl
