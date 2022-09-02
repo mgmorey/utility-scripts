@@ -77,10 +77,6 @@ configure_platform() {
 		;;
 	esac
     done
-
-    if [ -n "${cc-}" ] && [ ! -x $cc ]; then
-	abort '%s: %s: No such compiler\n' "$script" "$cc"
-    fi
 }
 
 configure_platform_bsd_netbsd() {
