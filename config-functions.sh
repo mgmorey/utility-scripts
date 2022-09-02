@@ -322,9 +322,13 @@ install_dependencies() {
 	    ;;
     esac
 
+    ${script_prefix}get-configuration
     packages="$(get_dependencies | sort -u)"
     pattern="$(get-packages -s pattern development)"
-    install-packages ${pattern:+-p "$pattern" }$packages
+
+    if [ -n "$packages" -o -n "$pattern" ]; then
+	install-packages ${pattern:+-p "$pattern" }$packages
+    fi
 }
 
 install_project_link() (
