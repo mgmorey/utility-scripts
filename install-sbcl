@@ -207,6 +207,9 @@ validate_platform() {
 		(8.*)
 		    return
 		    ;;
+		(9.*)
+		    return
+		    ;;
 		(*)
 		    abort_not_supported Release
 		    ;;

@@ -86,59 +86,46 @@ validate_platform() {
 			;;
 		esac
 		;;
-	    (debian)
-		case "$VERSION_ID" in
-		    (10)
-			return
-			;;
-		    (11)
-			return
-			;;
-		    (*)
-			break
-			;;
-		esac
+	    (debian|raspbian)
+		return
 		;;
 	    (fedora)
 		return
 		;;
-	    (opensuse)
+	    (opensuse-*)
 		return
 		;;
-	    (rhel|ol)
+	    (rhel|ol|almalinux)
 		case "$VERSION_ID" in
-		    (7|7.*)
+		    (7.*)
 			return
 			;;
-		    (8|8.*)
+		    (8.*)
+			return
+			;;
+		    (9.*)
 			return
 			;;
 		    (*)
 			break
+			;;
+		esac
+		;;
+	    (rocky)
+		case "$VERSION_ID" in
+		    (7.*)
+			return
+			;;
+		    (8.*)
+			return
+			;;
+		    (*)
+			abort_not_supported Release
 			;;
 		esac
 		;;
 	    (ubuntu)
-		case "$VERSION_ID" in
-		    (18.*)
-			return
-			;;
-		    (19.*)
-			return
-			;;
-		    (20.*)
-			return
-			;;
-		    (21.*)
-			return
-			;;
-		    (22.*)
-			return
-			;;
-		    (*)
-			break
-			;;
-		esac
+		return
 		;;
 	    (freebsd)
 		return
@@ -153,17 +140,7 @@ validate_platform() {
 		return
 		;;
 	    (windows)
-		case "$kernel_name" in
-		    (CYGWIN_NT)
-			return
-			;;
-		    (MINGW64_NT)
-			return
-			;;
-		    (*)
-			break
-			;;
-		esac
+		return
 		;;
 	esac
     done
