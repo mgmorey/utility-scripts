@@ -63,7 +63,7 @@ install_sbcl() {
 	case "$id" in
 	    (windows)
 		return
- 		;;
+		;;
 	esac
     done
 

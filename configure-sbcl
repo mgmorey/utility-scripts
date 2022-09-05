@@ -67,9 +67,9 @@ configure_sbcl() {
 	build_prefix=$(get_prefix)
 	sh make.sh --prefix="$build_prefix"
 
-        if [ "$docs" = true ]; then
+	if [ "$docs" = true ]; then
 	    (cd ./doc/manual && make)
-        fi
+	fi
     fi
 
     if [ "$check" = true ]; then
