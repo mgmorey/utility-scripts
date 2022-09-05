@@ -157,7 +157,9 @@ install_emacs() {
     if [ "$install" != true ]; then
 	return 0
     elif [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
-	return 0
+	if [ ! -w "$install_prefix" ]; then
+	    return 0
+	fi
     fi
 
     umask 0022
