@@ -98,11 +98,19 @@ parse_arguments() {
 }
 
 parse_category() {
-    if is_valid_category "$1"; then
-	categories="${categories:+$categories }$1"
+    category=$(to_lower $1)
+
+    if is_valid_category "$category"; then
+	categories="${categories:+$categories }$category"
     else
 	usage_error '%s: %s: Invalid category\n' "$script" "$1"
     fi
+}
+
+to_lower() {
+    if [ $# -gt 0 ]; then
+	printf '%s\n' "$1"
+    fi | tr '[:upper:]' '[:lower:]'
 }
 
 usage() {
