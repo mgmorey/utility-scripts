@@ -20,7 +20,7 @@ GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 
 EMACS_ARCHIVE_SUFFIX=.tar.xz
 EMACS_PROJECT_NAME=emacs
-EMACS_PROJECT_VERSION=28.1
+EMACS_PROJECT_VERSION=28.2
 EMACS_TLS_BACKEND=openssl
 
 abort() {
@@ -154,6 +154,8 @@ get_prefix() {
 }
 
 install_emacs() {
+    install_prefix=$(get_prefix)
+
     if [ "$install" != true ]; then
 	return 0
     elif [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
@@ -164,7 +166,6 @@ install_emacs() {
 
     umask 0022
     cd "$build_dirname"
-    install_prefix=$(get_prefix)
     make_install prefix="$install_prefix" install
     install_project_link "$install_prefix"
 }
