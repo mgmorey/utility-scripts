@@ -86,6 +86,16 @@ configure_paths() {
     archive_url=$CURL_MIRROR_BASE_URL/download/$archive_filename
 }
 
+get_curl_configure_cflags() (
+    if [ -n "${debug-}" ]; then
+	CFLAGS="${CFLAGS+$CFLAGS }-O0 -g"
+    fi
+
+    if [ -n "${CFLAGS:-}" ]; then
+	printf '%s\n' "$CFLAGS"
+    fi
+)
+
 get_curl_configure_options() (
     if [ -n "${prefix-}" ]; then
         options="${options:+$options }--prefix=$(get_prefix)"
@@ -99,10 +109,15 @@ get_curl_configure_options() (
 )
 
 get_curl_configure_command() {
+    CFLAGS=$(get_curl_configure_cflags)
     options=$(get_curl_configure_options)
     printf '%s' "$1/${2-configure}"
 
-    if [ -n "${options-}" ]; then
+    if [ -n "${CFLAGS:-}" ]; then
+	printf ' %s' CFLAGS="\"$CFLAGS\""
+    fi
+
+    if [ -n "${options:-}" ]; then
 	printf ' %s' "$options"
     fi
 
@@ -141,7 +156,7 @@ parse_arguments() {
     tls_backend=$CURL_TLS_BACKEND
     version=$CURL_PROJECT_VERSION
 
-    while getopts bcfinp:t:v:h opt; do
+    while getopts bcfginp:t:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -152,6 +167,9 @@ parse_arguments() {
 	    (f)
 		build=true
 		force=true
+		;;
+	    (g)
+		debug=true
 		;;
 	    (i)
 		install=true
@@ -209,7 +227,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-t TLS-BACKEND] \
+Usage: $script [-b] [-c] [-f] [-g] [-i] [-n] [-p PREFIX] [-t TLS-BACKEND] \
 [-v VERSION]
        $script -h
 EOF
