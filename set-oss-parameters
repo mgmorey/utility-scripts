@@ -84,11 +84,17 @@ set_oss_dir() {
 	    ;;
 	(lib)
 	    if [ "$(get_count "$1/*.a" "$1/*.la")" -gt 0 ]; then
-		LDFLAGS="-L$1${LDFLAGS+ $LDFLAGS}"
+		if ! is_included "-L$1" "${LDFLAGS-}"; then
+		    LDFLAGS="-L$1${LDFLAGS+ $LDFLAGS}"
+		fi
 	    fi
 	    if [ "$(get_count "$1/*.dylib" "$1/*.so" "$1/*.so.*")" -gt 0 ]; then
-		LD_LIBRARY_PATH="$1${LD_LIBRARY_PATH+:$LD_LIBRARY_PATH}"
-		LD_RUN_PATH="$1${LD_RUN_PATH+:$LD_RUN_PATH}"
+		if ! is_included "$1" "${LD_LIBRARY_PATH-}"; then
+		    LD_LIBRARY_PATH="$1${LD_LIBRARY_PATH+:$LD_LIBRARY_PATH}"
+		fi
+		if ! is_included "$1" "${LD_RUN_PATH-}"; then
+		    LD_RUN_PATH="$1${LD_RUN_PATH+:$LD_RUN_PATH}"
+		fi
 	    fi
 	    ;;
 	(man)
