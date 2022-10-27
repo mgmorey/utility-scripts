@@ -23,7 +23,7 @@ UNBOUND_MIRROR_BASE_URL=https://www.nlnetlabs.nl/downloads/unbound
 
 UNBOUND_OPT_PREFIX=/opt/%s
 UNBOUND_PROJECT_NAME=unbound
-UNBOUND_PROJECT_VERSION=1.16.2
+UNBOUND_PROJECT_VERSION=1.17.0
 
 abort() {
     printf "$@" >&2
