@@ -1,0 +1,8 @@
+#!/bin/sh -eu
+
+yum install -y epel-release
+yum install -y xrdp
+systemctl enable xrdp
+systemctl start xrdp
+firewall-cmd --add-port=3389/tcp --permanent
+firewall-cmd --reload
