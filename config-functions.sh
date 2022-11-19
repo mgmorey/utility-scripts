@@ -67,6 +67,10 @@ configure_platform() {
 		configure_platform_unix_illumos
 		break
 		;;
+	    (freebsd)
+		configure_platform_bsd_freebsd
+		break
+		;;
 	    (netbsd)
 		configure_platform_bsd_netbsd
 		break
@@ -79,10 +83,18 @@ configure_platform() {
     done
 }
 
-configure_platform_bsd_netbsd() {
+configure_platform_bsd_freebsd() {
     make=gmake
+}
+
+configure_platform_bsd_netbsd() {
+     make=gmake
     include_prefix /usr/pkg
     configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
+}
+
+configure_platform_bsd_freebsd() {
+    make=gmake
 }
 
 configure_platform_linux_redhat_8() {
