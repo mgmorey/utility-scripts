@@ -20,7 +20,7 @@ GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 
 GDB_ARCHIVE_SUFFIX=.tar.xz
 GDB_PROJECT_NAME=gawk
-GDB_PROJECT_VERSION=5.1.1
+GDB_PROJECT_VERSION=5.2.1
 
 abort() {
     printf "$@" >&2
