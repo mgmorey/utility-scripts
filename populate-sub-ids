@@ -1,0 +1,7 @@
+#!/bin/sh -eux
+
+for file in /etc/sub[gu]id; do
+    if [ ! -s "$file" ]; then
+	printf '%s\n' "$USER::100000:65536" >$file
+    fi
+done
