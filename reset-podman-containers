@@ -1,0 +1,5 @@
+#!/bin/sh -eux
+
+uid=$(id -u)
+
+/bin/rm -rf ~/.{config,local/share}/containers /run/user/$uid/{libpod,runc,vfs-*}
