@@ -1,7 +1,27 @@
 #!/bin/sh -eux
 
-for file in /etc/sub[gu]id; do
-    if [ ! -s "$file" ]; then
-	printf '%s\n' "$USER::100000:65536" >$file
-    fi
-done
+BASE_NAMES="subgid subuid"
+
+GID_BEGIN=100000
+GID_COUNT=65536
+
+print_entry() {
+    printf '%s:%s:%s\n' \
+	   "$user_name" \
+	   $GID_BEGIN \
+	   $GID_COUNT
+}
+
+populate_sub_ids() {
+    user_name=${SUDO_USER-$USER}
+
+    for base_name in $BASE_NAMES; do
+	file_name=/etc/$base_name
+
+	if [ ! -s "$file_name" ]; then
+	    print_entry >$file_name
+	fi
+    done
+}
+
+populate_sub_ids
