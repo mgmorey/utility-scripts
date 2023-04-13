@@ -38,6 +38,7 @@ openssl	version	s/OpenSSL \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 pip	--version	s/pip \([0-9][0-9]*\(\.[0-9][0-9]*\)*\) from .*/\1/p
 pip3	--version	s/pip \([0-9][0-9]*\(\.[0-9][0-9]*\)*\) from .*/\1/p
 pipenv	--version	s/pipenv, version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
+podman	--version	s/podman version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 pyenv	--version	s/pyenv \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 pytest	--version	s/pytest \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 python	--version	s/Python \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
