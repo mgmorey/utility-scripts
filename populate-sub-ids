@@ -22,6 +22,8 @@ populate_sub_ids() {
 	    print_entry >$file_name
 	fi
     done
+
+    podman system migrate
 }
 
 populate_sub_ids
