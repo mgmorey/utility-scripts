@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-VOLUME_GID=500
-VOLUME_UID=500
+: ${VOLUME_GID=500}
+: ${VOLUME_UID=500}
 
 VOLUME_COMMENT='Docker Volume Account'
 VOLUME_FILE=docker-volumes.txt
@@ -92,20 +92,30 @@ create_docker_volume_devices() {
     real_user=$(get_real_user)
     volume_file=$(find_file $VOLUME_FILE)
 
-    if [ ! -f $volume_file ]; then
-	abort '%s: %s: No such volume file\n' "$script" "$volume_file"
+    if [ -d "$volume_home" ]; then
+	skip_volumes=true
     fi
 
-    umask 0022
-    create_home_directory
+    if [ "$skip_volumes" = false ]; then
+	if [ ! -f $volume_file ]; then
+	    abort '%s: %s: No such volume file\n' "$script" "$volume_file"
+	fi
 
-    get_volumes | while IFS=':' read device mount mode name; do
-	create_volume_device "$device"
-    done
+	umask 0022
+	create_home_directory
+
+	get_volumes | while IFS=':' read device mount mode name; do
+	    create_volume_device "$device"
+	done
+    fi
 
     create_volume_group
     create_volume_user
-    modify_permissions
+
+    if [ "$skip_volumes" = false ]; then
+	modify_permissions
+    fi
+
     modify_user
 }
 
@@ -236,13 +246,14 @@ modify_user() {
 }
 
 parse_arguments() {
+    skip_volumes=false
     template_dir=
     volume_comment=$VOLUME_COMMENT
     volume_group=$VOLUME_GROUP
     volume_home=$VOLUME_HOME
     volume_user=$VOLUME_USER
 
-    while getopts c:d:g:n:t:h opt; do
+    while getopts c:d:g:n:st:h opt; do
 	case $opt in
 	    (c)
 		volume_comment=$OPTARG
@@ -255,6 +266,9 @@ parse_arguments() {
 		;;
 	    (n)
 		parse_volume_user "$OPTARG"
+		;;
+	    (s)
+		skip_volumes=true
 		;;
 	    (t)
 		parse_template_dir "$OPTARG"
@@ -420,20 +434,21 @@ print_volume_usermod_args() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-d VOLUME-HOME] [-n VOLUME-GROUP] [-n VOLUME-USER] \
+Usage: $script [-d VOLUME-HOME] [-n VOLUME-GROUP] [-n VOLUME-USER] [-s] \
 [-t TEMPLATE-DIR]
        $script -h
 
 Create and populate Docker volume account and device directories.
 
-  -d VOLUME-HOME   use VOLUME-HOME as the account home directory
-		   (default value is $VOLUME_HOME)
-  -g VOLUME-GROUP  use VOLUME-GROUP as the account group
-		   (default value is $VOLUME_GROUP)
-  -h               print this help text (all other options are ignored)
-  -n VOLUME-USER   use VOLUME-USER as the account name
-		   (default value is $VOLUME_USER)
-  -t TEMPLATE-DIR  populate home directory from TEMPLATE-DIR
+  -d VOLUME-HOME  use VOLUME-HOME as the account home directory
+		  (default value is $VOLUME_HOME)
+  -g VOLUME-GROUP use VOLUME-GROUP as the account group
+		  (default value is $VOLUME_GROUP)
+  -h              print this help text (all other options are ignored)
+  -n VOLUME-USER  use VOLUME-USER as the account name
+		  (default value is $VOLUME_USER)
+  -s              skip creation of volume devices
+  -t TEMPLATE-DIR populate home directory from TEMPLATE-DIR
 EOF
 }
 

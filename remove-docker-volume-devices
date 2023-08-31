@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-VOLUME_GID=500
-VOLUME_UID=500
+: ${VOLUME_GID=500}
+: ${VOLUME_UID=500}
 
 VOLUME_HOME=/local/volumes
 VOLUME_USER=docker-volume
@@ -75,20 +75,20 @@ manage_pw() {
 }
 
 parse_arguments() {
-    keep_files=false
+    skip_volumes=false
     volume_home=$VOLUME_HOME
     volume_user=$VOLUME_USER
 
-    while getopts d:kn:h opt; do
+    while getopts d:n:sh opt; do
 	case $opt in
 	    (d)
 		volume_home=$OPTARG
 		;;
-	    (k)
-		keep_files=true
-		;;
 	    (n)
 		parse_volume_user "$OPTARG"
+		;;
+	    (s)
+		skip_volumes=true
 		;;
 	    (h)
 		usage
@@ -156,7 +156,7 @@ remove_docker_volume_devices() {
     remove_volume_user $volume_user
     remove_volume_group $volume_group
 
-    if [ "$keep_files" = false ]; then
+    if [ "$skip_volumes" = false ]; then
 	/bin/rm -rf ${volume_home-$VOLUME_HOME}
     fi
 }
@@ -175,7 +175,7 @@ remove_volume_user() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-d VOLUME-HOME] [-k] [-n VOLUME-USER]
+Usage: $script [-d VOLUME-HOME] [-n VOLUME-USER] [-s]
        $script -h
 
 Remove Docker volume account and device directories.
@@ -183,8 +183,8 @@ Remove Docker volume account and device directories.
   -d VOLUME-HOME  use VOLUME-HOME as the account home directory
 		  (default value is $VOLUME_HOME)
   -h              print this help text (all other options are ignored)
-  -k              keep account home directory and files
   -n VOLUME-USER  use VOLUME-USER as the account name
+  -s              skip removal of volume devices
 EOF
 }
 
