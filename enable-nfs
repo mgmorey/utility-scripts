@@ -1,0 +1,13 @@
+#!/bin/sh -eu
+
+mkdir -p /home/nfsshare
+
+if [ ! -f /etc/exports ]; then
+    cat >/etc/exports <<EOF
+/home/nfsshare 127.0.0.0/8(rw,no_root_squash)
+EOF
+fi
+
+systemctl enable --now nfs-server rpcbind
+# firewall-cmd --add-service={nfs,nfs3,mountd,rpc-bind}
+# firewall-cmd --runtime-to-permanent
