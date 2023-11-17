@@ -38,7 +38,7 @@ git_pull_dir() (
 
 git_pull_recursive() {
     rootdir=$(get_root_dir)
-    dirs=$(find $rootdir -maxdepth $MAXDEPTH -type d)
+    dirs=$(find -L $rootdir -maxdepth $MAXDEPTH -type d)
 
     for dir in $dirs; do
 	if [ -e "$dir/.git/HEAD" ]; then
