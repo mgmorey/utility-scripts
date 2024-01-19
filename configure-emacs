@@ -21,7 +21,7 @@ GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 EMACS_ARCHIVE_SUFFIX=.tar.xz
 EMACS_PROJECT_NAME=emacs
 EMACS_PROJECT_VERSION=29.1
-EMACS_TLS_BACKEND=openssl
+EMACS_TLS_BACK_END=openssl
 
 abort() {
     printf "$@" >&2
@@ -30,6 +30,10 @@ abort() {
 
 abort_invalid_prefix() {
     usage_error '%s: invalid prefix -- %s\n' "$script" "$*"
+}
+
+abort_invalid_tls_back_end() {
+    usage_error '%s: invalid TLS back end -- %s\n' "$script" "$*"
 }
 
 abort_invalid_toolkit() {
@@ -105,9 +109,9 @@ get_configure_options() (
 	options="${options:+$options }--without-gif"
     fi
 
-    if [ "${tls_backend-}" = gnutls ]; then
+    if [ "${tls_back_end-}" = gnutls ]; then
 	options="${options:+$options }--with-gnutls"
-    elif [ "${tls_backend-}" = openssl ]; then
+    elif [ "${tls_back_end-}" = openssl ]; then
 	options="${options:+$options }--without-gnutls"
     fi
 
@@ -177,7 +181,7 @@ parse_arguments() {
     install=false
     keep=false
     prefix=$GNU_OPT_PREFIX
-    tls_backend=$EMACS_TLS_BACKEND
+    tls_back_end=$EMACS_TLS_BACK_END
     version=$EMACS_PROJECT_VERSION
     with_xtoolkit=false
     with_xwidgets=false
@@ -217,14 +221,14 @@ parse_arguments() {
 	    (t)
 		case $OPTARG in
 		    (gnutls)
-			tls_backend=$OPTARG
+			tls_back_end=$OPTARG
 			;;
 		    (openssl)
-			tls_backend=$OPTARG
+			tls_back_end=$OPTARG
 			with_xwidgets=false
 			;;
 		    (*)
-			abort_invalid_tls_backend $OPTARG
+			abort_invalid_tls_back_end $OPTARG
 			;;
 		esac
 		;;
@@ -239,7 +243,7 @@ parse_arguments() {
 		esac
 		;;
 	    (w)
-		tls_backend=gnutls
+		tls_back_end=gnutls
 		with_xtoolkit=true
 		with_xwidgets=true
 		xtoolkit=gtk3
