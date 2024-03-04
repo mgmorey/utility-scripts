@@ -20,7 +20,7 @@ GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 
 GDB_ARCHIVE_SUFFIX=.tar.xz
 GDB_PROJECT_NAME=gdb
-GDB_PROJECT_VERSION=13.2
+GDB_PROJECT_VERSION=14.2
 
 abort() {
     printf "$@" >&2
@@ -55,7 +55,7 @@ configure_gdb() {
     extract_archive "$archive_pathname" "$src_dirname"
     cd "$build_dirname"
 
-    command=$(get_configure_command $src_dirname)
+    command=$(get_configure_command $src_dirname | awk '{print $1}')
     printf '%s\n' "$command"
     eval $command
 
