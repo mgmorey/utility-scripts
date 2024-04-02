@@ -23,7 +23,7 @@ LIBPSL_MIRROR_BASE_URL=https://github.com/rockdaboot/libpsl/releases/download
 
 LIBPSL_OPT_PREFIX=/opt/%s
 LIBPSL_PROJECT_NAME=libpsl
-LIBPSL_PROJECT_VERSION=0.21.0
+LIBPSL_PROJECT_VERSION=0.21.5
 
 abort() {
     printf "$@" >&2
@@ -78,7 +78,7 @@ configure_paths() {
     src_dirname="$HOME/Documents/src/PSL/$archive_basename"
     archive_filename=$archive_basename$LIBPSL_ARCHIVE_SUFFIX
     archive_pathname="$LIBPSL_ARCHIVE_DIR/$archive_filename"
-    archive_url="$LIBPSL_MIRROR_BASE_URL/$archive_basename/$archive_filename"
+    archive_url="$LIBPSL_MIRROR_BASE_URL/$version/$archive_filename"
 }
 
 get_configure_options() (
