@@ -28,6 +28,10 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
+get_count() {
+    eval ls "$@" 2>/dev/null | wc -l
+}
+
 get_dirs() (
     dirnames=$(ls -d "$@" 2>/dev/null || true)
 
@@ -35,10 +39,6 @@ get_dirs() (
 	find -L $dirnames -maxdepth 2 -type d
     fi
 )
-
-get_count() {
-    eval ls "$@" 2>/dev/null | wc -l
-}
 
 parse_arguments() {
     no_export=false
