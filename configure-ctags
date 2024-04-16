@@ -23,7 +23,7 @@ CTAGS_MIRROR_BASE_URL=https://github.com/universal-ctags/ctags
 
 CTAGS_OPT_PREFIX=/opt/%s
 CTAGS_PROJECT_NAME=ctags
-CTAGS_PROJECT_VERSION=6.0.0
+CTAGS_PROJECT_VERSION=6.1.0
 
 abort() {
     printf "$@" >&2
