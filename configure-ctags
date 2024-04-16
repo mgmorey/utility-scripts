@@ -241,7 +241,7 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
-	(rhel)
+	(rhel|ol|almalinux)
 	    case "$VERSION_ID" in
 		(7.*)
 		    return
@@ -250,19 +250,6 @@ validate_platform() {
 		    return
 		    ;;
 		(9.*)
-		    return
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(rocky)
-	    case "$VERSION_ID" in
-		(7.*)
-		    return
-		    ;;
-		(8.*)
 		    return
 		    ;;
 		(*)
