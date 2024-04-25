@@ -21,7 +21,7 @@ GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 GNUTLS_ARCHIVE_SUFFIX=.tar.xz
 GNUTLS_MIRROR_BASE_URL=https://www.gnupg.org/ftp/gcrypt
 GNUTLS_PROJECT_NAME=gnutls
-GNUTLS_PROJECT_VERSION=3.7.8
+GNUTLS_PROJECT_VERSION=3.8.4
 
 abort() {
     printf "$@" >&2
