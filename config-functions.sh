@@ -134,7 +134,7 @@ download_using_curl() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
     assert [ -n "$2" ]
-    curl ${CURL_OPTS+$CURL_OPTS }--fail --location --output "$1" "$2"
+    curl ${CURL_OPTS+$CURL_OPTS }--fail --location --output "$1" --progress-bar "$2"
 }
 
 download_using_wget() {
