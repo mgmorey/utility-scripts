@@ -145,7 +145,6 @@ install_curl() {
 parse_arguments() {
     build=true
     check=false
-    debug=false
     force=false
     install=false
     prefix=$CURL_OPT_PREFIX
@@ -163,9 +162,6 @@ parse_arguments() {
 	    (f)
 		build=true
 		force=true
-		;;
-	    (g)
-		debug=true
 		;;
 	    (i)
 		install=true
