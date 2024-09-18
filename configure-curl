@@ -87,10 +87,6 @@ configure_paths() {
 }
 
 get_curl_configure_cflags() (
-    if [ -n "${debug-}" ]; then
-	CFLAGS="${CFLAGS+$CFLAGS }-O0 -g"
-    fi
-
     if [ -n "${CFLAGS:-}" ]; then
 	printf '%s\n' "$CFLAGS"
     fi
