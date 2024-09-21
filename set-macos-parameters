@@ -50,7 +50,7 @@ include_sdk_parameters() {
 
     if [ -n "${xcrun-}" ]; then
 	SDKROOT=$($xcrun --show-sdk-path)
-	CPPFLAGS="${CPPFLAGS+$CPPFLAGS }-I$SDKROOT/usr/include"
+	CPPFLAGS="${CPPFLAGS+$CPPFLAGS }-I$SDKROOT/usr/include/c++/v1"
 	LDFLAGS="${LDFLAGS+$LDFLAGS }-L$SDKROOT/usr/lib"
     fi
 }
