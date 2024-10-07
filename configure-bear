@@ -105,7 +105,6 @@ install_bear() {
     umask 0022
     cd "$src_dirname"
     make_install $(get_bear_make_options) install
-    install_project_link "$install_prefix"
 
     if [ "$(id -u)" -eq 0 ]; then
 	find "$src_dirname" -user root -type d | xargs chown-real-user

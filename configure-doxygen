@@ -109,7 +109,6 @@ install_doxygen() {
     cd "$build_dirname"
     install_prefix=$(get_prefix)
     make_install prefix="$install_prefix" install
-    install_project_link "$install_prefix"
 }
 
 parse_arguments() {
