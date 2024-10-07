@@ -18,9 +18,9 @@
 
 GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 
-TEXTINFO_ARCHIVE_SUFFIX=.tar.xz
-TEXTINFO_PROJECT_NAME=texinfo
-TEXTINFO_PROJECT_VERSION=6.8
+TEXINFO_ARCHIVE_SUFFIX=.tar.xz
+TEXINFO_PROJECT_NAME=texinfo
+TEXINFO_PROJECT_VERSION=6.8
 
 abort() {
     printf "$@" >&2
@@ -70,12 +70,12 @@ configure_texinfo() {
 
 configure_paths() {
     archive_dirname="$GNU_ARCHIVE_DIR"
-    archive_basename=$TEXTINFO_PROJECT_NAME-$version
+    archive_basename=$TEXINFO_PROJECT_NAME-$version
     build_dirname="$HOME/Documents/build/$archive_basename"
     src_dirname="$HOME/Documents/src/GNU/$archive_basename"
-    archive_filename=$archive_basename$TEXTINFO_ARCHIVE_SUFFIX
+    archive_filename=$archive_basename$TEXINFO_ARCHIVE_SUFFIX
     archive_pathname="$GNU_ARCHIVE_DIR/$archive_filename"
-    archive_url=$GNU_MIRROR_BASE_URL/$TEXTINFO_PROJECT_NAME/$archive_filename
+    archive_url=$GNU_MIRROR_BASE_URL/$TEXINFO_PROJECT_NAME/$archive_filename
 }
 
 get_configure_options() (
@@ -89,11 +89,11 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages $TEXTINFO_PROJECT_NAME-build $TEXTINFO_PROJECT_NAME-test
+    get-packages $TEXINFO_PROJECT_NAME-build $TEXINFO_PROJECT_NAME-test
 }
 
 get_prefix() {
-    printf "$prefix" "$TEXTINFO_PROJECT_NAME-$version"
+    printf "$prefix" "$TEXINFO_PROJECT_NAME-$version"
 }
 
 install_texinfo() {
@@ -116,7 +116,7 @@ parse_arguments() {
     force=false
     install=false
     prefix=$GNU_OPT_PREFIX
-    version=$TEXTINFO_PROJECT_VERSION
+    version=$TEXINFO_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do
 	case $opt in
