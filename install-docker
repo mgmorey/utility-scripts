@@ -199,6 +199,19 @@ validate_platform() {
     esac
 
     case "$ID" in
+	(amzn)
+	    case "$VERSION_ID" in
+		(2)
+		    true
+		    ;;
+		(2023)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
 	(centos)
 	    case "$VERSION_ID" in
 		(7)
