@@ -1,7 +1,7 @@
 #!/bin/sh -eu
 
-# configure-libpsl: download and configure the Public Suffix List Library
-# Copyright (C) 2022  "Michael G. Morey" <mgmorey@gmail.com>
+# configure-doxygen: download and configure Doxygen
+# Copyright (C) 2024  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,14 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-LIBPSL_ARCHIVE_DIR="$HOME/Downloads/PSL"
-LIBPSL_ARCHIVE_SUFFIX=.tar.gz
+DOXYGEN_ARCHIVE_DIR="$HOME/Downloads/Doxygen"
+DOXYGEN_ARCHIVE_SUFFIX=.tar.gz
 
-LIBPSL_MIRROR_BASE_URL=https://github.com/rockdaboot/libpsl/releases/download
+DOXYGEN_MIRROR_BASE_URL=https://github.com
 
-LIBPSL_OPT_PREFIX=/opt/%s
-LIBPSL_PROJECT_NAME=libpsl
-LIBPSL_PROJECT_VERSION=0.21.5
+DOXYGEN_PROJECT_NAME=doxygen
+DOXYGEN_PROJECT_VERSION=1.12.0
 
 abort() {
     printf "$@" >&2
@@ -46,7 +45,7 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
-configure_libpsl() {
+configure_doxygen() {
     umask 0022
 
     if [ "$force" = true ]; then
@@ -58,12 +57,9 @@ configure_libpsl() {
     extract_archive "$archive_pathname" "$src_dirname"
     cd "$build_dirname"
 
-    command=$(get_libpsl_configure_command $src_dirname)
-    printf '%s\n' "$command"
-    eval $command
-
     if [ "$build" = true ]; then
-	make_build
+	cmake "$src_dirname"
+	make_build all
     fi
 
     if [ "$check" = true ]; then
@@ -72,13 +68,16 @@ configure_libpsl() {
 }
 
 configure_paths() {
-    archive_dirname="$LIBPSL_ARCHIVE_DIR"
-    archive_basename=$LIBPSL_PROJECT_NAME-$version
+    archive_dirname="$DOXYGEN_ARCHIVE_DIR"
+    archive_basename=$DOXYGEN_PROJECT_NAME-${version}
     build_dirname="$HOME/Documents/build/$archive_basename"
-    src_dirname="$HOME/Documents/src/PSL/$archive_basename"
-    archive_filename=$archive_basename$LIBPSL_ARCHIVE_SUFFIX
-    archive_pathname="$LIBPSL_ARCHIVE_DIR/$archive_filename"
-    archive_url="$LIBPSL_MIRROR_BASE_URL/$version/$archive_filename"
+    src_dirname="$HOME/Documents/src/Doxygen/$archive_basename"
+    archive_filename=${archive_basename}.src$DOXYGEN_ARCHIVE_SUFFIX
+    archive_pathname="$DOXYGEN_ARCHIVE_DIR/$archive_filename"
+    archive_url=$DOXYGEN_MIRROR_BASE_URL/$DOXYGEN_PROJECT_NAME
+    archive_url=$archive_url/$DOXYGEN_PROJECT_NAME/releases/download
+    archive_url=$archive_url/$(printf 'Release_%s\n' $version | tr '.' '_')
+    archive_url=$archive_url/$archive_filename
 }
 
 get_configure_options() (
@@ -92,25 +91,14 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages $LIBPSL_PROJECT_NAME-build $LIBPSL_PROJECT_NAME-test
-}
-
-get_libpsl_configure_command() {
-    options=$(get_configure_options)
-    printf '%s' "$1/${2-configure}"
-
-    if [ -n "${options-}" ]; then
-	printf ' %s' "$options"
-    fi
-
-    printf '\n'
+    get-packages $DOXYGEN_PROJECT_NAME-build $DOXYGEN_PROJECT_NAME-test
 }
 
 get_prefix() {
-    printf "$prefix" "$LIBPSL_PROJECT_NAME-$version"
+    printf "$prefix" "$DOXYGEN_PROJECT_NAME-$version"
 }
 
-install_libpsl() {
+install_doxygen() {
     if [ "$install" != true ]; then
 	return 0
     elif [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
@@ -121,7 +109,6 @@ install_libpsl() {
     cd "$build_dirname"
     install_prefix=$(get_prefix)
     make_install prefix="$install_prefix" install
-    install_project_link "$install_prefix"
 }
 
 parse_arguments() {
@@ -129,10 +116,10 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$LIBPSL_OPT_PREFIX
-    version=$LIBPSL_PROJECT_VERSION
+    prefix=$GNU_OPT_PREFIX
+    version=$DOXYGEN_PROJECT_VERSION
 
-    while getopts bcfginop:v:h opt; do
+    while getopts bcfinp:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -153,7 +140,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME/.local|$LOCAL_PREFIX|$LIBPSL_OPT_PREFIX)
+		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX)
 			prefix=$OPTARG
 			;;
 		    (*)
@@ -163,7 +150,7 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    (0.[0-9]|0.[1-9][0-9]|0.[1-9][0-9].[0-9])
+		    (6.[0-9]|6.[1-9][0-9])
 			version=$OPTARG
 			;;
 		    (*)
@@ -190,7 +177,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-c] [-f] [-g] [-i] [-n] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }
@@ -229,7 +216,7 @@ validate_platform() {
 	(opensuse-*)
 	    return
 	    ;;
-	(rhel|ol)
+	(ol)
 	    case "$VERSION_ID" in
 		(7.*)
 		    return
@@ -237,7 +224,30 @@ validate_platform() {
 		(8.*)
 		    return
 		    ;;
-		(9.*)
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(rhel)
+	    case "$VERSION_ID" in
+		(7.*)
+		    return
+		    ;;
+		(8.*)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(rocky)
+	    case "$VERSION_ID" in
+		(7.*)
+		    return
+		    ;;
+		(8.*)
 		    return
 		    ;;
 		(*)
@@ -299,7 +309,7 @@ install_dependencies
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"
 else
-    configure_libpsl
+    configure_doxygen
 fi
 
-install_libpsl
+install_doxygen
