@@ -1,0 +1,8 @@
+#!/bin/sh -eu
+
+git_log() {
+    git log --date=format:%Y --follow --format=%ad "$1" | sort -u
+}
+
+git_log "$1" | numeric-list.awk | sed 's/, $/\n/'
+git_log "$1" | numeric-range-list.awk | sed 's/, $/\n/'
