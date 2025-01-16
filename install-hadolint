@@ -1,0 +1,63 @@
+#!/bin/sh -eu
+
+# install-hadolint: install Hadolint
+# Copyright (C) 2025  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+HADOLINT_MIRROR_BASE_URL=https://github.com/hadolint/hadolint
+
+HADOLINT_PROJECT_NAME=hadolint
+HADOLINT_PROJECT_VERSION=2.12.0
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
+}
+
+configure_paths() {
+    archive_basename=$HADOLINT_PROJECT_NAME
+    dest_dirname=/usr/local/bin
+    archive_filename=${archive_basename}-Linux-x86_64
+    archive_pathname="$dest_dirname/$archive_basename"
+    archive_url_prefix=releases/download/v$HADOLINT_PROJECT_VERSION
+    archive_url=$HADOLINT_MIRROR_BASE_URL/$archive_url_prefix/$archive_filename
+}
+
+install_hadolint() {
+    download_archive "$archive_pathname" "$archive_url"
+    chmod a+rx "$archive_pathname"
+}
+
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}config-functions.sh"
+
+configure_paths
+install_hadolint
