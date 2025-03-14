@@ -228,19 +228,6 @@ validate_platform() {
 	(opensuse-*)
 	    return
 	    ;;
-	(ol)
-	    case "$VERSION_ID" in
-		(7.*)
-		    return
-		    ;;
-		(8.*)
-		    return
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
 	(rhel|ol|almalinux)
 	    case "$VERSION_ID" in
 		(7.*)
