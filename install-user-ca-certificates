@@ -22,7 +22,7 @@ install_user_ca_certificates() {
     files=$(find "$@" -type f -name '*.pem')
 
     if [ -n "$files" ]; then
-	if [ -e $PROFILE -a -z "$SSL_CERT_DIR" ]; then
+	if [ -e $PROFILE -a -z "${SSL_CERT_DIR:-}" ]; then
 	    SSL_CERT_DIR=$CERT_DIR
 	    print_command >>$PROFILE
 	fi
