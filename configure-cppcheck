@@ -23,7 +23,7 @@ CPPCHECK_MIRROR_BASE_URL=https://github.com/danmar/cppcheck
 
 CPPCHECK_OPT_PREFIX=/opt/%s
 CPPCHECK_PROJECT_NAME=cppcheck
-CPPCHECK_PROJECT_VERSION=2.16.2
+CPPCHECK_PROJECT_VERSION=2.17.0
 
 abort() {
     printf "$@" >&2
