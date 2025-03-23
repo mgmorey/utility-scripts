@@ -23,7 +23,7 @@ BEAR_MIRROR_BASE_URL=https://github.com/rizsotto/Bear
 
 BEAR_OPT_PREFIX=/opt/%s
 BEAR_PROJECT_NAME=Bear
-BEAR_PROJECT_VERSION=3.1.5
+BEAR_PROJECT_VERSION=3.1.6
 
 abort() {
     printf "$@" >&2
