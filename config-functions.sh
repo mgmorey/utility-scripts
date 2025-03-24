@@ -160,7 +160,7 @@ extract_archive() (
     if [ "$compress" = zip ]; then
 	un$compress "$archive"
     elif [ -n "$compress" ]; then
-	$compress -dc "$archive" | tar -xvf -
+	$compress -dc "$archive" | tar -xf -
     else
 	return 1
     fi
