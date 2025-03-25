@@ -46,7 +46,7 @@ configure_bear() {
     umask 0022
 
     if [ "$force" = true ]; then
-	rm -rf "$src_dirname" "$archive_pathname"
+	rm -rf "$build_dirname" "$src_dirname" "$archive_pathname"
     fi
 
     mkdir -p "$archive_dirname" "$build_dirname" "$src_dirname"
