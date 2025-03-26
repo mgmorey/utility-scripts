@@ -1,6 +1,13 @@
 #!/bin/sh -eux
 
 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+sudo cp kubectl /usr/local/bin/ && sudo chmod +x /usr/local/bin/kubectl
+kubectl version --client
+
+
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo cp kubectl /usr/local/bin/ && sudo chmod +x /usr/local/bin/kubectl
+kubectl version --client
 
 # Debian
 sudo apt-get update && sudo apt-get install -y apt-transport-https
