@@ -15,9 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CA_CERTIFICATE_TARGET_DIR=/etc/pki/ca-trust/source/anchors
-RPM_PACKAGE=ca-certificates
-
 abort() {
     printf "$@" >&2
     exit 1
@@ -31,67 +28,48 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
-configure_platform() {
-    case "$ID" in
-	(centos)
-	    case "$VERSION_ID" in
-		(7)
-                    install_ca_certificates_package
-		    ;;
-		(8)
-		    :
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(rhel|ol)
-	    case "$VERSION_ID" in
-		(7.*)
-                    install_ca_certificates_package
-		    ;;
-		(8.*)
-                    install_ca_certificates_package
-		    ;;
-		(9.*)
-                    install_ca_certificates_package
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(rocky)
-	    case "$VERSION_ID" in
-		(8.*)
-                    install_ca_certificates_package
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(windows)
-            true
-	    ;;
+get_packages() {
+    case "$1" in
 	(*)
-	    abort_not_supported Distro
+	    printf '%s\n' ca-certificates
 	    ;;
     esac
 }
 
-install_ca_certificate_file() {
-    update-ca-trust force-enable
-    install -m a=r "$file" $CA_CERTIFICATE_TARGET_DIR
-    update-ca-trust extract
+get_target() {
+    case "$ID" in
+	(opensuse-*)
+	    printf '%s\n' /etc/pki/trust/anchors
+	    ;;
+	(*)
+	    printf '%s\n' /etc/pki/ca-trust/source/anchors
+	    ;;
+    esac
 }
 
-install_ca_certificates_package() {
-    if ! rpm -q $RPM_PACKAGE >/dev/null 2>&1; then
-	manager=$(get-package-managers | awk 'NR == 1 {print $0}')
-	$manager install $RPM_PACKAGE
-    fi
+get_updater() {
+    case "$ID" in
+	(opensuse-*)
+	    printf '%s\n' update-ca-certificates
+	    ;;
+	(*)
+	    printf '%s\n' update-ca-trust
+	    ;;
+    esac
+}
+
+install_ca_certificate() {
+    target=$(get_target)
+    updater=$(get_updater)
+    $updater force-enable
+    install -m a=r "$1" "$target"
+    $updater extract
+}
+
+install_packages() {
+    manager=$(get-package-managers | awk 'NR == 1 {print $0}')
+    packages=$(get_packages $manager)
+    $manager install $packages
 }
 
 install_tls_ca_certificate() {
@@ -111,8 +89,8 @@ install_tls_ca_certificate() {
     esac
 
     umask 0022
-    configure_platform
-    install_ca_certificate_file
+    install_packages
+    install_ca_certificate "$file"
 }
 
 parse_arguments() {
@@ -168,6 +146,9 @@ validate_platform() {
 		    abort_not_supported Release
 		    ;;
 	    esac
+	    ;;
+	(opensuse-tumbleweed)
+	    true
 	    ;;
 	(rhel|ol)
 	    case "$VERSION_ID" in
