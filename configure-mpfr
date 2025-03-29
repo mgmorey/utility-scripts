@@ -22,7 +22,7 @@ MPFR_BASE_URL=https://www.mpfr.org
 
 MPFR_ARCHIVE_SUFFIX=.tar.xz
 MPFR_PROJECT_NAME=mpfr
-MPFR_PROJECT_VERSION=4.2.1
+MPFR_PROJECT_VERSION=4.2.2
 
 abort() {
     printf "$@" >&2
