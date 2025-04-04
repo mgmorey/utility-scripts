@@ -103,6 +103,7 @@ get_gnuplot_configure_options() (
     fi
 
     options="${options:+$options }--without-libcerf"
+    options="${options:+$options }--without-qt"
 
     if [ -n "${options:-}" ]; then
 	printf '%s\n' "$options"
