@@ -21,7 +21,7 @@ GNUPLOT_ARCHIVE_SUFFIX=.tar.gz
 
 GNUPLOT_OPT_PREFIX=/opt/%s
 GNUPLOT_PROJECT_NAME=gnuplot
-GNUPLOT_PROJECT_VERSION=5.4.4
+GNUPLOT_PROJECT_VERSION=6.0.2
 
 abort() {
     printf "$@" >&2
@@ -170,7 +170,7 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    (5.[0-9].[0-9])
+		    ([56].[0-9].[0-9]|[56].[0-9].[1-9][0-9])
 			version=$OPTARG
 			;;
 		    (*)
