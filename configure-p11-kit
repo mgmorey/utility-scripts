@@ -23,7 +23,7 @@ P11_KIT_MIRROR_BASE_URL=https://github.com/p11-glue/p11-kit/releases/download
 
 P11_KIT_OPT_PREFIX=/opt/%s
 P11_KIT_PROJECT_NAME=p11-kit
-P11_KIT_PROJECT_VERSION=0.24.1
+P11_KIT_PROJECT_VERSION=0.25.4
 
 abort() {
     printf "$@" >&2
