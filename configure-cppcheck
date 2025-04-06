@@ -46,15 +46,16 @@ configure_cppcheck() {
     umask 0022
 
     if [ "$force" = true ]; then
-	rm -rf "$src_dirname" "$archive_pathname"
+	rm -rf "$build_dirname" "$src_dirname" "$archive_pathname"
     fi
 
-    mkdir -p "$src_dirname" "$archive_dirname"
+    mkdir -p "$archive_dirname" "$build_dirname" "$src_dirname"
     download_archive "$archive_pathname" "$archive_url"
     extract_archive "$archive_pathname" "$src_dirname"
-    cd "$src_dirname"
+    cd "$build_dirname"
 
     if [ "$build" = true ]; then
+	cmake -B . -S "$src_dirname"
 	make_build $(get_cppcheck_make_options)
     fi
 
@@ -102,7 +103,7 @@ install_cppcheck() {
     fi
 
     umask 0022
-    cd "$src_dirname"
+    cd "$build_dirname"
     make_install $(get_cppcheck_make_options) install
     install_project_link "$install_prefix"
 
@@ -117,10 +118,11 @@ parse_arguments() {
     check=false
     force=false
     install=false
+    keep=false
     prefix=$CPPCHECK_OPT_PREFIX
     version=$CPPCHECK_PROJECT_VERSION
 
-    while getopts bcfinp:v:h opt; do
+    while getopts bcfiknp:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -133,6 +135,9 @@ parse_arguments() {
 		;;
 	    (i)
 		install=true
+		;;
+	    (k)
+		keep=true
 		;;
 	    (n)
 		build=false
@@ -176,7 +181,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-c] [-f] [-i] [-k] [-n] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }
@@ -293,7 +298,10 @@ validate_platform
 configure_platform
 parse_arguments "$@"
 configure_paths
-install_dependencies
+
+if [ "$keep" != true ]; then
+    install_dependencies
+fi
 
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"
