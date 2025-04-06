@@ -52,13 +52,12 @@ configure_bear() {
     mkdir -p "$archive_dirname" "$build_dirname" "$src_dirname"
     download_archive "$archive_pathname" "$archive_url"
     extract_archive "$archive_pathname" "$src_dirname"
+    cd "$build_dirname"
 
     if [ "$build" = true ]; then
 	cmake -DENABLE_UNIT_TESTS=OFF \
 	      -DENABLE_FUNC_TESTS=OFF \
-	      -B "$build_dirname" \
-	      -S "$src_dirname"
-	cd "$build_dirname"
+	      -B . -S "$src_dirname"
 	make_build $(get_bear_make_options) all
     fi
 
@@ -82,6 +81,7 @@ get_bear_make_options() (
     printf '%s\n' \
 	   FILESDIR="$prefix/share" \
 	   HAVE_RULES=yes \
+	   PREFIX="$prefix" \
 	   MATCHCOMPILER=yes
 )
 
