@@ -22,7 +22,7 @@ expr	--version	s/expr .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 g++	-dumpfullversion,-dumpversion	s/\([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 gawk	--version	1s/GNU Awk \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 gcc	-dumpfullversion,-dumpversion	s/\([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
-gcov	--version	1s/gcov .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
+gcov	--version	1s/gcov .* \([0-9][0-9]*\.[0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 gcovr	--version	1s/gcovr \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 gdb	--version	1s/GNU gdb .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 git	--version	s/git version \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
