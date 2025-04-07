@@ -298,7 +298,10 @@ validate_platform() {
 		(20.04)
 		    true
 		    ;;
-		(20.10)
+		(22.04)
+		    true
+		    ;;
+		(24.04)
 		    true
 		    ;;
 		(*)
