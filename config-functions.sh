@@ -345,7 +345,7 @@ install_project_link() (
     prefix="$1"
     link="${prefix%-*}"
 
-    if [ "$link" != "$prefix" ]; then
+    if [ -d "$prefix" -a "$link" != "$prefix" ]; then
 	prefix_base=$(basename "$prefix")
 	prefix_dir=$(dirname "$prefix")
 	link_base=$(basename "$link")
