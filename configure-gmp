@@ -18,9 +18,9 @@
 
 GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 
-GDB_ARCHIVE_SUFFIX=.tar.xz
-GDB_PROJECT_NAME=gmp
-GDB_PROJECT_VERSION=6.3.0
+GMP_ARCHIVE_SUFFIX=.tar.xz
+GMP_PROJECT_NAME=gmp
+GMP_PROJECT_VERSION=6.3.0
 
 abort() {
     printf "$@" >&2
@@ -71,12 +71,12 @@ configure_gmp() {
 
 configure_paths() {
     archive_dirname="$GNU_ARCHIVE_DIR"
-    archive_basename=$GDB_PROJECT_NAME-$version
+    archive_basename=$GMP_PROJECT_NAME-$version
     build_dirname="$HOME/Documents/build/$archive_basename"
-    archive_filename=$archive_basename$GDB_ARCHIVE_SUFFIX
+    archive_filename=$archive_basename$GMP_ARCHIVE_SUFFIX
     archive_pathname="$GNU_ARCHIVE_DIR/$archive_filename"
     src_dirname="$HOME/Documents/src/GNU/$archive_basename"
-    archive_url=$GNU_MIRROR_BASE_URL/$GDB_PROJECT_NAME/$archive_filename
+    archive_url=$GNU_MIRROR_BASE_URL/$GMP_PROJECT_NAME/$archive_filename
 }
 
 get_configure_options() (
@@ -90,7 +90,7 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages $GDB_PROJECT_NAME-build $GDB_PROJECT_NAME-test
+    get-packages $GMP_PROJECT_NAME-build $GMP_PROJECT_NAME-test
 }
 
 get_gmp_configure_command() {
@@ -105,7 +105,7 @@ get_gmp_configure_command() {
 }
 
 get_prefix() {
-    printf "$prefix" "$GDB_PROJECT_NAME-$version"
+    printf "$prefix" "$GMP_PROJECT_NAME-$version"
 }
 
 install_gmp() {
@@ -128,7 +128,7 @@ parse_arguments() {
     force=false
     install=false
     prefix=$GNU_OPT_PREFIX
-    version=$GDB_PROJECT_VERSION
+    version=$GMP_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do
 	case $opt in
