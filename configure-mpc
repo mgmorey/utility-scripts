@@ -1,7 +1,7 @@
 #!/bin/sh -eu
 
-# configure-mpc: download and configure the GNU MP Bignum library
-# Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
+# configure-mpc: download and configure the GNU MPC library
+# Copyright (C) 2025  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
