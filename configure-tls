@@ -139,7 +139,7 @@ validate_platform() {
 	    ;;
 	(ubuntu)
 	    case "$VERSION_ID" in
-		(2024.04)
+		(24.04)
 		    true
 		    ;;
 		(*)
