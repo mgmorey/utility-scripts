@@ -41,7 +41,10 @@ get_target() {
 	(opensuse-*)
 	    printf '%s\n' /etc/pki/trust/anchors
 	    ;;
-	(*)
+	(ubuntu)
+	    printf '%s\n' /usr/local/share/ca-certificates
+	    ;;
+	(rhel|ol|fedora)
 	    printf '%s\n' /etc/pki/ca-trust/source/anchors
 	    ;;
     esac
@@ -49,7 +52,7 @@ get_target() {
 
 get_updater() {
     case "$ID" in
-	(opensuse-*)
+	(opensuse-*|ubuntu)
 	    printf '%s\n' update-ca-certificates
 	    ;;
 	(*)
@@ -61,32 +64,17 @@ get_updater() {
 install_file() {
     target=$(get_target)
 
-    if [ "$(id -u)" -eq 0 ]; then
-	if [ -e "$target" ]; then
-	    updater=$(get_updater)
-	    $updater force-enable
-	    install -m a=r "$1" "$target"
-	    $updater extract
-	fi
-    else
-	realpath=$(realpath "$1")
-
-	if which git >/dev/null 2>&1; then
-	    git config --global http.sslCAInfo "$realpath"
-	fi
-
-	if which pip3 >/dev/null 2>&1; then
-	    pip3 config set global.cert "$realpath"
-	fi
+    if [ -n "$target" -a -e "$target" ]; then
+	updater=$(get_updater)
+	install -m a=r "$1" "$target"
+	$updater
     fi
 }
 
 install_packages() {
-    if [ "$(id -u)" -eq 0 ]; then
-	manager=$(get-package-managers | awk 'NR == 1 {print $0}')
-	packages=$(get_packages $manager)
-	$manager install $packages
-    fi
+    manager=$(get-package-managers | awk 'NR == 1 {print $0}')
+    packages=$(get_packages $manager)
+    $manager install $packages
 }
 
 install_tls_ca_certificate() {
