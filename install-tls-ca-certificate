@@ -69,12 +69,14 @@ install_file() {
 	    $updater extract
 	fi
     else
+	realpath=$(realpath "$1")
+
 	if which git >/dev/null 2>&1; then
-	    git config --global http.sslCAInfo "$1"
+	    git config --global http.sslCAInfo "$realpath"
 	fi
 
 	if which pip3 >/dev/null 2>&1; then
-	    pip3 config set global.cert "$1"
+	    pip3 config set global.cert "$realpath"
 	fi
     fi
 }
