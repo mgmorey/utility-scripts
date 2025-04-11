@@ -58,8 +58,8 @@ set_parameters() {
 
 usage() {
     cat <<-EOF >&2
-Usage: $0: [-s SHELL]
-       $0: -h
+Usage: $script: [-s SHELL]
+       $script: -h
 EOF
 }
 
