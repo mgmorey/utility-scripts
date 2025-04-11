@@ -1,0 +1,175 @@
+#!/bin/sh -eu
+
+# Copyright (C) 2025  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_not_supported() {
+    abort '%s: %s: %s not supported\n' "$script" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
+}
+
+configure_file() {
+    realpath=$(realpath "$1")
+
+    if which git >/dev/null 2>&1; then
+	git config --global http.sslCAInfo "$realpath"
+    fi
+
+    if which pip3 >/dev/null 2>&1; then
+	pip3 config set global.cert "$realpath"
+    fi
+}
+
+configure_tls() {
+    if [ ! -e "$file" ]; then
+	abort '%s: %s: No such file\n' "$script" "$file"
+    fi
+
+    filetype="$(file -b "$file")"
+
+    case "$filetype" in
+	('PEM certificate')
+	    true
+	    ;;
+	(*)
+	    abort '%s: %s: Not a $filetype file\n' "$script" "$file"
+	    ;;
+    esac
+
+    configure_file "$file"
+}
+
+get_ca_cert_file() {
+    case "$ID" in
+	(ubuntu)
+	    printf '%s\n' /etc/ssl/certs/ca-certificates.crt
+	    ;;
+    esac
+}
+
+parse_arguments() {
+    while getopts h opt; do
+	case $opt in
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		usage_error
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 1 ]; then
+	usage_error '%s: Too many arguments\n' "$script"
+    fi
+
+    file="${1-$(get_ca_cert_file)}"
+
+    if [ -z "${file:-}" ]; then
+	usage_error '%s: Not enough arguments\n' "$script"
+    fi
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script FILE
+       $script -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+validate_platform() {
+    case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    true
+		    ;;
+		(8)
+		    :
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(opensuse-tumbleweed)
+	    true
+	    ;;
+	(rhel|ol)
+	    case "$VERSION_ID" in
+		(7.*)
+		    true
+		    ;;
+		(8.*)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(opensuse-tumbleweed)
+	    true
+	    ;;
+	(ubuntu)
+            true
+	    ;;
+	(*)
+	    abort_not_supported Distro
+	    ;;
+    esac
+}
+
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+
+set_user_profile "$script_dir"
+eval $(get-os-release -x)
+validate_platform
+parse_arguments "$@"
+configure_tls
