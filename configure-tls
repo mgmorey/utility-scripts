@@ -59,14 +59,6 @@ configure_tls() {
     configure_file "$file"
 }
 
-get_ca_cert_file() {
-    case "$ID" in
-	(ubuntu)
-	    printf '%s\n' /etc/ssl/certs/ca-certificates.crt
-	    ;;
-    esac
-}
-
 parse_arguments() {
     while getopts h opt; do
 	case $opt in
@@ -82,15 +74,13 @@ parse_arguments() {
 
     shift $(($OPTIND - 1))
 
-    if [ $# -gt 1 ]; then
+    if [ $# -lt 1 ]; then
+	usage_error '%s: Not enough arguments\n' "$script"
+    elif [ $# -gt 1 ]; then
 	usage_error '%s: Too many arguments\n' "$script"
     fi
 
-    file="${1-$(get_ca_cert_file)}"
-
-    if [ -z "${file:-}" ]; then
-	usage_error '%s: Not enough arguments\n' "$script"
-    fi
+    file="$1"
 }
 
 usage() {
