@@ -58,18 +58,33 @@ get_updater() {
     esac
 }
 
-install_ca_certificate() {
+install_file() {
     target=$(get_target)
-    updater=$(get_updater)
-    $updater force-enable
-    install -m a=r "$1" "$target"
-    $updater extract
+
+    if [ "$(id -u)" -eq 0 ]; then
+	if [ -e "$target" ]; then
+	    updater=$(get_updater)
+	    $updater force-enable
+	    install -m a=r "$1" "$target"
+	    $updater extract
+	fi
+    else
+	if which git >/dev/null 2>&1; then
+	    git config --global http.sslCAInfo "$1"
+	fi
+
+	if which pip3 >/dev/null 2>&1; then
+	    pip3 config set global.cert "$1"
+	fi
+    fi
 }
 
 install_packages() {
-    manager=$(get-package-managers | awk 'NR == 1 {print $0}')
-    packages=$(get_packages $manager)
-    $manager install $packages
+    if [ "$(id -u)" -eq 0 ]; then
+	manager=$(get-package-managers | awk 'NR == 1 {print $0}')
+	packages=$(get_packages $manager)
+	$manager install $packages
+    fi
 }
 
 install_tls_ca_certificate() {
@@ -84,13 +99,13 @@ install_tls_ca_certificate() {
 	    true
 	    ;;
 	(*)
-	    abort '%s: %s: Not a PEM certificate file\n' "$script" "$file"
+	    abort '%s: %s: Not a $filetype file\n' "$script" "$file"
 	    ;;
     esac
 
     umask 0022
     install_packages
-    install_ca_certificate "$file"
+    install_file "$file"
 }
 
 parse_arguments() {
@@ -163,17 +178,10 @@ validate_platform() {
 		    ;;
 	    esac
 	    ;;
-	(rocky)
-	    case "$VERSION_ID" in
-		(8.*)
-		    true
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
+	(opensuse-tumbleweed)
+	    true
 	    ;;
-	(windows)
+	(ubuntu)
             true
 	    ;;
 	(*)
