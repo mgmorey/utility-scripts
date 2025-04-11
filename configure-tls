@@ -126,6 +126,9 @@ validate_platform() {
 		(8.*)
 		    true
 		    ;;
+		(9.*)
+		    true
+		    ;;
 		(*)
 		    abort_not_supported Release
 		    ;;
@@ -135,7 +138,14 @@ validate_platform() {
 	    true
 	    ;;
 	(ubuntu)
-            true
+	    case "$VERSION_ID" in
+		(2024.04)
+		    true
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
 	    ;;
 	(*)
 	    abort_not_supported Distro
