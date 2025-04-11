@@ -55,9 +55,9 @@ print_parameter() {
 
     if [ -z "${2-}" ]; then
 	continue
-    elif [ "$no_export" = true ]; then
+    elif [ "${no_export:-}" = true ]; then
 	printf '%s=%s\n' "$1" "$2"
-    else
+    elif [ -n "${shell:-}" ]; then
 	case "$(basename ${shell%.exe})" in
 	    (*bash|ksh*|zsh)
 		printf 'export %s="%s"\n' "$1" "$2"
