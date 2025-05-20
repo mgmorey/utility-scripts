@@ -32,11 +32,23 @@ configure_file() {
     realpath=$(realpath "$1")
 
     if which git >/dev/null 2>&1; then
+	git=git
+    fi
+
+    if [ -n "$git" ]; then
 	git config --global http.sslCAInfo "$realpath"
     fi
 
-    if which pip3 >/dev/null 2>&1; then
-	pip3 config set global.cert "$realpath"
+    if which pip >/dev/null 2>&1; then
+	pip=pip
+    elif which pip3 >/dev/null 2>&1; then
+	pip=pip3
+    else
+	pip=
+    fi
+
+    if [ -n "$pip" ]; then
+	$pip config set global.cert "$realpath"
     fi
 }
 
@@ -109,6 +121,16 @@ validate_platform() {
 		    ;;
 		(8)
 		    :
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(fedora)
+	    case "$VERSION_ID" in
+		(42)
+		    true
 		    ;;
 		(*)
 		    abort_not_supported Release
