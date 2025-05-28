@@ -49,12 +49,16 @@ configure_ctags() {
 	rm -rf "$src_dirname" "$archive_pathname"
     fi
 
-    mkdir -p "$src_dirname" "$archive_dirname"
+    mkdir -p "$archive_dirname" "$build_dirname" "$src_dirname"
     download_archive "$archive_pathname" "$archive_url"
     extract_archive "$archive_pathname" "$src_dirname"
     cd "$src_dirname"
 
-    ./autogen.sh
+    if [ ! -r configure ]; then
+	./autogen.sh
+    fi
+
+    cd "$build_dirname"
     command=$(get_ctags_configure_command "$src_dirname")
     printf '%s\n' "$command"
     eval $command
@@ -71,7 +75,8 @@ configure_ctags() {
 configure_paths() {
     archive_dirname="$CTAGS_ARCHIVE_DIR"
     archive_basename=v$version
-    src_dirname="$HOME/Documents/src/Ctags/ctags-$version"
+    build_dirname="$HOME/Documents/build/$CTAGS_PROJECT_NAME-$version"
+    src_dirname="$HOME/Documents/src/Ctags/$CTAGS_PROJECT_NAME-$version"
     archive_filename=$archive_basename$CTAGS_ARCHIVE_SUFFIX
     archive_pathname="$CTAGS_ARCHIVE_DIR/$archive_filename"
     archive_url=$CTAGS_MIRROR_BASE_URL/archive/refs/tags/$archive_filename
@@ -107,21 +112,23 @@ get_prefix() {
 }
 
 install_ctags() {
+    install_prefix=$(get_prefix)
+
     if [ "$install" != true ]; then
 	return 0
     elif [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
-	return 0
+	if [ ! -w "$install_prefix" ]; then
+	    return 0
+	fi
     fi
 
     umask 0022
-    cd "$src_dirname"
-    install_prefix=$(get_prefix)
+    cd "$build_dirname"
     make_install prefix="$install_prefix" install
     install_project_link "$install_prefix"
 
     if [ "$(id -u)" -eq 0 ]; then
-	find "$src_dirname" -user root -type d | xargs chown-real-user
-	find "$src_dirname" -user root -type f | xargs chown-real-user
+	find "$build_dirname" -user root -type f | xargs chown-real-user
     fi
 }
 
