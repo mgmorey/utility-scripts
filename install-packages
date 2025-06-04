@@ -44,6 +44,12 @@ configure_platform() {
 		    (8)
 			"${script_prefix}install-epel"
 			;;
+		    (9)
+			"${script_prefix}install-epel"
+			;;
+		    (10)
+			"${script_prefix}install-epel"
+			;;
 		    (*)
 			"${script_prefix}install-epel"
 			;;
@@ -62,7 +68,7 @@ configure_platform() {
 		is_pattern_supported=true
 		break
 		;;
-	    (rhel|ol)
+	    (rhel|ol|almalinux)
 		is_pattern_supported=true
 		break
 		;;
@@ -335,6 +341,9 @@ validate_platform() {
 			return
 			;;
 		    (9.*)
+			return
+			;;
+		    (10.*)
 			return
 			;;
 		    (*)
