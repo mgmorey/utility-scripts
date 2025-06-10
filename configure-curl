@@ -17,13 +17,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 CURL_ARCHIVE_DIR="$HOME/Downloads/cURL"
-CURL_ARCHIVE_SUFFIX=.tar.gz
+CURL_ARCHIVE_SUFFIX=.tar.xz
 
 CURL_MIRROR_BASE_URL=https://curl.se
 
 CURL_OPT_PREFIX=/opt/%s
 CURL_PROJECT_NAME=curl
-CURL_PROJECT_VERSION=8.13.0
+CURL_PROJECT_VERSION=8.14.1
 CURL_TLS_BACKEND=openssl
 
 abort() {
