@@ -19,11 +19,10 @@
 CTAGS_ARCHIVE_DIR="$HOME/Downloads/Ctags"
 CTAGS_ARCHIVE_SUFFIX=.tar.gz
 
-CTAGS_MIRROR_BASE_URL=https://github.com/universal-ctags/ctags
-
+CTAGS_BASE_URL=https://github.com/universal-ctags/ctags
 CTAGS_OPT_PREFIX=/opt/%s
-CTAGS_PROJECT_NAME=ctags
-CTAGS_PROJECT_VERSION=6.1.0
+CTAGS_PROJECT_NAME=universal-ctags
+CTAGS_PROJECT_VERSION=6.2.0
 
 abort() {
     printf "$@" >&2
@@ -74,12 +73,12 @@ configure_ctags() {
 
 configure_paths() {
     archive_dirname="$CTAGS_ARCHIVE_DIR"
-    archive_basename=v$version
+    archive_basename=$CTAGS_PROJECT_NAME-$version
     build_dirname="$HOME/Documents/build/$CTAGS_PROJECT_NAME-$version"
     src_dirname="$HOME/Documents/src/Ctags/$CTAGS_PROJECT_NAME-$version"
     archive_filename=$archive_basename$CTAGS_ARCHIVE_SUFFIX
     archive_pathname="$CTAGS_ARCHIVE_DIR/$archive_filename"
-    archive_url=$CTAGS_MIRROR_BASE_URL/archive/refs/tags/$archive_filename
+    archive_url=$CTAGS_BASE_URL/releases/download/v$version/$archive_filename
 }
 
 get_configure_options() (
