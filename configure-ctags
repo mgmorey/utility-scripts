@@ -107,7 +107,7 @@ get_dependencies() {
 }
 
 get_prefix() {
-    printf "$prefix" "$CTAGS_PROJECT_NAME-$version"
+    printf "$prefix" "ctags-$version"
 }
 
 install_ctags() {
