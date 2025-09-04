@@ -19,7 +19,7 @@
 HADOLINT_MIRROR_BASE_URL=https://github.com/hadolint/hadolint
 
 HADOLINT_PROJECT_NAME=hadolint
-HADOLINT_PROJECT_VERSION=2.12.0
+HADOLINT_PROJECT_VERSION=2.13.1
 
 abort() {
     printf "$@" >&2
