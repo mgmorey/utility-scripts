@@ -17,9 +17,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 function get_maximum_length(column, nrow) {
-    maximum = 6
+    maximum = 0
 
-    for (i = 1; i <= nrow; ++i)
+    for (i = 0; i <= nrow; ++i)
 	if (length(column[i]) > maximum)
 	    maximum = length(column[i])
 
@@ -64,8 +64,9 @@ END {
     if (nrow == 0)
 	exit(1)
 
-    for (j = 1; j <= ncol; ++j)
+    for (j = 1; j <= ncol; ++j) {
 	width[j] = get_maximum_length(table[j], nrow)
+    }
 
     for (i = 0; i <= nrow; ++i) {
 	for (j = 1; j <= ncol; ++j) {
