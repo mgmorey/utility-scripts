@@ -1,6 +1,6 @@
 #!/usr/bin/gawk -f
 
-# fstab.awk: align columns of configuration file /etc/fstab
+# reformat-fstab.awk: align columns of configuration file /etc/fstab
 # Copyright (C) 2025  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -61,6 +61,9 @@ BEGIN {
 	table[j][nrow] = $j
 }
 END {
+    if (nrow == 0)
+	exit (1)
+
     for (j = 1; j <= ncol; ++j) {
 	width[j] = get_maximum_length(table[j], nrow)
     }
