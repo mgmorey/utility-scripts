@@ -62,11 +62,10 @@ BEGIN {
 }
 END {
     if (nrow == 0)
-	exit (1)
+	exit(1)
 
-    for (j = 1; j <= ncol; ++j) {
+    for (j = 1; j <= ncol; ++j)
 	width[j] = get_maximum_length(table[j], nrow)
-    }
 
     for (i = 0; i <= nrow; ++i) {
 	for (j = 1; j <= ncol; ++j) {
