@@ -22,13 +22,17 @@ abort() {
 }
 
 reformat_fstab() {
-    is_inplace=false
+    in_place=false
+    suffix=".$$.$(date +%F@%T)~"
 
-    while getopts i:h opt; do
+    while getopts is:h opt; do
 	case $opt in
 	    (i)
-		backup_suffix="$OPTARG"
-		is_inplace=true
+		in_place=true
+		;;
+	    (s)
+		in_place=true
+		suffix="$OPTARG"
 		;;
 	    (h)
 		usage
@@ -42,7 +46,7 @@ reformat_fstab() {
 
     shift $(($OPTIND - 1))
 
-    if [ $is_inplace = true -a $# -lt 1 ]; then
+    if [ $in_place = true -a $# -lt 1 ]; then
 	usage_error '%s: INPUT-FILE needed for in-place edit\n' "$script"
     fi
 
@@ -57,12 +61,15 @@ reformat_fstab() {
 	abort '%s: Temporary output file %s is empty\n' "$script" "$tmpfile"
     fi
 
-    if [ $is_inplace = true ]; then
+    if [ $in_place = true ]; then
 	if [ ! -e "$1" -o ! -w "$1" ]; then
 	    usage_error '%s: Output file %s is not writable\n' "$script" "$1"
 	fi
 
-    	/bin/mv -f "$1" "$1$backup_suffix"
+	if [ -n "$suffix" ]; then
+    	    /bin/mv -f "$1" "$1$suffix"
+	fi
+
 	/bin/mv -f $tmpfile "$1"
 	chmod u=rw,go=r "$1"
     else
@@ -72,9 +79,9 @@ reformat_fstab() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-i BACKUP-SUFFIX INPUT-FILE]
+Usage: $script [-i] [-s SUFFIX] [FILE]
 
-Reformat file contents by aligning columns.
+Reformat fstab by aligning columns.
 EOF
 }
 
