@@ -28,16 +28,16 @@ reformat_fstab() {
 
     tmpfile=$(mktemp)
     trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
-    "${script_prefix}$script.awk" "$@" | tee $tmpfile
+    if "${script_prefix}$script.awk" "$@" >$tmpfile; then
+	if [ -s $tmpfile ]; then
+	    cat $tmpfile
 
-    if [ $# -lt 1 ]; then
-	exit 0
-    fi
-
-    if [ -s $tmpfile -a -e "$1" -a -w "$1" ]; then
-	/bin/mv -f "$1" "${1}~"
-	/bin/mv -f $tmpfile "$1"
-	chmod u=rw,go=r "$1"
+	    if [ $# -eq 1 -a -e "$1" -a -w "$1" ]; then
+		/bin/mv -f "$1" "${1}~"
+		/bin/mv -f $tmpfile "$1"
+		chmod u=rw,go=r "$1"
+	    fi
+	fi
     fi
 }
 
