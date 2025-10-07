@@ -48,12 +48,12 @@ BEGIN {
 /^# </ {
     header = 1
     i_first = 0
-    table[1][i_first] = "# <file system>"
-    table[2][i_first] = "<mount point>"
-    table[3][i_first] = "<type>"
-    table[4][i_first] = "<options>"
-    table[5][i_first] = "<dump>"
-    table[6][i_first] = "<pass>"
+    table[1][0] = "# <file system>"
+    table[2][0] = "<mount point>"
+    table[3][0] = "<type>"
+    table[4][0] = "<options>"
+    table[5][0] = "<dump>"
+    table[6][0] = "<pass>"
 }
 /^[^#]/ {
     if (NF != j_last) {
