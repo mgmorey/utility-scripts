@@ -16,10 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-function get_maximum_length(column, first, last) {
+function get_maximum_length(column, i_first, i_last) {
     maximum = 0
 
-    for (i = first; i <= last; ++i)
+    for (i = i_first; i <= i_last; ++i)
 	if (length(column[i]) > maximum)
 	    maximum = length(column[i])
 
@@ -27,9 +27,11 @@ function get_maximum_length(column, first, last) {
 }
 
 BEGIN {
-    first = 1
-    last = 0
-    ncol = 6
+    i_first = 1
+    i_last = 0
+    j_first = 1
+    j_integer = 5
+    j_last = 6
 }
 /^$/ {
     print $0
@@ -39,44 +41,49 @@ BEGIN {
 }
 /^# [^<]/ {
     if (header == 1)
-	comment[last] = $0
+	comment[i_last] = $0
     else
 	print $0
 }
 /^# </ {
-    first = 0
     header = 1
-    table[1][0] = "# <file system>"
-    table[2][0] = "<mount point>"
-    table[3][0] = "<type>"
-    table[4][0] = "<options>"
-    table[5][0] = "<dump>"
-    table[6][0] = "<pass>"
+    i_first = 0
+    table[1][i_first] = "# <file system>"
+    table[2][i_first] = "<mount point>"
+    table[3][i_first] = "<type>"
+    table[4][i_first] = "<options>"
+    table[5][i_first] = "<dump>"
+    table[6][i_first] = "<pass>"
 }
 /^[^#]/ {
-    if (NF != ncol) {
+    if (NF != j_last) {
 	exit(1)
     }
 
-    ++last
+    ++i_last
 
-    for (j = 1; j <= ncol; ++j)
-	table[j][last] = $j
+    for (j = j_first; j <= j_last; ++j)
+	table[j][i_last] = $j
 }
 END {
-    if (last == 0)
+    if (i_last == 0)
 	exit(1)
 
-    for (j = 1; j <= ncol; ++j) {
-	width[j] = get_maximum_length(table[j], first, last)
+    for (j = j_first; j <= j_last; ++j) {
+	width[j] = get_maximum_length(table[j], i_first, i_last)
     }
 
-    for (i = first; i <= last; ++i) {
-	for (j = 1; j <= ncol; ++j) {
-	    if (j < ncol)
-		printf("%-*s ", width[j], table[j][i])
+    for (i = i_first; i <= i_last; ++i) {
+	for (j = j_first; j <= j_last; ++j) {
+	    if (j < j_integer)
+		printf("%-*s", width[j], table[j][i])
 	    else
-		printf("%-*s\n", width[j], table[j][i])
+		printf("%*s", width[j], table[j][i])
+
+	    if (j < j_last)
+		printf(" ")
+	    else
+		printf("\n")
 	}
 
 	if (comment[i] != "")
