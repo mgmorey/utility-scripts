@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+SUFFIX=".$$.$(date +%F@%T)~"
+
 abort() {
     printf "$@" >&2
     exit 1
@@ -23,7 +25,7 @@ abort() {
 
 reformat_fstab() {
     in_place=false
-    suffix=".$$.$(date +%F@%T)~"
+    suffix=
 
     while getopts is:h opt; do
 	case $opt in
@@ -53,25 +55,24 @@ reformat_fstab() {
     tmpfile=$(mktemp)
     trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
 
-    if ! "$script_prefix$script.awk" "$@" >$tmpfile; then
-	abort '%s: Script %s failed\n' "$script" "$script.awk"
-    fi
-
-    if [ ! -s $tmpfile ]; then
-	abort '%s: Temporary output file %s is empty\n' "$script" "$tmpfile"
+    if ! "$script_prefix$script.awk" "$@" >$tmpfile || [ ! -s $tmpfile ]; then
+	abort 'Script %s failed to write file %s\n' "$script.awk" "$tmpfile"
     fi
 
     if [ $in_place = true ]; then
-	if [ ! -e "$1" -o ! -w "$1" ]; then
-	    usage_error '%s: Output file %s is not writable\n' "$script" "$1"
+	if ! diff -b "$1" $tmpfile; then
+	    abort 'Script %s failed to reformat file %s\n' "$script.awk" "$1"
 	fi
 
-	if [ -n "$suffix" ]; then
-    	    /bin/mv -f "$1" "$1$suffix"
-	fi
+	if ! diff -s "$1" $tmpfile; then
+	    if [ ! -w "$(dirname "$1")" ]; then
+		usage_error '%s: Cannot rewrite file %s\n' "$script" "$1"
+	    fi
 
-	/bin/mv -f $tmpfile "$1"
-	chmod u=rw,go=r "$1"
+    	    /bin/mv -f "$1" "$1${suffix:-$SUFFIX}"
+	    /bin/mv -f $tmpfile "$1"
+	    chmod u=rw,go=r "$1"
+	fi
     else
 	cat $tmpfile
     fi
