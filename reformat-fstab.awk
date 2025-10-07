@@ -43,12 +43,13 @@ BEGIN {
     print $0
 }
 /^# [^<]/ {
-    if (nrow > 0)
+    if (headers_seen == 1)
 	comment[nrow] = $0
     else
 	print $0
 }
 /^# </ {
+    headers_seen = 1
 }
 /^[^#]/ {
     if (NF != ncol) {
