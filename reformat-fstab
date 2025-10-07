@@ -22,28 +22,57 @@ abort() {
 }
 
 reformat_fstab() {
-    if [ $# -gt 1 ]; then
-	usage_error '%s: Too many arguments\n' "$script"
+    is_inplace=false
+
+    while getopts i:h opt; do
+	case $opt in
+	    (i)
+		backup_suffix="$OPTARG"
+		is_inplace=true
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $is_inplace = true -a $# -lt 1 ]; then
+	usage_error '%s: INPUT-FILE needed for in-place edit\n' "$script"
     fi
 
     tmpfile=$(mktemp)
     trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
-    if "${script_prefix}$script.awk" "$@" >$tmpfile; then
-	if [ -s $tmpfile ]; then
-	    cat $tmpfile
 
-	    if [ $# -eq 1 -a -e "$1" -a -w "$1" ]; then
-		/bin/mv -f "$1" "${1}~"
-		/bin/mv -f $tmpfile "$1"
-		chmod u=rw,go=r "$1"
-	    fi
+    if ! "$script_prefix$script.awk" "$@" >$tmpfile; then
+	abort '%s: Script %s failed\n' "$script" "$script.awk"
+    fi
+
+    if [ ! -s $tmpfile ]; then
+	abort '%s: Temporary output file %s is empty\n' "$script" "$tmpfile"
+    fi
+
+    if [ $is_inplace = true ]; then
+	if [ ! -e "$1" -o ! -w "$1" ]; then
+	    usage_error '%s: Output file %s is not writable\n' "$script" "$1"
 	fi
+
+    	/bin/mv -f "$1" "$1$backup_suffix"
+	/bin/mv -f $tmpfile "$1"
+	chmod u=rw,go=r "$1"
+    else
+	cat $tmpfile
     fi
 }
 
 usage() {
     cat <<EOF >&2
-Usage: $script [FILE]
+Usage: $script [-i BACKUP-SUFFIX INPUT-FILE]
 
 Reformat file contents by aligning columns.
 EOF

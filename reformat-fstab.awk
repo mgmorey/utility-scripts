@@ -19,7 +19,7 @@
 function get_maximum_length(column, nrow) {
     maximum = 0
 
-    for (i = 0; i <= nrow; ++i)
+    for (i = ifirst; i <= nrow; ++i)
 	if (length(column[i]) > maximum)
 	    maximum = length(column[i])
 
@@ -27,14 +27,9 @@ function get_maximum_length(column, nrow) {
 }
 
 BEGIN {
+    ifirst = 1
     ncol = 6
     nrow = 0
-    table[1][0] = "# <file system>"
-    table[2][0] = "<mount point>"
-    table[3][0] = "<type>"
-    table[4][0] = "<options>"
-    table[5][0] = "<dump>"
-    table[6][0] = "<pass>"
 }
 /^$/ {
     print $0
@@ -43,13 +38,20 @@ BEGIN {
     print $0
 }
 /^# [^<]/ {
-    if (headers_seen == 1)
+    if (have_headers == 1)
 	comment[nrow] = $0
     else
 	print $0
 }
 /^# </ {
-    headers_seen = 1
+    have_headers = 1
+    ifirst = 0
+    table[1][0] = "# <file system>"
+    table[2][0] = "<mount point>"
+    table[3][0] = "<type>"
+    table[4][0] = "<options>"
+    table[5][0] = "<dump>"
+    table[6][0] = "<pass>"
 }
 /^[^#]/ {
     if (NF != ncol) {
@@ -69,7 +71,7 @@ END {
 	width[j] = get_maximum_length(table[j], nrow)
     }
 
-    for (i = 0; i <= nrow; ++i) {
+    for (i = ifirst; i <= nrow; ++i) {
 	for (j = 1; j <= ncol; ++j) {
 	    if (j < ncol)
 		printf("%-*.*s ", width[j], width[j], table[j][i])
