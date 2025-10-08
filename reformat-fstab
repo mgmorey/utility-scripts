@@ -60,7 +60,7 @@ reformat_fstab() {
     fi
 
     if [ $in_place = true ]; then
-	if ! diff -b "$1" $tmpfile; then
+	if diff -b "$1" $tmpfile; then
 	    abort 'Script %s failed to reformat file %s\n' "$script.awk" "$1"
 	fi
 
