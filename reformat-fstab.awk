@@ -27,6 +27,7 @@ function get_maximum_length(column, i_first, i_last) {
 }
 
 BEGIN {
+    header = 0
     i_first = 1
     i_last = 0
     j_first = 1
