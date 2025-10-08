@@ -37,13 +37,13 @@ BEGIN {
 /^#?$/ {
     print $0
 }
-/^#[ ]+[^<]/ {
+/^#[\t ]+[^<]/ {
     if (header == 1)
 	comment[i_last] = $0
     else
 	print $0
 }
-/^#([ ]+<[^>]+>)+/ {
+/^#([\t ]+<[^>]+>)+/ {
     header = 1
     i_first = 0
     table[1][0] = "# <file system>"
