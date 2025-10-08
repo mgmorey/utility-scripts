@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# reformat-fstab: align columns of configuration file /etc/fstab
+# fstab-tidy: align columns of filesytem entries in /etc/fstab
 # Copyright (C) 2025  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

@@ -1,6 +1,6 @@
 #!/usr/bin/gawk -f
 
-# reformat-fstab.awk: align columns of configuration file /etc/fstab
+# fstab-tidy.awk: align columns of filesytem entries in /etc/fstab
 # Copyright (C) 2025  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-function get_maximum_length(column, i_first, i_last) {
+function abort(message) {
+    printf("%s:%d: %s\n", FILENAME, FNR, message) > "/dev/stderr"
+    exit(1)
+}
+
+function get_maximum_width(table, i_first, i_last, j) {
     maximum = 0
 
-    for (i = i_first; i <= i_last; ++i)
-	if (length(column[i]) > maximum)
-	    maximum = length(column[i])
+    for (i = i_first; i <= i_last; ++i) {
+	l = length(table[i][j])
+
+	if (l > maximum)
+	    maximum = l
+    }
 
     return maximum
 }
@@ -34,49 +42,46 @@ BEGIN {
     j_integer = 5
     j_last = 6
 }
-/^#?$/ {
-    print $0
-}
+/^#?$/
 /^#[\t ]+[^<]/ {
     if (header == 1)
 	comment[i_last] = $0
     else
-	print $0
+	print
 }
 /^#([\t ]+<[^>]+>)+/ {
     header = 1
     i_first = 0
-    table[1][0] = "# <file system>"
-    table[2][0] = "<mount point>"
-    table[3][0] = "<type>"
-    table[4][0] = "<options>"
-    table[5][0] = "<dump>"
-    table[6][0] = "<pass>"
+    table[0][1] = "# <file system>"
+    table[0][2] = "<mount point>"
+    table[0][3] = "<type>"
+    table[0][4] = "<options>"
+    table[0][5] = "<dump>"
+    table[0][6] = "<pass>"
 }
 /^[^#]/ {
-    if (NF != j_last) {
-	exit(1)
-    }
+    if (NF != j_last)
+	abort(sprintf("Column count is %d (should be %d)", NF, j_last))
 
     ++i_last
 
     for (j = j_first; j <= j_last; ++j)
-	table[j][i_last] = $j
+	table[i_last][j] = $j
 }
 END {
     if (i_last == 0)
-	exit(1)
+	abort("No filesystem entries found")
 
     for (j = j_first; j <= j_last; ++j) {
-	width[j] = get_maximum_length(table[j], i_first, i_last)
+	width[j] = get_maximum_width(table, i_first, i_last, j)
     }
 
     for (i = i_first; i <= i_last; ++i) {
 	for (j = j_first; j <= j_last; ++j) {
 	    if (j < j_integer)
-		printf("%-*s", width[j], table[j][i])
+		printf("%-*s", width[j], table[i][j])
 	    else
-		printf("%*s", width[j], table[j][i])
+		printf("%*s", width[j], table[i][j])
 
 	    if (j < j_last)
 		printf(" ")
