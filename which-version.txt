@@ -64,3 +64,4 @@ valgrind	--version	s/valgrind-\([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
 vagrant	--version	s/Vagrant \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
 which	--version	1s/GNU which v\([0-9][0-9]*\(\.[0-9][0-9]*\)*\), .*/\1/p
 xargs	--version	1s/xargs .* \([0-9][0-9]*\(\.[0-9][0-9]*\)*\).*/\1/p
+yamllint	--version	1s/yamllint \([0-9][0-9]*\(\.[0-9][0-9]*\)*\)/\1/p
