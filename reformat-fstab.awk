@@ -34,19 +34,16 @@ BEGIN {
     j_integer = 5
     j_last = 6
 }
-/^$/ {
+/^#?$/ {
     print $0
 }
-/^#$/ {
-    print $0
-}
-/^# [^<]/ {
+/^#[ ]+[^<]/ {
     if (header == 1)
 	comment[i_last] = $0
     else
 	print $0
 }
-/^# </ {
+/^#([ ]+<[^>]+>)+/ {
     header = 1
     i_first = 0
     table[1][0] = "# <file system>"
