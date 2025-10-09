@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# fstab-tidy: align columns of filesytem entries in /etc/fstab
+# fstab-format: align columns of filesytem entries in /etc/fstab
 # Copyright (C) 2025  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -16,29 +16,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-FORMAT=+%F@%T
+DATEFMT=+%F@%T
 
 abort() {
     printf "$@" >&2
     exit 1
 }
 
-get_suffix() {
-    printf '%s\n' ".$$.$(date $FORMAT)~"
-}
-
 reformat_fstab() {
     in_place=false
-    suffix=
 
-    while getopts is:h opt; do
+    while getopts ih opt; do
 	case $opt in
 	    (i)
 		in_place=true
-		;;
-	    (s)
-		in_place=true
-		suffix="$OPTARG"
 		;;
 	    (h)
 		usage
@@ -60,20 +51,20 @@ reformat_fstab() {
     trap "/bin/rm -f \"$tmpfile\"" EXIT INT QUIT TERM
 
     if ! "$script_prefix$script.awk" "$@" >$tmpfile || [ ! -s $tmpfile ]; then
-	abort 'Script %s failed to write file %s\n' "$script.awk" "$tmpfile"
+	abort '%s: %s: Error formatting file\n' "$script" "$1"
     fi
 
     if [ $in_place = true ]; then
 	if ! diff -b "$1" $tmpfile; then
-	    abort 'Script %s failed to reformat file %s\n' "$script.awk" "$1"
+	    abort '%s: %s: Error formatting file\n' "$script" "$1"
 	fi
 
 	if ! diff -s "$1" $tmpfile; then
 	    if [ ! -w "$(dirname "$1")" ]; then
-		usage_error '%s: Cannot rewrite file %s\n' "$script" "$1"
+		usage_error '%s: %s: No write permissions\n' "$script" "$1"
 	    fi
 
-    	    /bin/mv -f "$1" "$1${suffix:-$(get_suffix)}"
+    	    /bin/mv -f "$1" "$1.$$.$(date $DATEFMT)~"
 	    /bin/mv -f $tmpfile "$1"
 	    chmod u=rw,go=r "$1"
 	fi
@@ -84,7 +75,8 @@ reformat_fstab() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-i] [-s SUFFIX] [FILE]
+Usage: $script [-i] FILE
+       $script [FILE|-]
 
 Reformat fstab by aligning columns.
 EOF

@@ -1,6 +1,6 @@
 #!/usr/bin/gawk -f
 
-# fstab-tidy.awk: align columns of filesytem entries in /etc/fstab
+# fstab-format.awk: align columns of filesytem entries in /etc/fstab
 # Copyright (C) 2025  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 function abort(message) {
-    printf("%s:%d: %s\n", FILENAME, FNR, message) > "/dev/stderr"
+    printf("%s: %s:%d: %s\n", ARGV[0], FILENAME, FNR, message) > "/dev/stderr"
     exit(1)
 }
 
