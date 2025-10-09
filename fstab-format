@@ -44,7 +44,11 @@ reformat_fstab() {
     shift $(($OPTIND - 1))
 
     if [ $in_place = true -a $# -lt 1 ]; then
-	usage_error '%s: INPUT-FILE needed for in-place edit\n' "$script"
+	usage_error '%s: In-place argument FILE required\n' "$script"
+    fi
+
+    if [ $# -gt 1 ]; then
+	usage_error '%s: Too many arguments\n' "$script"
     fi
 
     tmpfile=$(mktemp)
@@ -75,10 +79,10 @@ reformat_fstab() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-i] FILE
-       $script [FILE|-]
+Usage: $script -i FILE
+       $script [FILE]
 
-Reformat fstab by aligning columns.
+Format file /etc/fstab.
 EOF
 }
 
