@@ -1,0 +1,3 @@
+#!/bin/sh -eu
+
+pipx install --include-deps ansible
