@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-DATEFMT=%F@%T
+DATEFMT=%FT%TZ
 
 abort() {
     printf "$@" >&2
@@ -68,7 +68,7 @@ reformat_fstab() {
 		usage_error '%s: %s: No write permissions\n' "$script" "$1"
 	    fi
 
-    	    /bin/mv -f "$1" "$1.$$.$(date +$DATEFMT)~"
+    	    /bin/mv -f "$1" "$1.$$.$(date -u +$DATEFMT)~"
 	    /bin/mv -f $tmpfile "$1"
 	    chmod u=rw,go=r "$1"
 	fi
