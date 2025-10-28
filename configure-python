@@ -23,7 +23,7 @@ PYTHON_MIRROR_BASE_URL=https://www.python.org/ftp
 
 PYTHON_OPT_PREFIX=/opt/%s
 PYTHON_PROJECT_NAME=python
-PYTHON_PROJECT_VERSION=3.10.4
+PYTHON_PROJECT_VERSION=3.12.12
 
 abort() {
     printf "$@" >&2
