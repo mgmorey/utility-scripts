@@ -86,6 +86,11 @@ get_configure_options() (
         options="${options:+$options }--prefix=$(get_prefix)"
     fi
 
+    if [ -n "${ssl_prefix-}" ]; then
+	options="${options:+$options }--with-openssl=${ssl_prefix}"
+	options="${options:+$options }--with-openssl-rpath=${ssl_prefix}/lib64"
+    fi
+
     if [ -n "${options:-}" ]; then
 	printf '%s\n' "$options"
     fi
@@ -123,10 +128,12 @@ parse_arguments() {
     check=false
     force=false
     install=false
+    keep=false
     prefix=$PYTHON_OPT_PREFIX
+    ssl_prefix=
     version=$PYTHON_PROJECT_VERSION
 
-    while getopts bcfip:v:h opt; do
+    while getopts bcfiknp:s:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -142,10 +149,27 @@ parse_arguments() {
 	    (i)
 		install=true
 		;;
+	    (k)
+		keep=true
+		;;
+	    (n)
+		build=false
+		force=false
+		;;
 	    (p)
 		case $OPTARG in
 		    ($HOME/.local|$LOCAL_PREFIX|$PYTHON_OPT_PREFIX)
 			prefix=$OPTARG
+			;;
+		    (*)
+			abort_invalid_prefix $OPTARG
+			;;
+		esac
+		;;
+	    (s)
+		case $OPTARG in
+		    (/opt/openssl-*)
+			ssl_prefix=$OPTARG
 			;;
 		    (*)
 			abort_invalid_prefix $OPTARG
@@ -259,7 +283,10 @@ validate_platform
 configure_platform
 parse_arguments "$@"
 configure_paths
-install_dependencies
+
+if [ "$keep" != true ]; then
+    install_dependencies
+fi
 
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"
