@@ -214,7 +214,8 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-g] [-i] [-n] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-c] [-f] [-g] [-i] [-k] [-n] [-p PREFIX] [-s SSL-PREFIX]
+       	       [-v VERSION]
        $script -h
 EOF
 }
