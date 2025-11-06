@@ -23,7 +23,8 @@ OPENSSL_MIRROR_BASE_URL=https://www.openssl.org/source
 
 OPENSSL_OPT_PREFIX=/opt/%s
 OPENSSL_PROJECT_NAME=openssl
-OPENSSL_PROJECT_VERSION=3.5.0
+# OPENSSL_PROJECT_VERSION=3.5.4
+OPENSSL_PROJECT_VERSION=3.0.18
 
 abort() {
     printf "$@" >&2
@@ -232,12 +233,15 @@ validate_platform() {
 	(opensuse-*)
 	    return
 	    ;;
-	(rhel|ol)
+	(rhel|ol|almalinux)
 	    case "$VERSION_ID" in
 		(7.*)
 		    return
 		    ;;
 		(8.*)
+		    return
+		    ;;
+		(9.*)
 		    return
 		    ;;
 		(*)
