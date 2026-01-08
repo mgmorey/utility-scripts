@@ -50,18 +50,14 @@ configure_git() {
     umask 0022
 
     if [ "$force" = true ]; then
-	rm -rf "$src_dirname" "$archive_pathname"
+	rm -rf "$build_dirname" "$src_dirname" "$archive_pathname"
     fi
 
     mkdir -p "$src_dirname" "$archive_dirname"
     download_archive "$archive_pathname" "$archive_url"
     extract_archive "$archive_pathname" "$src_dirname"
-    cd "$src_dirname"
-
-    if [ ! -r configure ]; then
-	$make configure
-    fi
-
+    cp -R "$src_dirname" "$(dirname "$build_dirname")"
+    cd "$build_dirname"
     command=$(get_git_configure_command "$src_dirname")
     printf '%s\n' "$command"
     eval $command
@@ -78,6 +74,7 @@ configure_git() {
 configure_paths() {
     archive_dirname="$GIT_ARCHIVE_DIR"
     archive_basename=$GIT_PROJECT_NAME-$version
+    build_dirname="$HOME/Documents/build/$archive_basename"
     src_dirname="$HOME/Documents/src/Git/$archive_basename"
     archive_filename=$archive_basename$GIT_ARCHIVE_SUFFIX
     archive_pathname="$GIT_ARCHIVE_DIR/$archive_filename"
@@ -121,7 +118,7 @@ install_git() {
     fi
 
     umask 0022
-    cd "$src_dirname"
+    cd "$build_dirname"
     install_prefix=$(get_prefix)
     make_install prefix="$install_prefix" install install-doc install-html
     install_project_link "$install_prefix"
