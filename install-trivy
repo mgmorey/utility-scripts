@@ -1,0 +1,4 @@
+#!/bin/sh -eu
+
+cd
+curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
