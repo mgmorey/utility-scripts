@@ -83,7 +83,7 @@ set_oss_dir() {
 	    INFOPATH="$1${INFOPATH+:$INFOPATH}"
 	    ;;
 	(lib)
-	    if [ "$(get_count "$1/*.a" "$1/*.la")" -gt 0 ]; then
+	    if [ "$(get_count "$1/*.a" "$1/*.la" "$1/*.so")" -gt 0 ]; then
 		if ! is_included "-L$1" "${LDFLAGS-}"; then
 		    LDFLAGS="-L$1${LDFLAGS+ $LDFLAGS}"
 		fi
