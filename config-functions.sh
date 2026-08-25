@@ -170,10 +170,6 @@ extract_files() {
     extract_archive "$pathname" "$src_dir"
 }
 
-get_cpu_core_count() {
-    lscpu 2>/dev/null | awk '$1 == "CPU(s):" {print $2}' || true
-}
-
 get_compiler() {
     printf '%s\n' "$1"
 }
@@ -276,7 +272,7 @@ get_linker_flags() {
 }
 
 get_make_build_options() {
-    get_make_job_options "$(get_cpu_core_count)"
+    get_make_job_options "$(nproc)"
 }
 
 get_make_check_options() {
