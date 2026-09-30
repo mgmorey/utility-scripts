@@ -33,6 +33,8 @@ configure_file() {
 
     if which git >/dev/null 2>&1; then
 	git=git
+    else
+	git=
     fi
 
     if [ -n "$git" ]; then
@@ -64,7 +66,8 @@ configure_tls() {
 	    true
 	    ;;
 	(*)
-	    abort '%s: %s: Not a $filetype file\n' "$script" "$file"
+	    abort '%s: %s: Not a PEM certificate file (%s)\n' \
+		  "$script" "$file" "$filetype"
 	    ;;
     esac
 
