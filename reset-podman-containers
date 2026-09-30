@@ -2,4 +2,5 @@
 
 uid=$(id -u)
 
-/bin/rm -rf ~/.{config,local/share}/containers /run/user/$uid/{libpod,runc,vfs-*}
+/bin/rm -rf ~/.config/containers ~/.local/share/containers \
+    /run/user/$uid/libpod /run/user/$uid/runc /run/user/$uid/vfs-*
