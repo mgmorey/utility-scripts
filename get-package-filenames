@@ -78,5 +78,5 @@ elif [ $# -gt 1 ]; then
     usage_error '%s: Too many arguments\n' "$script"
 fi
 
-eval $("${script_prefix}get-os-release" -x)
+eval "$("${script_prefix}get-os-release" -x)"
 get_package_filenames "$@"

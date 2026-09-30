@@ -114,18 +114,29 @@ get_solaris_dirs() {
 }
 
 include_binary_directories() {
-    for bindir; do
-	if is_to_be_included "$dir/$bindir" "${PATH-}"; then
-	    case "$dir" in
-		(/opt/csw|/opt/homebrew|/home/linuxbrew/.linuxbrew|"$HOME"/.linuxbrew)
+    case "$dir" in
+	(/opt/csw|/opt/homebrew|/home/linuxbrew/.linuxbrew|"$HOME"/.linuxbrew)
+	    # Reverse so appended directories keep the order prepending gives
+	    bindirs=
+
+	    for bindir; do
+		bindirs="$bindir${bindirs:+ $bindirs}"
+	    done
+
+	    for bindir in $bindirs; do
+		if is_to_be_included "$dir/$bindir" "${PATH-}"; then
 		    PATH="${PATH:+$PATH:}$dir/$bindir"
-		    ;;
-		(*)
+		fi
+	    done
+	    ;;
+	(*)
+	    for bindir; do
+		if is_to_be_included "$dir/$bindir" "${PATH-}"; then
 		    PATH="$dir/$bindir${PATH:+:$PATH}"
-		    ;;
-	    esac
-	fi
-    done
+		fi
+	    done
+	    ;;
+    esac
 }
 
 include_common_directories() {
@@ -281,6 +292,6 @@ script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}parameter-functions.sh"
 
-eval $("${script_prefix}get-os-release" -x)
+eval "$("${script_prefix}get-os-release" -x)"
 parse_arguments "$@"
 set_profile_parameters
