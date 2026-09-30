@@ -77,10 +77,14 @@ set_oss_dir() {
 
     case "$(basename "$1" "$bits")" in
 	(include)
-	    CPPFLAGS="-I$1${CPPFLAGS+ $CPPFLAGS}"
+	    if ! is_included "-I$1" "${CPPFLAGS-}"; then
+		CPPFLAGS="-I$1${CPPFLAGS+ $CPPFLAGS}"
+	    fi
 	    ;;
 	(info)
-	    INFOPATH="$1${INFOPATH+:$INFOPATH}"
+	    if ! is_included "$1" "${INFOPATH-}"; then
+		INFOPATH="$1${INFOPATH+:$INFOPATH}"
+	    fi
 	    ;;
 	(lib)
 	    if [ "$(get_count "$1/*.a" "$1/*.la" "$1/*.so")" -gt 0 ]; then
@@ -98,13 +102,19 @@ set_oss_dir() {
 	    fi
 	    ;;
 	(man)
-	    MANPATH="$1${MANPATH+:$MANPATH}"
+	    if ! is_included "$1" "${MANPATH-}"; then
+		MANPATH="$1${MANPATH+:$MANPATH}"
+	    fi
 	    ;;
 	(bin)
-	    PATH="$1${PATH+:$PATH}"
+	    if ! is_included "$1" "${PATH-}"; then
+		PATH="$1${PATH+:$PATH}"
+	    fi
 	    ;;
 	(pkgconfig)
-	    PKG_CONFIG_PATH="$1${PKG_CONFIG_PATH+:$PKG_CONFIG_PATH}"
+	    if ! is_included "$1" "${PKG_CONFIG_PATH-}"; then
+		PKG_CONFIG_PATH="$1${PKG_CONFIG_PATH+:$PKG_CONFIG_PATH}"
+	    fi
 	    ;;
     esac
 }

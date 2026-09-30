@@ -117,7 +117,7 @@ include_binary_directories() {
     for bindir; do
 	if is_to_be_included "$dir/$bindir" "${PATH-}"; then
 	    case "$dir" in
-		(/opt/csw)
+		(/opt/csw|/opt/homebrew|/home/linuxbrew/.linuxbrew|"$HOME"/.linuxbrew)
 		    PATH="${PATH:+$PATH:}$dir/$bindir"
 		    ;;
 		(*)
@@ -204,18 +204,18 @@ include_pkgconf_directories() {
 
 include_profile_directories() {
     # add user info directory to INFOPATH (if it exists)
-    if ! is_included "$HOME/info" "${PATH-}"; then
+    if is_to_be_included "$HOME/info" "${INFOPATH-}"; then
 	INFOPATH="$HOME/info${INFOPATH:+:$INFOPATH}"
     fi
 
     # add user man directory to MANPATH (if it exists)
-    if ! is_included "$HOME/man" "${PATH-}"; then
+    if is_to_be_included "$HOME/man" "${MANPATH-}"; then
 	MANPATH="$HOME/man${MANPATH:+:$MANPATH}"
     fi
 
     # add user binary directories to PATH (if they exist)
     for bin in $(get_profile_bins); do
-	if ! is_included "$HOME/$bin" "${PATH-}"; then
+	if is_to_be_included "$HOME/$bin" "${PATH-}"; then
 	    PATH="$HOME/$bin${PATH:+:$PATH}"
 	fi
     done
