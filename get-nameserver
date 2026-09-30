@@ -18,4 +18,5 @@
 
 $1 == "nameserver" {
     print $2;
+    exit;
 }
