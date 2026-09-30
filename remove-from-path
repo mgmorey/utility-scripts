@@ -25,32 +25,23 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
-print_parameter() {
-    case "$(basename $shell)" in
+# Unlike print_parameter(), an emptied value must still be printed
+print_value() {
+    case "$(basename "${shell%.exe}")" in
 	(*bash|ksh*|zsh)
-	    printf 'export %s="%s"\n' "$var" "$value"
+	    printf 'export %s=%s\n' "$var" "$(quote_value "$value")"
 	    ;;
 	(csh|tcsh)
-	    printf 'setenv %s "%s";\n' "$var" "$value"
+	    printf 'setenv %s %s;\n' "$var" "$(quote_value "$value")"
 	    ;;
 	(fish)
-	    printf 'set -x %s "%s";\n' "$var" "$value"
+	    printf 'set -x %s %s;\n' "$var" "$(quote_fish_value "$value")"
 	    ;;
 	(*)
-	    printf '%s="%s"\n' "$var" "$value"
+	    printf '%s=%s\n' "$var" "$(quote_value "$value")"
 	    printf 'export %s\n' "$var"
 	    ;;
     esac
-}
-
-remove_directory() {
-    assert [ $# -eq 2 ]
-    printf '%s\n' "$2" | sed '
-s|:'"$1"':|:|g
-s|^'"$1"':||
-s|:'"$1"'$||
-s|^'"$1"'$||
-'
 }
 
 remove_from_path() {
@@ -59,23 +50,7 @@ remove_from_path() {
     while getopts s:h opt; do
 	case $opt in
 	    (s)
-		case $(basename $OPTARG) in
-		    (*bash|ksh*|zsh)
-			shell=$OPTARG
-			;;
-		    (csh|tcsh)
-			shell=$OPTARG
-			;;
-		    (fish)
-			shell=$OPTARG
-			;;
-		    (sh)
-			shell=$OPTARG
-			;;
-		    (*)
-			usage_error '%s: %s: Unsupported shell\n' "$script" "$OPTARG"
-			;;
-		esac
+		parse_shell "$OPTARG"
 		;;
 	    (h)
 		usage
@@ -102,7 +77,7 @@ remove_from_path() {
 	value=$(remove_directory "$dir" "$value")
     done
 
-    print_parameter
+    print_value
 }
 
 usage() {
@@ -112,15 +87,19 @@ Usage: $script: [-s SHELL] PARAMETER [DIRECTORY [...]]
 EOF
 }
 
-usage_error() {
-    if [ $# -gt 0 ]; then
-	printf "$@" >&2
-    fi
-
-    printf '%s\n' '' >&2
-    usage
-    exit 2
-}
-
 script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}parameter-functions.sh"
+
 remove_from_path "$@"

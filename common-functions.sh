@@ -396,13 +396,20 @@ get_user_name() {
 is_included() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
-    printf '%s\n' "${2-}" | grep -Eq '(^|:)'"$1"'(:|$)'
+
+    case ":${2-}:" in
+	(*":$1:"*)
+	    return 0
+	    ;;
+    esac
+
+    return 1
 }
 
 is_to_be_included() {
     assert [ $# -eq 2 ]
     assert [ -n "$1" ]
-    test -d $1 && ! is_included $1 "$2"
+    test -d "$1" && ! is_included "$1" "$2"
 }
 
 is_valid_command_version() (

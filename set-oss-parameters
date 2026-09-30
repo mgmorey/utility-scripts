@@ -77,7 +77,7 @@ set_oss_dir() {
 
     case "$(basename "$1")" in
 	(include)
-	    if ! is_included "-I$1" "${CPPFLAGS-}"; then
+	    if ! is_included "-I$1" "${CPPFLAGS-}" ' '; then
 		CPPFLAGS="-I$1${CPPFLAGS+ $CPPFLAGS}"
 	    fi
 	    ;;
@@ -88,7 +88,7 @@ set_oss_dir() {
 	    ;;
 	(lib|lib64)
 	    if [ "$(get_count "$1/*.a" "$1/*.la" "$1/*.so")" -gt 0 ]; then
-		if ! is_included "-L$1" "${LDFLAGS-}"; then
+		if ! is_included "-L$1" "${LDFLAGS-}" ' '; then
 		    LDFLAGS="-L$1${LDFLAGS+ $LDFLAGS}"
 		fi
 	    fi

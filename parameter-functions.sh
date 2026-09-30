@@ -17,16 +17,26 @@ get_directory() {
     printf '%s\n' "$1" | sed 's/^-[IL]//'
 }
 
+# is_included ITEM LIST [SEPARATOR]: exact entry match (SEPARATOR defaults to :)
 is_included() {
-    assert [ $# -eq 2 ]
+    assert [ $# -ge 2 ]
+    assert [ $# -le 3 ]
     assert [ -n "$1" ]
-    printf '%s\n' "$2" | grep -Eq '(^|[: ])'"$1"'([: ]|$)'
+
+    case "${3-:}$2${3-:}" in
+	(*"${3-:}$1${3-:}"*)
+	    return 0
+	    ;;
+    esac
+
+    return 1
 }
 
 is_to_be_included() {
-    assert [ $# -eq 2 ]
+    assert [ $# -ge 2 ]
+    assert [ $# -le 3 ]
     assert [ -n "$1" ]
-    test -d "$(get_directory "$1")" && ! is_included "$1" "$2"
+    test -d "$(get_directory "$1")" && ! is_included "$@"
 }
 
 parse_shell() {
@@ -93,15 +103,30 @@ quote_value() {
     printf "'%s'\n" "$(printf '%s\n' "$1" | sed "s/'/'\\\\''/g")"
 }
 
-remove_directory() {
+# remove_directory DIR LIST: drop every exact DIR entry, keeping empty entries
+remove_directory() (
     assert [ $# -eq 2 ]
-    printf '%s\n' "$2" | sed '
-s|:'"$1"':|:|g
-s|^'"$1"':||
-s|:'"$1"'$||
-s|^'"$1"'$||
-'
-}
+    assert [ -n "$1" ]
+    emitted=false
+    rest="$2:"
+    result=
+
+    while [ -n "$rest" ]; do
+	entry=${rest%%:*}
+	rest=${rest#*:}
+
+	if [ "$entry" = "$1" ]; then
+	    continue
+	elif [ "$emitted" = true ]; then
+	    result="$result:$entry"
+	else
+	    result=$entry
+	    emitted=true
+	fi
+    done
+
+    printf '%s\n' "$result"
+)
 
 usage_error() {
     if [ $# -gt 0 ]; then
