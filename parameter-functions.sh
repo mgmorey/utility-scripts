@@ -60,16 +60,16 @@ print_parameter() {
     elif [ -n "${shell:-}" ]; then
 	case "$(basename ${shell%.exe})" in
 	    (*bash|ksh*|zsh)
-		printf 'export %s="%s"\n' "$1" "$2"
+		printf 'export %s=%s\n' "$1" "$(quote_value "$2")"
 		;;
 	    (csh|tcsh)
-		printf 'setenv %s "%s";\n' "$1" "$2"
+		printf 'setenv %s %s;\n' "$1" "$(quote_value "$2")"
 		;;
 	    (fish)
-		printf 'set -x %s "%s";\n' "$1" "$2"
+		printf 'set -x %s %s;\n' "$1" "$(quote_fish_value "$2")"
 		;;
 	    (*)
-		printf '%s="%s"\n' "$1" "$2"
+		printf '%s=%s\n' "$1" "$(quote_value "$2")"
 		printf 'export %s\n' "$1"
 		;;
 	esac
@@ -83,6 +83,14 @@ print_parameters() {
 	eval $(printf 'value="${%s-}"\n' "$var")
 	print_parameter "$var" "$value"
     done
+}
+
+quote_fish_value() {
+    printf "'%s'\n" "$(printf '%s\n' "$1" | sed -e 's/\\/\\\\/g' -e "s/'/\\\\'/g")"
+}
+
+quote_value() {
+    printf "'%s'\n" "$(printf '%s\n' "$1" | sed "s/'/'\\\\''/g")"
 }
 
 remove_directory() {
