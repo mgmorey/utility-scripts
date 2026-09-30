@@ -224,6 +224,6 @@ script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}common-functions.sh"
 
-eval $("${script_prefix}get-os-release" -x)
+eval "$("${script_prefix}get-os-release" -x)"
 parse_arguments "$@"
 install_scripts

@@ -185,7 +185,7 @@ fi
 
 set_user_profile "$script_dir"
 eval $(get-configuration app.ini)
-eval $(get-os-release -x)
+eval "$(get-os-release -x)"
 configure_platform
 parse_arguments "$@"
 

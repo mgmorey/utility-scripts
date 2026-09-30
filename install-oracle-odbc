@@ -227,5 +227,5 @@ script_dirname=$(cd "$(dirname "$0")" && pwd)
 . "$script_dirname/oracle-config.sh"
 
 set_user_profile "$script_dirname"
-eval $(get-os-release -x)
+eval "$(get-os-release -x)"
 install_oracle_odbc

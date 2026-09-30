@@ -80,5 +80,5 @@ if [ $# -gt 0 ]; then
     usage_error '%s: Too many arguments\n' "$script"
 fi
 
-eval $("${script_prefix}get-os-release" -x)
+eval "$("${script_prefix}get-os-release" -x)"
 install_macos_sdk_headers

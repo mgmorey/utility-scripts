@@ -74,6 +74,6 @@ validate_platform() {
     abort_not_supported "Operating system"
 }
 
-eval $(get-os-release -x)
+eval "$(get-os-release -x)"
 
 set_publisher_sfe

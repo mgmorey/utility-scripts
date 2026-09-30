@@ -56,7 +56,7 @@ export_parameters() {
 }
 
 run_app() {
-    eval $(get-os-release -x)
+    eval "$(get-os-release -x)"
     eval $("${script_prefix}get-configuration" app.ini)
 
     while getopts d:h:p: opt; do
@@ -194,6 +194,6 @@ real_user=$(get_real_user)
 validate_user_name $real_user
 set_user_profile "$script_dir"
 eval $(get-configuration app.ini)
-eval $(get-os-release -x)
+eval "$(get-os-release -x)"
 configure_platform
 run_app "$@"

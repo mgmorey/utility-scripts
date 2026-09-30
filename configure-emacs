@@ -399,7 +399,7 @@ script_prefix=${script_dir:+$script_dir/}
 . "${script_prefix}config-functions.sh"
 
 set_user_profile "$script_dir"
-eval $(get-os-release -x)
+eval "$(get-os-release -x)"
 validate_platform
 configure_platform
 parse_arguments "$@"

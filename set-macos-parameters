@@ -127,6 +127,6 @@ script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}parameter-functions.sh"
 
-eval $("${script_prefix}get-os-release" -x)
+eval "$("${script_prefix}get-os-release" -x)"
 parse_arguments "$@"
 set_macos_parameters

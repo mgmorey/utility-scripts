@@ -47,6 +47,6 @@ validate_platform() {
     abort_not_supported "Operating system"
 }
 
-eval $(get-os-release -x)
+eval "$(get-os-release -x)"
 
 clean_up_zfs_snapshots

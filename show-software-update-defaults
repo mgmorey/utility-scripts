@@ -25,7 +25,7 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
-eval $(get-os-release -x)
+eval "$(get-os-release -x)"
 
 case "$kernel_name" in
     (Darwin)

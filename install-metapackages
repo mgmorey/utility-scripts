@@ -198,6 +198,6 @@ script_prefix=${script_dir:+$script_dir/}
 . "${script_prefix}common-functions.sh"
 
 set_user_profile "$script_dir"
-eval $(get-os-release -x)
+eval "$(get-os-release -x)"
 parse_arguments "$@"
 install_metapackages

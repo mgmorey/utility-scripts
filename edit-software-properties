@@ -65,5 +65,5 @@ edit_software_properties() {
     esac
 }
 
-eval $(get-os-release -x)
+eval "$(get-os-release -x)"
 edit_software_properties

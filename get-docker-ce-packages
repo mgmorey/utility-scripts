@@ -73,6 +73,6 @@ get_docker_ce_packages() {
     fi
 }
 
-eval $(get-os-release -x)
+eval "$(get-os-release -x)"
 
 get_docker_ce_packages

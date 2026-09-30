@@ -37,7 +37,7 @@ configure_all() {
 }
 
 configure_baseline() {
-    eval $(get-os-release -x)
+    eval "$(get-os-release -x)"
     eval $("${script_prefix}get-configuration" app.ini)
 
     case "$kernel_name" in

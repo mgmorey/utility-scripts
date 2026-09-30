@@ -135,5 +135,5 @@ if [ $# -gt 0 ]; then
 fi
 
 set_user_profile "$script_dir"
-eval $(get-os-release -x)
+eval "$(get-os-release -x)"
 install_git_build_deps
