@@ -75,7 +75,7 @@ set_oss_dir() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
 
-    case "$(basename "$1" "$bits")" in
+    case "$(basename "$1")" in
 	(include)
 	    if ! is_included "-I$1" "${CPPFLAGS-}"; then
 		CPPFLAGS="-I$1${CPPFLAGS+ $CPPFLAGS}"
@@ -86,7 +86,7 @@ set_oss_dir() {
 		INFOPATH="$1${INFOPATH+:$INFOPATH}"
 	    fi
 	    ;;
-	(lib)
+	(lib|lib64)
 	    if [ "$(get_count "$1/*.a" "$1/*.la" "$1/*.so")" -gt 0 ]; then
 		if ! is_included "-L$1" "${LDFLAGS-}"; then
 		    LDFLAGS="-L$1${LDFLAGS+ $LDFLAGS}"
@@ -120,8 +120,6 @@ set_oss_dir() {
 }
 
 set_oss_parameters() {
-    bits="$(uname -m | sed 's/x86_//')"
-
     for dir in $(get_dirs $dirs | sort -r); do
 	set_oss_dir "$dir"
     done
@@ -152,6 +150,5 @@ script_prefix=${script_dir:+$script_dir/}
 
 . "${script_prefix}parameter-functions.sh"
 
-eval $("${script_prefix}get-os-release" -x)
 parse_arguments "$@"
 set_oss_parameters
