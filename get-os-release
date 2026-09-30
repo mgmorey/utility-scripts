@@ -184,7 +184,8 @@ output_data() {
     if [ "$is_shell_format" = true ]; then
 	for var in $vars; do
 	    eval value="\${$var-}"
-	    printf '%s="%s"\n' "$var" "$value"
+	    printf "%s='%s'\n" "$var" \
+		   "$(printf '%s\n' "$value" | sed "s/'/'\\\\''/g")"
 	done
     else
 	for var in $vars; do
