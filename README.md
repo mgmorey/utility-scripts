@@ -166,7 +166,6 @@ These scripts form the layer on which the subject-area scripts are built.
 | `get-uninstalled-packages` |  | Filter installed packages from list |
 | `install-epel` | RHEL | Install Extra Packages for Enterprise Linux |
 | `install-homebrew` |  | Install the Homebrew package manager |
-| `install-ius` | RHEL | Install the IUS and EPEL repositories on EL7 |
 | `install-metapackages` |  | Install packages for given metapackages |
 | `install-opencsw` | Solaris/illumos | Install OpenCSW package manager `pkgutil` |
 | `install-package-managers` |  | Install non-native package managers |
@@ -309,7 +308,6 @@ paths.
 | `refresh-virtualenv` |  | Install virtual environment dependencies |
 | `run-python` |  | Run Python script |
 | `test-python-version` |  | Test Python interpreter version string |
-| `trust-pypi` |  | Configure pip to trust the PyPI hosts |
 | `uninstall-pipware` |  | Uninstall Python packages installed with pip |
 | `upgrade-pyenv` |  | Upgrade pyenv via `git pull` |
 
@@ -341,17 +339,14 @@ paths.
 | `get-kubernetes-packages` | List Kubernetes package names |
 | `grep-docker-package` | Filter for Docker package names |
 | `install-docker` | Install Docker OS-level virtualization system |
-| `install-docker-buildx` | Build and install the Docker Buildx plugin |
 | `install-docker-ce` | Install Docker CE OS-level virtualization system |
 | `install-docker-compose` | Install Docker Compose from GitHub |
 | `install-docker-compose-command-completion` | Install Docker Compose command completion |
 | `install-docker-credential-secretservice` | Install Docker credential secretservice |
 | `install-hadolint` | Install Hadolint |
 | `install-kind` | Install kind (Kubernetes in Docker) |
-| `install-kubectl` | Install the Kubernetes command-line tool |
 | `install-kubernetes` | Install Kubernetes container orchestration system |
 | `install-minikube` | Install Minikube |
-| `install-trivy` | Install the Trivy security scanner |
 | `remove-dangling-docker-images` | Clean up Docker images |
 | `remove-docker-volume-devices` | Remove Docker volume devices |
 | `reset-podman-containers` | Delete all rootless Podman container storage |
@@ -419,7 +414,6 @@ paths.
 | `fix-libcuda` | WSL | Repair `libcuda` symbolic links under WSL |
 | `fstab-format` |  | Align columns of file system entries in `/etc/fstab` |
 | `fstab-format.awk` |  | Align columns of file system entries in `/etc/fstab` |
-| `generate-tls-certificate` |  | Generate a self-signed TLS certificate and key |
 | `get-nameserver` |  | Return nameserver value from file argument |
 | `get-nameserver-from-resolver` |  | Return nameserver value from resolver |
 | `install-tls-ca-certificate` |  | Install a CA certificate into the system trust store |

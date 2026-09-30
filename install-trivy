@@ -1,7 +1,0 @@
-#!/bin/sh -eu
-
-# install-trivy: install the Trivy security scanner
-
-BIN_DIR=$HOME/.local/bin
-
-curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh -b "$BIN_DIR" | sh
