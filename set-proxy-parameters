@@ -82,7 +82,7 @@ set_proxy_parameters() {
 
     if [ -n "$all_proxy" ]; then
 	"${script_prefix}generate-proxy-parameters" \
-	    ${no_proxy:+-n $no_proxy} $all_proxy | \
+	    ${no_proxy:+-n "$no_proxy"} "$all_proxy" | \
 	    print_proxy_parameters
     fi
 }
