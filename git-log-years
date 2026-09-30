@@ -1,5 +1,7 @@
 #!/bin/sh -eu
 
+# git-log-years: print the years in which a file was changed
+
 git_log() {
     git log --date=format:%Y --follow --format=%ad "$1" | sort -u
 }

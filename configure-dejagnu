@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# configure-dejagnu: download and configure the GNU Debugger
+# configure-dejagnu: download and configure GNU DejaGnu
 # Copyright (C) 2023  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

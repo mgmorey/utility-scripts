@@ -1,5 +1,7 @@
 #!/bin/sh -eux
 
+# install-kind: install kind (Kubernetes in Docker)
+
 # For AMD64 / x86_64
 [ $(uname -m) = x86_64 ] && curl -Lo ~/.local/bin/kind https://kind.sigs.k8s.io/dl/v0.29.0/kind-linux-amd64
 # For ARM64

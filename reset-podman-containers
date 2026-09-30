@@ -1,5 +1,7 @@
 #!/bin/sh -eux
 
+# reset-podman-containers: delete all rootless Podman container storage
+
 uid=$(id -u)
 
 /bin/rm -rf ~/.config/containers ~/.local/share/containers \

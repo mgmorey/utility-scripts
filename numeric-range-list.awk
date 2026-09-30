@@ -1,5 +1,7 @@
 #!/usr/bin/awk -f
 
+# numeric-range-list.awk: print numbers as a comma-separated list of ranges
+
 BEGIN {
     earliest = "";
     latest = "";

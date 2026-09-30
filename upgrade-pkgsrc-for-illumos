@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# upgrade-pkgsrc-for-illumos: upgrade PkgSrc portable package build system
+# upgrade-pkgsrc-for-illumos: upgrade pkgsrc portable package build system
 # for illumos
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 

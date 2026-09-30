@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# clean-pipenv: remove PipEnv virtual environments
+# clean-up-pipenv: remove the Pipenv virtual environment of the current project
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

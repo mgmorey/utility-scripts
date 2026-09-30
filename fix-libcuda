@@ -1,5 +1,7 @@
 #!/bin/sh -eu
 
+# fix-libcuda: repair libcuda symbolic links under WSL
+
 cd /usr/lib/wsl/lib
 /bin/rm -f libcuda.so libcuda.so.1
 ln -sf libcuda.so.1.1 libcuda.so.1

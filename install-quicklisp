@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-sbcl: install SBCL
+# install-quicklisp: install Quicklisp for SBCL
 # Copyright (C) 2022  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

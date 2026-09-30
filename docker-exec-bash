@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# docker-exec-bash: exec Bash in container
+# docker-exec-bash: run Bash in a container
 # Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

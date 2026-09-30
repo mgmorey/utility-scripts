@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# install-docker-compose-command-completion: install Docker Compose
+# install-docker-compose-command-completion: install Docker Compose command completion
 # command completion from GitHub
 # Copyright (C) 2021  "Michael G. Morey" <mgmorey@gmail.com>
 

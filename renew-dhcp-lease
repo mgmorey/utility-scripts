@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# renew-dhcp-lease: renew the DHCP lease
+
 if which dhclient >/dev/null 2>&1; then
     dhclient -r
     dhclient

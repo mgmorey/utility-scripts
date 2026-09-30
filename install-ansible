@@ -1,3 +1,5 @@
 #!/bin/sh -eu
 
+# install-ansible: install Ansible with pipx
+
 pipx install --include-deps ansible

@@ -1,3 +1,5 @@
 #!/bin/sh -eu
 
+# install-solarisstudio: install Oracle Developer Studio
+
 pkg install --accept developerstudio-126

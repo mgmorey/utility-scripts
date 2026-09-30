@@ -1,5 +1,6 @@
 #!/bin/sh -eu
 
+# configure-tls: configure Git and pip to use a PEM CA certificate file
 # Copyright (C) 2025  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

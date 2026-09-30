@@ -1,5 +1,7 @@
 #!/bin/sh -eu
 
+# enable-nfs: export /home/nfsshare and enable the NFS server
+
 mkdir -p /home/nfsshare
 
 if [ ! -f /etc/exports ]; then

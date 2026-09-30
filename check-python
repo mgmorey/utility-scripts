@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# check-python.: check that Python version meets requirement
+# check-python: report a Python interpreter and test its version
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

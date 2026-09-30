@@ -1,3 +1,5 @@
 #!/bin/sh -eux
 
+# trust-pypi: configure pip to trust the PyPI hosts
+
 python3 -m pip config set global.trusted-host=pypi.org files.pythonhosted.org

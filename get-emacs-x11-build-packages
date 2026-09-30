@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# get-emacs-build-packages: get list of Emacs build dependencies
+# get-emacs-x11-build-packages: get list of Emacs build dependencies with X11
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

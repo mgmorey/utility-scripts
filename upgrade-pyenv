@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# upgrade-pyenv: upgrade pyenv package via git pull
+# upgrade-pyenv: upgrade pyenv via git pull
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

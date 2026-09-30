@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# uninstall-pipware: uninstall Python packages installed via PIP
+# uninstall-pipware: uninstall Python packages installed with pip
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

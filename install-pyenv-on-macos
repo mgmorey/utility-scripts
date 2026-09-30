@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# pyenv-install-on-macos: install Python via pyenv on macOS
+# install-pyenv-on-macos: install pyenv on macOS with SDK settings
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

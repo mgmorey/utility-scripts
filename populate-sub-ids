@@ -1,5 +1,7 @@
 #!/bin/sh -eux
 
+# populate-sub-ids: add subordinate UID and GID ranges for rootless containers
+
 BASE_NAMES="subgid subuid"
 
 GID_BEGIN=100000

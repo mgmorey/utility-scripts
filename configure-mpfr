@@ -1,6 +1,6 @@
 #!/bin/sh -eu
 
-# configure-mpfr: download and configure the GNU MP Bignum library
+# configure-mpfr: download and configure the GNU MPFR library
 # Copyright (C) 2025  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

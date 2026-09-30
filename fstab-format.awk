@@ -1,6 +1,6 @@
 #!/usr/bin/gawk -f
 
-# fstab-format.awk: align columns of filesytem entries in /etc/fstab
+# fstab-format.awk: align columns of file system entries in /etc/fstab
 # Copyright (C) 2025  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

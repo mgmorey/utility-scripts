@@ -1,6 +1,6 @@
 # -*- Mode: Shell-script -*-
 
-# restapi-functions.sh: Python RESTful API functions
+# restapi-functions.sh: define Python RESTful API shell functions
 # Copyright (C) 2018  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

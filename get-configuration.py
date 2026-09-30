@@ -1,7 +1,7 @@
 #!/usr/bin/env run-python
 # -*- Mode: Python -*-
 
-# get-configuration: print application configuration parameters
+# get-configuration.py: print application configuration parameters
 # Copyright (C) 2020  "Michael G. Morey" <mgmorey@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify

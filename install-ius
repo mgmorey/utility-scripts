@@ -1,5 +1,7 @@
 #!/bin/sh -eu
 
+# install-ius: install the IUS and EPEL repositories on EL7
+
 yum install \
 https://repo.ius.io/ius-release-el7.rpm \
 https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
