@@ -498,15 +498,14 @@ These files are sourced by other scripts and are not run directly.
 
 Each `.ini` file maps package categories to package names for one platform
 release, named `<ID>-<VERSION_ID>.ini` after the values that `get-os-release`
-reports. The repository contains 101 data files:
+reports. The repository contains 87 data files:
 
 | Platform | Releases |
 |---|---|
 | AlmaLinux | 8.5 through 10.0 |
 | Amazon Linux | 2023 |
-| CentOS | 7 and 8 |
 | Debian | 10 through 13 |
-| Fedora | 32 through 42 |
+| Fedora | 41 and 42 |
 | FreeBSD | 11.3 through 13.1 |
 | illumos | 2020.04 |
 | macOS | 10.14 through 26.0 |
@@ -516,7 +515,7 @@ reports. The repository contains 101 data files:
 | Raspbian | 10 |
 | Red Hat Enterprise Linux | 7.9 through 9.8 |
 | Rocky Linux | 8.4 and 8.5 |
-| Ubuntu | 18.04 through 24.04 |
+| Ubuntu | 20.04, 22.04, and 24.04 |
 | Windows (MinGW-w64) | 10 |
 
 ### Command Version Data
