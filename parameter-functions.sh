@@ -54,7 +54,7 @@ print_parameter() {
     assert [ -n "$1" ]
 
     if [ -z "${2-}" ]; then
-	continue
+	return 0
     elif [ "${no_export:-}" = true ]; then
 	printf '%s=%s\n' "$1" "$2"
     elif [ -n "${shell:-}" ]; then
