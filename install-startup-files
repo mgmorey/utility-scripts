@@ -20,9 +20,10 @@ BASE_URL=https://%s@github.com/mgmorey
 PROJECT_NAME=startup-files
 
 PROJECT_URL=$BASE_URL/$PROJECT_NAME.git
+EMACS_PROJECT_URL=$BASE_URL/emacs-config.git
 
 LEGACY_FILES=".emacs"
-STARTUP_FILES=".bash_profile .editorconfig .profile"
+STARTUP_FILES=".bash_profile .bashrc .editorconfig .profile"
 
 abort() {
     printf "$@" >&2
@@ -31,6 +32,12 @@ abort() {
 
 assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
+}
+
+format_emacs_project_url() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf "$EMACS_PROJECT_URL\n" "$1"
 }
 
 format_git_directory() {
@@ -91,13 +98,7 @@ install_startup_files() (
     for file in $STARTUP_FILES; do
 	if is_to_be_installed $file; then
 	    printf 'Installing %s\n' $file
-
-	    if [ -r /etc/skel/$file -a "$file" = .profile ]; then
-		$gnu_install -bm 644 /etc/skel/$file $file
-		cat $git_dir/$file >>$file
-	    else
-		$gnu_install -bm 644 $git_dir/$file $file
-	    fi
+	    $gnu_install -bm 644 $git_dir/$file $file
 	fi
     done
 
@@ -114,9 +115,13 @@ install_startup_files() (
     if [ -d .config/emacs ]; then
 	cd .config/emacs
 
-	if [ ! -e init.el ]; then
-	    printf 'Installing %s\n' .config/emacs/init.el
-	    $gnu_install -bm 644 $git_dir/.config/emacs/init.el init.el
+	# Initialize in place so an existing directory (e.g. a moved .emacs.d) is kept
+	if [ ! -e init.el -a ! -d .git ]; then
+	    printf 'Installing %s\n' .config/emacs
+	    git init -q
+	    git remote add origin $(format_emacs_project_url $real_user)
+	    git fetch -q origin
+	    git checkout -q -t origin/main
 	fi
 
 	cd
