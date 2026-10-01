@@ -148,7 +148,6 @@ These scripts form the layer on which the subject-area scripts are built.
 
 | Script | Platform | Description |
 |---|---|---|
-| `brew` |  | Run Homebrew with Artifactory settings scoped to this process |
 | `brew-list-keg-only` |  | Print list of Homebrew packages which are keg-only |
 | `edit-software-properties` | Debian | Invoke software properties dialog |
 | `get-configuration` |  | Get configuration (wrapper for Python script) |
