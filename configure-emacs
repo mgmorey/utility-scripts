@@ -118,7 +118,7 @@ get_configure_options() (
     if [ "${with_xtoolkit-}" = true ]; then
 	options="${options:+$options }--with-x-toolkit${xtoolkit:+=$xtoolkit}"
     elif [ "${with_xtoolkit-}" = false ]; then
-	options="${options:+$options }--with-x-toolkit=no"
+	options="${options:+$options }--without-x"
     fi
 
     if [ "${with_xwidgets-}" = true ]; then

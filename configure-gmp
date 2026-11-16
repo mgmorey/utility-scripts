@@ -111,13 +111,16 @@ get_prefix() {
 install_gmp() {
     if [ "$install" != true ]; then
 	return 0
-    elif [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+    fi
+
+    install_prefix=$(get_prefix)
+
+    if [ "$ID" != windows -a "$(id -u)" -gt 0 -a ! -w "$install_prefix" ]; then
 	return 0
     fi
 
     umask 0022
     cd "$build_dirname"
-    install_prefix=$(get_prefix)
     make_install prefix="$install_prefix" install install-info
     install_project_link "$install_prefix"
 }
@@ -127,10 +130,11 @@ parse_arguments() {
     check=false
     force=false
     install=false
+    keep=false
     prefix=$GNU_OPT_PREFIX
     version=$GMP_PROJECT_VERSION
 
-    while getopts bcfinp:v:h opt; do
+    while getopts bcfiknp:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -144,6 +148,9 @@ parse_arguments() {
 		;;
 	    (i)
 		install=true
+		;;
+	    (k)
+		keep=true
 		;;
 	    (n)
 		build=false
@@ -188,7 +195,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-i] [-n] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-c] [-f] [-i] [-k] [-n] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }
@@ -305,7 +312,10 @@ validate_platform
 configure_platform
 parse_arguments "$@"
 configure_paths
-install_dependencies
+
+if [ "$keep" != true ]; then
+    install_dependencies
+fi
 
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"
