@@ -201,15 +201,20 @@ existing, writable directory such as `~/.local`, and evaluate
 `set-oss-parameters` for that directory before each build, so that the build
 finds, and records a run-time path to, the libraries installed before it. For
 example, the following builds GNU Emacs with GnuTLS and every library that it
-needs into `~/.local`, in dependency order:
+needs into `~/.local`, in dependency order. The parentheses run the loop in a
+subshell, so that the settings, including `LD_LIBRARY_PATH`, end with it;
+left in an interactive shell, they can make system programs load the newly
+built libraries in place of their own:
 
 ```sh
 prefix=$HOME/.local
 
-for project in m4 pkgconf ncurses gmp nettle gnutls emacs; do
-    eval "$(set-oss-parameters "$prefix")"
-    configure-$project -k -i -p "$prefix"
-done
+(
+    for project in m4 pkgconf ncurses gmp nettle gnutls emacs; do
+        eval "$(set-oss-parameters "$prefix")"
+        configure-$project -k -i -p "$prefix"
+    done
+)
 ```
 
 | Script | Description |
