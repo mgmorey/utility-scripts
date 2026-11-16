@@ -199,7 +199,18 @@ pkgconf, is checked against a SHA-256 value recorded in its script.
 Without root, pass `-k` to skip installing build packages and `-p` with an
 existing, writable directory such as `~/.local`, and evaluate
 `set-oss-parameters` for that directory before each build, so that the build
-finds, and records a run-time path to, the libraries installed before it.
+finds, and records a run-time path to, the libraries installed before it. For
+example, the following builds GNU Emacs with GnuTLS and every library that it
+needs into `~/.local`, in dependency order:
+
+```sh
+prefix=$HOME/.local
+
+for project in m4 pkgconf ncurses gmp nettle gnutls emacs; do
+    eval "$(set-oss-parameters "$prefix")"
+    configure-$project -k -i -p "$prefix"
+done
+```
 
 | Script | Description |
 |---|---|
