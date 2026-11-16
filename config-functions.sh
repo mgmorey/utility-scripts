@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
-GNU_MIRROR_BASE_URL=https://ftpmirror.gnu.org
+GNU_MIRROR_BASE_URL=${GNU_MIRROR_BASE_URL:-https://ftpmirror.gnu.org}
 GNU_OPT_PREFIX=/opt/gnu/%s
 LOCAL_PREFIX=/usr/local
 OPENCSW_PREFIX=/opt/csw
@@ -57,7 +57,7 @@ configure_platform() {
 	case "$id" in
 	    (rhel|ol)
 		case "$VERSION_ID" in
-		   (8.*)
+		    (8.*)
 			configure_platform_linux_redhat_8
 			break
 			;;
@@ -88,7 +88,7 @@ configure_platform_bsd_freebsd() {
 }
 
 configure_platform_bsd_netbsd() {
-     make=gmake
+    make=gmake
     include_prefix /usr/pkg
     configure_compiler "/usr/bin/gcc" "${incdirs-}" "${libdirs-}"
 }
@@ -119,15 +119,15 @@ download_archive() {
     assert [ -n "$1" ]
     assert [ -n "$2" ]
 
-    if [ -r "$1" -a -s "$1" ]; then
-	return
+    if [ ! -r "$1" -o ! -s "$1" ]; then
+	cd "$(dirname "$1")"
+
+	if ! download_using_curl "$(basename "$1")" "$2"; then
+	    download_using_wget "$(basename "$1")" "$2"
+	fi
     fi
 
-    cd "$(dirname "$1")"
-
-    if ! download_using_curl "$(basename "$1")" "$2"; then
-	download_using_wget "$(basename "$1")" "$2"
-    fi
+    verify_signature "$1" "$2"
 }
 
 download_using_curl() {
@@ -370,4 +370,63 @@ make_check() {
 make_install() {
     install_options=$(get_make_install_options)
     ${make-make}${install_options:+ $install_options} "$@"
+}
+
+verify_checksum() {
+    assert [ $# -eq 2 ]
+    assert [ -r "$1" ]
+    assert [ -n "$2" ]
+
+    if [ "${GPG_VERIFY-true}" = false ]; then
+	return 0
+    fi
+
+    if ! printf '%s  %s\n' "$2" "$1" | sha256sum -c - >&2; then
+	abort '%s: %s: SHA-256 checksum mismatch\n' "$script" "$1"
+    fi
+}
+
+verify_signature() {
+    assert [ $# -eq 2 ]
+    assert [ -r "$1" ]
+    assert [ -n "$2" ]
+
+    if [ "${GPG_VERIFY-true}" = false ]; then
+	return 0
+    elif ! which gpg >/dev/null 2>&1; then
+	printf '%s: gpg not found; signature not verified\n' "$script" >&2
+	return 0
+    fi
+
+    signature="$1.sig"
+
+    if [ ! -s "$signature" ]; then
+	if ! curl ${CURL_OPTS+$CURL_OPTS }--fail --location --silent \
+	     --output "$signature" "$2.sig"; then
+	    rm -f "$signature"
+	    printf '%s: no signature at %s.sig; not verified\n' \
+		   "$script" "$2" >&2
+	    return 0
+	fi
+    fi
+
+    keyring="${GNU_ARCHIVE_DIR-$(dirname "$1")}/gnu-keyring.gpg"
+
+    if [ ! -s "$keyring" ]; then
+	curl ${CURL_OPTS+$CURL_OPTS }--fail --location --silent \
+	     --output "$keyring" "$GNU_MIRROR_BASE_URL/gnu-keyring.gpg" ||
+	    rm -f "$keyring"
+    fi
+
+    if [ ! -s "$keyring" ]; then
+	keyring=
+    fi
+
+    # The default keyring is also searched, for keys imported by hand
+    if ! gpg --batch --no-auto-key-retrieve \
+	 ${keyring:+--keyring "$keyring"} \
+	 --verify "$signature" "$1" >&2; then
+	abort '%s: %s: signature not verified; %s\n' "$script" "$1" \
+	      'import the signing key or set GPG_VERIFY=false'
+    fi
 }

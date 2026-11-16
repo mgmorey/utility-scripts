@@ -132,7 +132,7 @@ parse_arguments() {
     prefix=$P11_KIT_OPT_PREFIX
     version=$P11_KIT_PROJECT_VERSION
 
-    while getopts bcfginop:v:h opt; do
+    while getopts bcfinp:v:h opt; do
 	case $opt in
 	    (b)
 		build=true

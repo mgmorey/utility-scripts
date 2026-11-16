@@ -19,7 +19,7 @@
 GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 
 GNUTLS_ARCHIVE_SUFFIX=.tar.xz
-GNUTLS_MIRROR_BASE_URL=https://www.gnupg.org/ftp/gcrypt
+GNUTLS_MIRROR_BASE_URL=${GNUTLS_MIRROR_BASE_URL:-https://www.gnupg.org/ftp/gcrypt}
 GNUTLS_PROJECT_NAME=gnutls
 # GNUTLS_PROJECT_VERSION=3.7.11
 GNUTLS_PROJECT_VERSION=3.8.12
@@ -162,7 +162,7 @@ parse_arguments() {
     prefix=$GNU_OPT_PREFIX
     version=$GNUTLS_PROJECT_VERSION
 
-    while getopts bcfgiknop:v:h opt; do
+    while getopts bcfiknp:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -186,7 +186,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX)
+		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX|/*)
 			prefix=$OPTARG
 			;;
 		    (*)
@@ -223,7 +223,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-g] [-i] [-k] [-n] [-o] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-c] [-f] [-i] [-k] [-n] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }

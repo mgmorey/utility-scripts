@@ -21,7 +21,7 @@ GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 EMACS_ARCHIVE_SUFFIX=.tar.xz
 EMACS_PROJECT_NAME=emacs
 EMACS_PROJECT_VERSION=31.1
-EMACS_TLS_BACK_END=openssl
+EMACS_TLS_BACK_END=gnutls
 
 abort() {
     printf "$@" >&2
@@ -65,7 +65,7 @@ configure_emacs() {
     cd "$src_dirname"
 
     if [ ! -r configure ]; then
-       make configure
+	make configure
     fi
 
     cd "$build_dirname"
@@ -210,7 +210,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX)
+		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX|/*)
 			prefix=$OPTARG
 			;;
 		    (*)

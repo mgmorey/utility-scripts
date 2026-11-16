@@ -158,7 +158,7 @@ parse_arguments() {
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX)
+		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX|/*)
 			prefix=$OPTARG
 			;;
 		    (*)

@@ -185,6 +185,22 @@ Each script downloads a source release and configures it for installation,
 typically under `/opt`, where `set-oss-parameters` adds it to the search
 paths.
 
+GNU releases are downloaded from `GNU_MIRROR_BASE_URL` (default
+`https://ftpmirror.gnu.org`), which can be set to a reachable mirror such as
+`https://mirrors.kernel.org/gnu`; an archive already present in
+`~/Downloads/GNU` is not downloaded again. Each archive is verified against
+its detached `.sig` signature, using the GNU keyring (downloaded to
+`~/Downloads/GNU/gnu-keyring.gpg`) and the default GnuPG keyring; a project
+whose signing keys are not in the GNU keyring, such as GnuTLS, needs its keys
+imported first. A bad or unverifiable signature stops the script, and
+`GPG_VERIFY=false` skips the check. A release without a signature, such as
+pkgconf, is checked against a SHA-256 value recorded in its script.
+
+Without root, pass `-k` to skip installing build packages and `-p` with an
+existing, writable directory such as `~/.local`, and evaluate
+`set-oss-parameters` for that directory before each build, so that the build
+finds, and records a run-time path to, the libraries installed before it.
+
 | Script | Description |
 |---|---|
 | `configure-binutils` | Download and configure GNU Binutils |
@@ -208,13 +224,16 @@ paths.
 | `configure-libtasn1` | Download and configure the GNU ASN.1 Library |
 | `configure-libtool` | Download and configure GNU Libtool |
 | `configure-libunistring` | Download and configure the GNU Unistring Library |
+| `configure-m4` | Download and configure GNU M4 |
 | `configure-make` | Download and configure GNU Make |
 | `configure-mpc` | Download and configure the GNU MPC library |
 | `configure-mpfr` | Download and configure the GNU MPFR library |
 | `configure-nasm` | Download and configure NASM |
+| `configure-ncurses` | Download and configure the ncurses library |
 | `configure-nettle` | Download and configure Nettle |
 | `configure-openssl` | Download and configure OpenSSL |
 | `configure-p11-kit` | Download and configure P11-Kit |
+| `configure-pkgconf` | Download and configure pkgconf |
 | `configure-qemu` | Download and configure QEMU |
 | `configure-readline` | Download and configure GNU Readline |
 | `configure-texinfo` | Download and configure GNU Texinfo |
