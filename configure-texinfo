@@ -149,7 +149,7 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    (6.[0-9]|6.[1-9][0-9])
+		    ([67].[0-9]|[67].[1-9][0-9])
 			version=$OPTARG
 			;;
 		    (*)
