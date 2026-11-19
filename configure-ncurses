@@ -69,9 +69,13 @@ configure_ncurses() {
 }
 
 configure_paths() {
+    if [ "$widec" = true ]; then
+	build_suffix=-widec
+    fi
+
     archive_dirname="$GNU_ARCHIVE_DIR"
     archive_basename=$NCURSES_PROJECT_NAME-$version
-    build_dirname="$HOME/Documents/build/$archive_basename"
+    build_dirname="$HOME/Documents/build/$archive_basename${build_suffix-}"
     archive_filename=$archive_basename$NCURSES_ARCHIVE_SUFFIX
     archive_pathname="$GNU_ARCHIVE_DIR/$archive_filename"
     src_dirname="$HOME/Documents/src/GNU/$archive_basename"
@@ -81,14 +85,26 @@ configure_paths() {
 get_configure_options() (
     if [ -n "${prefix-}" ]; then
         options="${options:+$options }--prefix=$(get_prefix)"
+	options="${options:+$options }--enable-pc-files"
+	options="${options:+$options }--with-pkg-config-libdir=$(get_prefix)/lib/pkgconfig"
+	terminfo_dirs=$(get_prefix)/share/terminfo:
     fi
 
-    # Static, narrow-character libraries, which Emacs links without an RPATH
-    for option in --without-shared --with-termlib --disable-widec \
-				   --without-ada --without-cxx-binding --without-debug \
-				   --without-manpages --without-progs --without-tests; do
+    # Shared and static libraries, so that readline and Emacs can link either
+    for option in --with-shared --with-normal --with-termlib --enable-rpath \
+		  --without-ada --without-cxx-binding --without-debug \
+		  --without-manpages --without-progs --without-tests; do
 	options="${options:+$options }$option"
     done
+
+    if [ "$widec" = true ]; then
+	options="${options:+$options }--enable-widec"
+    else
+	options="${options:+$options }--disable-widec"
+    fi
+
+    # A private prefix would otherwise look only in its own terminfo directory
+    options="${options:+$options }--with-terminfo-dirs=${terminfo_dirs-}/etc/terminfo:/lib/terminfo:/usr/share/terminfo"
 
     if [ -n "${options:-}" ]; then
 	printf '%s\n' "$options"
@@ -139,8 +155,9 @@ parse_arguments() {
     keep=false
     prefix=$GNU_OPT_PREFIX
     version=$NCURSES_PROJECT_VERSION
+    widec=false
 
-    while getopts bcfiknp:v:h opt; do
+    while getopts bcfiknp:v:wh opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -182,6 +199,9 @@ parse_arguments() {
 			;;
 		esac
 		;;
+	    (w)
+		widec=true
+		;;
 	    (h)
 		usage
 		exit 0
@@ -201,7 +221,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-i] [-k] [-n] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-c] [-f] [-i] [-k] [-n] [-p PREFIX] [-v VERSION] [-w]
        $script -h
 EOF
 }

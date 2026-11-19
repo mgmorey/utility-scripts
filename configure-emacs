@@ -403,6 +403,7 @@ eval "$(get-os-release -x)"
 validate_platform
 configure_platform
 parse_arguments "$@"
+configure_dependencies gmp gnutls ncurses
 configure_paths
 
 if [ "$keep" != true ]; then

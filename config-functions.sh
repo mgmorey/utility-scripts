@@ -50,6 +50,28 @@ configure_compiler() {
     pkg_config_path="$(get_pkg_config_path)"
 }
 
+configure_dependencies() {
+    for dependency; do
+	dependency_prefix=$(get_dependency_prefix "$dependency")
+
+	case " ${included_prefixes-} " in
+	    (*" $dependency_prefix "*)
+		continue
+		;;
+	esac
+
+	included_prefixes="${included_prefixes+$included_prefixes }$dependency_prefix"
+	include_dependency_prefix "$dependency_prefix"
+    done
+
+    configure_compiler "" "${incdirs-}" "${libdirs-}"
+
+    if [ -n "${pkg_config_path-}" ]; then
+	PKG_CONFIG_PATH=$pkg_config_path
+	export PKG_CONFIG_PATH
+    fi
+}
+
 configure_platform() {
     make=make
 
@@ -245,29 +267,45 @@ get_configure_command() {
     printf '\n'
 }
 
+# The unversioned link that install_project_link creates, or the prefix itself
+get_dependency_prefix() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+    printf "$prefix" "$1"
+}
+
 get_include_flags() {
     assert [ $# -ge 1 ]
-    printf -- "-I%s\n" "$@"
+    flags=
+
+    for arg; do
+	for incdir in $arg; do
+	    flags="${flags:+$flags }-I$incdir"
+	done
+    done
+
+    printf '%s\n' "$flags"
 }
 
 get_linker_flags() {
-    assert [ $# -eq 1 ]
-    assert [ -n "$1" ]
-    ldflags=
+    assert [ $# -ge 1 ]
+    flags=
 
-    for libdir; do
-	case "$os_family" in
-	    (gnu-*)
-		ldflags="-Wl,--rpath=$libdir"
-		;;
-	    (unix)
-		ldflags="-L$libdir -R$libdir"
-		;;
-	esac
+    for arg; do
+	for libdir in $arg; do
+	    case "$os_family" in
+		(gnu-*)
+		    flags="${flags:+$flags }-L$libdir -Wl,--rpath=$libdir"
+		    ;;
+		(unix)
+		    flags="${flags:+$flags }-L$libdir -R$libdir"
+		    ;;
+	    esac
+	done
     done
 
-    if [ "${ldflags-}" ]; then
-	printf '%s\n' "$ldflags"
+    if [ -n "$flags" ]; then
+	printf '%s\n' "$flags"
     fi
 }
 
@@ -288,11 +326,17 @@ get_make_job_options() {
 }
 
 get_pkg_config_path() {
+    pkg_config_path=
+
     for pkgdir in ${pkgdirs-}; do
-	pkg_config_path=${pkg_config_path+$pkg_config_path:}$pkgdir
+	pkg_config_path=${pkg_config_path:+$pkg_config_path:}$pkgdir
     done
 
-    if [ "${pkg_config_path-}" ]; then
+    if [ -n "${PKG_CONFIG_PATH-}" ]; then
+	pkg_config_path=${pkg_config_path:+$pkg_config_path:}$PKG_CONFIG_PATH
+    fi
+
+    if [ -n "$pkg_config_path" ]; then
 	printf '%s\n' "$pkg_config_path"
     fi
 }
@@ -307,6 +351,30 @@ include_prefix() {
 
     if [ -d "$libdir/pkgconfig" ]; then
 	pkgdirs="${pkgdirs+$pkgdirs }$libdir/pkgconfig"
+    fi
+}
+
+# Add the include, library, and pkg-config directories that exist under $1
+include_dependency_prefix() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    if [ -d "$1/include" ]; then
+	incdirs="${incdirs+$incdirs }$1/include"
+    fi
+
+    for subdir in lib lib64; do
+	if [ -d "$1/$subdir" ]; then
+	    libdirs="${libdirs+$libdirs }$1/$subdir"
+	fi
+
+	if [ -d "$1/$subdir/pkgconfig" ]; then
+	    pkgdirs="${pkgdirs+$pkgdirs }$1/$subdir/pkgconfig"
+	fi
+    done
+
+    if [ -d "$1/share/pkgconfig" ]; then
+	pkgdirs="${pkgdirs+$pkgdirs }$1/share/pkgconfig"
     fi
 }
 
