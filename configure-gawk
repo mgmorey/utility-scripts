@@ -18,9 +18,9 @@
 
 GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 
-GDB_ARCHIVE_SUFFIX=.tar.xz
-GDB_PROJECT_NAME=gawk
-GDB_PROJECT_VERSION=5.4.2
+GAWK_ARCHIVE_SUFFIX=.tar.xz
+GAWK_PROJECT_NAME=gawk
+GAWK_PROJECT_VERSION=5.4.2
 
 abort() {
     printf "$@" >&2
@@ -71,12 +71,12 @@ configure_gawk() {
 
 configure_paths() {
     archive_dirname="$GNU_ARCHIVE_DIR"
-    archive_basename=$GDB_PROJECT_NAME-$version
+    archive_basename=$GAWK_PROJECT_NAME-$version
     build_dirname="$HOME/Documents/build/$archive_basename"
-    archive_filename=$archive_basename$GDB_ARCHIVE_SUFFIX
+    archive_filename=$archive_basename$GAWK_ARCHIVE_SUFFIX
     archive_pathname="$GNU_ARCHIVE_DIR/$archive_filename"
     src_dirname="$HOME/Documents/src/GNU/$archive_basename"
-    archive_url=$GNU_MIRROR_BASE_URL/$GDB_PROJECT_NAME/$archive_filename
+    archive_url=$GNU_MIRROR_BASE_URL/$GAWK_PROJECT_NAME/$archive_filename
 }
 
 get_configure_options() (
@@ -90,11 +90,11 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages $GDB_PROJECT_NAME-build $GDB_PROJECT_NAME-test
+    get-packages $GAWK_PROJECT_NAME-build $GAWK_PROJECT_NAME-test
 }
 
 get_prefix() {
-    printf "$prefix" "$GDB_PROJECT_NAME-$version"
+    printf "$prefix" "$GAWK_PROJECT_NAME-$version"
 }
 
 install_gawk() {
@@ -117,7 +117,7 @@ parse_arguments() {
     force=false
     install=false
     prefix=$GNU_OPT_PREFIX
-    version=$GDB_PROJECT_VERSION
+    version=$GAWK_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do
 	case $opt in

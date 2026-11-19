@@ -18,9 +18,9 @@
 
 GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 
-GDB_ARCHIVE_SUFFIX=.tar.xz
-GDB_PROJECT_NAME=glibc
-GDB_PROJECT_VERSION=2.44
+GLIBC_ARCHIVE_SUFFIX=.tar.xz
+GLIBC_PROJECT_NAME=glibc
+GLIBC_PROJECT_VERSION=2.44
 
 abort() {
     printf "$@" >&2
@@ -71,12 +71,12 @@ configure_glibc() {
 
 configure_paths() {
     archive_dirname="$GNU_ARCHIVE_DIR"
-    archive_basename=$GDB_PROJECT_NAME-$version
+    archive_basename=$GLIBC_PROJECT_NAME-$version
     build_dirname="$HOME/Documents/build/$archive_basename"
-    archive_filename=$archive_basename$GDB_ARCHIVE_SUFFIX
+    archive_filename=$archive_basename$GLIBC_ARCHIVE_SUFFIX
     archive_pathname="$GNU_ARCHIVE_DIR/$archive_filename"
     src_dirname="$HOME/Documents/src/GNU/$archive_basename"
-    archive_url=$GNU_MIRROR_BASE_URL/$GDB_PROJECT_NAME/$archive_filename
+    archive_url=$GNU_MIRROR_BASE_URL/$GLIBC_PROJECT_NAME/$archive_filename
 }
 
 get_configure_options() (
@@ -90,11 +90,11 @@ get_configure_options() (
 )
 
 get_dependencies() {
-    get-packages $GDB_PROJECT_NAME-build $GDB_PROJECT_NAME-test
+    get-packages $GLIBC_PROJECT_NAME-build $GLIBC_PROJECT_NAME-test
 }
 
 get_prefix() {
-    printf "$prefix" "$GDB_PROJECT_NAME-$version"
+    printf "$prefix" "$GLIBC_PROJECT_NAME-$version"
 }
 
 install_glibc() {
@@ -117,7 +117,7 @@ parse_arguments() {
     force=false
     install=false
     prefix=$GNU_OPT_PREFIX
-    version=$GDB_PROJECT_VERSION
+    version=$GLIBC_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do
 	case $opt in
