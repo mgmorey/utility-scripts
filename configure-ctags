@@ -22,7 +22,7 @@ CTAGS_ARCHIVE_SUFFIX=.tar.gz
 CTAGS_BASE_URL=https://github.com/universal-ctags/ctags
 CTAGS_OPT_PREFIX=/opt/%s
 CTAGS_PROJECT_NAME=universal-ctags
-CTAGS_PROJECT_VERSION=6.2.0
+CTAGS_PROJECT_VERSION=6.2.1
 
 abort() {
     printf "$@" >&2

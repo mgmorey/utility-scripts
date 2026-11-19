@@ -22,7 +22,7 @@ NASM_ARCHIVE_SUFFIX=.tar.xz
 NASM_MIRROR_BASE_URL=https://www.nasm.us/pub/nasm/releasebuilds
 
 NASM_PROJECT_NAME=nasm
-NASM_PROJECT_VERSION=2.15.05
+NASM_PROJECT_VERSION=2.16.03
 
 abort() {
     printf "$@" >&2
@@ -147,7 +147,7 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    (2.[1-9][0-9].[0-9]|2.[1-9][0-9].[1-9][0-9]|2.[1-9][0-9].[0-9][0-9])
+		    (2.[1-9][0-9]|2.[1-9][0-9].[0-9]|2.[1-9][0-9].[1-9][0-9]|2.[1-9][0-9].[0-9][0-9]|3.[0-9][0-9]|3.[0-9][0-9].[0-9])
 			version=$OPTARG
 			;;
 		    (*)

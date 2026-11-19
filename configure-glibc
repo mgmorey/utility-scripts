@@ -20,7 +20,7 @@ GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 
 GDB_ARCHIVE_SUFFIX=.tar.xz
 GDB_PROJECT_NAME=glibc
-GDB_PROJECT_VERSION=2.36
+GDB_PROJECT_VERSION=2.44
 
 abort() {
     printf "$@" >&2
