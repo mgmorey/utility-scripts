@@ -229,6 +229,10 @@ get_configure_command() {
     cppflags="${CPPFLAGS-}${cppflags+ $cppflags}"
     cxxflags="${CXXFLAGS-}${cxxflags+ $cxxflags}"
     ldflags="${LDFLAGS-}${ldflags+ $ldflags}"
+    cflags=${cflags# }
+    cppflags=${cppflags# }
+    cxxflags=${cxxflags# }
+    ldflags=${ldflags# }
     options=$(get_configure_options)
     printf '%s' "$1/${2-configure}"
 

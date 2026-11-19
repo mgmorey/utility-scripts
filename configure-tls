@@ -144,7 +144,7 @@ validate_platform() {
 	(opensuse-tumbleweed)
 	    true
 	    ;;
-	(rhel|ol)
+	(rhel|ol|almalinux|rocky)
 	    case "$VERSION_ID" in
 		(7.*)
 		    true
@@ -155,13 +155,13 @@ validate_platform() {
 		(9.*)
 		    true
 		    ;;
+		(10.*)
+		    true
+		    ;;
 		(*)
 		    abort_not_supported Release
 		    ;;
 	    esac
-	    ;;
-	(opensuse-tumbleweed)
-	    true
 	    ;;
 	(ubuntu)
 	    case "$VERSION_ID" in

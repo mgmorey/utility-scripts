@@ -57,9 +57,9 @@ configure_gnutls() {
     extract_archive "$archive_pathname" "$src_dirname"
     cd "$build_dirname"
 
-    command=$(get_gnutls_configure_command "$src_dirname")
+    command=$(get_configure_command "$src_dirname")
     printf '%s\n' "$command"
-    eval $command
+    eval "$command"
 
     if [ "$build" = true ]; then
 	make_build
@@ -106,17 +106,6 @@ get_configure_options() (
 
 get_dependencies() {
     get-packages $GNUTLS_PROJECT_NAME-build $GNUTLS_PROJECT_NAME-test
-}
-
-get_gnutls_configure_command() {
-    options=$(get_configure_options)
-    printf '%s' "$1/${2-configure}"
-
-    if [ -n "${options-}" ]; then
-	printf ' %s' "$options"
-    fi
-
-    printf '\n'
 }
 
 get_prefix() {
@@ -262,7 +251,7 @@ validate_platform() {
 	(opensuse-*)
 	    return
 	    ;;
-	(rhel|ol|almalinux)
+	(rhel|ol|almalinux|rocky)
 	    case "$VERSION_ID" in
 		(7.*)
 		    return
@@ -271,6 +260,9 @@ validate_platform() {
 		    return
 		    ;;
 		(9.*)
+		    return
+		    ;;
+		(10.*)
 		    return
 		    ;;
 		(*)

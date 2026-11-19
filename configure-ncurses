@@ -55,9 +55,9 @@ configure_ncurses() {
     extract_archive "$archive_pathname" "$src_dirname"
     cd "$build_dirname"
 
-    command=$(get_ncurses_configure_command $src_dirname)
+    command=$(get_configure_command "$src_dirname")
     printf '%s\n' "$command"
-    eval $command
+    eval "$command"
 
     if [ "$build" = true ]; then
 	make_build
@@ -113,17 +113,6 @@ get_configure_options() (
 
 get_dependencies() {
     get-packages $NCURSES_PROJECT_NAME-build $NCURSES_PROJECT_NAME-test
-}
-
-get_ncurses_configure_command() {
-    options=$(get_configure_options)
-    printf '%s' "$1/${2-configure}"
-
-    if [ -n "${options-}" ]; then
-	printf ' %s' "$options"
-    fi
-
-    printf '\n'
 }
 
 get_prefix() {
@@ -191,7 +180,7 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    ([5-9].[0-9])
+		    ([5-9].[0-9]|[5-9].[1-9][0-9])
 			version=$OPTARG
 			;;
 		    (*)
@@ -260,7 +249,7 @@ validate_platform() {
 	(opensuse-*)
 	    return
 	    ;;
-	(rhel|ol|almalinux)
+	(rhel|ol|almalinux|rocky)
 	    case "$VERSION_ID" in
 		(7.*)
 		    return
@@ -271,17 +260,7 @@ validate_platform() {
 		(9.*)
 		    return
 		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(rocky)
-	    case "$VERSION_ID" in
-		(7.*)
-		    return
-		    ;;
-		(8.*)
+		(10.*)
 		    return
 		    ;;
 		(*)

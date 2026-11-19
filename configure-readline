@@ -65,9 +65,9 @@ configure_readline() {
     extract_archive "$archive_pathname" "$src_dirname"
     cd "$build_dirname"
 
-    command=$(get_configure_command $src_dirname)
+    command=$(get_configure_command "$src_dirname")
     printf '%s\n' "$command"
-    eval $command
+    eval "$command"
 
     if [ "$build" = true ]; then
 	make_build everything
@@ -159,7 +159,7 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    (8.[0-9]|8.[1-9][0-9])
+		    ([89].[0-9]|[89].[1-9][0-9])
 			version=$OPTARG
 			;;
 		    (*)
@@ -225,7 +225,7 @@ validate_platform() {
 	(opensuse-*)
 	    return
 	    ;;
-	(ol)
+	(rhel|ol|almalinux|rocky)
 	    case "$VERSION_ID" in
 		(7.*)
 		    return
@@ -233,30 +233,10 @@ validate_platform() {
 		(8.*)
 		    return
 		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(rhel)
-	    case "$VERSION_ID" in
-		(7.*)
+		(9.*)
 		    return
 		    ;;
-		(8.*)
-		    return
-		    ;;
-		(*)
-		    abort_not_supported Release
-		    ;;
-	    esac
-	    ;;
-	(rocky)
-	    case "$VERSION_ID" in
-		(7.*)
-		    return
-		    ;;
-		(8.*)
+		(10.*)
 		    return
 		    ;;
 		(*)
