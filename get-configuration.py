@@ -67,14 +67,13 @@ def main():
     config = ConfigParser(interpolation=ExtendedInterpolation()
                           if args.extended else BasicInterpolation())
 
-    for filename in args.files:
-        config.read(filename)
+    config.read(args.files)
 
-        for section in (args.sections if args.sections else config.sections()):
-            prefix = args.prefix if args.prefix else section
+    for section in (args.sections if args.sections else config.sections()):
+        prefix = args.prefix if args.prefix else section
 
-            for key, value in config[section].items():
-                print(format_pair(key, value, prefix))
+        for key, value in config[section].items():
+            print(format_pair(key, value, prefix))
 
 
 if __name__ == '__main__':

@@ -29,48 +29,76 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$0" "$*"
 }
 
-get_configuration_basename() {
+# Print the existing files for the first ID or ID_LIKE entry that has any, from
+# the least specific (OS) to the most specific (OS and release); later files
+# override earlier ones.  Only ID may match without a release, since a release
+# of a similar OS need not correspond to the release of this one.
+get_configuration_files() {
+    stems=true
+
     for id in $ID $ID_LIKE; do
-	case "$id" in
-	    (opensuse-tumbleweed)
-		basename=$ID
-		;;
-	    (freebsd)
-		basename=$ID-${VERSION_ID%-p*}
-		;;
-	    (macos)
-		basename=$ID-$(printf '%s\n' $VERSION_ID | cut -d. -f 1,2)
-		;;
-	    (netbsd)
-		basename=$ID-$VERSION_ID
-		;;
-	    (solaris)
-		basename=$ID-$VERSION_ID
-		;;
-	    (windows)
-		basename=${kernel_name%_*}-$ID-${VERSION_ID%.0}
-		;;
-            (*)
-		basename=$ID-$VERSION_ID
-		;;
-	esac
+	stem=$(get_configuration_stem "$id")
+	version=$(get_configuration_version "$id")
+	files=
 
-	if [ -n "${basename-}" ]; then
-	    break
+	for name in ${stems:+$stem} ${version:+$stem-${version%%[.-]*} $stem-$version}; do
+	    path="$script_prefix$(printf '%s\n' "$name.ini" | to_lower)"
+
+	    if [ -r "$path" ]; then
+		case " $files " in
+		    (*" $path "*)
+			;;
+		    (*)
+			files="${files:+$files }$path"
+			;;
+		esac
+	    fi
+	done
+
+	if [ -n "$files" ]; then
+	    printf '%s\n' "$files"
+	    return
 	fi
-    done
 
-    if [ -n "${basename-}" ]; then
-	printf '%s\n' "$basename.ini"
-    fi
+	stems=
+    done
+}
+
+get_configuration_stem() {
+    case "$1" in
+	(windows)
+	    printf '%s-%s\n' "${kernel_name%_*}" "$1"
+	    ;;
+	(*)
+	    printf '%s\n' "$1"
+	    ;;
+    esac
+}
+
+get_configuration_version() {
+    case "$1" in
+	(opensuse-tumbleweed)
+	    ;;
+	(freebsd)
+	    printf '%s\n' "${VERSION_ID%-p*}"
+	    ;;
+	(macos)
+	    printf '%s\n' "$VERSION_ID" | cut -d. -f 1,2
+	    ;;
+	(windows)
+	    printf '%s\n' "${VERSION_ID%.0}"
+	    ;;
+	(*)
+	    printf '%s\n' "$VERSION_ID"
+	    ;;
+    esac
 }
 
 get_os_configuration() {
-    basename=$(get_configuration_basename | to_lower)
-    filename="$script_prefix$basename"
+    files=$(get_configuration_files)
 
-    if [ -n "$filename" -a -r "$filename" ]; then
-	"${script_prefix}get-configuration" --extended $filename
+    if [ -n "$files" ]; then
+	"${script_prefix}get-configuration" --extended $files
     else
 	abort_not_supported "Operating system"
     fi

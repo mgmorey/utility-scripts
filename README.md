@@ -59,7 +59,7 @@ The scripts share the following conventions:
   `os_family`), which scripts evaluate before choosing platform-specific
   behavior.
 - **Package data.** `get-os-configuration` selects the data file for the
-  running platform, such as `rhel-9.8.ini` or `macos-15.7.ini`. Each section of
+  running platform, such as `rhel-9.8.ini` or `macos.ini`. Each section of
   a data file names a package category, such as `[docker]` or `[curl]`, and
   lists the platform's package names for it. `get-packages CATEGORY` prints
   the package names, and `install-packages` installs them.
@@ -532,9 +532,16 @@ These files are sourced by other scripts and are not run directly.
 
 ### Platform Package Data
 
-Each `.ini` file maps package categories to package names for one platform
-release, named `<ID>-<VERSION_ID>.ini` after the values that `get-os-release`
-reports. The repository contains 87 data files:
+Each `.ini` file maps package categories to package names for a platform,
+optionally for a release, named `<ID>.ini`, `<ID>-<MAJOR>.ini`, or
+`<ID>-<VERSION_ID>.ini` after the values that `get-os-release` reports. For the
+running platform, `get-os-configuration` reads every existing file of that
+list from the least to the most specific, and a later file overrides the
+sections and keys of an earlier one. A release without a file of its own, such
+as macOS 27, therefore uses the `<ID>` or `<ID>-<MAJOR>` file. The `ID_LIKE`
+values are tried in order when no file matches `ID`, but only with a major or
+full release, so Rocky Linux 8.10 uses `rhel-8.10.ini`. The repository contains
+48 data files for these platforms and releases:
 
 | Platform | Releases |
 |---|---|
