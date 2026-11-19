@@ -1,0 +1,121 @@
+#!/bin/sh -eu
+
+# check-configuration: check the platform package data files
+# Copyright (C) 2026  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
+}
+
+check_file() {
+    assert [ $# -eq 1 ]
+    layers=$(get_layers "$1")
+
+    if ! output=$("${script_prefix}get-configuration" --extended $layers 2>&1)
+    then
+	printf '%s\n' "$output" >&2
+	return 1
+    fi
+
+    # A lone backslash is a line continuation that was not consumed
+    if printf '%s\n' "$output" | grep -Eq "(^|[ ]|=')\\\\([ ]|'\$)"; then
+	printf '%s: %s: stray backslash in a value\n' "$script" "$1" >&2
+	return 1
+    fi
+}
+
+# Print the file and the layers it overrides, from the least specific
+get_layers() {
+    assert [ $# -eq 1 ]
+    name=$(basename "$1" .ini)
+    stem=$(printf '%s\n' "$name" |
+	       sed -n 's/^\(.*\)-[0-9][0-9.]*\(-release\|-stable\)\{0,1\}$/\1/p')
+    layers=
+
+    if [ -n "$stem" ]; then
+	version=${name#$stem-}
+	major=${version%%[.-]*}
+
+	for layer in "$stem.ini" "$stem-$major.ini"; do
+	    if [ -r "$(dirname "$1")/$layer" ]; then
+		layers="${layers:+$layers }$(dirname "$1")/$layer"
+	    fi
+	done
+    fi
+
+    printf '%s\n' "${layers:+$layers }$1" | tr ' ' '\n' | awk '!seen[$0]++'
+}
+
+parse_arguments() {
+    while getopts h opt; do
+	case $opt in
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+    files="$*"
+
+    if [ -z "$files" ]; then
+	files=$(ls "${script_prefix}"*.ini)
+    fi
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script [FILE ...]
+       $script -h
+EOF
+}
+
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+parse_arguments "$@"
+count=0
+failures=0
+
+for file in $files; do
+    count=$((count + 1))
+
+    if ! check_file "$file"; then
+	failures=$((failures + 1))
+    fi
+done
+
+printf '%s: %d files checked, %d failed\n' "$script" "$count" "$failures" >&2
+[ "$failures" -eq 0 ]

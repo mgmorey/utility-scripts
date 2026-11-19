@@ -149,6 +149,7 @@ These scripts form the layer on which the subject-area scripts are built.
 | Script | Platform | Description |
 |---|---|---|
 | `brew-list-keg-only` |  | Print list of Homebrew packages which are keg-only |
+| `check-configuration` |  | Check the platform package data files |
 | `edit-software-properties` | Debian | Invoke software properties dialog |
 | `get-configuration` |  | Get configuration (wrapper for Python script) |
 | `get-configuration.py` |  | Print application configuration parameters |

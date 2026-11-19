@@ -20,6 +20,9 @@
 """Print application configuration parameters."""
 
 import argparse
+import configparser
+import os
+import sys
 from configparser import *
 
 TO_UNDERSCORES = str.maketrans(' .-', '___')
@@ -37,7 +40,47 @@ def format_pair(key: str, value: str, prefix: str) -> str:
 
 
 def format_value(value: str) -> str:
-    return value.translate(TO_SPACES)
+    """Format a value as the contents of a single-quoted shell word."""
+    return value.translate(TO_SPACES).replace("'", "'\\''")
+
+
+def get_pairs(args, config):
+    """Get the variable names and values of the selected sections."""
+    names = {}
+    pairs = []
+
+    for section in (args.sections if args.sections else config.sections()):
+        prefix = args.prefix if args.prefix else section
+
+        for key, value in config[section].items():
+            name = format_key(key, prefix)
+            origin = (section, key)
+
+            if not args.prefix and names.setdefault(name, origin) != origin:
+                raise ValueError('{0}: [{1}] {2} and [{3}] {4} are both {0}'
+                                 .format(name, *names[name], *origin))
+
+            pairs.append(format_pair(key, value, prefix))
+
+    return pairs
+
+
+def main():
+    """Print configuration parameters."""
+    args = parse_args()
+    config = ConfigParser(interpolation=ExtendedInterpolation()
+                          if args.extended else BasicInterpolation())
+
+    try:
+        config.read(args.files)
+        pairs = get_pairs(args, config)
+    except (configparser.Error, ValueError) as error:
+        sys.exit('{0}: {1}: {2}'.format(os.path.basename(sys.argv[0]),
+                                        ' '.join(args.files),
+                                        ' '.join(str(error).split())))
+
+    for pair in pairs:
+        print(pair)
 
 
 def parse_args():
@@ -59,21 +102,6 @@ def parse_args():
                         nargs='*',
                         help='read sections SECTIONS')
     return parser.parse_args()
-
-
-def main():
-    """Print configuration parameters."""
-    args = parse_args()
-    config = ConfigParser(interpolation=ExtendedInterpolation()
-                          if args.extended else BasicInterpolation())
-
-    config.read(args.files)
-
-    for section in (args.sections if args.sections else config.sections()):
-        prefix = args.prefix if args.prefix else section
-
-        for key, value in config[section].items():
-            print(format_pair(key, value, prefix))
 
 
 if __name__ == '__main__':
