@@ -41,6 +41,13 @@ get_packages() {
 
 	for category in $categories; do
 	    parameter=$(get_parameter "$category" "${suffix:-packages}")
+
+	    if [ "$warn_undefined" = true ] &&
+		   eval "[ -z \"\${$parameter+set}\" ]"; then
+		warn '%s: %s: %s not defined for %s %s\n' "$script" \
+		     "$category" "${suffix:-packages}" "$ID" "$VERSION_ID"
+	    fi
+
 	    eval packages=\${$parameter-}
 
 	    if [ -n "$packages" ]; then
@@ -61,8 +68,9 @@ is_valid_category() {
 parse_arguments() {
     categories=
     suffix=
+    warn_undefined=false
 
-    while getopts i:l:d:s:v:h opt; do
+    while getopts i:l:d:s:v:wh opt; do
 	case $opt in
 	    (i)
 		ID=$OPTARG
@@ -75,6 +83,9 @@ parse_arguments() {
 		;;
 	    (v)
 		VERSION_ID=$OPTARG
+		;;
+	    (w)
+		warn_undefined=true
 		;;
 	    (h)
 		usage
@@ -115,7 +126,7 @@ to_lower() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-i ID] [-l LIKE] [-s SUFFIX] [-v VERSION] CATEGORY [...]
+Usage: $script [-i ID] [-l LIKE] [-s SUFFIX] [-v VERSION] [-w] CATEGORY [...]
        $script -h
 EOF
 }
@@ -128,6 +139,10 @@ usage_error() {
     printf '%s\n' '' >&2
     usage
     exit 2
+}
+
+warn() {
+    printf "$@" >&2
 }
 
 script=$(basename "$0")
