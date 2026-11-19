@@ -43,6 +43,16 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
+configure_paths() {
+    archive_dirname="$GNU_ARCHIVE_DIR"
+    archive_basename=$TEXINFO_PROJECT_NAME-$version
+    build_dirname="$HOME/Documents/build/$archive_basename"
+    src_dirname="$HOME/Documents/src/GNU/$archive_basename"
+    archive_filename=$archive_basename$TEXINFO_ARCHIVE_SUFFIX
+    archive_pathname="$GNU_ARCHIVE_DIR/$archive_filename"
+    archive_url=$GNU_MIRROR_BASE_URL/$TEXINFO_PROJECT_NAME/$archive_filename
+}
+
 configure_texinfo() {
     umask 0022
 
@@ -66,16 +76,6 @@ configure_texinfo() {
     if [ "$check" = true ]; then
 	make_check "check"
     fi
-}
-
-configure_paths() {
-    archive_dirname="$GNU_ARCHIVE_DIR"
-    archive_basename=$TEXINFO_PROJECT_NAME-$version
-    build_dirname="$HOME/Documents/build/$archive_basename"
-    src_dirname="$HOME/Documents/src/GNU/$archive_basename"
-    archive_filename=$archive_basename$TEXINFO_ARCHIVE_SUFFIX
-    archive_pathname="$GNU_ARCHIVE_DIR/$archive_filename"
-    archive_url=$GNU_MIRROR_BASE_URL/$TEXINFO_PROJECT_NAME/$archive_filename
 }
 
 get_configure_options() (

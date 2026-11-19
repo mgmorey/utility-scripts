@@ -46,6 +46,18 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
+configure_paths() {
+    archive_dirname="$XERCES_ARCHIVE_DIR"
+    archive_basename=$(get_xerces_basename $XERCES_PROJECT_NAME $version)
+    src_dirname="$HOME/Documents/src/Apache/$archive_basename"
+    archive_filename=$archive_basename$XERCES_ARCHIVE_SUFFIX
+    archive_pathname="$archive_dirname/$archive_filename"
+    archive_url=$(get_xerces_url \
+		      $XERCES_MIRROR_BASE_URL \
+		      $version \
+		      $archive_filename)
+}
+
 configure_xerces() {
     umask 0022
 
@@ -72,16 +84,12 @@ configure_xerces() {
     fi
 }
 
-configure_paths() {
-    archive_dirname="$XERCES_ARCHIVE_DIR"
-    archive_basename=$(get_xerces_basename $XERCES_PROJECT_NAME $version)
-    src_dirname="$HOME/Documents/src/Apache/$archive_basename"
-    archive_filename=$archive_basename$XERCES_ARCHIVE_SUFFIX
-    archive_pathname="$archive_dirname/$archive_filename"
-    archive_url=$(get_xerces_url \
-		      $XERCES_MIRROR_BASE_URL \
-		      $version \
-		      $archive_filename)
+get_dependencies() {
+    get-packages $XERCES_PROJECT_NAME-build $XERCES_PROJECT_NAME-test
+}
+
+get_prefix() {
+    printf "$prefix" "$XERCES_PROJECT_NAME-$version"
 }
 
 get_xerces_basename() {
@@ -95,14 +103,6 @@ get_xerces_configure_command() (
 get_xerces_url() {
     major_version=$(printf '%s\n' "$2" | cut -d. -f1)
     printf "%s/dist/xerces/c/%s/sources/%s\n" "$1" "$major_version" "$3"
-}
-
-get_dependencies() {
-    get-packages $XERCES_PROJECT_NAME-build $XERCES_PROJECT_NAME-test
-}
-
-get_prefix() {
-    printf "$prefix" "$XERCES_PROJECT_NAME-$version"
 }
 
 install_xerces() {

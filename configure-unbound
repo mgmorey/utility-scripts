@@ -46,6 +46,16 @@ assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
+configure_paths() {
+    archive_dirname="$UNBOUND_ARCHIVE_DIR"
+    archive_basename=$UNBOUND_PROJECT_NAME-$version
+    build_dirname="$HOME/Documents/build/$archive_basename"
+    src_dirname="$HOME/Documents/src/Unbound/$archive_basename"
+    archive_filename=$archive_basename$UNBOUND_ARCHIVE_SUFFIX
+    archive_pathname="$archive_dirname/$archive_filename"
+    archive_url=$UNBOUND_MIRROR_BASE_URL/$archive_filename
+}
+
 configure_unbound() {
     umask 0022
 
@@ -69,16 +79,6 @@ configure_unbound() {
     if [ "$check" = true ]; then
 	make_check "check"
     fi
-}
-
-configure_paths() {
-    archive_dirname="$UNBOUND_ARCHIVE_DIR"
-    archive_basename=$UNBOUND_PROJECT_NAME-$version
-    build_dirname="$HOME/Documents/build/$archive_basename"
-    src_dirname="$HOME/Documents/src/Unbound/$archive_basename"
-    archive_filename=$archive_basename$UNBOUND_ARCHIVE_SUFFIX
-    archive_pathname="$archive_dirname/$archive_filename"
-    archive_url=$UNBOUND_MIRROR_BASE_URL/$archive_filename
 }
 
 get_configure_options() (
