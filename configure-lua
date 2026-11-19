@@ -22,7 +22,7 @@ LUA_ARCHIVE_SUFFIX=.tar.gz
 LUA_BASE_URL=https://www.lua.org/ftp
 LUA_OPT_PREFIX=/opt/%s
 LUA_PROJECT_NAME=lua
-LUA_PROJECT_VERSION=5.4.9
+LUA_PROJECT_VERSION=5.5.1
 
 abort() {
     printf "$@" >&2

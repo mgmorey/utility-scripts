@@ -256,6 +256,7 @@ prefix=$HOME/.local
 | `configure-qemu` | Download and configure QEMU |
 | `configure-readline` | Download and configure GNU Readline |
 | `configure-texinfo` | Download and configure GNU Texinfo |
+| `configure-tree-sitter` | Download and configure Tree-sitter |
 | `configure-unbound` | Download and configure Unbound |
 | `configure-xerces` | Download and configure Xerces |
 

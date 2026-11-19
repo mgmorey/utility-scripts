@@ -20,7 +20,7 @@ GNU_ARCHIVE_DIR="$HOME/Downloads/GNU"
 
 READLINE_ARCHIVE_SUFFIX=.tar.gz
 READLINE_PROJECT_NAME=readline
-READLINE_PROJECT_VERSION=8.3
+READLINE_PROJECT_VERSION=8.3.6
 
 abort() {
     printf "$@" >&2
@@ -39,15 +39,41 @@ abort_not_supported() {
     abort '%s: %s: %s not supported\n' "$script" "$PRETTY_NAME" "$*"
 }
 
+apply_patches() {
+    for filename in $(get_patch_filenames); do
+	patch_pathname="$archive_dirname/$filename"
+	patch_url=$GNU_MIRROR_BASE_URL/$READLINE_PROJECT_NAME/$READLINE_PROJECT_NAME-$base_version-patches/$filename
+	download_archive "$patch_pathname" "$patch_url"
+	(cd "$src_dirname" && patch -p0 -s < "$patch_pathname")
+    done
+}
+
 assert() {
     "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
 }
 
 configure_paths() {
+    # Version 8.3.6 is release 8.3 with its first six patches applied
+    case "$version" in
+	(*.*.*)
+	    base_version=${version%.*}
+	    patch_level=${version##*.}
+	    ;;
+	(*)
+	    base_version=$version
+	    patch_level=0
+	    ;;
+    esac
+
     archive_dirname="$GNU_ARCHIVE_DIR"
-    archive_basename=$READLINE_PROJECT_NAME-$version
-    build_dirname="$HOME/Documents/build/$archive_basename"
+    archive_basename=$READLINE_PROJECT_NAME-$base_version
+    build_dirname="$HOME/Documents/build/$READLINE_PROJECT_NAME-$version"
     src_dirname="$HOME/Documents/src/GNU/$archive_basename"
+
+    if [ "$patch_level" -gt 0 ]; then
+	src_dirname="$HOME/Documents/src/GNU/$READLINE_PROJECT_NAME-$version/$archive_basename"
+    fi
+
     archive_filename=$archive_basename$READLINE_ARCHIVE_SUFFIX
     archive_pathname="$GNU_ARCHIVE_DIR/$archive_filename"
     archive_url=$GNU_MIRROR_BASE_URL/$READLINE_PROJECT_NAME/$archive_filename
@@ -63,6 +89,7 @@ configure_readline() {
     mkdir -p "$build_dirname" "$src_dirname" "$archive_dirname"
     download_archive "$archive_pathname" "$archive_url"
     extract_archive "$archive_pathname" "$src_dirname"
+    apply_patches
     cd "$build_dirname"
 
     command=$(get_configure_command "$src_dirname")
@@ -93,6 +120,16 @@ get_configure_options() (
 
 get_dependencies() {
     get-packages bootstrap readline-build
+}
+
+get_patch_filenames() {
+    number=1
+
+    while [ "$number" -le "$patch_level" ]; do
+	printf 'readline%s-%03d\n' "$(printf '%s\n' "$base_version" | tr -d .)" \
+	       "$number"
+	number=$((number + 1))
+    done
 }
 
 get_prefix() {
@@ -159,7 +196,7 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    ([89].[0-9]|[89].[1-9][0-9])
+		    ([89].[0-9]|[89].[1-9][0-9]|[89].[0-9].[1-9]|[89].[0-9].[1-9][0-9])
 			version=$OPTARG
 			;;
 		    (*)
