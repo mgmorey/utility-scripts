@@ -59,9 +59,9 @@ configure_openssl() {
     extract_archive "$archive_pathname" "$src_dirname"
     cd "$build_dirname"
 
-    command=$(get_openssl_configure_command "$src_dirname" config)
+    command=$(get_configure_command "$src_dirname" config)
     printf '%s\n' "$command"
-    eval $command
+    eval "$command"
 
     if [ "$build" = true ]; then
 	make_build
@@ -82,18 +82,7 @@ configure_paths() {
     archive_url=$OPENSSL_MIRROR_BASE_URL/$archive_filename
 }
 
-get_openssl_configure_command() {
-    options=$(get_openssl_configure_options)
-    printf '%s' "$1/${2-configure}"
-
-    if [ -n "${options-}" ]; then
-	printf ' %s' "$options"
-    fi
-
-    printf '\n'
-}
-
-get_openssl_configure_options() (
+get_configure_options() (
     if [ -n "${prefix-}" ]; then
         options="${options:+$options }--prefix=$(get_prefix)"
     fi

@@ -60,9 +60,9 @@ configure_gnuplot() {
     fi
 
     cd "$build_dirname"
-    command=$(get_gnuplot_configure_command "$src_dirname")
+    command=$(get_configure_command "$src_dirname")
     printf '%s\n' "$command"
-    eval $command
+    eval "$command"
 
     if [ "$build" = true ]; then
 	make_build
@@ -82,22 +82,7 @@ configure_paths() {
     archive_pathname="$archive_dirname/$archive_filename"
 }
 
-get_dependencies() {
-    get-packages $GNUPLOT_PROJECT_NAME-build
-}
-
-get_gnuplot_configure_command() {
-    options=$(get_gnuplot_configure_options)
-    printf '%s' "$1/${2-configure}"
-
-    if [ -n "${options-}" ]; then
-	printf ' %s' "$options"
-    fi
-
-    printf '\n'
-}
-
-get_gnuplot_configure_options() (
+get_configure_options() (
     if [ -n "${prefix-}" ]; then
 	options="${options:+$options }--prefix=$(get_prefix)"
     fi
@@ -109,6 +94,10 @@ get_gnuplot_configure_options() (
 	printf '%s\n' "$options"
     fi
 )
+
+get_dependencies() {
+    get-packages $GNUPLOT_PROJECT_NAME-build
+}
 
 get_prefix() {
     printf "$prefix" "$GNUPLOT_PROJECT_NAME-$version"

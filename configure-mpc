@@ -55,9 +55,9 @@ configure_gmp() {
     extract_archive "$archive_pathname" "$src_dirname"
     cd "$build_dirname"
 
-    command=$(get_gmp_configure_command $src_dirname)
+    command=$(get_configure_command "$src_dirname")
     printf '%s\n' "$command"
-    eval $command
+    eval "$command"
 
     if [ "$build" = true ]; then
 	targets="all info"
@@ -91,17 +91,6 @@ get_configure_options() (
 
 get_dependencies() {
     get-packages $MPC_PROJECT_NAME-build $MPC_PROJECT_NAME-test
-}
-
-get_gmp_configure_command() {
-    options=$(get_configure_options)
-    printf '%s' "$1/${2-configure}"
-
-    if [ -n "${options-}" ]; then
-	printf ' %s' "$options"
-    fi
-
-    printf '\n'
 }
 
 get_prefix() {

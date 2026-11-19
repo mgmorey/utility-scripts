@@ -57,7 +57,7 @@ configure_libtool() {
 
     command=$(get_configure_command $src_dirname)
     printf '%s\n' "$command"
-    eval $command
+    eval "$command"
 
     if [ "$build" = true ]; then
 	make_build

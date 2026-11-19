@@ -58,9 +58,9 @@ configure_git() {
     extract_archive "$archive_pathname" "$src_dirname"
     cp -R "$src_dirname" "$(dirname "$build_dirname")"
     cd "$build_dirname"
-    command=$(get_git_configure_command "$src_dirname")
+    command=$(get_configure_command "$src_dirname")
     printf '%s\n' "$command"
-    eval $command
+    eval "$command"
 
     if [ "$build" = true ]; then
 	make_build all doc
@@ -93,17 +93,6 @@ get_configure_options() (
 
 get_dependencies() {
     get-packages $GIT_PROJECT_NAME-build $GIT_PROJECT_NAME-test
-}
-
-get_git_configure_command() {
-    options=$(get_configure_options)
-    printf '%s' "$1/${2-configure}"
-
-    if [ -n "${options-}" ]; then
-	printf ' %s' "$options"
-    fi
-
-    printf '\n'
 }
 
 get_prefix() {

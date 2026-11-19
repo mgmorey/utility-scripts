@@ -55,9 +55,9 @@ configure_gawk() {
     extract_archive "$archive_pathname" "$src_dirname"
     cd "$build_dirname"
 
-    command=$(get_gawk_configure_command $src_dirname)
+    command=$(get_configure_command "$src_dirname")
     printf '%s\n' "$command"
-    eval $command
+    eval "$command"
 
     if [ "$build" = true ]; then
 	targets="all info"
@@ -79,22 +79,7 @@ configure_paths() {
     archive_url=$GNU_MIRROR_BASE_URL/$GDB_PROJECT_NAME/$archive_filename
 }
 
-get_dependencies() {
-    get-packages $GDB_PROJECT_NAME-build $GDB_PROJECT_NAME-test
-}
-
-get_gawk_configure_command() {
-    options=$(get_gawk_configure_options)
-    printf '%s' "$1/${2-configure}"
-
-    if [ -n "${options-}" ]; then
-	printf ' %s' "$options"
-    fi
-
-    printf '\n'
-}
-
-get_gawk_configure_options() (
+get_configure_options() (
     if [ -n "${prefix-}" ]; then
         options="${options:+$options }--prefix=$(get_prefix)"
     fi
@@ -103,6 +88,10 @@ get_gawk_configure_options() (
 	printf '%s\n' "$options"
     fi
 )
+
+get_dependencies() {
+    get-packages $GDB_PROJECT_NAME-build $GDB_PROJECT_NAME-test
+}
 
 get_prefix() {
     printf "$prefix" "$GDB_PROJECT_NAME-$version"
