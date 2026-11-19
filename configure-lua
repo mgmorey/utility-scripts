@@ -1,0 +1,333 @@
+#!/bin/sh -eu
+
+# configure-lua: download and configure Lua
+# Copyright (C) 2026  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+LUA_ARCHIVE_DIR="$HOME/Downloads/Lua"
+LUA_ARCHIVE_SUFFIX=.tar.gz
+
+LUA_BASE_URL=https://www.lua.org/ftp
+LUA_OPT_PREFIX=/opt/%s
+LUA_PROJECT_NAME=lua
+LUA_PROJECT_VERSION=5.4.9
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_invalid_prefix() {
+    usage_error '%s: invalid prefix -- %s\n' "$script" "$*"
+}
+
+abort_invalid_version() {
+    usage_error '%s: invalid version -- %s\n' "$script" "$*"
+}
+
+abort_not_supported() {
+    abort '%s: %s: %s not supported\n' "$script" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
+}
+
+configure_lua() {
+    umask 0022
+
+    if [ "$force" = true ]; then
+	rm -rf "$src_dirname" "$archive_pathname"
+    fi
+
+    mkdir -p "$archive_dirname" "$src_dirname"
+    download_archive "$archive_pathname" "$archive_url"
+    extract_archive "$archive_pathname" "$src_dirname"
+
+    # Lua has no configure script and builds only in its source tree
+    cd "$src_dirname"
+
+    if [ "$build" = true ]; then
+	$make clean
+	make_build "$(get_platform_target)" "MYCFLAGS=$(get_cflags)" \
+		   "MYLDFLAGS=$(get_ldflags)" ${cc:+"CC=$cc"}
+    fi
+
+    if [ "$check" = true ]; then
+	make_check test
+    fi
+}
+
+configure_paths() {
+    archive_dirname="$LUA_ARCHIVE_DIR"
+    archive_basename=$LUA_PROJECT_NAME-$version
+    src_dirname="$HOME/Documents/src/Lua/$archive_basename"
+    archive_filename=$archive_basename$LUA_ARCHIVE_SUFFIX
+    archive_pathname="$LUA_ARCHIVE_DIR/$archive_filename"
+    archive_url=$LUA_BASE_URL/$archive_filename
+}
+
+get_cflags() {
+    flags="${CFLAGS-}${cflags:+ $cflags}${CPPFLAGS:+ $CPPFLAGS}"
+    flags="$flags${cppflags:+ $cppflags}"
+    printf '%s\n' "${flags# }"
+}
+
+get_dependencies() {
+    get-packages bootstrap lua-build
+}
+
+get_ldflags() {
+    flags="${LDFLAGS-}${ldflags:+ $ldflags}"
+    printf '%s\n' "${flags# }"
+}
+
+# The platform targets that link the interactive interpreter with readline
+get_platform_target() {
+    case "$ID" in
+	(freebsd)
+	    printf '%s\n' freebsd
+	    ;;
+	(illumos|solaris)
+	    printf '%s\n' solaris
+	    ;;
+	(macos)
+	    printf '%s\n' macosx
+	    ;;
+	(netbsd)
+	    printf '%s\n' bsd
+	    ;;
+	(*)
+	    printf '%s\n' linux-readline
+	    ;;
+    esac
+}
+
+get_prefix() {
+    printf "$prefix" "$LUA_PROJECT_NAME-$version"
+}
+
+install_lua() {
+    if [ "$install" != true ]; then
+	return 0
+    fi
+
+    install_prefix=$(get_prefix)
+
+    if [ "$ID" != windows -a "$(id -u)" -gt 0 -a ! -w "$install_prefix" ]; then
+	return 0
+    fi
+
+    umask 0022
+    cd "$src_dirname"
+    make_install INSTALL_TOP="$install_prefix" install
+    install_project_link "$install_prefix"
+}
+
+parse_arguments() {
+    build=true
+    check=false
+    force=false
+    install=false
+    keep=false
+    prefix=$LUA_OPT_PREFIX
+    version=$LUA_PROJECT_VERSION
+
+    while getopts bcfiknp:v:h opt; do
+	case $opt in
+	    (b)
+		build=true
+		;;
+	    (c)
+		check=true
+		;;
+	    (f)
+		build=true
+		force=true
+		;;
+	    (i)
+		install=true
+		;;
+	    (k)
+		keep=true
+		;;
+	    (n)
+		build=false
+		force=false
+		;;
+	    (p)
+		case $OPTARG in
+		    ($HOME/.local|$LOCAL_PREFIX|$LUA_OPT_PREFIX|/*)
+			prefix=$OPTARG
+			;;
+		    (*)
+			abort_invalid_prefix $OPTARG
+			;;
+		esac
+		;;
+	    (v)
+		case $OPTARG in
+		    (5.[3-9].[0-9]|5.[3-9].[0-9][0-9])
+			version=$OPTARG
+			;;
+		    (*)
+			abort_invalid_version $OPTARG
+			;;
+		esac
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error '%s: Too many arguments\n' "$script"
+    fi
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script [-b] [-c] [-f] [-i] [-k] [-n] [-p PREFIX] [-v VERSION]
+       $script -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+validate_platform() {
+    case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    return
+		    ;;
+		(8)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    return
+	    ;;
+	(fedora)
+	    return
+	    ;;
+	(opensuse-*)
+	    return
+	    ;;
+	(rhel|ol|almalinux|rocky)
+	    case "$VERSION_ID" in
+		(7.*)
+		    return
+		    ;;
+		(8.*)
+		    return
+		    ;;
+		(9.*)
+		    return
+		    ;;
+		(10.*)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    return
+	    ;;
+	(freebsd)
+	    return
+	    ;;
+	(illumos)
+	    return
+	    ;;
+	(macos)
+	    return
+	    ;;
+	(netbsd)
+	    return
+	    ;;
+	(solaris)
+	    return
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
+
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+. "${script_prefix}config-functions.sh"
+
+set_user_profile "$script_dir"
+eval "$(get-os-release -x)"
+validate_platform
+configure_platform
+parse_arguments "$@"
+
+# Dependencies are installed under the GNU prefix unless one is given
+case "$prefix" in
+    (*%s*)
+	dependency_prefix_format=$GNU_OPT_PREFIX
+	;;
+esac
+
+configure_dependencies readline ncurses
+configure_paths
+
+if [ "$keep" != true ]; then
+    install_dependencies
+fi
+
+if [ "$(id -u)" -eq 0 ]; then
+    run_unpriv /bin/sh -c "$0 $*"
+else
+    configure_lua
+fi
+
+install_lua

@@ -275,7 +275,7 @@ get_configure_command() {
 get_dependency_prefix() {
     assert [ $# -eq 1 ]
     assert [ -n "$1" ]
-    printf "$prefix" "$1"
+    printf "${dependency_prefix_format-$prefix}" "$1"
 }
 
 get_include_flags() {

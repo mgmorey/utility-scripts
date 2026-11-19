@@ -235,11 +235,13 @@ prefix=$HOME/.local
 | `configure-gmp` | Download and configure the GNU MP Bignum library |
 | `configure-gnuplot` | Download and configure Gnuplot |
 | `configure-gnutls` | Download and configure the GNU TLS library |
+| `configure-htop` | Download and configure htop |
 | `configure-libidn2` | Download and configure the GNU IDN Library |
 | `configure-libpsl` | Download and configure the Public Suffix List Library |
 | `configure-libtasn1` | Download and configure the GNU ASN.1 Library |
 | `configure-libtool` | Download and configure GNU Libtool |
 | `configure-libunistring` | Download and configure the GNU Unistring Library |
+| `configure-lua` | Download and configure Lua |
 | `configure-m4` | Download and configure GNU M4 |
 | `configure-make` | Download and configure GNU Make |
 | `configure-mpc` | Download and configure the GNU MPC library |

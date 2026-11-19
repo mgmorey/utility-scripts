@@ -1,0 +1,314 @@
+#!/bin/sh -eu
+
+# configure-htop: download and configure htop
+# Copyright (C) 2026  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+HTOP_ARCHIVE_DIR="$HOME/Downloads/Htop"
+HTOP_ARCHIVE_SUFFIX=.tar.xz
+
+HTOP_BASE_URL=https://github.com/htop-dev/htop
+HTOP_OPT_PREFIX=/opt/%s
+HTOP_PROJECT_NAME=htop
+HTOP_PROJECT_VERSION=3.5.3
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_invalid_prefix() {
+    usage_error '%s: invalid prefix -- %s\n' "$script" "$*"
+}
+
+abort_invalid_version() {
+    usage_error '%s: invalid version -- %s\n' "$script" "$*"
+}
+
+abort_not_supported() {
+    abort '%s: %s: %s not supported\n' "$script" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
+}
+
+configure_htop() {
+    umask 0022
+
+    if [ "$force" = true ]; then
+	rm -rf "$build_dirname" "$src_dirname" "$archive_pathname"
+    fi
+
+    mkdir -p "$archive_dirname" "$build_dirname" "$src_dirname"
+    download_archive "$archive_pathname" "$archive_url"
+    extract_archive "$archive_pathname" "$src_dirname"
+    cd "$build_dirname"
+
+    command=$(get_configure_command "$src_dirname")
+    printf '%s\n' "$command"
+    eval "$command"
+
+    if [ "$build" = true ]; then
+	make_build
+    fi
+
+    if [ "$check" = true ]; then
+	make_check "check"
+    fi
+}
+
+configure_paths() {
+    archive_dirname="$HTOP_ARCHIVE_DIR"
+    archive_basename=$HTOP_PROJECT_NAME-$version
+    build_dirname="$HOME/Documents/build/$archive_basename"
+    src_dirname="$HOME/Documents/src/Htop/$archive_basename"
+    archive_filename=$archive_basename$HTOP_ARCHIVE_SUFFIX
+    archive_pathname="$HTOP_ARCHIVE_DIR/$archive_filename"
+    archive_url=$HTOP_BASE_URL/releases/download/$version/$archive_filename
+}
+
+get_configure_options() (
+    if [ -n "${prefix-}" ]; then
+	options="${options:+$options }--prefix=$(get_prefix)"
+    fi
+
+    options="${options:+$options }--enable-unicode"
+
+    if [ -n "${options:-}" ]; then
+	printf '%s\n' "$options"
+    fi
+)
+
+get_dependencies() {
+    get-packages bootstrap htop-build
+}
+
+get_prefix() {
+    printf "$prefix" "$HTOP_PROJECT_NAME-$version"
+}
+
+install_htop() {
+    if [ "$install" != true ]; then
+	return 0
+    fi
+
+    install_prefix=$(get_prefix)
+
+    if [ "$ID" != windows -a "$(id -u)" -gt 0 -a ! -w "$install_prefix" ]; then
+	return 0
+    fi
+
+    umask 0022
+    cd "$build_dirname"
+    make_install prefix="$install_prefix" install
+    install_project_link "$install_prefix"
+}
+
+parse_arguments() {
+    build=true
+    check=false
+    force=false
+    install=false
+    keep=false
+    prefix=$HTOP_OPT_PREFIX
+    version=$HTOP_PROJECT_VERSION
+
+    while getopts bcfiknp:v:h opt; do
+	case $opt in
+	    (b)
+		build=true
+		;;
+	    (c)
+		check=true
+		;;
+	    (f)
+		build=true
+		force=true
+		;;
+	    (i)
+		install=true
+		;;
+	    (k)
+		keep=true
+		;;
+	    (n)
+		build=false
+		force=false
+		;;
+	    (p)
+		case $OPTARG in
+		    ($HOME/.local|$LOCAL_PREFIX|$HTOP_OPT_PREFIX|/*)
+			prefix=$OPTARG
+			;;
+		    (*)
+			abort_invalid_prefix $OPTARG
+			;;
+		esac
+		;;
+	    (v)
+		case $OPTARG in
+		    ([3-9].[0-9].[0-9]|[3-9].[0-9][0-9].[0-9])
+			version=$OPTARG
+			;;
+		    (*)
+			abort_invalid_version $OPTARG
+			;;
+		esac
+		;;
+	    (h)
+		usage
+		exit 0
+		;;
+	    (\?)
+		exit 2
+		;;
+	esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+	usage_error '%s: Too many arguments\n' "$script"
+    fi
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script [-b] [-c] [-f] [-i] [-k] [-n] [-p PREFIX] [-v VERSION]
+       $script -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+	printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+validate_platform() {
+    case "$ID" in
+	(centos)
+	    case "$VERSION_ID" in
+		(7)
+		    return
+		    ;;
+		(8)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(debian|raspbian)
+	    return
+	    ;;
+	(fedora)
+	    return
+	    ;;
+	(opensuse-*)
+	    return
+	    ;;
+	(rhel|ol|almalinux|rocky)
+	    case "$VERSION_ID" in
+		(7.*)
+		    return
+		    ;;
+		(8.*)
+		    return
+		    ;;
+		(9.*)
+		    return
+		    ;;
+		(10.*)
+		    return
+		    ;;
+		(*)
+		    abort_not_supported Release
+		    ;;
+	    esac
+	    ;;
+	(ubuntu)
+	    return
+	    ;;
+	(freebsd)
+	    return
+	    ;;
+	(illumos)
+	    return
+	    ;;
+	(macos)
+	    return
+	    ;;
+	(netbsd)
+	    return
+	    ;;
+	(solaris)
+	    return
+	    ;;
+	(*)
+	    abort_not_supported "Operating system"
+	    ;;
+    esac
+}
+
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+	script_dir=$(cd "$(dirname "$0")" && pwd)
+	;;
+    (*)
+	script_dir=
+	;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+. "${script_prefix}config-functions.sh"
+
+set_user_profile "$script_dir"
+eval "$(get-os-release -x)"
+validate_platform
+configure_platform
+parse_arguments "$@"
+
+# Dependencies are installed under the GNU prefix unless one is given
+case "$prefix" in
+    (*%s*)
+	dependency_prefix_format=$GNU_OPT_PREFIX
+	;;
+esac
+
+configure_dependencies ncurses
+configure_paths
+
+if [ "$keep" != true ]; then
+    install_dependencies
+fi
+
+if [ "$(id -u)" -eq 0 ]; then
+    run_unpriv /bin/sh -c "$0 $*"
+else
+    configure_htop
+fi
+
+install_htop
