@@ -132,7 +132,9 @@ install_ncurses() {
 
     umask 0022
     cd "$build_dirname"
-    make_install prefix="$install_prefix" install
+
+    # The system tic compiles terminfo and must not load the new libtinfo.
+    (unset LD_LIBRARY_PATH; make_install prefix="$install_prefix" install)
     install_project_link "$install_prefix"
 }
 
