@@ -65,7 +65,7 @@ configure_texinfo() {
     extract_archive "$archive_pathname" "$src_dirname"
     cd "$build_dirname"
 
-    command=$(get_configure_command $src_dirname)
+    command=$(get_configure_command "$src_dirname")
     printf '%s\n' "$command"
     eval "$command"
 
@@ -99,13 +99,16 @@ get_prefix() {
 install_texinfo() {
     if [ "$install" != true ]; then
 	return 0
-    elif [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+    fi
+
+    install_prefix=$(get_prefix)
+
+    if [ "$ID" != windows -a "$(id -u)" -gt 0 -a ! -w "$install_prefix" ]; then
 	return 0
     fi
 
     umask 0022
     cd "$build_dirname"
-    install_prefix=$(get_prefix)
     make_install prefix="$install_prefix" install
     install_project_link "$install_prefix"
 }
@@ -115,10 +118,11 @@ parse_arguments() {
     check=false
     force=false
     install=false
+    keep=false
     prefix=$GNU_OPT_PREFIX
     version=$TEXINFO_PROJECT_VERSION
 
-    while getopts bcfinp:v:h opt; do
+    while getopts bcfiknp:v:h opt; do
 	case $opt in
 	    (b)
 		build=true
@@ -133,13 +137,16 @@ parse_arguments() {
 	    (i)
 		install=true
 		;;
+	    (k)
+		keep=true
+		;;
 	    (n)
 		build=false
 		force=false
 		;;
 	    (p)
 		case $OPTARG in
-		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX)
+		    ($HOME/.local|$LOCAL_PREFIX|$GNU_OPT_PREFIX|/*)
 			prefix=$OPTARG
 			;;
 		    (*)
@@ -176,7 +183,7 @@ parse_arguments() {
 
 usage() {
     cat <<EOF >&2
-Usage: $script [-b] [-c] [-f] [-g] [-i] [-n] [-p PREFIX] [-v VERSION]
+Usage: $script [-b] [-c] [-f] [-i] [-k] [-n] [-p PREFIX] [-v VERSION]
        $script -h
 EOF
 }
@@ -215,7 +222,7 @@ validate_platform() {
 	(opensuse-*)
 	    return
 	    ;;
-	(rhel|ol|almalinux)
+	(rhel|ol|almalinux|rocky)
 	    case "$VERSION_ID" in
 		(7.*)
 		    return
@@ -283,7 +290,10 @@ validate_platform
 configure_platform
 parse_arguments "$@"
 configure_paths
-install_dependencies
+
+if [ "$keep" != true ]; then
+    install_dependencies
+fi
 
 if [ "$(id -u)" -eq 0 ]; then
     run_unpriv /bin/sh -c "$0 $*"
