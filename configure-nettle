@@ -129,7 +129,7 @@ parse_arguments() {
     install=false
     keep=false
     minigmp=false
-    prefix=$GNU_OPT_PREFIX
+    prefix=$(get_default_prefix "$GNU_OPT_PREFIX")
     version=$NETTLE_PROJECT_VERSION
 
     while getopts bcfikmnp:v:h opt; do

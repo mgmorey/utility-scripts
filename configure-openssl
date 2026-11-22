@@ -119,7 +119,7 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$OPENSSL_OPT_PREFIX
+    prefix=$(get_default_prefix "$OPENSSL_OPT_PREFIX")
     version=$OPENSSL_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do

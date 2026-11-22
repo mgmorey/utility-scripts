@@ -114,7 +114,7 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$QEMU_OPT_PREFIX
+    prefix=$(get_default_prefix "$QEMU_OPT_PREFIX")
     version=$QEMU_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do

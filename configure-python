@@ -129,7 +129,7 @@ parse_arguments() {
     force=false
     install=false
     keep=false
-    prefix=$PYTHON_OPT_PREFIX
+    prefix=$(get_default_prefix "$PYTHON_OPT_PREFIX")
     ssl_prefix=
     version=$PYTHON_PROJECT_VERSION
 

@@ -113,7 +113,7 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$LOCAL_PREFIX
+    prefix=$(get_default_prefix "$LOCAL_PREFIX")
     version=$NASM_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do

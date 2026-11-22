@@ -124,7 +124,7 @@ parse_arguments() {
     debug=false
     force=false
     install=false
-    prefix=$GNU_OPT_PREFIX
+    prefix=$(get_default_prefix "$GNU_OPT_PREFIX")
     version=$LIBUNISTRING_PROJECT_VERSION
 
     while getopts bcfginop:v:h opt; do

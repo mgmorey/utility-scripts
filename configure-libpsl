@@ -118,7 +118,7 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$LIBPSL_OPT_PREFIX
+    prefix=$(get_default_prefix "$LIBPSL_OPT_PREFIX")
     version=$LIBPSL_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do

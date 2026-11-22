@@ -103,7 +103,7 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$GIFLIB_OPT_PREFIX
+    prefix=$(get_default_prefix "$GIFLIB_OPT_PREFIX")
     version=$GIFLIB_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do

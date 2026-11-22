@@ -112,7 +112,7 @@ parse_arguments() {
     version=$LIBTOOL_PROJECT_VERSION
     force=false
     install=false
-    prefix=$GNU_OPT_PREFIX
+    prefix=$(get_default_prefix "$GNU_OPT_PREFIX")
 
     while getopts bcfinp:v:h opt; do
 	case $opt in

@@ -125,7 +125,7 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$CURL_OPT_PREFIX
+    prefix=$(get_default_prefix "$CURL_OPT_PREFIX")
     tls_backend=$CURL_TLS_BACKEND
     version=$CURL_PROJECT_VERSION
 

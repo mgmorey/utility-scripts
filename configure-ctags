@@ -125,7 +125,7 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$CTAGS_OPT_PREFIX
+    prefix=$(get_default_prefix "$CTAGS_OPT_PREFIX")
     version=$CTAGS_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do

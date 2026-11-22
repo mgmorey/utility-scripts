@@ -115,7 +115,7 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$GNU_OPT_PREFIX
+    prefix=$(get_default_prefix "$GNU_OPT_PREFIX")
     version=$BINUTILS_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do

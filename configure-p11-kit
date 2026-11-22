@@ -118,7 +118,7 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$P11_KIT_OPT_PREFIX
+    prefix=$(get_default_prefix "$P11_KIT_OPT_PREFIX")
     version=$P11_KIT_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do

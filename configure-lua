@@ -142,7 +142,7 @@ parse_arguments() {
     force=false
     install=false
     keep=false
-    prefix=$LUA_OPT_PREFIX
+    prefix=$(get_default_prefix "$LUA_OPT_PREFIX")
     version=$LUA_PROJECT_VERSION
 
     while getopts bcfiknp:v:h opt; do

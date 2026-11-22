@@ -110,7 +110,7 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$UWSGI_OPT_PREFIX
+    prefix=$(get_default_prefix "$UWSGI_OPT_PREFIX")
     version=$UWSGI_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do

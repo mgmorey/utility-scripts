@@ -120,7 +120,7 @@ parse_arguments() {
     force=false
     install=false
     keep=false
-    prefix=$GNU_OPT_PREFIX
+    prefix=$(get_default_prefix "$GNU_OPT_PREFIX")
     version=$GMP_PROJECT_VERSION
 
     while getopts bcfiknp:v:h opt; do

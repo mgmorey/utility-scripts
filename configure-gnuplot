@@ -123,7 +123,7 @@ parse_arguments() {
     force=false
     install=false
     keep=false
-    prefix=$GNUPLOT_OPT_PREFIX
+    prefix=$(get_default_prefix "$GNUPLOT_OPT_PREFIX")
     version=$GNUPLOT_PROJECT_VERSION
 
     while getopts bcfiknp:v:h opt; do

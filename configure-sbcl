@@ -106,7 +106,7 @@ parse_arguments() {
     force=false
     install=false
     keep=false
-    prefix=$SBCL_OPT_PREFIX
+    prefix=$(get_default_prefix "$SBCL_OPT_PREFIX")
     version=$SBCL_PROJECT_VERSION
 
     while getopts bcdfiknp:v:h opt; do

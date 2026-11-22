@@ -124,7 +124,7 @@ parse_arguments() {
     check=false
     force=false
     install=false
-    prefix=$XERCES_OPT_PREFIX
+    prefix=$(get_default_prefix "$XERCES_OPT_PREFIX")
     version=$XERCES_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do

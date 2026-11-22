@@ -182,9 +182,12 @@ These scripts form the layer on which the subject-area scripts are built.
 
 #### Source Builds
 
-Each script downloads a source release and configures it for installation,
-typically under `/opt`, where `set-oss-parameters` adds it to the search
-paths.
+Each script downloads a source release and configures it for installation.
+Without privileges, a script installs into `~/.local`. As root, it installs
+under `/opt` (GNU projects under `/opt/gnu`) in a directory named for the
+project and version, and maintains an unversioned symbolic link to it. The
+`-p` option selects another prefix. `set-oss-parameters` adds an installed tree
+to the search paths.
 
 GNU releases are downloaded from `GNU_MIRROR_BASE_URL` (default
 `https://ftpmirror.gnu.org`), which can be set to a reachable mirror such as
@@ -197,23 +200,27 @@ imported first. A bad or unverifiable signature stops the script, and
 `GPG_VERIFY=false` skips the check. A release without a signature, such as
 pkgconf, is checked against a SHA-256 value recorded in its script.
 
-Without root, pass `-k` to skip installing build packages and `-p` with an
-existing, writable directory such as `~/.local`, and evaluate
-`set-oss-parameters` for that directory before each build, so that the build
-finds, and records a run-time path to, the libraries installed before it. For
-example, the following builds GNU Emacs with GnuTLS and every library that it
-needs into `~/.local`, in dependency order. The parentheses run the loop in a
-subshell, so that the settings, including `LD_LIBRARY_PATH`, end with it;
-left in an interactive shell, they can make system programs load the newly
-built libraries in place of their own:
+Without root, a script does not install build packages, so the compiler and
+development packages must already be present, and installs into `~/.local`.
+Evaluate `set-oss-parameters` for that directory before each build, so that
+the build finds, and records a run-time path to, the libraries installed
+before it. Each script also sources the login profile, so a profile that adds
+other trees to the search paths, such as software under `/opt`, can make a
+build use those instead. For example, the following builds GNU Emacs with
+GnuTLS, Texinfo, Tree-sitter, and every library that it needs into `~/.local`,
+in dependency order. The parentheses run the loop in a subshell, so that the
+settings, including `LD_LIBRARY_PATH`, end with it; left in an interactive
+shell, they can make system programs load the newly built libraries in place
+of their own:
 
 ```sh
 prefix=$HOME/.local
+projects="m4 pkgconf ncurses texinfo gmp nettle gnutls tree-sitter emacs"
 
 (
-    for project in m4 pkgconf ncurses gmp nettle gnutls emacs; do
+    for project in $projects; do
         eval "$(set-oss-parameters "$prefix")"
-        configure-$project -k -i -p "$prefix"
+        configure-$project -i
     done
 )
 ```

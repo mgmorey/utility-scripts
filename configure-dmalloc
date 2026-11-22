@@ -121,7 +121,7 @@ parse_arguments() {
     check=true
     force=false
     install=false
-    prefix=$DMALLOC_OPT_PREFIX
+    prefix=$(get_default_prefix "$DMALLOC_OPT_PREFIX")
     version=$DMALLOC_PROJECT_VERSION
 
     while getopts bcfinp:v:h opt; do

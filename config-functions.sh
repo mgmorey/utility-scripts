@@ -271,6 +271,18 @@ get_configure_command() {
     printf '\n'
 }
 
+# Users install into ~/.local, which needs no privileges; root uses $1
+get_default_prefix() {
+    assert [ $# -eq 1 ]
+    assert [ -n "$1" ]
+
+    if [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+        printf '%s\n' "$HOME/.local"
+    else
+        printf '%s\n' "$1"
+    fi
+}
+
 # The unversioned link that install_project_link creates, or the prefix itself
 get_dependency_prefix() {
     assert [ $# -eq 1 ]
@@ -395,6 +407,11 @@ install_dependencies() {
 	    if [ "${depends-true}" = false ]; then
 		return 0
 	    fi
+
+	    # Installing build packages needs root
+	    if [ "$(id -u)" -gt 0 ]; then
+		return 0
+	    fi
 	    ;;
     esac
 
@@ -412,6 +429,12 @@ install_project_link() (
     assert [ -n "$1" ]
     prefix="$1"
     link="${prefix%-*}"
+
+    # Only a name-version directory has an unversioned link
+    case "$(basename "$prefix")" in
+        (*-*) ;;
+        (*) return 0 ;;
+    esac
 
     if [ -d "$prefix" -a "$link" != "$prefix" ]; then
 	prefix_base=$(basename "$prefix")

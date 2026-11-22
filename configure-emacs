@@ -169,7 +169,7 @@ parse_arguments() {
     force=false
     install=false
     keep=false
-    prefix=$GNU_OPT_PREFIX
+    prefix=$(get_default_prefix "$GNU_OPT_PREFIX")
     tls_back_end=$EMACS_TLS_BACK_END
     version=$EMACS_PROJECT_VERSION
     with_xtoolkit=false
