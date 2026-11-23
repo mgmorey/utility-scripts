@@ -103,15 +103,25 @@ get_prefix() {
 install_dmalloc() {
     if [ "$install" != true ]; then
 	return 0
-    elif [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+    fi
+
+    install_prefix=$(get_prefix)
+
+    if [ "$ID" != windows -a "$(id -u)" -gt 0 -a ! -w "$install_prefix" ]; then
 	return 0
     fi
 
     umask 0022
     cd "$build_dirname"
-    install_prefix=$(get_prefix)
     targets="install installcxx installcxxsl installdocs installsl \
 installth installthcxx installthcxxsl installthsl"
+
+    # The Makefile hard-codes texi2html, which RHEL 9 does not provide
+    if ! which texi2html >/dev/null 2>&1; then
+	targets=$(printf '%s\n' "$targets" | sed 's/ installdocs / /')
+	printf '%s: texi2html not found; skipping installdocs\n' "$script" >&2
+    fi
+
     make_install prefix="$install_prefix" $targets
     install_project_link "$install_prefix"
 }
@@ -227,6 +237,12 @@ validate_platform() {
 		    return
 		    ;;
 		(8.*)
+		    return
+		    ;;
+		(9.*)
+		    return
+		    ;;
+		(10.*)
 		    return
 		    ;;
 		(*)
