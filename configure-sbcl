@@ -23,7 +23,7 @@ SBCL_MIRROR_BASE_URL=https://downloads.sourceforge.net/project/sbcl/sbcl
 
 SBCL_OPT_PREFIX=/opt/%s
 SBCL_PROJECT_NAME=sbcl
-SBCL_PROJECT_VERSION=2.5.3
+SBCL_PROJECT_VERSION=2.6.10
 
 abort() {
     printf "$@" >&2
