@@ -23,7 +23,7 @@ UWSGI_MIRROR_BASE_URL=https://files.pythonhosted.org/packages/source/u/uwsgi
 
 UWSGI_OPT_PREFIX=/opt/%s
 UWSGI_PROJECT_NAME=uwsgi
-UWSGI_PROJECT_VERSION=2.0.20
+UWSGI_PROJECT_VERSION=2.0.31
 
 abort() {
     printf "$@" >&2
