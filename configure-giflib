@@ -19,6 +19,8 @@
 GIFLIB_ARCHIVE_DIR="$HOME/Downloads/GIFLIB"
 GIFLIB_ARCHIVE_SUFFIX=.tar.gz
 
+GIFLIB_MIRROR_BASE_URL=https://downloads.sourceforge.net/project/giflib
+
 GIFLIB_OPT_PREFIX=/opt/%s
 GIFLIB_PROJECT_NAME=giflib
 GIFLIB_PROJECT_VERSION=5.2.1
@@ -46,7 +48,8 @@ assert() {
 
 configure_giflib() {
     umask 0022
-    mkdir -p "$(dirname "$src_dir")"
+    mkdir -p "$(dirname "$src_dir")" "$GIFLIB_ARCHIVE_DIR"
+    download_archive "$pathname" "$url"
     extract_files
     cd "$src_dir"
 
@@ -63,6 +66,8 @@ configure_paths() {
     basename=$GIFLIB_PROJECT_NAME-$version
     filename=$basename$GIFLIB_ARCHIVE_SUFFIX
     pathname="$GIFLIB_ARCHIVE_DIR/$filename"
+    # Releases are in directories named giflib-<MAJOR>.x
+    url=$GIFLIB_MIRROR_BASE_URL/giflib-${version%%.*}.x/$filename
     # GIFLIB cannot build out of tree, so the archive is extracted into the build tree
     src_dir="$HOME/Documents/build/$basename"
 }

@@ -19,6 +19,8 @@
 GNUPLOT_ARCHIVE_DIR="$HOME/Downloads/Gnuplot"
 GNUPLOT_ARCHIVE_SUFFIX=.tar.gz
 
+GNUPLOT_MIRROR_BASE_URL=https://downloads.sourceforge.net/project/gnuplot/gnuplot
+
 GNUPLOT_OPT_PREFIX=/opt/%s
 GNUPLOT_PROJECT_NAME=gnuplot
 GNUPLOT_PROJECT_VERSION=6.0.2
@@ -52,6 +54,7 @@ configure_gnuplot() {
     fi
 
     mkdir -p "$build_dirname" "$src_dirname" "$archive_dirname"
+    download_archive "$archive_pathname" "$archive_url"
     extract_archive "$archive_pathname" "$src_dirname"
     cd "$src_dirname"
 
@@ -80,6 +83,7 @@ configure_paths() {
     src_dirname="$HOME/Documents/src/Gnuplot/$archive_basename"
     archive_filename=$archive_basename$GNUPLOT_ARCHIVE_SUFFIX
     archive_pathname="$archive_dirname/$archive_filename"
+    archive_url=$GNUPLOT_MIRROR_BASE_URL/$version/$archive_filename
 }
 
 get_configure_options() (
