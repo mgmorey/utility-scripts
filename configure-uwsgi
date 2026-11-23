@@ -49,11 +49,10 @@ assert() {
 configure_paths() {
     archive_dirname="$UWSGI_ARCHIVE_DIR"
     archive_basename=uwsgi-$UWSGI_PROJECT_VERSION
-    archive_dir="$HOME/Downloads/uWSGI"
     # uWSGI cannot build out of tree, so the archive is extracted into the build tree
     src_dirname="$HOME/Documents/build/$archive_basename"
     archive_filename=$archive_basename.tar.gz
-    archive_pathname=$archive_dir/$archive_filename
+    archive_pathname=$archive_dirname/$archive_filename
     archive_url=$UWSGI_MIRROR_BASE_URL/$archive_filename
 }
 
