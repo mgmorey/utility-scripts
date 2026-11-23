@@ -106,13 +106,16 @@ get_prefix() {
 install_gnuplot() {
     if [ "$install" != true ]; then
 	return 0
-    elif [ "$ID" != windows -a "$(id -u)" -gt 0 ]; then
+    fi
+
+    install_prefix=$(get_prefix)
+
+    if [ "$ID" != windows -a "$(id -u)" -gt 0 -a ! -w "$install_prefix" ]; then
 	return 0
     fi
 
     umask 0022
     cd "$build_dirname"
-    install_prefix=$(get_prefix)
     make_install prefix="$install_prefix" install
     install_project_link "$install_prefix"
 }
