@@ -23,7 +23,7 @@ GIFLIB_MIRROR_BASE_URL=https://downloads.sourceforge.net/project/giflib
 
 GIFLIB_OPT_PREFIX=/opt/%s
 GIFLIB_PROJECT_NAME=giflib
-GIFLIB_PROJECT_VERSION=5.2.1
+GIFLIB_PROJECT_VERSION=6.1.3
 
 abort() {
     printf "$@" >&2
@@ -144,7 +144,7 @@ parse_arguments() {
 		;;
 	    (v)
 		case $OPTARG in
-		    (5.[0-9].[0-9]|5.[1-9][0-9].[0-9])
+		    ([56].[0-9].[0-9]|[56].[1-9][0-9].[0-9])
 			version=$OPTARG
 			;;
 		    (*)
