@@ -2,6 +2,6 @@
 
 # install-vagrant: install Vagrant from the HashiCorp repository
 
-dnf install -y yum-utils
+dnf install -y dnf-utils
 yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
 dnf -y install vagrant

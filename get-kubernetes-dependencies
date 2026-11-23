@@ -25,10 +25,10 @@ software-properties-common"
 FEDORA_PKGS="dnf-utils redhat-lsb-core"
 
 ORACLE_7_PKGS="redhat-lsb-core yum-utils"
-ORACLE_8_PKGS="redhat-lsb-core yum-utils"
+ORACLE_8_PKGS="dnf-utils redhat-lsb-core"
 
 REDHAT_7_PKGS="redhat-lsb-core yum-utils"
-REDHAT_8_PKGS="redhat-lsb-core yum-utils"
+REDHAT_8_PKGS="dnf-utils redhat-lsb-core"
 
 abort() {
     printf "$@" >&2
