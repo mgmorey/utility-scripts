@@ -47,6 +47,7 @@ assert() {
 configure_paths() {
     archive_dirname="$TREE_SITTER_ARCHIVE_DIR"
     archive_basename=$TREE_SITTER_PROJECT_NAME-$version
+    build_dirname="$HOME/Documents/build/$archive_basename"
     src_dirname="$HOME/Documents/src/TreeSitter/$archive_basename"
     archive_filename=$archive_basename$TREE_SITTER_ARCHIVE_SUFFIX
     archive_pathname="$TREE_SITTER_ARCHIVE_DIR/$archive_filename"
@@ -57,28 +58,41 @@ configure_tree_sitter() {
     umask 0022
 
     if [ "$force" = true ]; then
-	rm -rf "$src_dirname" "$archive_pathname"
+        rm -rf "$build_dirname" "$src_dirname" "$archive_pathname"
     fi
 
-    mkdir -p "$archive_dirname" "$src_dirname"
+    mkdir -p "$archive_dirname" "$build_dirname" "$src_dirname"
     download_archive "$archive_pathname" "$archive_url"
     extract_archive "$archive_pathname" "$src_dirname"
+    cd "$build_dirname"
 
-    # There is no configure script; the prefix is built into tree-sitter.pc
-    cd "$src_dirname"
+    # The source tree is never written to; CMake builds in the build tree
+    if ! which cmake >/dev/null 2>&1; then
+        abort '%s: cmake not found\n' "$script"
+    fi
+
+    command=$(get_cmake_command "$src_dirname")
+    printf '%s\n' "$command"
+    eval "$command"
 
     if [ "$build" = true ]; then
-	$make clean
-	make_build PREFIX="$(get_prefix)" ${cc:+"CC=$cc"}
+        make_build
     fi
 
     if [ "$check" = true ]; then
-	printf '%s: no tests to run without the Tree-sitter CLI\n' "$script" >&2
+        printf '%s: no tests to run without the Tree-sitter CLI\n' "$script" >&2
     fi
 }
 
+# The shared library is built; the prefix is recorded in tree-sitter.pc
+get_cmake_command() {
+    printf '%s' "${cc:+CC=\"$cc\" }cmake -S \"$1\" -B ."
+    printf ' -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_LIBDIR=lib'
+    printf ' -DCMAKE_INSTALL_PREFIX="%s"\n' "$(get_prefix)"
+}
+
 get_dependencies() {
-    get-packages bootstrap tree-sitter-build
+    get-packages bootstrap development tree-sitter-build
 }
 
 get_prefix() {
@@ -97,8 +111,8 @@ install_tree_sitter() {
     fi
 
     umask 0022
-    cd "$src_dirname"
-    make_install PREFIX="$install_prefix" install
+    cd "$build_dirname"
+    make_install install
     install_project_link "$install_prefix"
 }
 
