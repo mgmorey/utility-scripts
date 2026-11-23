@@ -19,7 +19,7 @@
 UWSGI_ARCHIVE_DIR="$HOME/Downloads/uWSGI"
 UWSGI_ARCHIVE_SUFFIX=.tar.gz
 
-UWSGI_MIRROR_BASE_URL=https://projects.unbit.it/downloads
+UWSGI_MIRROR_BASE_URL=https://files.pythonhosted.org/packages/source/u/uwsgi
 
 UWSGI_OPT_PREFIX=/opt/%s
 UWSGI_PROJECT_NAME=uwsgi
