@@ -23,7 +23,7 @@ LIBPSL_MIRROR_BASE_URL=https://github.com/rockdaboot/libpsl/releases/download
 
 LIBPSL_OPT_PREFIX=/opt/%s
 LIBPSL_PROJECT_NAME=libpsl
-LIBPSL_PROJECT_VERSION=0.21.5
+LIBPSL_PROJECT_VERSION=0.23.3
 
 abort() {
     printf "$@" >&2
