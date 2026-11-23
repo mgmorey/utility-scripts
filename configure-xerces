@@ -77,7 +77,8 @@ configure_xerces() {
     eval "$command"
 
     if [ "$build" = true ]; then
-	make_build
+	# The Xerces-C 2 makefiles are not parallel-safe
+	make_build -j1
     fi
 
     if [ "$check" = true ]; then
@@ -98,7 +99,7 @@ get_xerces_basename() {
 }
 
 get_xerces_configure_command() (
-    printf '%s\n' ./runConfigure -b 64 -p linux
+    printf '%s\n' "./runConfigure -b 64 -p linux"
 )
 
 get_xerces_url() {
@@ -231,6 +232,12 @@ validate_platform() {
 		    return
 		    ;;
 		(8.*)
+		    return
+		    ;;
+		(9.*)
+		    return
+		    ;;
+		(10.*)
 		    return
 		    ;;
 		(*)

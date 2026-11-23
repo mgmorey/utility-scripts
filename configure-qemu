@@ -222,6 +222,12 @@ validate_platform() {
 		(8.*)
 		    return
 		    ;;
+		(9.*)
+		    return
+		    ;;
+		(10.*)
+		    return
+		    ;;
 		(*)
 		    abort_not_supported Release
 		    ;;
