@@ -22,7 +22,7 @@ NASM_ARCHIVE_SUFFIX=.tar.xz
 NASM_MIRROR_BASE_URL=https://www.nasm.us/pub/nasm/releasebuilds
 
 NASM_PROJECT_NAME=nasm
-NASM_PROJECT_VERSION=2.16.03
+NASM_PROJECT_VERSION=3.02
 
 abort() {
     printf "$@" >&2
@@ -62,7 +62,7 @@ configure_nasm() {
     eval "$command"
 
     if [ "$build" = true ]; then
-	make_build all rdf
+	make_build all $(get_rdf_target rdf)
     fi
 }
 
@@ -94,6 +94,13 @@ get_prefix() {
     printf "$prefix" "$NASM_PROJECT_NAME-$version"
 }
 
+# NASM 3 dropped the RDF tools
+get_rdf_target() {
+    if [ "${version%%.*}" -lt 3 ]; then
+	printf '%s\n' "$1"
+    fi
+}
+
 install_nasm() {
     if [ "$install" != true ]; then
 	return 0
@@ -107,7 +114,7 @@ install_nasm() {
 
     umask 0022
     cd "$build_dirname"
-    make_install prefix="$install_prefix" install install_rdf
+    make_install prefix="$install_prefix" install $(get_rdf_target install_rdf)
     install_project_link "$install_prefix"
 }
 
