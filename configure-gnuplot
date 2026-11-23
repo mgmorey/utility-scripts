@@ -23,7 +23,7 @@ GNUPLOT_MIRROR_BASE_URL=https://downloads.sourceforge.net/project/gnuplot/gnuplo
 
 GNUPLOT_OPT_PREFIX=/opt/%s
 GNUPLOT_PROJECT_NAME=gnuplot
-GNUPLOT_PROJECT_VERSION=6.0.2
+GNUPLOT_PROJECT_VERSION=6.0.6
 
 abort() {
     printf "$@" >&2
