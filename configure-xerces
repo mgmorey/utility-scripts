@@ -23,7 +23,7 @@ XERCES_MIRROR_BASE_URL=https://archive.apache.org
 
 XERCES_OPT_PREFIX=/opt/%s
 XERCES_PROJECT_NAME=xerces
-XERCES_PROJECT_VERSION=2.8.0
+XERCES_PROJECT_VERSION=3.3.0
 
 abort() {
     printf "$@" >&2
@@ -49,8 +49,15 @@ assert() {
 configure_paths() {
     archive_dirname="$XERCES_ARCHIVE_DIR"
     archive_basename=$(get_xerces_basename $XERCES_PROJECT_NAME $version)
-    # Xerces-C cannot build out of tree, so the archive is extracted into the build tree
-    src_dirname="$HOME/Documents/build/$archive_basename"
+    build_dirname="$HOME/Documents/build/$archive_basename"
+
+    if [ "$(get_xerces_major)" -ge 3 ]; then
+	src_dirname="$HOME/Documents/src/Apache/$archive_basename"
+    else
+	# Xerces-C 2 cannot build out of tree, so the archive is extracted into the build tree
+	src_dirname=$build_dirname
+    fi
+
     archive_filename=$archive_basename$XERCES_ARCHIVE_SUFFIX
     archive_pathname="$archive_dirname/$archive_filename"
     archive_url=$(get_xerces_url \
@@ -63,28 +70,53 @@ configure_xerces() {
     umask 0022
 
     if [ "$force" = true ]; then
-	rm -rf "$src_dirname" "$archive_pathname"
+	rm -rf "$build_dirname" "$src_dirname" "$archive_pathname"
     fi
 
-    mkdir -p "$src_dirname" "$archive_dirname"
+    mkdir -p "$build_dirname" "$src_dirname" "$archive_dirname"
     download_archive "$archive_pathname" "$archive_url"
     extract_archive "$archive_pathname" "$src_dirname"
 
-    export XERCESCROOT="$src_dirname"
-    command=$(get_xerces_configure_command "$src_dirname")
-    cd "$src_dirname/src/xercesc"
+    if [ "$(get_xerces_major)" -ge 3 ]; then
+	cd "$build_dirname"
+	command=$(get_configure_command "$src_dirname")
+	build_options=
+	check_target=
+    else
+	export XERCESCROOT="$src_dirname"
+	command=$(get_xerces_configure_command "$src_dirname")
+	cd "$src_dirname/src/xercesc"
+	# The Xerces-C 2 makefiles are not parallel-safe
+	build_options=-j1
+	check_target=test
+    fi
+
     printf '%s\n' "$command"
     eval "$command"
 
     if [ "$build" = true ]; then
-	# The Xerces-C 2 makefiles are not parallel-safe
-	make_build -j1
+	make_build $build_options
     fi
 
     if [ "$check" = true ]; then
-	make_check "test"
+	if [ -n "$check_target" ]; then
+	    make_check "$check_target"
+	else
+	    # The upstream test harness writes its logs into the source tree
+	    printf '%s: Xerces-C 3 tests cannot run out of tree\n' "$script" >&2
+	fi
     fi
 }
+
+get_configure_options() (
+    if [ -n "${prefix-}" ]; then
+	options="${options:+$options }--prefix=$(get_prefix)"
+    fi
+
+    if [ -n "${options:-}" ]; then
+	printf '%s\n' "$options"
+    fi
+)
 
 get_dependencies() {
     get-packages $XERCES_PROJECT_NAME-build $XERCES_PROJECT_NAME-test
@@ -95,12 +127,20 @@ get_prefix() {
 }
 
 get_xerces_basename() {
-    printf '%s-c-src_%s\n' "$1" "$2" | tr '.' '_'
+    if [ "$(get_xerces_major)" -ge 3 ]; then
+	printf '%s-c-%s\n' "$1" "$2"
+    else
+	printf '%s-c-src_%s\n' "$1" "$2" | tr '.' '_'
+    fi
 }
 
 get_xerces_configure_command() (
     printf '%s\n' "./runConfigure -b 64 -p linux"
 )
+
+get_xerces_major() {
+    printf '%s\n' "${version%%.*}"
+}
 
 get_xerces_url() {
     major_version=$(printf '%s\n' "$2" | cut -d. -f1)
@@ -119,7 +159,7 @@ install_xerces() {
     fi
 
     umask 0022
-    cd "$src_dirname"
+    cd "$build_dirname"
     make_install prefix="$install_prefix" install
     install_project_link "$install_prefix"
 }
