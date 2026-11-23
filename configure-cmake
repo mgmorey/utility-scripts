@@ -1,0 +1,362 @@
+#!/bin/sh -eu
+
+# configure-cmake: download and configure CMake
+# Copyright (C) 2026  "Michael G. Morey" <mgmorey@gmail.com>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+CMAKE_ARCHIVE_DIR="$HOME/Downloads/CMake"
+CMAKE_ARCHIVE_SUFFIX=.tar.gz
+
+# Releases are in directories named v<VERSION> under the base URL
+CMAKE_MIRROR_BASE_URL=${CMAKE_MIRROR_BASE_URL:-https://github.com/Kitware/CMake/releases/download}
+
+CMAKE_OPT_PREFIX=/opt/%s
+CMAKE_PROJECT_NAME=cmake
+CMAKE_PROJECT_VERSION=4.5.1
+
+abort() {
+    printf "$@" >&2
+    exit 1
+}
+
+abort_invalid_prefix() {
+    usage_error '%s: invalid prefix -- %s\n' "$script" "$*"
+}
+
+abort_invalid_version() {
+    usage_error '%s: invalid version -- %s\n' "$script" "$*"
+}
+
+abort_not_supported() {
+    abort '%s: %s: %s not supported\n' "$script" "$PRETTY_NAME" "$*"
+}
+
+assert() {
+    "$@" || abort '%s: Assertion failed: %s\n' "$script" "$*"
+}
+
+configure_cmake() {
+    umask 0022
+
+    if [ "$force" = true ]; then
+        rm -rf "$build_dirname" "$src_dirname" "$archive_pathname" \
+           "$sums_pathname" "$sums_pathname.asc"
+    fi
+
+    mkdir -p "$build_dirname" "$src_dirname" "$archive_dirname"
+    download_file "$archive_pathname" "$archive_url"
+    verify_release
+    extract_archive "$archive_pathname" "$src_dirname"
+    cd "$build_dirname"
+
+    # CMake bootstraps itself from the source tree, using a separate build tree
+    command=$(get_bootstrap_command "$src_dirname")
+    printf '%s\n' "$command"
+    eval "$command"
+
+    if [ "$build" = true ]; then
+        make_build
+    fi
+
+    if [ "$check" = true ]; then
+        make_check "test"
+    fi
+}
+
+configure_paths() {
+    archive_dirname="$CMAKE_ARCHIVE_DIR"
+    archive_basename=$CMAKE_PROJECT_NAME-$version
+    build_dirname="$HOME/Documents/build/$archive_basename"
+    src_dirname="$HOME/Documents/src/CMake/$archive_basename"
+    archive_filename=$archive_basename$CMAKE_ARCHIVE_SUFFIX
+    archive_pathname="$CMAKE_ARCHIVE_DIR/$archive_filename"
+    release_url=$CMAKE_MIRROR_BASE_URL/v$version
+    archive_url=$release_url/$archive_filename
+    sums_filename=$archive_basename-SHA-256.txt
+    sums_pathname="$CMAKE_ARCHIVE_DIR/$sums_filename"
+    sums_url=$release_url/$sums_filename
+}
+
+download_file() {
+    assert [ $# -eq 2 ]
+    assert [ -n "$1" ]
+    assert [ -n "$2" ]
+
+    if [ -s "$1" ]; then
+        return 0
+    fi
+
+    if ! (cd "$(dirname "$1")" &&
+              { download_using_curl "$(basename "$1")" "$2" ||
+                    download_using_wget "$(basename "$1")" "$2"; }); then
+        rm -f "$1"
+        abort '%s: %s: download failed\n' "$script" "$2"
+    fi
+}
+
+get_bootstrap_command() {
+    printf '%s' "$1/bootstrap"
+
+    if [ -n "${prefix-}" ]; then
+        printf ' --prefix="%s"' "$(get_prefix)"
+    fi
+
+    printf ' --parallel=%s\n' "$(nproc)"
+}
+
+get_dependencies() {
+    get-packages $CMAKE_PROJECT_NAME-build $CMAKE_PROJECT_NAME-test
+}
+
+get_prefix() {
+    printf "$prefix" "$CMAKE_PROJECT_NAME-$version"
+}
+
+install_cmake() {
+    if [ "$install" != true ]; then
+        return 0
+    fi
+
+    install_prefix=$(get_prefix)
+
+    if [ "$ID" != windows -a "$(id -u)" -gt 0 -a ! -w "$install_prefix" ]; then
+        return 0
+    fi
+
+    umask 0022
+    cd "$build_dirname"
+    make_install install
+    install_project_link "$install_prefix"
+}
+
+parse_arguments() {
+    build=true
+    check=false
+    force=false
+    install=false
+    keep=false
+    prefix=$(get_default_prefix "$CMAKE_OPT_PREFIX")
+    version=$CMAKE_PROJECT_VERSION
+
+    while getopts bcfiknp:v:h opt; do
+        case $opt in
+            (b)
+                build=true
+                ;;
+            (c)
+                check=true
+                ;;
+            (f)
+                build=true
+                force=true
+                ;;
+            (i)
+                install=true
+                ;;
+            (k)
+                keep=true
+                ;;
+            (n)
+                build=false
+                force=false
+                ;;
+            (p)
+                case $OPTARG in
+                    ($HOME/.local|$LOCAL_PREFIX|$CMAKE_OPT_PREFIX|/*)
+                        prefix=$OPTARG
+                        ;;
+                    (*)
+                        abort_invalid_prefix $OPTARG
+                        ;;
+                esac
+                ;;
+            (v)
+                case $OPTARG in
+                    ([3-9].[0-9].[0-9]|[3-9].[0-9].[1-9][0-9]|\
+[3-9].[1-9][0-9].[0-9]|[3-9].[1-9][0-9].[1-9][0-9])
+                        version=$OPTARG
+                        ;;
+                    (*)
+                        abort_invalid_version $OPTARG
+                        ;;
+                esac
+                ;;
+            (h)
+                usage
+                exit 0
+                ;;
+            (\?)
+                exit 2
+                ;;
+        esac
+    done
+
+    shift $(($OPTIND - 1))
+
+    if [ $# -gt 0 ]; then
+        usage_error '%s: Too many arguments\n' "$script"
+    fi
+}
+
+usage() {
+    cat <<EOF >&2
+Usage: $script [-b] [-c] [-f] [-i] [-k] [-n] [-p PREFIX] [-v VERSION]
+       $script -h
+EOF
+}
+
+usage_error() {
+    if [ $# -gt 0 ]; then
+        printf "$@" >&2
+    fi
+
+    printf '%s\n' '' >&2
+    usage
+    exit 2
+}
+
+validate_platform() {
+    case "$ID" in
+        (centos)
+            case "$VERSION_ID" in
+                (7)
+                    return
+                    ;;
+                (8)
+                    return
+                    ;;
+                (*)
+                    abort_not_supported Release
+                    ;;
+            esac
+            ;;
+        (debian|raspbian)
+            return
+            ;;
+        (fedora)
+            return
+            ;;
+        (opensuse-*)
+            return
+            ;;
+        (rhel|ol|almalinux|rocky)
+            case "$VERSION_ID" in
+                (7.*)
+                    return
+                    ;;
+                (8.*)
+                    return
+                    ;;
+                (9.*)
+                    return
+                    ;;
+                (10.*)
+                    return
+                    ;;
+                (*)
+                    abort_not_supported Release
+                    ;;
+            esac
+            ;;
+        (ubuntu)
+            return
+            ;;
+        (freebsd)
+            return
+            ;;
+        (illumos)
+            return
+            ;;
+        (macos)
+            return
+            ;;
+        (netbsd)
+            return
+            ;;
+        (solaris)
+            return
+            ;;
+        (*)
+            abort_not_supported "Operating system"
+            ;;
+    esac
+}
+
+# Kitware signs the checksum file, not the archive
+verify_release() {
+    if [ "${GPG_VERIFY-true}" = false ]; then
+        return 0
+    fi
+
+    download_file "$sums_pathname" "$sums_url"
+
+    if which gpg >/dev/null 2>&1; then
+        download_file "$sums_pathname.asc" "$sums_url.asc"
+
+        if ! gpg --batch --no-auto-key-retrieve \
+             --verify "$sums_pathname.asc" "$sums_pathname" >&2; then
+            abort '%s: %s: signature not verified; %s\n' "$script" \
+                  "$sums_pathname" \
+                  'import the signing key or set GPG_VERIFY=false'
+        fi
+    else
+        printf '%s: gpg not found; signature not verified\n' "$script" >&2
+    fi
+
+    checksum=$(awk -v name="$archive_filename" '$2 == name { print $1 }' \
+                   "$sums_pathname")
+
+    if [ -z "$checksum" ]; then
+        abort '%s: %s: no checksum for %s\n' "$script" "$sums_pathname" \
+              "$archive_filename"
+    fi
+
+    verify_checksum "$archive_pathname" "$checksum"
+}
+
+script=$(basename "$0")
+
+case "$0" in
+    (*/*)
+        script_dir=$(cd "$(dirname "$0")" && pwd)
+        ;;
+    (*)
+        script_dir=
+        ;;
+esac
+
+script_prefix=${script_dir:+$script_dir/}
+
+. "${script_prefix}common-functions.sh"
+. "${script_prefix}config-functions.sh"
+
+set_user_profile "$script_dir"
+eval "$(get-os-release -x)"
+validate_platform
+configure_platform
+parse_arguments "$@"
+configure_paths
+
+if [ "$keep" != true ]; then
+    install_dependencies
+fi
+
+if [ "$(id -u)" -eq 0 ]; then
+    run_unpriv /bin/sh -c "$0 $*"
+else
+    configure_cmake
+fi
+
+install_cmake

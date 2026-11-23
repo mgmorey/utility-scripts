@@ -228,6 +228,7 @@ projects="m4 pkgconf ncurses texinfo gmp nettle gnutls tree-sitter emacs"
 | Script | Description |
 |---|---|
 | `configure-binutils` | Download and configure GNU Binutils |
+| `configure-cmake` | Download and bootstrap CMake |
 | `configure-cppcheck` | Download and configure Cppcheck |
 | `configure-ctags` | Download and configure Universal Ctags |
 | `configure-curl` | Download and configure cURL |
