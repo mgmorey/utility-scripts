@@ -144,8 +144,10 @@ download_archive() {
     if [ ! -r "$1" -o ! -s "$1" ]; then
 	cd "$(dirname "$1")"
 
-	if ! download_using_curl "$(basename "$1")" "$2"; then
-	    download_using_wget "$(basename "$1")" "$2"
+	if ! download_using_curl "$(basename "$1")" "$2" &&
+	   ! download_using_wget "$(basename "$1")" "$2"; then
+	    rm -f "$1"
+	    abort '%s: %s: download failed\n' "$script" "$2"
 	fi
     fi
 
