@@ -63,7 +63,8 @@ configure_paths() {
     basename=$GIFLIB_PROJECT_NAME-$version
     filename=$basename$GIFLIB_ARCHIVE_SUFFIX
     pathname="$GIFLIB_ARCHIVE_DIR/$filename"
-    src_dir="$HOME/Documents/src/GIFLIB/$basename"
+    # GIFLIB cannot build out of tree, so the archive is extracted into the build tree
+    src_dir="$HOME/Documents/build/$basename"
 }
 
 get_configure_options() (

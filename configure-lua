@@ -73,7 +73,8 @@ configure_lua() {
 configure_paths() {
     archive_dirname="$LUA_ARCHIVE_DIR"
     archive_basename=$LUA_PROJECT_NAME-$version
-    src_dirname="$HOME/Documents/src/Lua/$archive_basename"
+    # Lua cannot build out of tree, so the archive is extracted into the build tree
+    src_dirname="$HOME/Documents/build/$archive_basename"
     archive_filename=$archive_basename$LUA_ARCHIVE_SUFFIX
     archive_pathname="$LUA_ARCHIVE_DIR/$archive_filename"
     archive_url=$LUA_BASE_URL/$archive_filename

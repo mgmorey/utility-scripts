@@ -47,7 +47,8 @@ assert() {
 configure_paths() {
     archive_dirname="$SBCL_ARCHIVE_DIR"
     archive_basename=$SBCL_PROJECT_NAME-$version-source
-    src_dirname="$HOME/Documents/src/SBCL/${archive_basename%-source}"
+    # SBCL cannot build out of tree, so the archive is extracted into the build tree
+    src_dirname="$HOME/Documents/build/${archive_basename%-source}"
     archive_filename=$archive_basename$SBCL_ARCHIVE_SUFFIX
     archive_pathname="$archive_dirname/$archive_filename"
 }
