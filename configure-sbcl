@@ -19,6 +19,8 @@
 SBCL_ARCHIVE_DIR="$HOME/Downloads/SBCL"
 SBCL_ARCHIVE_SUFFIX=.tar.bz2
 
+SBCL_MIRROR_BASE_URL=https://downloads.sourceforge.net/project/sbcl/sbcl
+
 SBCL_OPT_PREFIX=/opt/%s
 SBCL_PROJECT_NAME=sbcl
 SBCL_PROJECT_VERSION=2.5.3
@@ -51,6 +53,7 @@ configure_paths() {
     src_dirname="$HOME/Documents/build/${archive_basename%-source}"
     archive_filename=$archive_basename$SBCL_ARCHIVE_SUFFIX
     archive_pathname="$archive_dirname/$archive_filename"
+    archive_url=$SBCL_MIRROR_BASE_URL/$version/$archive_filename
 }
 
 configure_sbcl() {
@@ -60,7 +63,8 @@ configure_sbcl() {
 	/bin/rm -rf "$src_dirname"
     fi
 
-    mkdir -p "$(dirname "$src_dirname")"
+    mkdir -p "$(dirname "$src_dirname")" "$archive_dirname"
+    download_archive "$archive_pathname" "$archive_url"
     extract_archive "$archive_pathname" "$src_dirname"
     cd "$src_dirname"
 
