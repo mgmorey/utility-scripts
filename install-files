@@ -124,7 +124,7 @@ install_files() {
 	    esac
 	    ;;
 	(symlink)
-	    ln -sf "$@" "$target_dir"
+	    ln -srf "$@" "$target_dir"
 	    ;;
     esac
 }
