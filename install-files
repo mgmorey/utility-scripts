@@ -41,6 +41,17 @@ get_install_options() {
     esac
 }
 
+get_symlink_command() {
+    case "$ID" in
+	(macos)
+	    printf '%s\n' gln
+	    ;;
+	(*)
+	    printf '%s\n' ln
+	    ;;
+    esac
+}
+
 install_files() {
     method=install
     mode=
@@ -124,7 +135,8 @@ install_files() {
 	    esac
 	    ;;
 	(symlink)
-	    ln -srf "$@" "$target_dir"
+	    symlink=$(get_symlink_command)
+	    $symlink -srf "$@" "$target_dir"
 	    ;;
     esac
 }
